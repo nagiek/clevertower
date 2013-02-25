@@ -24,7 +24,6 @@ require.config
     
     # Plugins
     # -------
-    "backbone.validateAll": "libs/plugins/Backbone.validateAll"
     bootstrap:              "libs/bootstrap/bootstrap.min"
     text:                   "libs/plugins/text"
     i18n:                   "libs/plugins/i18n"
@@ -63,16 +62,13 @@ require.config
       # Exports the global window.Backbone object
       exports: "Backbone"
     
-    # Backbone.validateAll plugin that depends on Backbone
-    "backbone.validateAll": ["backbone"]
-    
   config:
     i18n:
       locale: localStorage.getItem('locale') || 'en-en'
 
 
 # Include Desktop Specific JavaScript files here (or inside of your Desktop router)
-require ["jquery", "backbone", "routers/AppRouter", "json2", "jqueryui", "jquerymobile", "backbone.validateAll", "datepickermobile"], ($, Backbone, MobileRouter) ->
+require ["jquery", "backbone", "routers/App", "json2", "jqueryui", "jquerymobile", "datepickermobile"], ($, Backbone, AppRouter) ->
   
   # Prevents all anchor click handling
   $.mobile.linkBindingEnabled = false

@@ -24,7 +24,6 @@ require.config
     
     # Plugins
     # -------
-    "backbone.validateAll": "libs/plugins/Backbone.validateAll"
     bootstrap:              "libs/bootstrap/bootstrap"
     text:                   "libs/plugins/text"
     i18n:                   "libs/plugins/i18n"
@@ -62,39 +61,36 @@ require.config
       # Exports the global window.Backbone object
       exports: "Parse"
     
-    # Backbone.validateAll plugin that depends on Backbone
-    "backbone.validateAll": ["backbone"]
-    
   config:
     i18n:
       locale: localStorage.getItem('locale') || 'en-en'
 
 
 # Includes Desktop Specific JavaScript files here (or inside of your Desktop router)
-require ["jquery", "backbone", "routers/AppRouter", "json2", "jqueryui", "bootstrap", "backbone.validateAll"], ($, Parse, AppRouter) ->
+require ["jquery", "backbone", "routers/App", "json2", "jqueryui", "bootstrap"], ($, Parse, AppRouter) ->
   
   Parse.initialize "6XgIM84FecTslR8rnXBZsjnDqZgVISa946m9OmfO", "Jf4WgWUgu7R39oy5AZotay42dEDY5neMEoJddKEY" # JS Key
   
   # Instantiates a new Desktop Router instance
   new AppRouter()
   
-  # Only need this for pushState enabled browsers
-  if Parse.history and Parse.history._hasPushState
-
-    # Use delegation to avoid initial DOM selection and allow all matching elements to bubble
-    $(document).delegate "a", "click", (e) ->
-    
-      # Get the anchor href and protcol
-      href = $(this).attr("href")
-      protocol = @protocol + "//"
-    
-      # Ensure the protocol is not part of URL, meaning its relative.
-      # Stop the event bubbling to ensure the link will not cause a page refresh.
-      if href.slice(protocol.length) isnt protocol
-        e.preventDefault()
-    
-        # Note by using Backbone.history.navigate, router events will not be
-        # triggered.  If this is a problem, change this to navigate on your
-        # router.
-        Parse.history.navigate href, true
+  # # Only need this for pushState enabled browsers
+  # if Parse.history and Parse.history._hasPushState
+  # 
+  #   # Use delegation to avoid initial DOM selection and allow all matching elements to bubble
+  #   $(document).delegate "a", "click", (e) ->
+  #   
+  #     # Get the anchor href and protcol
+  #     href = $(this).attr("href")
+  #     protocol = @protocol + "//"
+  #   
+  #     # Ensure the protocol is not part of URL, meaning its relative.
+  #     # Stop the event bubbling to ensure the link will not cause a page refresh.
+  #     if href.slice(protocol.length) isnt protocol
+  #       e.preventDefault()
+  #   
+  #       # Note by using Backbone.history.navigate, router events will not be
+  #       # triggered.  If this is a problem, change this to navigate on your
+  #       # router.
+  #       Parse.history.navigate href, true
 

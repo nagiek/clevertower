@@ -1,18 +1,21 @@
-<header id="header"></header>
-<div class="login">
-  <form class="login-form">
-    <h2>Log In</h2>
+<a id="lLabel" data-toggle="dropdown" href="#" role="button" class="dropdown-toggle">
+  Login
+</a>
+<div aria-labelledby="lLabel" class="dropdown-menu pull-right">
+  <form class="login-form form-inline">
     <div class="error" style="display:none"></div>
-    <input type="text" id="login-username" placeholder="Username" />
-    <input type="password" id="login-password" placeholder="Password" />
-    <button>Log In</button>
-  </form>
-
-  <form class="signup-form">
-    <h2>Sign Up</h2>
-    <div class="error" style="display:none"></div>
-    <input type="text" id="signup-username" placeholder="Username" />
-    <input type="password" id="signup-password" placeholder="Create a Password" />
-    <button>Sign Up</button>
+    <div class="control-group">
+      <label for="login-username" class="control-label hide">Email:</label>
+      <div class="controls">
+        <input type="email" name="login-username" id="login-username" class="span" size="22" placeholder="Email">
+      </div>
+    </div>
+    <div class="control-group">
+      <label for="login-password" class="control-label hide">Password:</label>
+      <div class="controls">
+        <input type="password" name="password" id="login-password" class="span" size="22" placeholder="Password">
+      </div>
+    </div>
+    <button class="btn btn-block">Log In</button>
   </form>
 </div>

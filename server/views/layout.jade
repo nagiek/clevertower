@@ -35,7 +35,7 @@ html(lang="en")
     #page.page(data-role='page')      
       
       header(data-role='header', role="navigation")
-        .navbar.navbar-fixed-top
+        #primary-nav.navbar.navbar-fixed-top
           .navbar-inner
             .container
               button.btn.btn-navbar(data-target=".nav-collapse", data-toggle="collapse")
@@ -52,32 +52,15 @@ html(lang="en")
                       input.input-medium.search-query(type="text", name="q", placeholder="Search")
                         button.btn.element-hidden(type="submit") Search
                 ul.nav.pull-right#user-menu
-                  li
-                    a#profile Profile
-                  li.dropdown      
-                    a#pLabel.dropdown-toggle(data-target="#", data-toggle="dropdown", href="/user_network_path", role="button")
-                      i.icon.icon-cog
-                    ul.dropdown-menu.pull-right(aria-labelledby="pLabel", role="menu")
-                  li.dropdown      
-                    a#nLabel.dropdown-toggle(data-target="#", data-toggle="dropdown", href="/user_notifications_path", role="button")
-                      i.icon.icon-flag
-                    ul.dropdown-menu.pull-right(aria-labelledby="nLabel", role="menu")
-                  li
-                    a#logout Logout
-                ul.nav.pull-right#registration-menu(style="display:none;")
-                  li
-                    a(href="/signup") Sign up
-                  li
-                    a(href="/login") Login
 
       // Branding
       .brand-strip.hide
 
       // Main      
-      #main.container
+      .container
         #property-header
         .row
-          .span12
+          #main.span12
             block content
               #todoapp
                 .title

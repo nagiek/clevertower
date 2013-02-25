@@ -2,7 +2,7 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", "templates/user/menu"], function($, _, Parse) {
+  define(["jquery", "underscore", "backbone", "views/user/LoggedInMenu", "views/user/Login", "views/user/Signup"], function($, _, Parse, LoggedInView, LogInView, SignUpView) {
     var UserMenuView;
     return UserMenuView = (function(_super) {
 
@@ -12,29 +12,20 @@
         return UserMenuView.__super__.constructor.apply(this, arguments);
       }
 
-      UserMenuView.prototype.events = {
-        "click #logout": "logOut"
-      };
-
-      UserMenuView.prototype.el = ".content";
+      UserMenuView.prototype.el = "#user-menu";
 
       UserMenuView.prototype.initialize = function() {
-        _.bindAll(this, "logOut");
         return this.render();
       };
 
-      UserMenuView.prototype.logOut = function(e) {
-        var LoginView;
-        Parse.User.logOut();
-        LoginView = require("views/user/LoginView");
-        new LoginView();
-        this.undelegateEvents();
-        return delete this;
-      };
-
       UserMenuView.prototype.render = function() {
-        this.$el.html(JST["src/js/templates/user/menu.jst"]);
-        return this.delegateEvents();
+        if (Parse.User.current()) {
+          return new LoggedInView();
+        } else {
+          this.$el.html('<li id="login" class="dropdown"></li><li id="signup" class="dropdown"></li>');
+          new LogInView();
+          return new SignUpView();
+        }
       };
 
       return UserMenuView;

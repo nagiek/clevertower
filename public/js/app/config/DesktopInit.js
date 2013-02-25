@@ -10,7 +10,6 @@
       json2: "//cdnjs.cloudflare.com/ajax/libs/json2/20121008/json2",
       jquerymobile: '//cdnjs.cloudflare.com/ajax/libs/jquery-mobile/1.2.0/jquery.mobile.min',
       datepickermobile: 'libs/jqueryui/jquery.ui.datepicker.mobile.min',
-      "backbone.validateAll": "libs/plugins/Backbone.validateAll",
       bootstrap: "libs/bootstrap/bootstrap",
       text: "libs/plugins/text",
       i18n: "libs/plugins/i18n",
@@ -28,8 +27,7 @@
       backbone: {
         deps: ["underscore", "jquery"],
         exports: "Parse"
-      },
-      "backbone.validateAll": ["backbone"]
+      }
     },
     config: {
       i18n: {
@@ -38,20 +36,9 @@
     }
   });
 
-  require(["jquery", "backbone", "routers/AppRouter", "json2", "jqueryui", "bootstrap", "backbone.validateAll"], function($, Parse, AppRouter) {
+  require(["jquery", "backbone", "routers/App", "json2", "jqueryui", "bootstrap"], function($, Parse, AppRouter) {
     Parse.initialize("6XgIM84FecTslR8rnXBZsjnDqZgVISa946m9OmfO", "Jf4WgWUgu7R39oy5AZotay42dEDY5neMEoJddKEY");
-    new AppRouter();
-    if (Parse.history && Parse.history._hasPushState) {
-      return $(document).delegate("a", "click", function(e) {
-        var href, protocol;
-        href = $(this).attr("href");
-        protocol = this.protocol + "//";
-        if (href.slice(protocol.length) !== protocol) {
-          e.preventDefault();
-          return Parse.history.navigate(href, true);
-        }
-      });
-    }
+    return new AppRouter();
   });
 
 }).call(this);

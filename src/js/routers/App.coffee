@@ -1,16 +1,16 @@
-# Filename: router.js
 define [
   "jquery", 
   "backbone",
-  "views/app/AppView"
+  "views/app/Main"
 ], ($, Parse, AppView) ->
 
   class AppRouter extends Parse.Router
     routes:
-      ""        : "index"
+      ""         : "index"
+      "*actions" : "index"
 
     initialize: (options) ->
-      Parse.history.start();
-  
+      Parse.history.start pushState: true
+        
     index: ->
       new AppView()

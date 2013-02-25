@@ -10,7 +10,6 @@
       json2: "//cdnjs.cloudflare.com/ajax/libs/json2/20121008/json2",
       jquerymobile: '//cdnjs.cloudflare.com/ajax/libs/jquery-mobile/1.2.0/jquery.mobile.min',
       datepickermobile: 'libs/jqueryui/jquery.ui.datepicker.mobile.min',
-      "backbone.validateAll": "libs/plugins/Backbone.validateAll",
       bootstrap: "libs/bootstrap/bootstrap.min",
       text: "libs/plugins/text",
       i18n: "libs/plugins/i18n",
@@ -28,8 +27,7 @@
       backbone: {
         deps: ["underscore", "jquery"],
         exports: "Backbone"
-      },
-      "backbone.validateAll": ["backbone"]
+      }
     },
     config: {
       i18n: {
@@ -38,7 +36,7 @@
     }
   });
 
-  require(["jquery", "backbone", "routers/AppRouter", "json2", "jqueryui", "jquerymobile", "backbone.validateAll", "datepickermobile"], function($, Backbone, MobileRouter) {
+  require(["jquery", "backbone", "routers/App", "json2", "jqueryui", "jquerymobile", "datepickermobile"], function($, Backbone, AppRouter) {
     $.mobile.linkBindingEnabled = false;
     $.mobile.hashListeningEnabled = false;
     return new AppRouter();

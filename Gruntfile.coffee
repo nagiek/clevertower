@@ -15,18 +15,18 @@ module.exports = (grunt) ->
     pkg: grunt.file.readJSON 'package.json'
     
     # Converts Jade templates into HTML files.
-    # jade:
-    #   all:
-    #     files: [
-    #       expand: true
-    #       cwd: 'src/js/templates'
-    #       src: ['**/*.jade']
-    #       dest: 'public/js/app/templates'
-    #       ext: '.html'  
-    #     ]
-    #     options:
-    #       runtime: false
-    #       client: false
+    jade:
+      all:
+        files: [
+          expand: true
+          cwd: 'src/js/templates'
+          src: ['**/*.jade']
+          dest: 'public/js/app/templates'
+          ext: '.html'  
+        ]
+        options:
+          runtime: false
+          client: false
           
     coffee:
       all:
@@ -72,7 +72,13 @@ module.exports = (grunt) ->
           cwd: 'src/js/templates'
           src: ['**/*.jst']
           dest: 'public/js/app/templates'
-          ext: '.js'  
+          ext: '.js'
+        ,
+          expand: true
+          cwd: 'public/js/app/templates'
+          src: ['**/*.html']
+          dest: 'public/js/app/templates'
+          ext: '.js'
         ]
         options:
           amdWrapper: true
@@ -186,6 +192,9 @@ module.exports = (grunt) ->
       coffee:
         files: 'src/js/**/*.coffee'
         tasks: 'coffee'
+      jst:
+        files: 'src/js/templates/**/*.jst'
+        tasks: 'jst'
       jade:
         files: 'src/js/templates/*.jade'
         tasks: 'jade'

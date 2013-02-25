@@ -1,0 +1,16 @@
+<ul id="user-menu" class="nav pull-right">
+  <li><a id="profile" href="#"><%= Parse.User.current().get("username") %></a></li>
+  <li class="dropdown">
+    <a id="pLabel" data-target="#" data-toggle="dropdown" href="/user_network_path" role="button" class="dropdown-toggle">
+      <i class="icon icon-cog"></i>
+    </a>
+    <ul aria-labelledby="pLabel" role="menu" class="dropdown-menu pull-right"></ul>
+  </li>
+  <li class="dropdown">
+    <a id="nLabel" data-target="#" data-toggle="dropdown" href="/user_notifications_path" role="button" class="dropdown-toggle">
+      <i class="icon icon-flag"></i>
+    </a>
+    <ul aria-labelledby="nLabel" role="menu" class="dropdown-menu pull-right"></ul>
+  </li>
+  <li><a id="logout" href="#">Logout</a></li>
+</ul>

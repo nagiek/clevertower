@@ -4,8 +4,8 @@ define [
   "backbone", 
   'collections/todo/TodoList',
   'models/AppState',
-  'models/TodoModel',
-  'views/todo/TodoView',
+  'models/Todo',
+  'views/todo/Todo',
   'templates/todo/stats',
   'templates/todo/manage',
 ], ($, _, Parse, TodoList, AppState, Todo, TodoView, StatsTemplate, ManageTemplate) ->
@@ -31,7 +31,7 @@ define [
       self = this
       
       @state = new AppState
-      @state.set("filter", "all")
+      @state.set filter: "all"
       
       _.bindAll this, "addOne", "addAll", "addSome", "render", "toggleAllComplete", "createOnEnter"
     

@@ -7966,6 +7966,7 @@ label[for='toggle-all'] {
 .edit {
   position: relative;
   margin: 0;
+  height: 100%;
   width: 100%;
   font-size: 24px;
   font-family: inherit;
@@ -8524,6 +8525,11 @@ td.btn-group > .btn {
 }
 .comment-form .form-actions {
   margin-top: 0;
+}
+.dropdown-menu form {
+  margin-left: 4px;
+  margin-right: 4px;
+  margin-bottom: 0;
 }
 .dropdown-menu .dropdown-inline {
   display: block;
