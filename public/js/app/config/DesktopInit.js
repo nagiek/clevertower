@@ -15,6 +15,7 @@
       i18n: "libs/plugins/i18n",
       collections: "app/collections",
       models: "app/models",
+      nls: "app/nls",
       routers: "app/routers",
       templates: "app/templates",
       views: "app/views"
@@ -27,11 +28,6 @@
       backbone: {
         deps: ["underscore", "jquery"],
         exports: "Parse"
-      }
-    },
-    config: {
-      i18n: {
-        locale: localStorage.getItem('locale') || 'en-en'
       }
     }
   });

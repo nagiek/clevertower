@@ -1,34 +1,7 @@
 (function() {
 
   define({
-    root: {
-      actions: {
-        accept: "accept",
-        reject: "reject"
-      },
-      index: {
-        empty: "There are no tenants in your network."
-      },
-      in_property: {
-        empty: "There are no tenants in the property."
-      },
-      notices: {
-        create: 'Tenants added to lease',
-        update: 'Lease was successfully updated with new tenants.'
-      },
-      fields: {
-        state: {
-          active: "Active",
-          invited: "Invited",
-          pending: "Pending"
-        }
-      },
-      errors: {
-        messages: {
-          unique_tenant: "This user has already been added."
-        }
-      }
-    }
+    root: true
   });
 
 }).call(this);

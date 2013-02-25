@@ -2,7 +2,7 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", 'templates/user/login'], function($, _, Parse) {
+  define(["jquery", "underscore", "backbone", "i18n!nls/devise", "i18n!nls/user", 'templates/user/login'], function($, _, Parse, i18nDevise, i18nUser) {
     var LoginView;
     return LoginView = (function(_super) {
 
@@ -38,7 +38,7 @@
             return delete _this;
           },
           error: function(user, error) {
-            _this.$(".login-form .error").html("Invalid email or password. Please try again.").show();
+            _this.$(".login-form .error").html(i18nDevise.errors.invalid_login).show();
             return _this.$(".login-form button").removeAttr("disabled");
           }
         });
@@ -47,7 +47,7 @@
       };
 
       LoginView.prototype.render = function() {
-        this.$el.html(JST["src/js/templates/user/login.jst"]);
+        this.$el.html(JST["src/js/templates/user/login.jst"], i18nDevise, i18nUser);
         this.delegateEvents();
         return this;
       };

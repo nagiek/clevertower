@@ -32,6 +32,7 @@ require.config
     # -------------------
     collections:  "app/collections"
     models:       "app/models"
+    nls:          "app/nls"
     routers:      "app/routers"
     templates:    "app/templates"
     views:        "app/views"
@@ -61,9 +62,10 @@ require.config
       # Exports the global window.Backbone object
       exports: "Parse"
     
-  config:
-    i18n:
-      locale: localStorage.getItem('locale') || 'en-en'
+  # config:
+  #   i18n:
+  #     locale: 'fr-fr'
+      # locale: localStorage.getItem('locale') || 'fr-fr'
 
 
 # Includes Desktop Specific JavaScript files here (or inside of your Desktop router)

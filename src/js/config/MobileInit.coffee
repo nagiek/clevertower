@@ -32,6 +32,7 @@ require.config
     # -------------------
     collections:  "app/collections"
     models:       "app/models"
+    nls:          "app/nls"
     routers:      "app/routers"
     templates:    "app/templates"
     views:        "app/views"

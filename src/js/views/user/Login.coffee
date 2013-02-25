@@ -2,8 +2,10 @@ define [
   "jquery", 
   "underscore", 
   "backbone", 
+  "i18n!nls/devise"
+  "i18n!nls/user"
   'templates/user/login',
-], ($, _, Parse) ->
+], ($, _, Parse, i18nDevise, i18nUser) ->
 
   class LoginView extends Parse.View
     events:
@@ -27,7 +29,7 @@ define [
           delete this
 
         error: (user, error) =>
-          this.$(".login-form .error").html("Invalid email or password. Please try again.").show()
+          this.$(".login-form .error").html(i18nDevise.errors.invalid_login).show()
           @$(".login-form button").removeAttr "disabled"
 
       @$(".login-form button").attr "disabled", "disabled"
@@ -35,6 +37,6 @@ define [
 
 
     render: ->
-      @$el.html JST["src/js/templates/user/login.jst"]
+      @$el.html JST["src/js/templates/user/login.jst"], i18nDevise, i18nUser
       @delegateEvents()
       this
