@@ -14,6 +14,7 @@
       "backbone.validateAll": "libs/plugins/Backbone.validateAll",
       bootstrap: "libs/bootstrap/bootstrap.min",
       text: "libs/plugins/text",
+      i18n: "libs/plugins/i18n",
       collections: "app/collections",
       models: "app/models",
       routers: "app/routers",

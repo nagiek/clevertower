@@ -27,6 +27,7 @@ require.config
     "backbone.validateAll": "libs/plugins/Backbone.validateAll"
     bootstrap:              "libs/bootstrap/bootstrap.min"
     text:                   "libs/plugins/text"
+    i18n:                   "libs/plugins/i18n"
     
     # Application Folders
     # -------------------
