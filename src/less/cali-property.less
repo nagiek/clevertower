@@ -1,0 +1,222 @@
+/**
+ * @file
+ * Property Page Styling
+ */
+
+// .dashboard {
+//   li {
+//     float:left; /* LTR */
+//     margin-right:@baseLineHeight;
+//     margin-top:4px;
+//     &.btn-group {
+//       margin-top:0;
+//     }
+//   }
+// }
+
+/**
+ * Property
+ */
+.page-property {
+  #back-to-property {
+    margin-top:9px;
+    margin-left:18px;
+  }
+  .page-header {
+    margin-top:0;
+    img {
+      float:left;
+      position:relative;
+      z-index:1;
+    }
+    h1 {
+      display: block;
+      margin-top:8px;
+      margin-bottom:8px;
+      min-height:44px;
+      color:@black; // Keep, as it will be a link
+      text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
+    }
+  }
+  .header-wrapper {
+    margin-bottom:18px;
+    //zoom:1; // Fix IE7
+  }
+  .header-info {
+    padding-right: 12px; // If the property title is less than the width of the tabs.
+    margin-bottom: 18px; 
+    margin-right: 15px;
+    min-width:430px;
+//    margin-left: -4px;
+//    vertical-align: middle;
+//    padding:0;
+//    margin-left:0px;
+//    border: 1px solid #ccc; // Borders will throw off the span tags
+/*    border-bottom-color: #bbb;*/
+    .border-radius(4px);
+    @shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05);
+    .box-shadow(@shadow);
+    .buttonBackground(lighten(#5bc0de, 20%), lighten(desaturate(#2f96b4, 20%), 10%));
+    &:hover {
+      background-color:#8fc8d9;
+    }
+  }
+  .breadcrumb {
+    margin-left:-0.2em;
+    padding: 4px 0;
+  /*  display:inline-block;*/
+    a {
+      margin: 0 0.2em;
+      border-bottom: none; /* 'a' override */
+      &:hover {
+        border-bottom-style:solid;
+        border-bottom-width:2px;
+      }
+    }
+  }
+/*  .region-title-header {
+    margin-top:17px;
+    margin-left:15px;
+  }*/
+  
+  
+  #title-blocks {
+    .nav-tabs {
+      margin-right:3px; /* LTR */
+      margin-bottom:0;
+      position:relative;
+      top:5px; // 4px border radius +1.
+      //border-bottom:solid 1px @white;
+      border-bottom:none;
+
+      > li {
+        &.open {
+          > a.btn-success {
+            border: 1px solid #DDD;
+            border-bottom-color: transparent;
+          }
+        }
+        &.active > a {
+          color:@gray;
+          .caret {
+            border-top-color:@grayDark;
+          }
+          &.btn-success {
+            .caret {
+              border-top-color:@white;
+            }
+          }
+        }
+        &.right-dropdown > ul {
+          float:right;
+        }
+        > a {
+          text-shadow:none;
+          color:@white;
+          border-bottom-color:@white;
+          zoom:1; // Fix ie7.
+          .caret {
+            border-top-color:@white;
+          }
+          &.btn-success {
+            background-color: #51A351;
+            color:@white;
+            &:hover {
+              border: 1px solid #DDD;
+              border-bottom-color: transparent;
+              color:@white;
+              .caret {
+                border-top-color:@white;
+              }
+            }
+          }
+          &:hover {
+            color:@grayDarker;
+            .caret {
+              border-top-color:@grayDark;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+@media (max-width:979px) {
+  .property {
+    .page-header {
+      width:100%;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .property {
+    .header-wrapper {
+      width:100%;
+    }
+    .header-info {
+      min-width:0;
+      margin-left:0;
+      img {
+        width:64px;
+        height:64px;
+      }
+      h1 {
+        font-size:20px;
+        min-height:0;
+        margin-bottom:7px;
+      }
+    }
+    #title-blocks > .nav-tabs {
+      top: 0;
+      > li > a {
+        font-size:10px;
+        padding-left:10px;
+        padding-right:9px;
+        padding-top:5px;
+        padding-bottom:5px;
+      }
+    }
+    #primary-tabs {
+      > li {
+        display:none;
+        &.active {
+          display:block;
+          > a.active {
+            .border-radius(4px);
+          }
+        }
+      }
+    }
+    #secondary-tabs {
+      margin-top:18px;
+    }
+  }
+}
+
+@media (max-width:320px) {
+  .property {
+    .header-info {
+      h1 {
+        min-height:64px;
+      }
+    }
+    #title-blocks {
+      margin-left:0;
+      > .nav-tabs {
+        margin-top:3px;
+        margin-left:3px;
+        > li > a {
+          font-size:9px;
+          padding-left:9px;
+          padding-right:9px;
+          padding-top:4px;
+          padding-bottom:4px;
+        }
+      }
+    }
+  }
+}

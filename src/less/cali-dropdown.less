@@ -1,0 +1,40 @@
+// DROPDOWN MENUS
+// --------------
+
+// The dropdown menu (ul)
+// ----------------------
+.dropdown-menu {
+
+  // Inline items within the dropdown menu
+  .dropdown-inline {
+    display: block;
+    .clearfix();
+    
+    margin-top:0;
+    &:first-child {
+      margin-top:3px;
+    }
+      
+    > a {
+      display: inline-block;
+
+      &.text {
+        margin-right:10px;
+        padding:3px 15px;
+        
+        // Hover state
+        // -----------      
+        &:hover {
+          color: @dropdownLinkColorHover;
+          text-decoration: none;
+          background-color: @dropdownLinkBackgroundHover;
+        }
+      }
+
+      &.icon {
+        float:right;
+        margin-right:5px;
+      }
+    }
+  }
+}

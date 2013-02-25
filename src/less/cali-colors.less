@@ -1,0 +1,482 @@
+/**
+ * @file
+ * Default color set for austin design: green #75af10 and blue #44749D
+ */
+
+/*
+  #efb250; Graphic Accent Orange
+  #44749D; Link Blue
+  #53809d; Dark front page blue
+*/
+
+body {
+  color:#333;
+}
+
+#header-wrapper {
+  background-color:#fff;
+  border-bottom:solid 4px #445;
+}
+
+#main-wrapper {
+  background-color: #f4f4f4;
+  background-image: url(../images/background--content--panel-pane--no-sidebars.png);
+  background-repeat: repeat;
+}
+
+#promo {
+  min-height: 89px;
+  padding: 22px 0;
+  background-image: url(../images/background-promo.jpg);
+  background-position: left bottom;
+  background-repeat: repeat-x;
+}
+
+.logged-in #content .section,
+.not-front #content .section {
+  background-color:#fdfdfd;
+  border-width: 1px;
+  border-bottom-width: 2px;
+  border-style: solid;
+  border-color: #e4e4e4;
+}
+
+.vertical-tabs {
+  background-color: #fff;
+}
+
+/**
+ * Headers
+ */
+.breadcrumb a,
+.breadcrumb a:hover,
+h1.title {
+  color: #000; /* 'a' override */
+}
+
+#site-name {
+  color:#fff;
+  text-shadow:#aaa 0 1px 0;
+}
+
+h2, h3, h4, h5, h6 {
+  color: #666;
+}
+
+#site-slogan,
+#primary-banner {
+  color: #44749D;
+}
+
+
+/**
+ * Links
+ */
+a         { color: #44749D; }
+a:hover   { color: #ee800d; }
+a:active  { color: #e6603d; }
+a.active  { color: #000;    }
+
+#navigation a,
+#navigation a:hover {color: #333;}
+
+/* Local Actions */
+li.icon-action a  { 
+  background-repeat: no-repeat;
+  background-position: top left;
+}
+li.icon-action a:hover  { 
+  background-position: bottom left;
+}
+li.add-action a     { background-image: url(../images/icon-action-add.png);     }
+li.write-action a   { background-image: url(../images/icon-action-write.png);   }
+li.edit-action a    { background-image: url(../images/icon-action-edit.png);    }
+li.message-action a { background-image: url(../images/icon-action-message.png); }
+li.collect-action a { background-image: url(../images/icon-action-collect.png); }
+
+
+
+
+#quicktabs-view__why_ruumies___panel_pane_1 li a        { color: #44749D; }
+#quicktabs-view__why_ruumies___panel_pane_1 li.active a { color: #000;    }
+
+#quicktabs-view__why_ruumies___panel_pane_1 li.active a  {
+  background-color:#C6D4E1;
+  background-image: url(../images/background-menu-active.png);
+  background-position: left; /* LTR */
+  background-repeat: no-repeat;
+}
+
+.sidebar ul.menu li a.active  {
+  background: url(../images/background-sidebar-menu-active.png) 100% 0 no-repeat;
+}
+.sidebar ul.menu li.active  {
+  background: url(../images/background-sidebar-menu-active-rest.png) 0 0 no-repeat;
+}
+
+
+/*#C6D4E1 */
+
+ul.primary li a {
+  color: #44749D;
+}
+
+ul.secondary li a, 
+ul.secondary li a:hover {
+  color: #666;
+  background-color: transparent;
+}
+
+ul.secondary li.active a,
+ul.secondary li.active a:hover {
+  color: #666;
+  background-color: #EBE7E0;
+}
+
+/**
+ * Nodes
+ */
+/* override default node.css */
+.preview .node {
+  background-color:transparent;
+}
+
+.node-unpublished div.unpublished,
+.comment-unpublished div.unpublished /* The word "Unpublished" displayed underneath the content. */ {
+  color: #d8d8d8;
+} 
+
+.marker /* "New" or "Updated" marker for content that is new or updated for the current user */ {
+  color: #c00;
+}
+
+.node .submitted /* The "posted by" information */ {
+  color: #666;
+}
+
+.node .terms /* Node terms (taxonomy) */ {
+  color: #666;
+}
+
+.node .terms a {
+  color: #666;
+}
+
+#skip-link a,
+#skip-link a:visited {
+  background-color: #666;
+  color: #fff;
+}
+
+.breadcrumb a:hover {
+  border-bottom-color:#000;
+}
+
+#content-header {
+  border-bottom-color: #44749D;
+}
+
+/* Pager */
+.pager /* A list of page numbers when more than 1 page of content is available */ {
+  color: #666;
+}
+
+.pager a,
+.pager strong.pager-current,
+.pager a.active /* Each page number in the pager list */ {
+  color: #666;
+}
+
+/**
+ * Tables
+ */
+thead th {
+  background-color: #BDB8AD;
+  border-bottom-color: #ccc;
+}
+
+tr.even,
+tr.odd {
+  border-bottom-color: #ccc;
+}
+
+tbody {
+  border-top-color: #ccc;
+}
+
+td.region {
+  background-color: #C6D4E1;
+}
+
+
+/**
+ * Forms
+ */
+/* Generic Form Items */
+form fieldset {
+  border-color: #aaa;
+}
+
+.form-text {
+  border-color: #44749D;
+}
+
+.form-item input.error,
+.form-item textarea.error,
+.form-item select.error /* Highlight the form elements that caused a form submission error */ {
+  border-color: #c00;
+}
+
+.form-required /* The part of the label that indicates a required field */ {
+  color: #c00;
+}
+
+/* Buttons */
+.form-required {
+  color: #44749D;
+}
+
+.form-submit,
+.button {
+  background: #44749D url(../images/buttons.png) 0 0 repeat-x;
+  color: #fff;
+  border-top-color:    #34648D;
+  border-left-color:   #24547D;
+  border-right-color:  #24547D;
+  border-bottom-color: #14446D;
+}
+
+.button:hover {
+  color: #fff;
+}
+
+input.form-submit:active {
+  background: url(../images/buttons.png) 0 100% repeat-x;
+  text-shadow: #222 0 -1px 0;
+}
+
+input.form-button-disabled,
+input.form-button-disabled:active {
+  background: #666;
+  color: #fff;
+  border-color: #555;
+  text-shadow: #222 0 -1px 0;
+}
+
+/**
+ * Messages
+ */
+div.messages,
+div.status,
+div.warning,
+div.error /* Important messages (status, warning, and error) for the user */ {
+  border-color: #ff7;
+  color: #000;
+  background-color: #ffc;
+}
+
+div.warning /* Medium priority messages */ {
+  border-color: #fc0;
+}
+
+div.warning,
+tr.warning {
+  color: #000; /* Drupal core uses #220 */
+  background-color: #ffc;
+}
+
+div.error /* High priority messages. See also the .error declaration in pages.css. */ {
+  /* border: 1px solid #d77; */ /* Drupal core uses: 1px solid #d77 */
+  border-color: #c00;
+}
+
+div.error,
+tr.error {
+  color: #900; /* Drupal core uses #200 */
+  background-color: #fee;
+}
+
+/*
+.quicktabs-tabs,
+.sidebar ul.menu {
+  border-right-color:#000;
+}
+*/
+
+.region-sidebar-first .section {
+  border-right-color:#000; /* LTR */
+}
+
+.quicktabs-view__why_ruumies___panel_pane_1 .quicktabs_main {
+  border-left-color:#000; /* LTR */
+}
+
+
+/**
+ * Tabs
+ */
+div.tabs .author {
+  color: #666;
+}
+
+ul.secondary li {
+  border-right-color:#CCC; /* LTR */ /* system override */
+}
+
+
+/* Main navigation tabs */
+#navigation-wrapper {
+  background-color: #fff;
+}
+
+/**
+ * Regions
+ */
+.dashboard {
+  background-color: #eaeaea;
+}
+
+/**
+ * Blocks
+ */
+.block h2.block-title /* Block title */ {
+  border-top-color: #ccc;
+}
+
+/* Help block */
+#block-system-help {
+  background-color: #c6e1c8;
+  border-color: #449e4a;
+  color: #000;
+}
+
+/**
+ * Comments
+ */
+#comments h2.title {
+  color: #666;
+  border-top-color: #ccc;
+}
+
+/* "New" marker for comments that are new for the current user */ 
+.new {
+  color: #c00;
+}
+
+/* The "posted by" information */
+.comment .submitted {
+  color: #666;
+}
+
+.new {
+  color: #75af10;
+}
+
+/**
+ * Footer
+ */
+#footer {
+
+}
+
+/**
+ * Pricing Page
+ */
+#pricing-page td.yes {
+  color: #449e4a;
+}
+
+/**
+ * Views Styles
+ */
+.views-empty {
+  background-color:#ffffff;
+}
+
+.panels-flexible-region-last .view-content .views-row-odd,
+.panels-flexible-region-last .view-content .views-row-even {
+  background-color: transparent;
+}
+
+/* Override background set on td.active */
+.view-content tbody tr.odd td.active,
+.view-content tbody tr.odd  { background-color: #ffffff; }
+.view-content tbody tr.even td.active,
+.view-content tbody tr.even { background-color: #EBE7E0; }
+
+.views-field-field-image-fid a img {
+  border-color:#C6D4E1;
+}
+
+/**
+ * Views ID Styles
+ */
+
+/**
+ * .view-id-posts_by_admin AND
+ * .view-id-posts_by_tenants
+ */
+ 
+.view-id-posts_by_admin   .views-row-odd,
+.view-id-posts_by_tenants .views-row-odd  { background-color: #ffffff; }
+.view-id-posts_by_admin   .views-row-even,
+.view-id-posts_by_tenants .views-row-even { background-color: #EBE7E0; }
+
+.view-id-posts_by_admin .date-group,
+.view-id-posts_by_tenants .date-group {
+  background-color:#bbb;
+  color:#fff;
+}
+
+/**
+ * .view-id-property_income AND
+ * .view-id-property_expenses
+ */
+.view-id-property_rent_income.view-display-id-attachment_1 tbody,
+.view-id-property_other_income.view-display-id-attachment_1 tbody,
+.view-id-property_rent_schedule.view-display-id-attachment_1 tbody,
+.view-id-property_expenses.view-display-id-attachment_1 tbody {
+  border-top-color:#000;
+}
+
+
+/**
+ * .view-id-expenses_in_property
+ */
+.view-id-income_in_property.view-display-id-attachment_1 tbody,
+.view-id-expenses_in_property.view-display-id-attachment_1 tbody {
+  border-top-color:#000;
+}
+
+/**
+ * .view-id-my_lease
+ */  
+
+.view-id-my_properties
+td.views-field.active {
+  background:#fff;
+}
+
+/**
+ * .view-id-my_properties
+ */  
+.view-id-my_properties .view-content tbody tr, 
+.view-id-my_properties .view-content tbody tr.even,
+.view-id-my_properties .view-content tbody tr.even td.active {
+  border-bottom-color:#EBE7E0;
+  background-color: #fff;
+}
+
+.view-id-my_properties
+td.views-field.active {
+  background:#fff;
+}
+
+/**
+ * .view-id-features_landlord AND
+ * .view-id-features_tenant
+ */  
+.view-id-features_landlord .views-field-title, 
+.view-id-features_tenant .views-field-title {
+  color: #44749D;
+}

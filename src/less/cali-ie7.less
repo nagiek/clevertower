@@ -1,0 +1,25 @@
+/**
+ * @file
+ * IE7 support
+ */
+
+// Core variables and mixins
+@import "variables.less"; // Modify this for custom colors, font-sizes, etc
+@import "mixins.less";
+
+.splash-screen {
+  .footer {
+    a {
+      font-size:@baseFontSize;
+    }
+  }
+  #block-ruumies-overrides-register {
+    .controls {
+      margin-left:0;
+    }
+  }
+}
+
+.form-inline .form-type-textfield {
+  display: inline;
+}

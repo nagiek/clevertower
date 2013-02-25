@@ -1,0 +1,35 @@
+//
+// Tables.less
+// Tables for, you guessed it, tabular data
+// ----------------------------------------
+
+
+/**
+ * Table override
+ */
+table {
+  &.sticky-header {
+    margin-top: @navbarHeight - 2px;
+    z-index: @zindexFixedNavbar - 1;
+    border-bottom: 1px solid @tableBorder;
+    th {
+      background:@bodyBackground;
+      height: @baseLineHeight;
+      line-height: @baseLineHeight;
+      margin:0;
+      max-width: none;
+      padding: 8px;
+      text-align: left;
+      vertical-align: bottom;
+    }
+  }
+  .row {
+    margin-left:0;
+  }
+}
+
+@media (max-width: 767px) {
+  table.sticky-header {
+    display:none;
+  }
+}

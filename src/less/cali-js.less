@@ -1,0 +1,41 @@
+// TYPEAHEAD
+// ---------
+
+#autocomplete {
+  .dropdown-menu {
+    display:block;
+    top:0;
+  }
+}
+
+// VERTICAL TABS
+// -------------
+.vertical-tabs {
+  .vertical-tabs-list {
+    > li {
+      &.vertical-tab-button:focus {
+        outline:0;
+      }
+      > a .summary {
+        display:block;
+      }
+    }
+  } 
+  .vertical-tabs-pane {
+    legend {
+      display: none;
+    }
+    .fieldset-wrapper {
+      padding-top: 0;
+    }
+  }
+}
+
+// COLLPASE
+// ---------
+
+@media (max-width: 767px) {
+  .ctools-collapsible-content {
+    display:none;
+  }
+}

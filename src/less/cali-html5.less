@@ -1,0 +1,46 @@
+// HTML5
+// HTML5 snippets from http://html5snippets.com/
+// -------------------------------------------
+
+.drop-shadow {
+  position:relative;
+  z-index:2;
+  -webkit-box-shadow:0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+  -moz-box-shadow:0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+  box-shadow:0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+  &:before,
+  &:after {
+    content:"";
+    position:absolute; 
+    z-index:1;
+  }
+}
+
+ 
+.lifted {
+  .border-radius(4px);
+  &:before,
+  &:after {
+    bottom:15px;
+    left:10px;
+    width:50%;
+    height:20%;
+    -webkit-box-shadow:0 15px 10px rgba(0, 0, 0, 0.7);   
+    -moz-box-shadow:0 15px 10px rgba(0, 0, 0, 0.7);
+    box-shadow:0 15px 10px rgba(0, 0, 0, 0.7);
+    -webkit-transform:rotate(-3deg);    
+    -moz-transform:rotate(-3deg);   
+    -ms-transform:rotate(-3deg);   
+    -o-transform:rotate(-3deg);
+    transform:rotate(-3deg);
+  }
+  &:after {
+    right:10px; 
+    left:auto;
+    -webkit-transform:rotate(3deg);   
+    -moz-transform:rotate(3deg);  
+    -ms-transform:rotate(3deg);  
+    -o-transform:rotate(3deg);
+    transform:rotate(3deg);
+  }
+}

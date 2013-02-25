@@ -1,0 +1,51 @@
+// SPRITES
+// Glyphs and icons for buttons, nav, and more
+// -------------------------------------------
+
+// BACKGROUNDS
+// -----------
+
+#sunny    { background-image: url("@{imagesFolder}/backgrounds/background-skyline.jpg");   }
+#dusk     { background-image: url("@{imagesFolder}/backgrounds/background-skyline-a.jpg"); }
+
+#singapore    { background-image: url("@{imagesFolder}/backgrounds/20111216_C7342_PHOTO_EN_8316.jpg"); }
+#cali-bridge  { background-image: url("@{imagesFolder}/backgrounds/california-bridge-san-francisco.jpeg"); }
+#yun          { background-image: url("@{imagesFolder}/backgrounds/yun_6717.jpeg"); }
+
+// ICONS
+// -----
+
+.icon-big {
+  display: block;
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  margin: 0 auto;
+  background-image: url("@{iconBigSpritePath}");
+}
+
+
+.icon-riflescope      { background-position: 0      -144px; }
+.icon-google-maps     { background-position: -24px  -144px; }
+.icon-eye             { background-position: -48px  -144px; }
+.icon-ellipsis        { background-position: -72px  -144px; }
+.icon-plus            { background-position: -96px  -144px; } // Duplicate... oops...
+.icon-lightning       { background-position: -120px -144px; }
+
+.icon-big {
+  &.icon-people             { background-position: 0      0; }
+  &.icon-keys               { background-position: -46px  0; }  
+  &.icon-chat               { background-position: -142px 0; }
+  &.icon-clevertower        { background-position: -225px 0; }
+}
+
+/*.icon-big {
+  &.icon-gears              { background-position: -138px -87px;  }
+  &.icon-people             { background-position: -141px -186px; }
+  &.icon-keys               { background-position: -186px -186px; }
+  
+  &.icon-left-arrow         { background-position: -138px -1064px; }
+  &.icon-right-arrow        { background-position: -186px -1064px; }
+  
+  &.icon-chat               { background-position: -186px -1144px; }
+}*/

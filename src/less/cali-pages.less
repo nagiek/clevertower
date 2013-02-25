@@ -1,0 +1,90 @@
+/**
+ * @file
+ * Page Styling
+ *
+ * Style the markup found in page.tpl.php. Also includes some styling of
+ * miscellaneous Drupal elements that appear in the $content variable, such as
+ * ul.links, .pager, .more-link, etc.
+ */
+
+/**
+ * Body
+ */
+body {
+  &.logged-in #main {
+    padding-top: @navbarHeight + 15px;
+  }
+}
+
+#main {
+  padding-top: @anonNavbarHeight + 15px;
+  margin-bottom:18px;
+}
+/*
+#header {
+  padding-top: 15px;
+}
+*/
+.logged-in #content .section,
+.not-front #content .section {
+  border-width: 1px;
+  border-bottom-width: 2px;
+  border-style: solid;
+}
+
+a.contextual-links-trigger,
+.contextual-links a {
+  border-bottom: none;
+}
+
+#content-area .block ul,
+#content-area .item-list ul {
+  margin: 0;
+  padding: 0;
+}
+
+/**
+ * Tabs
+ */
+.has-tabs {
+  .page-header {
+    border-bottom:none;
+    margin-bottom:0;
+    padding-bottom:0;
+  }
+  .action-links {
+    margin-bottom:18px;
+  }
+  &.has-actions .nav-tabs {
+  /*  margin-bottom:0;*/
+  }
+} 
+
+/**
+ * Page Header
+ */
+.page-header {
+  padding-bottom:0;
+  margin-top:0;
+  h1 {
+    display: inline-block;
+    margin-right:25px;
+    margin-bottom:9px;
+  }
+  .btn-toolbar {
+    margin-top:0;
+  }
+}
+
+@media (max-width:767px) {
+  body {
+    &.logged-in {
+	    #main {
+	      padding-top: 0 !important;
+	    }
+    } 
+  }
+  #main {
+    padding-top: 0;
+  }
+}

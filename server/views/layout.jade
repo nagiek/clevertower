@@ -1,0 +1,87 @@
+!!! 5
+html(lang="en")
+  head(prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# clevertower: http://ogp.me/ns/fb/clevertower#")
+
+    title CleverTower
+
+    // Metatags
+    meta(charset='utf-8')
+    meta(content="width = device-width,initial-scale = 1.0,maximum-scale = 1.0", name="viewport")
+    meta(http-equiv='Content-Type', content='text/html; charset=utf-8')
+    
+    // Links
+    link(rel="shortcut icon", type="image/vnd.microsoft.icon", href="favicon.ico")
+    link(rel="apple-touch-icon", type="image/png", href="apple/apple-touch-icon.png")
+    link(rel="apple-touch-icon", type="image/png", href="'apple/apple-touch-icon-ipad.png'", sizes="72x72")
+    link(rel="apple-touch-icon", type="image/png", href="'apple/apple-touch-icon-iphone4.png'", sizes="114x114")
+
+    // Facebook
+    meta(property='fb:app_id', content='387187337995318')
+    meta(property='og:description', content='CleverTower is a startup on a mission to change the way you live, and the way you manage property. Thanks for stopping by.')
+    meta(property='og:url', content='clevertower.com')
+    meta(property='og:image', content='/img/logos/logo-200.png')
+    meta(property='og:type', content='website')
+    meta(property='og:site_name', content='CleverTower')
+    
+    // Only script we need
+    script(type="text/javascript", src="js/app/config/init.js")
+    
+    // Le HTML5 shim, for IE6-8 support of HTML5 elements
+    //if lt IE 9
+      script(src="//html5shiv.googlecode.com/svn/trunk/html5.js")
+    
+  body
+    
+    #page.page(data-role='page')      
+      
+      header(data-role='header', role="navigation")
+        .navbar.navbar-fixed-top
+          .navbar-inner
+            .container
+              button.btn.btn-navbar(data-target=".nav-collapse", data-toggle="collapse")
+                span.icon-bar
+                span.icon-bar
+                span.icon-bar              
+              a.brand(href="/", title="Home")
+                img(src="/img/logos/logo.png", alt="logo")
+              a.btn.btn-home.pull-left(href="/") Network
+              .nav-collapse.in.collapse
+                ul.nav#search-menu
+                  li
+                    form.form-search.navbar-search(action="search", method="get")
+                      input.input-medium.search-query(type="text", name="q", placeholder="Search")
+                        button.btn.element-hidden(type="submit") Search
+                ul.nav.pull-right#user-menu
+                  li
+                    a#profile Profile
+                  li.dropdown      
+                    a#pLabel.dropdown-toggle(data-target="#", data-toggle="dropdown", href="/user_network_path", role="button")
+                      i.icon.icon-cog
+                    ul.dropdown-menu.pull-right(aria-labelledby="pLabel", role="menu")
+                  li.dropdown      
+                    a#nLabel.dropdown-toggle(data-target="#", data-toggle="dropdown", href="/user_notifications_path", role="button")
+                      i.icon.icon-flag
+                    ul.dropdown-menu.pull-right(aria-labelledby="nLabel", role="menu")
+                  li
+                    a#logout Logout
+                ul.nav.pull-right#registration-menu(style="display:none;")
+                  li
+                    a(href="/signup") Sign up
+                  li
+                    a(href="/login") Login
+
+      // Branding
+      .brand-strip.hide
+
+      // Main      
+      #main.container
+        #property-header
+        .row
+          .span12
+          
+      // Footer
+      footer.footer(data-role='footer')
+        .navbar.navbar-fixed-bottom
+          .container
+            p
+              | Made by Keigan

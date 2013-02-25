@@ -1,0 +1,94 @@
+/**
+ * @file
+ * Navigation Styling
+ */
+
+@footerPadTop: 15px;
+@footerPadBottom: 16px;
+@footerLineHeight: 16px;
+@footerHeight: @footerLineHeight + @footerPadTop + @footerPadBottom;
+@footerBorderWidth: 1px;
+
+/**
+ * Sticky Footer code
+ */
+html, body {height: 100%;}
+
+#page {min-height: 100%;}
+
+#main {
+  // overflow:auto;
+  padding-bottom: @footerHeight;
+}  
+
+#footer {
+  position: relative;
+  margin-top: -@footerHeight - @footerBorderWidth;
+  height: @footerHeight;
+	clear:both;
+} 
+
+/*Opera Fix*/
+body:before {
+	content:"";
+	height:100%;
+	float:left;
+	width:0;
+	margin-top:-32767px;
+}
+
+/**
+ * Content-bottom
+ */
+.region-content-bottom {
+  margin-top:@baseLineHeight;
+}
+
+/**
+ * Footer
+ */
+#footer {
+  border-top-width: @footerBorderWidth;
+  border-top-style: solid;
+  border-top-color: #E5E5E5;
+  .region-footer {
+    padding: @footerPadTop 0 @footerPadBottom;
+    .block {
+      display:inline-block;
+      vertical-align: top;
+      margin-bottom: 0;
+      p {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+/**
+ * Menus
+ */
+.region-content-bottom,
+.region-footer {
+  ul.menu {
+    padding: 0; /* unset 2em from system.css */
+    margin: 0; /* unset 2em from system.css */
+    li {
+      float:left;
+      margin-right:@baseLineHeight;
+      a {
+        border: none;
+        display: inline-block;
+      }
+    }
+  }
+}
+
+@media (max-width:767px) {
+  #footer {
+    height:auto;
+    margin-left:-20px;
+    margin-right:-20px;
+    padding-left:20px;
+    padding-right:20px;
+  }
+}

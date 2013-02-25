@@ -1,0 +1,286 @@
+/**
+ * @file
+ * Navigation Styling
+ */
+
+/**
+ * Navbar
+ */
+.not-logged-in {
+  .navbar {
+    &.navbar-large {
+      .navbar-inner {
+        min-height:@anonNavbarHeight + 1px; 
+      }
+    }
+  }
+}
+
+.navbar {
+  .nav > li > a {
+    // Override default text-shadow.
+    text-shadow: none;
+    margin-bottom:1px;
+  }
+  .brand {
+    padding-top:4px;
+    padding-bottom:4px;
+    img:active {
+      padding-top:1px;
+    }
+  }
+  .btn-nav {
+    float:left;
+    display:none;
+  }
+  .btn-home {
+    display:inline-block;
+    vertical-align: top;
+    margin-right: 10px;
+  }
+  #block-fboauth-login {
+    display:inline-block;
+    vertical-align: top;
+  }
+  .btn-facebook {
+    // padding-left
+    padding-top: 3px;
+    padding-bottom: 3px;
+  }
+  .btn-large {
+    padding:8px 14px;
+  }
+  small {
+    /* override TB.forms.less */
+    padding-top:0;
+    font-size:@baseFontSize * 0.8;
+    display:block;
+  }
+  .btn-navbar,
+  .btn-navbar:hover {
+    text-shadow: 0 -1px 0 rgba(0,0,0,.25);
+    color: @white;
+    .buttonBackground(@btnSuccessBackground, @btnSuccessBackgroundHighlight);
+  }
+  
+  .pull-right .dropdown-menu {
+    &:before {
+      right: 9px;
+      left:auto;
+    }
+    &:after {
+      right: 10px;
+      left:auto;
+    }
+  }
+  .btn-name {
+    max-width:320px;
+    height:18px;
+    line-height:19px;
+  	overflow: hidden;
+/*    text-overflow: ellipsis;
+*/  	word-wrap: break-word;
+  }
+  .btn-toolbar {
+    margin:0;
+  }
+  .btn-group {
+    padding-bottom:0;
+  }
+}
+
+/**
+ * Links
+ */
+a > .badge {
+  margin-left:4px; /* LTR */
+}
+
+/**
+ * Lists
+ */
+.inline {
+  > li {
+    display:inline;
+  }
+  li + li {
+    margin-left:10px;
+  }
+}
+
+@media (max-width:767px) {
+  .navbar {
+    .btn-name {
+      max-width:220px;
+    }
+  }
+}
+
+@media (max-width:480px) {
+  .navbar {
+    .btn-name {
+      max-width:120px;
+    }
+    .btn-large {
+      padding: 4px 10px;
+      font-size:@baseFontSize;
+    }
+/*    #block-fboauth-login {
+      padding-top:6px;
+      margin-bottom: 0;
+    }*/
+  }
+}
+
+/*
+ * The skip navigation link will be completely hidden until a user tabs to the
+ * link. See https://www.webaim.org/techniques/skipnav/
+ */
+#skip-link {
+  a,
+  a:visited {
+    position: absolute;
+    display: block;
+    left: 0;
+    top: -500px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    text-align: center;
+  }
+  a:hover,
+  a:active,
+  a:focus {
+    position: static;
+    width: 100%;
+    height: auto;
+    padding: 2px 0 3px 0;
+  }
+}
+
+/**
+ * Primary Actions (within the header)
+ */ 
+#primary-actions {
+  vertical-align:top;
+  display:inline-block;
+  margin-bottom:18px;
+  .btn {
+    margin-left:5px;
+  }
+}
+
+/**
+ * Action links (after the header)
+ */ 
+.action-links {
+  display:inline-block;
+  list-style: none;
+  h4 {
+    display:inline-block;
+    vertical-align:top;
+    margin-top: 5px;
+    margin-right:5px;
+  }
+  > li {
+    margin:0 5px 0 0; /* LTR */
+    /*height:16px;*/ /* icon height */
+    display:inline-block;
+    &.icon-action a {
+      padding:0 0 0 20px; /* icon is 16px wide */
+/*      display:inline-block;*/
+    }
+    a {
+      line-height:16px; /* icon height */
+    }
+  }
+  .btn {
+    vertical-align:top;
+  }
+}
+
+.has-tabs .action-links {
+  float:none;
+  margin-left:0;
+}
+
+
+
+@media (max-width: 767px) {
+  .navbar-fixed-top {
+    // Override responsive.less
+    margin-bottom: 0px;
+  }
+}
+
+
+
+@media (max-width: 480px) {
+
+  .tabs-left {
+    .nav {
+      float: none;
+      margin-right: 0;
+      border-right: 1px solid #DDD; 
+    }    
+  }
+
+  
+  .navbar {
+    .btn-home {
+      display:inline-block;
+    }
+  }
+  
+
+  
+  .not-logged-in {
+    .navbar {
+      &.navbar-large {
+        .navbar-inner {
+          min-height:0;
+        }
+      }
+    }
+  }
+  
+  
+  // STACKED NAV
+  // -----------
+  
+  // Stacked tabs and pills
+  #primary-tabs > li {
+    float: none;
+  }
+  #primary-tabs > li > a {
+    margin-right: 0; // no need for the gap between nav items
+  }
+
+  // Tabs
+  // ------
+  #primary-tabs {
+    border-bottom: 0;
+  }
+  #primary-tabs > li > a {
+    border: 1px solid #ddd;
+    .border-radius(0);
+  }
+  #primary-tabs > li:first-child > a {
+    .border-radius(4px 4px 0 0);
+  }
+  #primary-tabs > li:last-child > a {
+    .border-radius(0 0 4px 4px);
+  }
+  #primary-tabs > li > a:hover {
+    border-color: #ddd;
+    z-index: 2;
+  } 
+}
+
+@media (max-width: 560px) {
+  .navbar {
+    .inline-block {
+      display: block;
+    }
+  }
+}

@@ -1,0 +1,261 @@
+/**
+ * @file
+ * Node Styling
+ *
+ * Style anything that isn't in the $content variable.
+ */
+
+@cardTopPadding:13px;
+@cardSidePadding:15px;
+
+.card {
+  background: white;
+  border-left: 1px solid #C4CDE0;
+  border-right: 1px solid #C4CDE0;
+  padding: @cardTopPadding @cardSidePadding;
+  margin: 23px 25px;
+  position: relative;
+  .header {
+    border-bottom: 1px solid @grayLighter;
+    min-height:50px;
+    margin-bottom: 9px;
+    padding-bottom: 9px;
+    h3 {
+      margin-right:180px;
+    }
+  }
+  .submitted {
+    position:absolute;
+    top:@cardTopPadding;
+    right:@cardSidePadding;
+  }
+}
+
+
+/**
+ * Tasks
+ */
+.tasks {
+  margin:20px 0;
+  ul {
+    float:left; /* LTR */
+    margin-right:40px; /* LTR */
+  }
+  li {
+    list-style:none;
+    margin-left:-20px;
+  }
+}
+
+/**
+ * Message Board
+ */
+.node-bulletin,
+.node-post,
+.node-idea {
+  h3 {
+    a {
+      color:@gray + #222;
+      &:hover {
+        text-decoration:none;
+      }
+    }
+  }
+  
+  &.self {
+    h3 {
+      a {
+        color:@linkColor;
+        &:hover {
+          color:@linkColorHover;
+        }
+      }
+    }
+  }
+  
+  &.admin {
+    h3 {
+      a {
+        color:@grayDarker;
+      }
+    }
+  }
+}
+
+/**
+ * Features
+ */
+.node-feature {
+  h1 {
+    font-size:44px;
+  }
+  &.node-full {
+    &.has-photo {}
+    .field-name-body p,
+    .field-name-body li {
+      font-size:@baseFontSize;
+      line-height: @baseLineHeight;
+      margin-bottom:18px;
+      &.summary {
+        font-size:@baseFontSize + 4px;
+        line-height:@baseLineHeight + 4px;
+        color:@heroUnitLeadColor;
+        font-weight: 200;
+      }
+      &.aside {
+        font-size:@baseFontSize + 2px;
+        background:@grayLighter;
+        padding:14px;
+        font-style:italic;
+        border-left: 5px solid #359403;
+      }
+    }
+  }
+  &.node-teaser {
+    .field-name-body p {
+      font-size: 15px;
+      line-height: 24px;
+    }
+    a {
+      &:hover {
+        text-decoration:none;
+      } 
+    }
+  }
+}
+
+/**
+ * Listings
+ */
+#listing {
+  .panel-separator {
+    margin:18px 0;
+  }
+}
+
+.node-listing {
+  &.node-teaser {
+    .field-name-field-rent,
+    .field-name-field-price {
+      padding:8px 0;
+      font-size:@baseFontSize + 17px;
+      font-weight:bold;
+    }
+    .fields {
+      .field {
+        margin-right:20px;
+      }
+    }
+  }
+  .section {
+    margin-bottom:18px;
+  }
+  &.node-photo {
+    .field-name-field-rent {
+      font-size:@baseFontSize + 3px;
+    }
+  }
+  img {
+    margin-left:0;
+  }
+}
+
+/**
+ * Other
+ */
+.node {
+  .content {
+    margin-bottom:18px;
+  }
+
+/*  .submitted {
+    img {
+      float:left;
+    }
+    span {
+      display:block;
+      margin-left:75px;
+    }
+  }*/
+
+  .terms /* Node terms (taxonomy) */ {
+    margin: 0 0 0 0;
+    padding: 10px 0 0 0;
+  }
+  ul.links /* Node links. See also the ul.links declaration in the pages.css. */ {
+    margin: 1em 0;
+  }
+}
+
+.node-full {
+  .submitted {
+    margin-bottom: 18px;
+  }
+}
+
+/**
+ * News feed nodes
+ */
+.node-news_feed {
+  .field-name-body {
+    font-size:16px;
+    font-weight:bold;
+  }
+}
+
+/**
+ * Teasers
+ */
+.node-teaser {
+  .field-name-body {
+    p {
+      font-size:@baseFontSize;
+    }
+  }
+  .field-type-image {
+    float:left;
+    margin-right:5px;
+  }
+}
+
+
+/* List of links */
+ul.links {
+  margin: 0;
+  padding: 0;
+  &.inline {
+    display: inline;
+  }
+  li {
+    display: inline;
+    padding: 0 12px 0 0;
+  }
+  .field-label-inline .field-label {
+    width:100px;
+  }
+}
+
+@media (max-width: 767px) {
+  .card {
+
+    .header {
+      h3 {
+        margin-right:0;
+      }
+    }
+    .submitted {
+      position:static;
+      top:0;
+      right:0;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  /* Listings */
+  .node-listing {
+    img[class*="span"] {
+      width:100%;
+    }
+  }
+}

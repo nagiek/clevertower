@@ -1,0 +1,40 @@
+/**
+ * @file
+ * Image floating
+ */
+
+.micro-float {
+  float: none;
+  display:block;
+  margin-left: 32px + 5px;
+}
+
+.thumbnail-float {
+  float: none;
+  display:block;
+  margin-left: 50px + 5px;
+}
+
+.portrait-float {
+  float: none;
+  display:block;
+  margin-left: 100px + 12px;
+}
+
+.medium-float {
+  float: none;
+  display:block;
+  margin-left: 180px + 12px;
+}
+
+img[class*="span"] {
+  height: auto;
+}
+
+//@media (max-width: 767px) {}
+
+@media (max-width: 480px) {
+  .portrait-float {
+    margin-left: 64px + 12px;
+  }
+}

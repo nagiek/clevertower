@@ -1,32 +1,17 @@
-// DEPENDENCIES
-// ============
-var express = require("express"),
-    http = require("http"),
-    port = (process.env.PORT || 8001),
-    server = module.exports = express();
+require('coffee-script');
+require('./config/exceptions');
 
-// SERVER CONFIGURATION
-// ====================
-server.configure(function() {
+if(!process.env.NODE_ENV) process.env.NODE_ENV="local"
 
-  server.use(express["static"](__dirname + "/../public"));
+//  Load boot file and fire away!
+var app = require('./config/app')();
+var port = process.env.PORT || 3000;
 
-  server.use(express.errorHandler({
+app.listen(port);
 
-    dumpExceptions: true,
-
-    showStack: true
-
-  }));
-
-  server.use(server.router);
-
-});
-
-// SERVER
-// ======
-
-// Start Node.js Server
-http.createServer(server).listen(port);
-
-console.log('Welcome to Backbone-Require-Boilerplate!\n\nPlease go to http://localhost:' + port + ' to start using Require.js and Backbone.js');
+console.log('\x1b[36mCleverTower\x1b[90m v%s\x1b[0m running as \x1b[1m%s\x1b[0m on http://%s:%d',
+  app.set('version'),
+  app.set('env'),
+  app.set('host'),
+  app.address().port
+);

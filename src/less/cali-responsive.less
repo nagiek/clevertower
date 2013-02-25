@@ -1,0 +1,61 @@
+/**
+ * @file Responsive
+ */
+@import "bootstrap/responsive/responsive-767px-max.less";
+@import "bootstrap/responsive/responsive-768px-979px.less";
+@import "bootstrap/responsive/responsive-1200px-min.less";
+@import "bootstrap/responsive/responsive-navbar.less";
+@import "bootstrap/responsive/responsive-utilities.less";
+ 
+@media (min-width: 768px) and (max-width: 979px) {
+  .form-actions,
+  .modal {
+    input.span1 {
+      width: 60px;
+    }
+  }
+}
+
+
+@media (max-width: 767px) {
+  body {
+    padding-top: 0 !important;
+  }
+  .pull-left,
+  .pull-right {
+    float: none;
+  }
+  .navbar-fixed-top .navbar-inner {
+    padding:0;
+  }
+  .input-prepend, 
+  .input-append {
+    input[class*="span"] {
+      display:inline-block;
+    }
+  }
+}
+
+@media (max-width: 560px) {
+  // Provide an easy return method to the home screen.
+  .not-front {
+    .navbar-fixed-top {
+      .btn-nav {
+        display:block;
+      }
+      .brand {
+        display:none;
+      }
+      .navbar-inner {
+        background-image:url(../../images/logo-mini.png);
+        background-position:50% 3px;
+        background-repeat:no-repeat;
+      }
+    }
+  }
+  .navbar-fixed-top {
+    .btn-group {
+      margin-top:0;
+    }
+  }
+}

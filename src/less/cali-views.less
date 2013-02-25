@@ -1,0 +1,173 @@
+/* views UI */
+
+/**
+ * @file
+ * Views Styling
+ */
+
+.views-empty, // Empty Table
+.view-empty   // Empty View
+{
+  color:@grayLight;
+  p {
+   font-size:@baseFontSize + 2px;
+  }
+}
+
+.views-row{
+  &.ajax-changed {
+    background-color:@highlight;
+  }
+}
+
+.view-content {
+  h4, h5 {
+    display:inline;
+  }
+  h6 {
+    font-weight: normal;
+  }
+}
+
+.views-exposed-form {
+  .views-exposed-widget {
+    .btn,
+    .form-submit {
+      margin-top:24px;
+    }
+    input.span1 {
+      max-width: 40px;
+    }
+  }
+  .space {
+    margin:0 8px;
+  }
+}
+
+// copy of .navbar .dropdown-menu
+.views-field-add-menu .dropdown-menu {
+  margin-top: 1px;
+  .border-radius(4px);
+  &:before {
+    content: '';
+    display: inline-block;
+    border-left:   7px solid transparent;
+    border-right:  7px solid transparent;
+    border-bottom: 7px solid #ccc;
+    border-bottom-color: rgba(0,0,0,.2);
+    position: absolute;
+    top: -7px;
+    left: 9px;
+  }
+  &:after {
+    content: '';
+    display: inline-block;
+    border-left:   6px solid transparent;
+    border-right:  6px solid transparent;
+    border-bottom: 6px solid @white;
+    position: absolute;
+    top: -6px;
+    left: 10px;
+  }
+}
+
+.views-field-income,
+.views-field-expenses,
+.views-field-vacancies {
+  li {
+    float:left; /* LTR */
+    margin-right:@baseLineHeight;
+    margin-top:4px;
+    &.btn-group {
+      margin-top:0;
+    }
+  }
+}
+
+/* Views Widgets */
+/*.views-widget-filter-field_date_value,
+.views-widget-filter-field_date_value2,
+.views-widget-filter-field_transaction_date_value {
+  margin: 0 0 0.5em; // LTR
+}*/
+
+#edit-nid-wrapper .views-widget .form-item {width:100%;}
+#edit-nid-wrapper .views-widget .form-item label {width:30%;}
+
+#edit-nid-wrapper {
+  float:none;
+  padding:0;
+}
+
+.views-widget .form-item label,
+.views-widget select {
+  display:inline-block;
+}
+
+.views-widget-filter-field_date_value label,
+.views-widget-filter-field_date_value2 label,
+.views-widget-filter-field_transaction_date_value label {
+//  float:left; /* LTR */
+}
+
+.views-widget-filter-field_date_value .container-inline-date .date-padding,
+.views-widget-filter-field_date_value2 .container-inline-date .date-padding,
+.views-widget-filter-field_transaction_date_value .container-inline-date .date-padding {
+//  padding: 0 0 0 0.5em; /* LTR */
+}
+
+/* Generic */
+.views-row-odd,
+.views-row-even /* Unformatted layout */ {
+/*  margin-bottom: 30px;*/
+}
+
+.views-field-field-image-fid {
+  a {
+    width: 100%;
+    img {
+      border-width:3px;
+      border-style:solid;
+    }
+  }
+  
+}
+
+/* Grid layout */
+table.views-view-grid td {
+  vertical-align:top;
+}
+
+table.views-view-grid.cols-2 .col-1,
+table.views-view-grid.cols-2 .col-2 {
+  width:50%;
+  padding: 5px;
+  text-align:center;
+}
+
+/* Table layout */
+table.views-table {
+  margin: 0;
+}
+
+.views-table {
+  .item-list {
+    ul {
+      margin: 0;
+      padding: 0;
+    }
+    li {
+      list-style:none;
+    }
+  }
+}
+
+/* VBO */
+.views-table .views-field-views-bulk-operations {
+  padding:5px 10px;
+}
+
+/* Action buttons */
+.container-inline.form-wrapper {
+//  margin-bottom:1.583em;
+}

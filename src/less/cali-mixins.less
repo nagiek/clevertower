@@ -1,0 +1,23 @@
+// Mixins.less
+// Snippets of reusable CSS to develop faster and keep code readable
+// -----------------------------------------------------------------
+
+
+// UTILITY MIXINS
+// --------------------------------------------------
+
+// Photo-caption
+// ------------------
+.photo-caption() {
+  background: @black;
+  background: -webkit-linear-gradient(top, transparent, rgba(0, 0, 0, .7));
+  background: -moz-linear-gradient(top, transparent, rgba(0, 0, 0, .7));
+  background: linear-gradient(top, transparent, rgba(0, 0, 0, .7));
+  bottom: 0;
+  display: block;
+  left: 0;
+  padding-top: 5px;
+  position: absolute;
+  width: 100%;
+  word-wrap: break-word;
+}

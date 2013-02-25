@@ -1,0 +1,41 @@
+@adminMenuHeight: 30px;
+@shortcutMenuHeight: 40px;
+
+/* Fix Toolbar for .navbar-fixed-top */
+body.admin-menu,
+body.toolbar {
+  .navbar-fixed-top {
+    top: @adminMenuHeight;
+  }
+}
+
+body.admin-menu-with-shortcuts {
+  .navbar-fixed-top {
+    top: @adminMenuHeight + @shortcutMenuHeight;
+  }
+}
+
+
+html.overlay-open .navbar-fixed-top {
+  z-index: 400;
+}
+
+
+#toolbar,
+#admin-menu {
+  z-index: @zindexFixedNavbar + 1;
+  .dropdown {
+    z-index: @zindexFixedNavbar + 1;
+  }
+}
+
+
+div#admin-toolbar {
+  z-index: 500;
+}
+
+/* Admin toolbar fix */
+body.admin-expanded.admin-vertical.admin-nw .navbar,
+body.admin-expanded.admin-vertical.admin-sw .navbar {
+  margin-left: 260px;
+}

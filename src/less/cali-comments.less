@@ -1,0 +1,100 @@
+/**
+ * @file
+ * Comment Styling
+ */
+
+/* Wrapper for a single comment */
+@submittedWidth: 160px;
+
+.comment {
+  margin-top: 5px;
+  margin-bottom: 12px;
+  p {
+    margin-left: 10px;
+    float:none;
+    display: inline-block;
+  }
+  .comment-submitted {
+    float:left;
+    width:@submittedWidth - 10px;
+    img {
+      float:left;
+    }
+    a {
+      border: none;
+    }
+    span {
+      display: block;
+      margin-left: 35px;
+    }
+  }
+  ul.links.inline /* Comment links. See also the ul.links declaration in the pages.css. */ {
+    display:block;
+    margin:0;
+    margin-left: @submittedWidth;
+    border: none;
+    a {
+      border: none;
+    }
+  }
+}
+
+.indented {
+  .comment-submitted {
+    margin-left: 22px;
+  }
+}
+
+@media (max-width: 767px) {
+/*  .comment {
+    p {
+      margin-left:0;
+    }
+    .comment-submitted {
+      float:none;
+    }
+    ul.links.inline {
+      margin-left: 0;
+    }
+  }
+  .indented {
+    p,
+    ul.links.inline {
+      margin-left: 22px;
+    }
+  }*/
+}
+
+.node-teaser {
+  .comment-form {
+    .field-name-comment-body {
+      float:left;
+      width:75%;
+      margin-right:5%;
+    }
+    .form-actions {
+      background:transparent;
+      float:left;
+      width:20%;
+      margin:0;
+      padding:0;
+      border:0;
+    }
+  }
+}
+
+.comment-form {
+  margin-bottom: 30px;
+  img {
+    float:left;
+  }
+  .text-format-wrapper {
+    margin-left:35px;
+  }
+  .control-group {
+    margin-bottom:0;
+  }
+  .form-actions {
+    margin-top:0;
+  }
+}
