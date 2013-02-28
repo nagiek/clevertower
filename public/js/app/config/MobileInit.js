@@ -1,7 +1,7 @@
 (function() {
 
   require.config({
-    baseUrl: "./js",
+    baseUrl: "/js",
     paths: {
       jquery: '//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min',
       jqueryui: 'libs/jqueryui/jquery-ui-1.10.1.custom.min',
@@ -12,6 +12,8 @@
       datepickermobile: 'libs/jqueryui/jquery.ui.datepicker.mobile.min',
       bootstrap: "libs/bootstrap/bootstrap.min",
       text: "libs/plugins/text",
+      async: "libs/plugins/async",
+      propertyParser: "libs/plugins/propertyParser",
       i18n: "libs/plugins/i18n",
       collections: "app/collections",
       models: "app/models",
@@ -37,7 +39,7 @@
     }
   });
 
-  require(["jquery", "backbone", "routers/App", "json2", "jqueryui", "jquerymobile", "datepickermobile"], function($, Backbone, AppRouter) {
+  require(["jquery", "backbone", "routers/App", "json2", "jqueryui", "jquerymobile", "datepickermobile", "serializeObject"], function($, Backbone, AppRouter) {
     $.mobile.linkBindingEnabled = false;
     $.mobile.hashListeningEnabled = false;
     return new AppRouter();

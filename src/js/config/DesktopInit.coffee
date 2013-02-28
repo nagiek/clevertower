@@ -3,7 +3,7 @@
 require.config
   
   # Sets the js folder as the base directory for all future relative paths
-  baseUrl: "./js"
+  baseUrl: "/js"
   
   # 3rd party script alias names (Easier to type "jquery" than "libs/jquery, etc")
   # probably a good idea to keep version numbers in the file names for updates checking
@@ -11,21 +11,29 @@ require.config
     
     # Core Libraries
     # --------------
-    jquery:       '//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min' # "libs/jquery"
-    jqueryui:     'libs/jqueryui/jquery-ui-1.10.1.custom.min', # includes core, slider, datepicker
-    underscore:   "//cdnjs.cloudflare.com/ajax/libs/lodash.js/1.0.1/lodash.min" # "libs/lodash"
-    backbone:     "//www.parsecdn.com/js/parse-1.1.15.min" # "libs/parse"
+    jquery:                 '//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min'     # "libs/jquery"
+    jqueryui:               'libs/jqueryui/jquery-ui-1.10.1.custom.min',                  # includes core, slider, datepicker
+    underscore:             "//cdnjs.cloudflare.com/ajax/libs/lodash.js/1.0.1/lodash.min" # "libs/lodash"
+    backbone:               "//www.parsecdn.com/js/parse-1.1.15.min"                      # "libs/parse"
+    
+    # Async Libraries
+    # ---------------
+    # See below
+    # gmaps:                  "//maps.googleapis.com/maps/api/js?v=3&sensor=false&key=AIzaSyD_xrni-sLyPudfQ--6gn7yAhaW6nTuqkg"
     
     # Bonus Libraries
     # ---------------
-    json2:            "//cdnjs.cloudflare.com/ajax/libs/json2/20121008/json2",
-    jquerymobile:     '//cdnjs.cloudflare.com/ajax/libs/jquery-mobile/1.2.0/jquery.mobile.min'
-    datepickermobile: 'libs/jqueryui/jquery.ui.datepicker.mobile.min',
+    json2:                  "//cdnjs.cloudflare.com/ajax/libs/json2/20121008/json2",
+    jquerymobile:           '//cdnjs.cloudflare.com/ajax/libs/jquery-mobile/1.2.0/jquery.mobile.min'
+    datepickermobile:       'libs/jqueryui/jquery.ui.datepicker.mobile.min',
     
     # Plugins
     # -------
+    serializeObject:        "app/plugins/serialize_object"
     bootstrap:              "libs/bootstrap/bootstrap"
     text:                   "libs/plugins/text"
+    async:                  "libs/plugins/async"
+    propertyParser:         "libs/plugins/propertyParser"
     i18n:                   "libs/plugins/i18n"
     
     # Application Folders
@@ -67,9 +75,16 @@ require.config
   #     locale: 'fr-fr'
       # locale: localStorage.getItem('locale') || 'fr-fr'
 
+# convert Google Maps into an AMD module
+define "gmaps", ["async!//maps.googleapis.com/maps/api/js?v=3&sensor=false&key=AIzaSyD_xrni-sLyPudfQ--6gn7yAhaW6nTuqkg"], ->
+
+  # return the gmaps namespace for brevity
+  window.google.maps
+
+
 
 # Includes Desktop Specific JavaScript files here (or inside of your Desktop router)
-require ["jquery", "backbone", "routers/App", "json2", "jqueryui", "bootstrap"], ($, Parse, AppRouter) ->
+require ["jquery", "backbone", "routers/App", "json2", "jqueryui", "bootstrap", "serializeObject"], ($, Parse, AppRouter) ->
   
   Parse.initialize "6XgIM84FecTslR8rnXBZsjnDqZgVISa946m9OmfO", "Jf4WgWUgu7R39oy5AZotay42dEDY5neMEoJddKEY" # JS Key
   

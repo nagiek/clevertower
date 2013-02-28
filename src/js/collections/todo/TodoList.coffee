@@ -2,7 +2,7 @@ define [
   'jquery',
   'underscore',
   'backbone',
-  'models/TodoModel'
+  'models/Todo'
 ], ($, _, Parse, Todo) ->
 
   class TodoList extends Parse.Collection

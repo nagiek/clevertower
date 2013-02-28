@@ -62,15 +62,15 @@
       };
       if (/iPhone|iPod|iPad|Android|BlackBerry|Opera Mini|IEMobile/.test(ua)) {
         config = {
-          "dev-css": ["css/libs/jquery.mobile.css"],
-          "prod-css": ["css/libs/jquery.mobile.min.css"],
+          "dev-css": ["/css/libs/jquery.mobile.css"],
+          "prod-css": ["/css/libs/jquery.mobile.min.css"],
           "dev-js": [
             {
-              "data-main": "js/app/config/MobileInit.js",
-              src: "js/libs/require/require.js"
+              "data-main": "/js/app/config/MobileInit.js",
+              src: "/js/libs/require/require.js"
             }
           ],
-          "prod-js": ["js/app/config/MobileInit.min.js"]
+          "prod-js": ["/js/app/config/MobileInit.min.js"]
         };
       } else {
         config = {
@@ -78,17 +78,17 @@
           "prod-css": [],
           "dev-js": [
             {
-              "data-main": "js/app/config/DesktopInit.js",
-              src: "js/libs/require/require.js"
+              "data-main": "/js/app/config/DesktopInit.js",
+              src: "/js/libs/require/require.js"
             }
           ],
-          "prod-js": ["js/app/config/DesktopInit.min.js"]
+          "prod-js": ["/js/app/config/DesktopInit.min.js"]
         };
       }
       return loadFiles(config, function() {
         return loadFiles({
-          "dev-css": ["css/cali.css"],
-          "prod-css": ["css/cali.min.css"]
+          "dev-css": ["/css/cali.css"],
+          "prod-css": ["/css/cali.min.css"]
         });
       });
     }), false);

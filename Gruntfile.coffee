@@ -3,7 +3,7 @@
 # https://github.com/cowboy/grunt/blob/master/docs/configuring.md
 module.exports = (grunt) ->
 
-  # grunt.loadNpmTasks 'grunt-contrib-jade'
+  grunt.loadNpmTasks 'grunt-contrib-jade'
   grunt.loadNpmTasks 'grunt-contrib-jst'
   grunt.loadNpmTasks 'grunt-contrib-uglify'
   grunt.loadNpmTasks 'grunt-contrib-less'
@@ -29,12 +29,21 @@ module.exports = (grunt) ->
           client: false
           
     coffee:
-      all:
-        expand: true
-        cwd: 'src/js'
-        src: ['**/*.coffee']
-        dest: 'public/js/app/'
-        ext: '.js'
+      all: 
+        files: [{
+          expand: true
+          cwd: 'src/js'
+          src: ['**/*.coffee']
+          dest: 'public/js/app/'
+          ext: '.js'
+        },{
+          expand: true
+          cwd: 'cloud/Cloud'
+          src: ['**/*.coffee']
+          dest: 'cloud/Cloud'
+          ext: '.js' 
+        }]
+      
           
     # LESS CSS
     less:
@@ -190,7 +199,7 @@ module.exports = (grunt) ->
     # (use if you have a custom server, PhoneGap, Adobe Air, etc.)
     watch:
       coffee:
-        files: 'src/js/**/*.coffee'
+        files: ['src/js/**/*.coffee', 'cloud/Cloud/**/*.coffee']
         tasks: 'coffee'
       jst:
         files: 'src/js/templates/**/*.jst'
@@ -257,7 +266,7 @@ module.exports = (grunt) ->
 
   grunt.registerTask "default", []
 
-  grunt.registerTask "compile", ["jst", "less", "coffee", "uglify"]
+  grunt.registerTask "compile", ["jst", "less", "coffee", "jade"] # , "uglify"
   
 
   

@@ -3,7 +3,7 @@
 require.config
   
   # Sets the js folder as the base directory for all future relative paths
-  baseUrl: "./js"
+  baseUrl: "/js"
   
   # 3rd party script alias names (Easier to type "jquery" than "libs/jquery, etc")
   # probably a good idea to keep version numbers in the file names for updates checking
@@ -18,6 +18,7 @@ require.config
     
     # Bonus Libraries
     # ---------------
+    # gmaps:            "//maps.googleapis.com/maps/api/js?sensor=false" # &key=my_api_key
     json2:            "//cdnjs.cloudflare.com/ajax/libs/json2/20121008/json2",
     jquerymobile:     '//cdnjs.cloudflare.com/ajax/libs/jquery-mobile/1.2.0/jquery.mobile.min'
     datepickermobile: 'libs/jqueryui/jquery.ui.datepicker.mobile.min',
@@ -26,6 +27,8 @@ require.config
     # -------
     bootstrap:              "libs/bootstrap/bootstrap.min"
     text:                   "libs/plugins/text"
+    async:                  "libs/plugins/async"
+    propertyParser:         "libs/plugins/propertyParser"
     i18n:                   "libs/plugins/i18n"
     
     # Application Folders
@@ -69,7 +72,7 @@ require.config
 
 
 # Include Desktop Specific JavaScript files here (or inside of your Desktop router)
-require ["jquery", "backbone", "routers/App", "json2", "jqueryui", "jquerymobile", "datepickermobile"], ($, Backbone, AppRouter) ->
+require ["jquery", "backbone", "routers/App", "json2", "jqueryui", "jquerymobile", "datepickermobile", "serializeObject"], ($, Backbone, AppRouter) ->
   
   # Prevents all anchor click handling
   $.mobile.linkBindingEnabled = false

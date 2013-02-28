@@ -2,8 +2,8 @@
 
   define({
     actions: {
-      sign_in: "Sign in",
-      sign_up: "Sign up",
+      signin: "Sign in",
+      signup: "Sign up",
       logout: "Logout",
       login: "Login",
       forgot_your_password: "Forgot your password?",

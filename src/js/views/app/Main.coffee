@@ -2,9 +2,9 @@ define [
   "jquery", 
   "underscore", 
   "backbone", 
-  'views/todo/ManageTodos'
   "views/user/User"
-], ($, _, Parse, ManageTodosView, UserView) ->
+  "views/network/Manage"
+], ($, _, Parse, UserView, ManageNetworkView) ->
 
   class AppView extends Parse.View
   
@@ -16,5 +16,6 @@ define [
 
     render: ->
       new UserView()
-      new ManageTodosView()
+      new ManageNetworkView()
+    
       

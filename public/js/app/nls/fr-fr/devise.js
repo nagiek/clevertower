@@ -2,8 +2,8 @@
 
   define({
     actions: {
-      sign_in: "Se connecter",
-      sign_up: "Inscrivez-vous",
+      signin: "Se connecter",
+      signup: "Inscrivez-vous",
       logout: "Déconnexion",
       login: "Connecter",
       forgot_your_password: "Mot de passe oublié?",

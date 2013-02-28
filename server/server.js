@@ -9,9 +9,8 @@ var port = process.env.PORT || 3000;
 
 app.listen(port);
 
-console.log('\x1b[36mCleverTower\x1b[90m v%s\x1b[0m running as \x1b[1m%s\x1b[0m on http://%s:%d',
-  app.set('version'),
-  app.set('env'),
-  app.set('host'),
-  app.address().port
+console.log('CleverTower running as %s on http://%s:%d',
+  app.get('env'),
+  app.get('host'),
+  app.get('port')
 );

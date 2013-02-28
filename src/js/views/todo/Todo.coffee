@@ -2,7 +2,7 @@ define [
   "jquery", 
   "underscore", 
   "backbone", 
-  'models/TodoModel',
+  'models/Todo',
   'templates/todo/item',
 ], ($, _, Parse, Todo) ->
 

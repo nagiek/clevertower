@@ -4,8 +4,6 @@
 
 express   = require 'express'
 path      = require 'path'
-cons      = require 'consolidate'
-expose    = require 'express-expose'
 nib       = require 'nib'
 
 # Exports
@@ -22,7 +20,7 @@ module.exports = (app) ->
 
   # Configure expressjs
   app.configure ->
-    app.use express.logger('\033[90m:method\033[0m \033[36m:url\033[0m \033[90m:response-time ms\033[0m')
+    app.use express.logger()
     # app.register '.html', require('ejs')
     app.set 'views', __dirname + '/../views'
     app.set 'view engine', 'jade'
@@ -32,6 +30,6 @@ module.exports = (app) ->
     app.use express.errorHandler({dumpException: true, showStack: true})
     # app.use app.router
     app.use express.static __dirname + '/../../public'
-    app.dynamicHelpers { messages: require('express-messages-bootstrap') }
+    # app.dynamicHelpers { messages: require('express-messages-bootstrap') }
 
   return app

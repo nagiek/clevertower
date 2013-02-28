@@ -37,6 +37,6 @@ define [
 
 
     render: ->
-      @$el.html JST["src/js/templates/user/login.jst"], i18nDevise, i18nUser
+      @$el.html JST["src/js/templates/user/login.jst"](i18nDevise: i18nDevise, i18nUser: i18nUser)
       @delegateEvents()
       this

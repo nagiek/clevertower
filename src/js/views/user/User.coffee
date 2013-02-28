@@ -1,21 +1,22 @@
 define [
-  "jquery", 
-  "underscore", 
-  "backbone", 
-  "views/user/LoggedInMenu",
-  "views/user/Login",
-  "views/user/Signup",
-], ($, _, Parse, LoggedInView, LogInView, SignUpView) ->
+  "jquery"
+  "underscore"
+  "backbone"
+], ($, _, Parse) ->
 
   class UserMenuView extends Parse.View    
     el: "#user-menu"
+
     initialize: ->
       @render()
 
     render: ->
       if Parse.User.current()
-        new LoggedInView();
+        require ["views/user/LoggedInMenu"], (LoggedInView) ->
+          new LoggedInView() 
       else
+        # Logged out menu backbone
         @$el.html '<li id="login" class="dropdown"></li><li id="signup" class="dropdown"></li>'
-        new LogInView();
-        new SignUpView();
+        require ["views/user/Login", "views/user/Signup"], (LogInView, SignUpView) ->
+          new LogInView()
+          new SignUpView()

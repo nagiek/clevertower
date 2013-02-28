@@ -1,1 +1,0 @@
-(function(){define(["jquery","backbone","views/View"],function(e,t,i){var n;return n=t.Router.extend({initialize:function(){return t.history.start()},routes:{"":"index"},index:function(){return new i}})})}).call(this);

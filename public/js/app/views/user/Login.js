@@ -47,7 +47,10 @@
       };
 
       LoginView.prototype.render = function() {
-        this.$el.html(JST["src/js/templates/user/login.jst"], i18nDevise, i18nUser);
+        this.$el.html(JST["src/js/templates/user/login.jst"]({
+          i18nDevise: i18nDevise,
+          i18nUser: i18nUser
+        }));
         this.delegateEvents();
         return this;
       };

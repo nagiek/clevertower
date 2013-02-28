@@ -1,9 +1,10 @@
 define [
-  "jquery", 
-  "underscore", 
-  "backbone", 
-  'templates/user/signup',
-], ($, _, Parse) ->
+  "jquery"
+  "underscore"
+  "backbone"
+  "i18n!nls/devise"
+  'templates/user/signup'
+], ($, _, Parse, i18nDevise) ->
 
   class SignupView extends Parse.View
     events:
@@ -24,12 +25,11 @@ define [
         ACL: new Parse.ACL()
       ,
         success: (user) =>
-          AppView = require "views/app/Main"
-          new AppView()
-
-          this.undelegateEvents();
-          this.remove();
-          delete this
+          require ["views/app/Main"], (AppView) ->
+            new AppView()
+            this.undelegateEvents();
+            this.remove();
+            delete this
 
         error: (user, error) ->
           self.$(".signup-form .error").html(error.message).show()
@@ -39,6 +39,6 @@ define [
       e.preventDefault()
 
     render: ->
-      @$el.html JST["src/js/templates/user/signup.jst"]
+      @$el.html JST["src/js/templates/user/signup.jst"](i18nDevise: i18nDevise)
       @delegateEvents()
       this

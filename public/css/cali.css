@@ -8648,6 +8648,30 @@ td.btn-group > .btn {
 .button_to > div {
   display: inline;
 }
+/**
+ * Twitter Bootstrap - Drupal joiners.
+ */
+.wizard {
+  position: absolute;
+  overflow-x: hidden;
+  height: 500px;
+  width: 100%;
+}
+.wizard form {
+  position: absolute;
+  overflow-y: scroll;
+  width: 100%;
+  height: 100%;
+  margin-bottom: 18px;
+}
+.wizard .form-actions {
+  position: absolute;
+  width: 100%;
+  bottom: -18px;
+}
+.wizard .property-form {
+  left: 150%;
+}
 .navbar-search .form-type-textfield {
   float: left;
 }
@@ -10169,11 +10193,11 @@ ul.links .field-label-inline .field-label {
 /**
  * Search Form
  */
-.geolocation-map {
+#mapCanvas {
   width: 100%;
   height: 350px;
 }
-.geolocation-map img {
+#mapCanvas img {
   max-width: none;
 }
 .geolocation-client-location {
@@ -10182,31 +10206,31 @@ ul.links .field-label-inline .field-label {
 .field-widget-geolocation-googlemap .controls {
   display: inline-block;
 }
-.ctools-modal-content .geolocation-address {
+.ctools-modal-content #geolocation-search {
   width: 300px;
 }
-.ctools-modal-content .geolocation-map {
+.ctools-modal-content #mapCanvas {
   height: 200px;
 }
-.geolocation-search {
+#geolocation-search {
   margin-bottom: 13px;
 }
-.geolocation-search .control-group {
+#geolocation-search .control-group {
   margin-bottom: 0;
 }
 @media (max-width: 767px) {
-  html .ctools-modal-content .geolocation-address {
+  html .ctools-modal-content #geolocation-search {
     width: 300px;
   }
-  .geolocation-map {
+  #mapCanvas {
     height: 300px;
   }
 }
 @media (max-width: 320px) {
-  html .ctools-modal-content .geolocation-address {
+  html .ctools-modal-content #geolocation-search {
     width: 165px;
   }
-  .geolocation-map {
+  #mapCanvas {
     height: 150px;
   }
 }

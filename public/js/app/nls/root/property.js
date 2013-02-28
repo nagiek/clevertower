@@ -1,6 +1,9 @@
 (function() {
 
   define({
+    actions: {
+      new_property: "New Property"
+    },
     menu: {
       day_to_day: "Day to Day",
       reports: "Reports",
@@ -33,16 +36,59 @@
       view_tenant: "See Tenant View"
     },
     form: {
-      marketing: "Marketing",
-      contact: "Contact",
-      building: "Building",
-      features: "Features",
-      amenities: "Amenities"
+      structure: {
+        marketing: "Marketing",
+        contact: "Contact",
+        building: "Building",
+        features: "Features",
+        amenities: "Amenities",
+        included: "Included"
+      }
+    },
+    fields: {
+      description: "Description",
+      phone: "Phone",
+      email: "Email",
+      website: "Website",
+      title: "Title",
+      photos: "Photos",
+      property_type: {
+        label: "Property Type",
+        condo: "Condo",
+        apartment: "Apartment"
+      },
+      year: "Year",
+      mls: "MLS",
+      air_conditioning: "Air conditioning",
+      back_yard: "Back yard",
+      balcony: "Balcony",
+      cats_allowed: "Cats allowed",
+      concierge: "Concierge",
+      dogs_allowed: "Dogs allowed",
+      doorman: "Doorman",
+      elevator: "Elevator",
+      exposed_brick: "Exposed brick",
+      fireplace: "Fireplace",
+      front_yard: "Front yard",
+      gym: "Gym",
+      laundry: "Laundry",
+      indoor_parking: "Indoor parking",
+      outdoor_parking: "Outdoor parking",
+      park: "Park",
+      pool: "Pool",
+      sauna: "Sauna",
+      wheelchair: "wheelchair",
+      electricity: "Electricity",
+      furniture: "Furniture",
+      gas: "Gas",
+      heat: "Heat",
+      hot_water: "Hot water"
     },
     errors: {
       messages: {
         access_denied: "You do not have access to the property.",
-        missing: 'You must select a property.'
+        missing: 'You must select a property.',
+        title_missing: 'A title is required.'
       }
     }
   });

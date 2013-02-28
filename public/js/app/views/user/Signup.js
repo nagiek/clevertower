@@ -2,7 +2,7 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", 'templates/user/signup'], function($, _, Parse) {
+  define(["jquery", "underscore", "backbone", "i18n!nls/devise", 'templates/user/signup'], function($, _, Parse, i18nDevise) {
     var SignupView;
     return SignupView = (function(_super) {
 
@@ -35,12 +35,12 @@
           ACL: new Parse.ACL()
         }, {
           success: function(user) {
-            var AppView;
-            AppView = require("views/app/Main");
-            new AppView();
-            _this.undelegateEvents();
-            _this.remove();
-            return delete _this;
+            return require(["views/app/Main"], function(AppView) {
+              new AppView();
+              this.undelegateEvents();
+              this.remove();
+              return delete this;
+            });
           },
           error: function(user, error) {
             self.$(".signup-form .error").html(error.message).show();
@@ -52,7 +52,9 @@
       };
 
       SignupView.prototype.render = function() {
-        this.$el.html(JST["src/js/templates/user/signup.jst"]);
+        this.$el.html(JST["src/js/templates/user/signup.jst"]({
+          i18nDevise: i18nDevise
+        }));
         this.delegateEvents();
         return this;
       };

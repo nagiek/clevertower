@@ -1,0 +1,14 @@
+{
+    "applications": {
+        "CleverTower": {
+            "applicationId": "6XgIM84FecTslR8rnXBZsjnDqZgVISa946m9OmfO", 
+            "masterKey": "bsgK6CzLoHfVpsn7tzqCxibRxnWiLBmrRHMQkPfD"
+        }, 
+        "_default": {
+            "link": "CleverTower"
+        }
+    }, 
+    "global": {
+        "parseVersion": "1.2.1"
+    }
+}

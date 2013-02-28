@@ -4,9 +4,12 @@ module.exports = (app) ->
   # admin   = require('./admin_rest')(app)
   # helpers  = require('./helpers')(app)
 
-  # app.get '/*', (req, res) ->
   app.get '/', (req, res) ->
     res.render 'index'
+  app.get '/*', (req, res) ->
+    res.render 'index'
+        
+
 
 
   # # Load Root

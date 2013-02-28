@@ -11,8 +11,8 @@ __p += '<li class="' +
 '">\n  <div class="view">\n  <input class="toggle" type="checkbox" ' +
 ((__t = ( done ? 'checked="checked"' : '' )) == null ? '' : __t) +
 '>\n  <label class="todo-content">' +
-((__t = ( content )) == null ? '' : __t) +
-'</label>\n  <button class="todo-destroy"></button>\n  </div>\n  <input class="edit" value="' +
+((__t = ( title )) == null ? '' : __t) +
+'</label>\n  </div>\n  <input class="edit" value="' +
 ((__t = ( content )) == null ? '' : __t) +
 '">\n</li>\n';
 

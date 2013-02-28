@@ -16,7 +16,7 @@ helpers     = require '../controllers/helpers'
 #
 module.exports = ->
   # Create Server
-  app = express.createServer()
+  app = express()
 
   helpers(app)
 
@@ -26,11 +26,12 @@ module.exports = ->
   # Load Environmental Settings
   environment(app)
 
+  # Not 3.x compatible
+  # Load error routes + pages
+  # errors(app)
+
   # Load routes config
   routes(app)
-
-  # Load error routes + pages
-  errors(app)
 
   # Load hooks
   hooks(app)

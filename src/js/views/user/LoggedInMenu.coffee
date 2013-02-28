@@ -1,9 +1,10 @@
 define [
-  "jquery", 
-  "underscore", 
-  "backbone", 
-  "templates/user/logged_in_menu",
-], ($, _, Parse) ->
+  "jquery"
+  "underscore"
+  "backbone"
+  "i18n!nls/devise"
+  "templates/user/logged_in_menu"
+], ($, _, Parse, i18nDevise) ->
 
   class LoggedInMenuView extends Parse.View
     events:
@@ -16,14 +17,13 @@ define [
 
     # Logs out the user and shows the login view
     logOut: (e) ->
-      Parse.User.logOut()
-      AppView = require "views/app/Main"
-      new AppView()
-      
-      this.undelegateEvents();
-      delete this
+      require ["views/app/Main"], (AppView) ->
+        Parse.User.logOut()
+        new AppView()      
+        this.undelegateEvents();
+        delete this
 
     render: ->
-      @$el.html JST["src/js/templates/user/logged_in_menu.jst"]
+      @$el.html JST["src/js/templates/user/logged_in_menu.jst"](i18nDevise: i18nDevise)
       @delegateEvents()
       this

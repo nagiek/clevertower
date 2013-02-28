@@ -1,6 +1,6 @@
 define [
-  'underscore',
-  'backbone',
+  'underscore'
+  'backbone'
 ], (_, Parse) ->
 
   Todo = Parse.Object.extend "Todo",
