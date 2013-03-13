@@ -80,17 +80,14 @@ define [
       components.thoroughfare = street_number + " " + route
       return components
        
-    geolocate : ->
+    geolocate : (e) ->
 
       # First use browser geolocation    
       if navigator.geolocation
-    
         # Set current user location, if available
         navigator.geolocation.getCurrentPosition (position) =>
-          @marker.set 
-            lat: position.coords.latitude
-            lng: position.coords.longitude
-          @geocode {'latLng': @marker.toGPoint()}
+          @marker.set "center", new Parse.GeoPoint(position.coords)
+          @geocode latLng: @marker.toGPoint()
     
       # If browser geolication is not supoprted, try ip location
       else

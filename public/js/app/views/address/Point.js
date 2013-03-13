@@ -50,29 +50,12 @@
       GPointView.prototype.render = function() {
         this.setMapZoom(this.model.get('location_type'));
         this.$searchInput.val(this.model.get('formatted_address'));
-        this.model.$location_type.val(this.model.get('location_type'));
-        this.model.$adrsThr.val(this.model.get('thoroughfare'));
-        this.model.$adrsLty.val(this.model.get('locality'));
-        this.model.$adrsNhd.val(this.model.get('neighbourhood'));
-        this.model.$adrsAd1.val(this.model.get('administrative_area_level_1'));
-        this.model.$adrsAd2.val(this.model.get('administrative_area_level_2'));
-        this.model.$adrsCty.val(this.model.get('country'));
-        this.model.$adrsPCd.val(this.model.get('postal_code'));
         return this;
       };
 
       GPointView.prototype.remove = function() {
         this.gMarker.setMap(null);
         this.gMarker = null;
-        this.model.$formatted_address.val('');
-        this.model.$location_type.val('');
-        this.model.$adrsLat.val('');
-        this.model.$adrsLng.val('');
-        this.model.$adrsThr.val('');
-        this.model.$adrsLty.val('');
-        this.model.$adrsAdm.val('');
-        this.model.$adrsCty.val('');
-        this.model.$adrsPCd.val('');
         return GPointView.__super__.remove.apply(this, arguments);
       };
 

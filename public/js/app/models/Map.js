@@ -72,16 +72,13 @@
         components.thoroughfare = street_number + " " + route;
         return components;
       },
-      geolocate: function() {
+      geolocate: function(e) {
         var _this = this;
         if (navigator.geolocation) {
           return navigator.geolocation.getCurrentPosition(function(position) {
-            _this.marker.set({
-              lat: position.coords.latitude,
-              lng: position.coords.longitude
-            });
+            _this.marker.set("center", new Parse.GeoPoint(position.coords));
             return _this.geocode({
-              'latLng': _this.marker.toGPoint()
+              latLng: _this.marker.toGPoint()
             });
           });
         } else {

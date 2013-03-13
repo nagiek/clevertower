@@ -50,28 +50,28 @@ define [
     render: ->
       @setMapZoom               @model.get('location_type')
       @$searchInput.val         @model.get('formatted_address')
-      @model.$location_type.val @model.get('location_type')
-      # @model.$adrsLat.val       @model.get('lat')
-      # @model.$adrsLat.val       @model.get('lng')
-      @model.$adrsThr.val       @model.get('thoroughfare')
-      @model.$adrsLty.val       @model.get('locality')
-      @model.$adrsNhd.val       @model.get('neighbourhood')
-      @model.$adrsAd1.val       @model.get('administrative_area_level_1')
-      @model.$adrsAd2.val       @model.get('administrative_area_level_2')
-      @model.$adrsCty.val       @model.get('country')
-      @model.$adrsPCd.val       @model.get('postal_code')
+      # @model.$location_type.val @model.get('location_type')
+      # # @model.$adrsLat.val       @model.get('lat')
+      # # @model.$adrsLat.val       @model.get('lng')
+      # @model.$adrsThr.val       @model.get('thoroughfare')
+      # @model.$adrsLty.val       @model.get('locality')
+      # @model.$adrsNhd.val       @model.get('neighbourhood')
+      # @model.$adrsAd1.val       @model.get('administrative_area_level_1')
+      # @model.$adrsAd2.val       @model.get('administrative_area_level_2')
+      # @model.$adrsCty.val       @model.get('country')
+      # @model.$adrsPCd.val       @model.get('postal_code')
       this
 
     remove: ->
       @gMarker.setMap               null
       @gMarker =                    null
-      @model.$formatted_address.val ''
-      @model.$location_type.val     ''
-      @model.$adrsLat.val           ''
-      @model.$adrsLng.val           ''
-      @model.$adrsThr.val           ''
-      @model.$adrsLty.val           ''
-      @model.$adrsAdm.val           ''
-      @model.$adrsCty.val           ''
-      @model.$adrsPCd.val           ''
+      # @model.$formatted_address.val ''
+      # @model.$location_type.val     ''
+      # @model.$adrsLat.val           ''
+      # @model.$adrsLng.val           ''
+      # @model.$adrsThr.val           ''
+      # @model.$adrsLty.val           ''
+      # @model.$adrsAdm.val           ''
+      # @model.$adrsCty.val           ''
+      # @model.$adrsPCd.val           ''
       super
