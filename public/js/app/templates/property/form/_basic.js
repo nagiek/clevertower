@@ -10,11 +10,11 @@ __p += '<fieldset>\n  <legend>' +
 ((__t = ( i18nProperty.form.structure.building )) == null ? '' : __t) +
 '</legend>\n  <div class="row">\n    <div id="property-title-group" class="control-group span">\n      <label for="property-title" class="control-label">' +
 ((__t = ( i18nProperty.fields.title )) == null ? '' : __t) +
-'</label>\n      <div class="controls">\n        <input type="text" name="property[title]" id="property-title" class="span3" value="' +
+'</label>\n      <div class="controls">\n        <input type="text" name="property[title]" id="property-title" class="span4" value="' +
 ((__t = ( property.title ? property.title : property.get("address").get('thoroughfare') )) == null ? '' : __t) +
 '">\n      </div>\n    </div>\n    <div class="control-group span">\n      <label for="property-email" class="control-label">' +
 ((__t = ( i18nProperty.fields.property_type.label )) == null ? '' : __t) +
-'</label>\n      <div class="controls">\n        <select name="property[property_type]" id="property-property_type" class="span2" ' +
+'</label>\n      <div class="controls">\n        <select name="property[property_type]" id="property-property_type" class="span3" ' +
 ((__t = ( property.property_type ? 'value="' + property.property_type + '"' : ''  )) == null ? '' : __t) +
 '>\n          <option value="">' +
 ((__t = ( i18nCommon.form.select.select_value )) == null ? '' : __t) +
@@ -34,9 +34,9 @@ __p += '<fieldset>\n  <legend>' +
 ((__t = ( i18nProperty.form.structure.marketing )) == null ? '' : __t) +
 '</legend>\n  <div class="row">\n    <div class="control-group span">\n      <label for="property-description" class="control-label">' +
 ((__t = ( i18nProperty.fields.description )) == null ? '' : __t) +
-'</label>\n      <div class="controls">\n        <textarea rows="5" name="property[description]" id="property-description" class="span3">' +
+'</label>\n      <div class="controls">\n        <textarea rows="5" name="property[description]" id="property-description" class="span4">' +
 ((__t = ( property.description ? property.description : ''  )) == null ? '' : __t) +
-'</textarea>\n      </div>\n    </div>\n    <div class="control-group span4">\n      <label for="property-amenities" class="control-label">' +
+'</textarea>\n      </div>\n    </div>\n    <div class="control-group span6">\n      <label for="property-amenities" class="control-label">' +
 ((__t = ( i18nProperty.form.structure.amenities )) == null ? '' : __t) +
 '</label>\n      <div class="controls three-column">\n        <label for="property-air_conditioning" class="control-label">\n          <input type="checkbox" name="property[air_conditioning]" id="property-air_conditioning" ' +
 ((__t = ( property.air_conditioning ? checked="checked" : '' )) == null ? '' : __t) +

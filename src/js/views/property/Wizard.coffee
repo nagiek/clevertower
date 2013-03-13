@@ -16,7 +16,7 @@ define [
   
     # Instead of generating a new element, bind to the existing skeleton of
     # the App already present in the HTML.
-    el: "#form"
+    el: "#form .wizard"
     
     state: 'address'
     

@@ -89,7 +89,7 @@ define [
           
           # Reset form
           @$el.find("#new-property").removeProp "disabled"
-          @$el.append '<div id="form" class="wizard"></div>'
+          @$el.append '<div id="form" class="row"><div class="wizard span12"></div></div>'
           @$el.find("section").show()
 
         

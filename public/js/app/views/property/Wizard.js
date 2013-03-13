@@ -12,7 +12,7 @@
         return PropertyWizardView.__super__.constructor.apply(this, arguments);
       }
 
-      PropertyWizardView.prototype.el = "#form";
+      PropertyWizardView.prototype.el = "#form .wizard";
 
       PropertyWizardView.prototype.state = 'address';
 

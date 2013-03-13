@@ -4,13 +4,13 @@
     <div id="property-title-group" class="control-group span">
       <label for="property-title" class="control-label"><%= i18nProperty.fields.title %></label>
       <div class="controls">
-        <input type="text" name="property[title]" id="property-title" class="span3" value="<%= property.title ? property.title : property.get("address").get('thoroughfare') %>">
+        <input type="text" name="property[title]" id="property-title" class="span4" value="<%= property.title ? property.title : property.get("address").get('thoroughfare') %>">
       </div>
     </div>
     <div class="control-group span">
       <label for="property-email" class="control-label"><%= i18nProperty.fields.property_type.label %></label>
       <div class="controls">
-        <select name="property[property_type]" id="property-property_type" class="span2" <%= property.property_type ? 'value="' + property.property_type + '"' : ''  %>>
+        <select name="property[property_type]" id="property-property_type" class="span3" <%= property.property_type ? 'value="' + property.property_type + '"' : ''  %>>
           <option value=""><%= i18nCommon.form.select.select_value %></option>
           <option value="1"><%= i18nProperty.fields.property_type.condo %></option>
           <option value="2"><%= i18nProperty.fields.property_type.apartment %></option>
@@ -38,10 +38,10 @@
     <div class="control-group span">
       <label for="property-description" class="control-label"><%= i18nProperty.fields.description %></label>
       <div class="controls">
-        <textarea rows="5" name="property[description]" id="property-description" class="span3"><%= property.description ? property.description : ''  %></textarea>
+        <textarea rows="5" name="property[description]" id="property-description" class="span4"><%= property.description ? property.description : ''  %></textarea>
       </div>
     </div>
-    <div class="control-group span4">
+    <div class="control-group span6">
       <label for="property-amenities" class="control-label"><%= i18nProperty.form.structure.amenities %></label>
       <div class="controls three-column">
         <label for="property-air_conditioning" class="control-label">
