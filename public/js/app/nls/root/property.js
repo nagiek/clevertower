@@ -3,6 +3,7 @@
   define({
     actions: {
       new_property: "New Property",
+      setup_property: "Setup Property",
       edit_picture: "Change Picture"
     },
     menu: {

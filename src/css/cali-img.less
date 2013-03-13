@@ -32,6 +32,16 @@ img[class*="span"] {
   }
 }
 
+.photo-medium {
+  height:@mediumImgLength;
+  width:@mediumImgLength;
+  img {
+    min-height:@mediumImgLength - 100;
+    max-height:@mediumImgLength + 100;
+    width:@mediumImgLength;
+  }
+}
+
 .photo-float {
   // Applied to things around the photo
   float: none;
@@ -64,10 +74,5 @@ img[class*="span"] {
 }
 
 @media (max-width: 767px) {
-  .elastic-float    { margin-left: auto;    }
+  .elastic-float    { margin-left: auto; padding-left: @profileImgPadding; }
 }
-
-@media (max-width: 480px) {
-  .profile-float    { margin-left: @thumbnailImgLength + @profileImgPadding;    }
-}
-

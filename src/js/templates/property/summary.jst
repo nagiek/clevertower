@@ -1,27 +1,25 @@
-<div class="property views-row row">
-  <div class="views-field-title span8">
-    <div class="photo photo-profile">
-      <a href="/properties/<%= objectId %>">
-        <img src="<%= cover %>" alt="Profile" class="profile-picture">
-      </a>
-    </div>
-      
+<div class="property span8">
+  <div class="photo photo-medium photo-elastic pull-left tablet-left">
+    <a href="/properties/<%= objectId %>">
+      <img src="<%= cover %>" alt="Profile" class="profile-picture">
+    </a>
+  </div>
+  
+  <div class="photo-float medium-float elastic-float">
     <div class="btn-toolbar stay-right">
-      <% if (init !== false) { %>
-        <div class="btn-group">
-          <a href="#" class="btn btn-warning">
-            <i class="icon icon-lightning"></i>
-          </a>
-        </div>
-      <% } %>
       <%= JST["src/js/templates/property/menu.jst"]({objectId: objectId, i18nProperty: i18nProperty}) %>
     </div>
     
-    <div class="profile-float">
-      <h3><a href="/properties/<%= objectId %>"><%= title %></a></h3>
-    </div>
+    <h2>
+      <a href="/properties/<%= objectId %>"><%= title %></a>
+      <% if (init !== false) { %>
+        <a href="#" class="badge badge-info" rel="tooltip" data-original-title="<%=i18nProperty.actions.setup_property%>">
+          <i class="icon icon-lightning icon-white"></i>
+        </a>
+      <% } %>
+    </h2>
     
-    <dl class="profile-float">
+    <dl>
       <!-- <div class="span"> -->
         <dt><a href="/properties/<%= objectId %>/tasks"><%= i18nCommon.classes.tasks %></a></dt>
         <dd><%= tasks %></dd>

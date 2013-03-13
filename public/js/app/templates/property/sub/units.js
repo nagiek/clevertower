@@ -6,7 +6,7 @@ this["JST"]["src/js/templates/property/sub/units.jst"] = function(obj) {
 obj || (obj = {});
 var __t, __p = '', __e = _.escape;
 with (obj) {
-__p += '<form id="units" method="post">\n  <h2>Listing units</h2>\n  \n  <div class="well form-actions form-inline form-condensed pull-right">\n    <button class="save btn btn-primary">' +
+__p += '<form id="units" method="post">\n  <h2>Listing units</h2>\n  \n  <div class="well form-actions form-inline form-condensed stay-right">\n    <button class="save btn btn-primary">' +
 ((__t = ( i18nCommon.actions.save )) == null ? '' : __t) +
 '</button>\n  \t<div class="control-group">\n  \t\t<div class="control-label">' +
 ((__t = ( i18nCommon.actions.add_x_more )) == null ? '' : __t) +

@@ -7,21 +7,23 @@ obj || (obj = {});
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
 with (obj) {
-__p += '<div class="property views-row row">\n  <div class="views-field-title span8">\n    <div class="photo photo-profile">\n      <a href="/properties/' +
+__p += '<div class="property span8">\n  <div class="photo photo-medium photo-elastic pull-left tablet-left">\n    <a href="/properties/' +
 ((__t = ( objectId )) == null ? '' : __t) +
-'">\n        <img src="' +
+'">\n      <img src="' +
 ((__t = ( cover )) == null ? '' : __t) +
-'" alt="Profile" class="profile-picture">\n      </a>\n    </div>\n      \n    <div class="btn-toolbar stay-right">\n      ';
- if (init !== false) { ;
-__p += '\n        <div class="btn-group">\n          <a href="#" class="btn btn-warning">\n            <i class="icon icon-lightning"></i>\n          </a>\n        </div>\n      ';
- } ;
-__p += '\n      ' +
+'" alt="Profile" class="profile-picture">\n    </a>\n  </div>\n  \n  <div class="photo-float medium-float elastic-float">\n    <div class="btn-toolbar stay-right">\n      ' +
 ((__t = ( JST["src/js/templates/property/menu.jst"]({objectId: objectId, i18nProperty: i18nProperty}) )) == null ? '' : __t) +
-'\n    </div>\n    \n    <div class="profile-float">\n      <h3><a href="/properties/' +
+'\n    </div>\n    \n    <h2>\n      <a href="/properties/' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '">' +
 ((__t = ( title )) == null ? '' : __t) +
-'</a></h3>\n    </div>\n    \n    <dl class="profile-float">\n      <!-- <div class="span"> -->\n        <dt><a href="/properties/' +
+'</a>\n      ';
+ if (init !== false) { ;
+__p += '\n        <a href="#" class="badge badge-info" rel="tooltip" data-original-title="' +
+((__t = (i18nProperty.actions.setup_property)) == null ? '' : __t) +
+'">\n          <i class="icon icon-lightning icon-white"></i>\n        </a>\n      ';
+ } ;
+__p += '\n    </h2>\n    \n    <dl>\n      <!-- <div class="span"> -->\n        <dt><a href="/properties/' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '/tasks">' +
 ((__t = ( i18nCommon.classes.tasks )) == null ? '' : __t) +

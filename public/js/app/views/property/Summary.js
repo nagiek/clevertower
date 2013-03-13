@@ -14,6 +14,8 @@
 
       PropertySummaryView.prototype.tagName = "li";
 
+      PropertySummaryView.prototype.className = "row";
+
       PropertySummaryView.prototype.events = {
         "click .toggle": "toggleDone",
         "dblclick label.property-content": "edit",

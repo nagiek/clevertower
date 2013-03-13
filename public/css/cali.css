@@ -9367,6 +9367,15 @@ img[class*="span"] {
   max-height: 180px;
   max-width: 180px;
 }
+.photo-medium {
+  height: 180px;
+  width: 180px;
+}
+.photo-medium img {
+  min-height: 80px;
+  max-height: 280px;
+  width: 180px;
+}
 .photo-float {
   float: none;
   display: block;
@@ -9404,11 +9413,7 @@ img[class*="span"] {
 @media (max-width: 767px) {
   .elastic-float {
     margin-left: auto;
-  }
-}
-@media (max-width: 480px) {
-  .profile-float {
-    margin-left: 76px;
+    padding-left: 12px;
   }
 }
 #autocomplete .dropdown-menu {
@@ -10276,7 +10281,7 @@ body.logged-in .page-branding #main {
 }
 #property .page-header h1 {
   margin-top: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
   min-height: 44px;
 }
 #property .page-header h1 a {
@@ -10349,6 +10354,7 @@ body.logged-in .page-branding #main {
   background-color: #8fc8d9;
 }
 #property .page-header .nav-tabs {
+  vertical-align: bottom;
   margin-right: 3px;
   /* LTR */
 
@@ -10398,18 +10404,11 @@ body.logged-in .page-branding #main {
 #property .page-header .nav-tabs > li > a:hover .caret {
   border-top-color: #333333;
 }
-/*
-@media (max-width:979px) {
-  #property {
-    .page-header {
-      width:100%;
-      > .header {
-        max-width: 500px; // max-width - container padding - max thumbnail length - image padding = ?
-      }
-    }
+@media (max-width: 979px) {
+  #property .page-header h1 {
+    margin-bottom: 8px;
   }
 }
-*/
 @media (max-width: 480px) {
   #property .page-header > .header {
     min-width: 0;
@@ -10435,35 +10434,23 @@ body.logged-in .page-branding #main {
     max-height: none;
     max-width: 100%;
   }
-  #property #title-blocks > .nav-tabs {
+  #property .nav-tabs {
     position: relative;
     top: -50px;
   }
-  #property #title-blocks > .nav-tabs > li > a {
+  #property .nav-tabs > li > a {
     font-size: 12px;
     padding-left: 12px;
     padding-right: 11px;
-    padding-top: 6px;
-    padding-bottom: 6px;
+    padding-top: 5px;
+    padding-bottom: 5px;
   }
 }
 @media (max-width: 320px) {
-  #property .header h1 {
-    min-height: 64px;
-  }
-  #property #title-blocks {
-    margin-left: 0;
-  }
-  #property #title-blocks > .nav-tabs {
-    margin-top: 3px;
-    margin-left: 3px;
-  }
-  #property #title-blocks > .nav-tabs > li > a {
+  #property .nav-tabs > li > a {
     font-size: 9px;
     padding-left: 9px;
     padding-right: 9px;
-    padding-top: 4px;
-    padding-bottom: 4px;
   }
 }
 /**
@@ -11033,35 +11020,25 @@ table.views-table {
 /**
  * .view-id-my_properties
  */
-#view-id-my_properties .views-row {
-  margin-left: 0;
-}
-#view-id-my_properties .views-row > ul {
-  margin-bottom: 0;
-}
 #view-id-my_properties .views-row-odd {
   background-color: #e0f5fe;
 }
 #view-id-my_properties .views-row-even {
   background-color: #ffffff;
 }
-#view-id-my_properties .views-field-title {
-  margin-bottom: 3px;
-  margin-left: 0;
-}
-#view-id-my_properties .views-field-title .stay-right {
-  margin-top: 5px;
-}
-#view-id-my_properties .views-field-title .btn-text {
+#view-id-my_properties .btn-text {
   font-weight: 400;
   font-size: 18px;
   padding-top: 2px;
   padding-bottom: 6px;
 }
-#view-id-my_properties .views-field-title h3 {
+#view-id-my_properties h2 {
   line-height: 1;
-  margin-top: 5px;
-  margin-bottom: 48px;
+  margin-top: 15px;
+}
+#view-id-my_properties .btn-toolbar,
+#view-id-my_properties dl {
+  margin: 0;
 }
 #view-id-my_properties dt {
   display: inline;
@@ -11075,11 +11052,11 @@ table.views-table {
   font-size: 110%;
 }
 @media (max-width: 767px) {
-  #view-id-my_properties .views-row {
+  #view-id-my_properties .property {
     padding-bottom: 12px;
   }
-  #view-id-my_properties .views-field-title .stay-right {
-    margin-right: 10px;
+  #view-id-my_properties .btn-toolbar {
+    padding-right: 10px;
   }
   #view-id-my_properties dt {
     width: 160px;
@@ -11088,6 +11065,35 @@ table.views-table {
   #view-id-my_properties dd {
     width: 60px;
     margin-left: 0;
+  }
+}
+@media (max-width: 480px) {
+  #view-id-my_properties .photo-float {
+    position: relative;
+    top: -80px;
+    min-height: 0;
+    margin-bottom: 7px;
+  }
+  #view-id-my_properties .photo-float h2 {
+    font-size: 20px;
+    margin-bottom: 48px;
+  }
+  #view-id-my_properties .photo-float h2 a {
+    color: #000000;
+  }
+  #view-id-my_properties .btn-toolbar {
+    width: 105px;
+  }
+  #view-id-my_properties .btn-toolbar .btn-group {
+    margin-left: 5px;
+  }
+  .photo {
+    height: 80px;
+    width: 100%;
+  }
+  .photo img {
+    max-height: none;
+    width: 100%;
   }
 }
 /**

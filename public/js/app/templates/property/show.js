@@ -16,23 +16,23 @@ __p += '<div class="page-header row">    \n  <div class="photo photo-thumbnail p
 ((__t = ( objectId )) == null ? '' : __t) +
 '">' +
 ((__t = ( title )) == null ? '' : __t) +
-'</a>\n    </h1>\n\n    <div id="title-blocks" class="inline-block profile-inline">\n      <ul class="nav nav-tabs" role="navigation">\n        <li class="dropdown">\n          <a href="#" class="dropdown-toggle" data-toggle="dropdown">\n            ' +
+'</a>\n    </h1>\n\n    <ul class="nav nav-tabs inline-block profile-inline" role="navigation">\n      <li class="dropdown">\n        <a href="#" class="dropdown-toggle" data-toggle="dropdown">\n          ' +
 ((__t = ( i18nProperty.menu.day_to_day )) == null ? '' : __t) +
-'\n            <b class="caret"></b>\n          </a>\n          ' +
+'\n          <b class="caret"></b>\n        </a>\n        ' +
 ((__t = ( JST["src/js/templates/property/menu/show.jst"]({objectId: objectId, i18nProperty: i18nProperty}) )) == null ? '' : __t) +
-'\n        </li>\n        <li class="dropdown">\n          <a href="#" class="dropdown-toggle" data-toggle="dropdown">\n            ' +
+'\n      </li>\n      <li class="dropdown">\n        <a href="#" class="dropdown-toggle" data-toggle="dropdown">\n          ' +
 ((__t = ( i18nProperty.menu.reports )) == null ? '' : __t) +
-'\n            <b class="caret"></b>\n          </a>\n          ' +
+'\n          <b class="caret"></b>\n        </a>\n        ' +
 ((__t = ( JST["src/js/templates/property/menu/reports.jst"]({objectId: objectId, i18nProperty: i18nProperty}) )) == null ? '' : __t) +
-'\n        </li>\n        <li class="dropdown">\n          <a href="#" class="dropdown-toggle" data-toggle="dropdown">\n            ' +
+'\n      </li>\n      <li class="dropdown">\n        <a href="#" class="dropdown-toggle" data-toggle="dropdown">\n          ' +
 ((__t = ( i18nProperty.menu.other )) == null ? '' : __t) +
-'\n            <b class="caret"></b>\n          </a>\n          ' +
+'\n          <b class="caret"></b>\n        </a>\n        ' +
 ((__t = ( JST["src/js/templates/property/menu/other.jst"]({objectId: objectId, i18nProperty: i18nProperty}) )) == null ? '' : __t) +
-'\n        </li>\n        <li class="dropdown add-dropdown">\n          <a href="#" class="btn.btn-success dropdown-toggle" data-toggle="dropdown">\n            ' +
+'\n      </li>\n      <li class="dropdown add-dropdown">\n        <a href="#" class="btn.btn-success dropdown-toggle" data-toggle="dropdown">\n          ' +
 ((__t = ( i18nProperty.menu.actions )) == null ? '' : __t) +
-'\n            <b class="caret"></b>\n          </a>\n          ' +
+'\n          <b class="caret"></b>\n        </a>\n        ' +
 ((__t = ( JST["src/js/templates/property/menu/actions.jst"]({objectId: objectId, i18nProperty: i18nProperty}) )) == null ? '' : __t) +
-'\n        </li>\n      </ul>\n    </div>\n  </header>\n</div>\n\n<div id="content"></div>\n\n<div id="edit-profile-picture-modal" class="modal form-modal hide fade">\n  <form id="profile-picture-upload" method="POST">\n    <div class="modal-header">\n      <button type="button" class="close" data-dismiss="modal" aria-labelledby="edit-profile-picture-modal-label" aria-hidden="true">&times;</button>\n      <h3 id="edit-profile-picture-modal-label">' +
+'\n      </li>\n    </ul>\n  </header>\n</div>\n\n<div id="content"></div>\n\n<div id="edit-profile-picture-modal" class="modal form-modal hide fade">\n  <form id="profile-picture-upload" method="POST">\n    <div class="modal-header">\n      <button type="button" class="close" data-dismiss="modal" aria-labelledby="edit-profile-picture-modal-label" aria-hidden="true">&times;</button>\n      <h3 id="edit-profile-picture-modal-label">' +
 ((__t = ( i18nProperty.actions.edit_picture )) == null ? '' : __t) +
 '</h3>\n    </div>\n    <div class="modal-body">\n      <div class="row-fluid">\n        <div id="preview-profile-picture" class="preview template-upload">\n          <img src="' +
 ((__t = ( cover )) == null ? '' : __t) +

@@ -10,8 +10,8 @@ define [
 
   class PropertySummaryView extends Parse.View
   
-    #... is a list tag.
     tagName: "li"
+    className: "row"
     
     # The DOM events specific to an item.
     events:

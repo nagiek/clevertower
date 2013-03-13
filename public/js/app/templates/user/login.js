@@ -13,7 +13,7 @@ __p += '<a id="lLabel" data-toggle="dropdown" href="#" role="button" class="drop
 ':</label>\n      <div class="controls">\n        <input type="email" name="login-username" id="login-username" class="span" size="22" placeholder="' +
 ((__t = ( i18nDevise.form.structure.email )) == null ? '' : __t) +
 '">\n      </div>\n    </div>\n    <div class="control-group">\n      <label for="login-password" class="control-label hide">' +
-((__t = ( i18nDevise.form.structure.email )) == null ? '' : __t) +
+((__t = ( i18nDevise.form.structure.password )) == null ? '' : __t) +
 ':</label>\n      <div class="controls">\n        <input type="password" name="password" id="login-password" class="span" size="22" placeholder="' +
 ((__t = ( i18nDevise.form.structure.password )) == null ? '' : __t) +
 '">\n      </div>\n    </div>\n    <button class="btn btn-block">' +

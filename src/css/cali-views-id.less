@@ -238,35 +238,23 @@
  * .view-id-my_properties
  */
 #view-id-my_properties {
-  .views-row {
-    margin-left:0;
-    > ul {
-      margin-bottom: 0;
-    }
+
+  .views-row-odd  {background-color:@blueLight;}
+  .views-row-even {background-color:@blueLighter;}
+
+  .btn-text {
+    font-weight: 400;
+    font-size: 18px;
+    padding-top: 2px;
+    padding-bottom: 6px;
   }
-  .views-row-odd {
-    background-color:@blueLight;
+  h2 {
+    line-height:1;
+    margin-top:15px;
   }
-  .views-row-even {
-    background-color:@blueLighter;
-  }
-  .views-field-title {
-    margin-bottom:3px;
-    margin-left:0;
-    .stay-right {
-      margin-top:5px;
-    }
-    .btn-text {
-      font-weight: 400;
-      font-size: 18px;
-      padding-top: 2px;
-      padding-bottom: 6px;
-    }
-    h3 {
-      line-height:1;
-      margin-top:5px;
-      margin-bottom:48px;
-    }
+  .btn-toolbar,
+  dl {
+    margin:0;
   }
   dt {
     display:inline;
@@ -283,13 +271,11 @@
 
 @media (max-width: 767px) {
   #view-id-my_properties {
-    .views-row {
+    .property {
       padding-bottom:12px;
     }
-    .views-field-title {
-      .stay-right {
-        margin-right:10px;
-      }
+    .btn-toolbar {
+      padding-right:10px;
     }
     dt {
       width:160px;
@@ -298,6 +284,38 @@
     dd {
       width:60px;
       margin-left:0;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  #view-id-my_properties {
+    .photo-float {
+      position:relative;
+      top:-80px;
+      min-height:0;
+      margin-bottom:7px;
+      h2 {
+        font-size:20px;
+        margin-bottom:48px;
+        a {
+          color:@black;            
+        }
+      }
+    }
+    .btn-toolbar {
+      width:105px; //2 btns + padding
+      .btn-group {
+        margin-left:5px;
+      }
+    }
+  }
+  .photo {
+    height:80px;
+    width:100%;
+    img {
+      max-height:none;
+      width: 100%;
     }
   }
 }
