@@ -16,12 +16,8 @@ __p += '<ul class="dropdown-menu">\n  <li><a href="/properties/' +
 ((__t = ( i18nProperty.menu.edit_photos )) == null ? '' : __t) +
 '</a></li>\n  <li><a href="/properties/' +
 ((__t = ( objectId )) == null ? '' : __t) +
-'/units">' +
-((__t = ( i18nProperty.menu.edit_units )) == null ? '' : __t) +
-'</a></li>\n  <li class="divider"></li>\n  <li><a href="/properties/' +
-((__t = ( objectId )) == null ? '' : __t) +
 '/managers">' +
-((__t = ( i18nProperty.menu.managers )) == null ? '' : __t) +
+((__t = ( i18nProperty.menu.edit_managers )) == null ? '' : __t) +
 '</a></li>\n  <li class="divider"></li>\n  <li><a href="/public/' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '">' +

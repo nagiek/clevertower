@@ -33,7 +33,6 @@
       };
 
       LoggedInMenuView.prototype.render = function() {
-        console.log('loggedinmenu');
         this.$el.html(JST["src/js/templates/user/logged_in_menu.jst"]({
           i18nDevise: i18nDevise
         }));

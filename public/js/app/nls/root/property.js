@@ -33,6 +33,7 @@
       edit_property: "Edit Property",
       edit_photos: "Edit Photos",
       edit_units: "Edit Units",
+      edit_managers: "Edit Managers",
       managers: "Managers",
       view_public: "See Public View",
       view_tenant: "See Tenant View"
@@ -94,8 +95,8 @@
     },
     errors: {
       access_denied: "You do not have access to the property.",
-      missing: 'You must select a property.',
-      title_missing: 'A title is required.'
+      missing: "You must select a property.",
+      title_missing: "A title is required."
     }
   });
 

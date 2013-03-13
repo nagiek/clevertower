@@ -33,20 +33,16 @@ define [
       @$el.append JST["src/js/templates/property/wizard.jst"](i18nCommon: i18nCommon)
       
       @map = new GMapView(wizard: this, address: @address)
-      
+
       @on "property:save", =>
         @remove()
         @undelegateEvents()
-        # delete @map
-        # delete @form
         delete this
         Parse.history.navigate '/'
 
       @on "wizard:cancel", =>
         @remove()
         @undelegateEvents()
-        # delete @map
-        # delete @form
         delete this
         Parse.history.navigate '/'
 
@@ -101,7 +97,6 @@ define [
               @$el.find('#address-search-group').addClass('error') # Add class to Control Group
                 
         when 'property'
-        
           @property.save @form.$el.serializeObject().property,
             success: (property) =>
               @trigger "property:save", property, this

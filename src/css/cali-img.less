@@ -3,38 +3,71 @@
  * Image floating
  */
 
-.micro-float {
-  float: none;
-  display:block;
-  margin-left: 32px + 5px;
-}
-
-.thumbnail-float {
-  float: none;
-  display:block;
-  margin-left: 50px + 5px;
-}
-
-.profile-float {
-  float: none;
-  display:block;
-  margin-left: 100px + 12px;
-}
-
-.medium-float {
-  float: none;
-  display:block;
-  margin-left: 180px + 12px;
+.photo {
+  overflow:hidden;
 }
 
 img[class*="span"] {
   height: auto;
 }
 
-//@media (max-width: 767px) {}
-
-@media (max-width: 480px) {
-  .portrait-float {
-    margin-left: 64px + 12px;
+.photo-thumbnail {
+  height:@thumbnailImgLength;
+  width:@thumbnailImgLength;
+  img {
+    height:@thumbnailImgLength;
+    min-width:@thumbnailImgLength;
+    max-width:@profileImgLength;
   }
 }
+
+.photo-profile {
+  height:@profileImgLength;
+  width:@profileImgLength;
+  img {
+    min-height:@profileImgLength;
+    min-width:@profileImgLength;
+    max-height:@mediumImgLength;
+    max-width:@mediumImgLength;
+  }
+}
+
+.photo-float {
+  // Applied to things around the photo
+  float: none;
+  display:block; 
+}
+.photo-inline {
+  // Applied to photo
+  display:inline-block;
+  vertical-align:top;
+}
+
+.micro-float        { margin-left: @microImgLength     + @microImgPadding;      }
+.thumbnail-float    { margin-left: @thumbnailImgLength + @thumbnailImgPadding;  }
+.profile-float      { margin-left: @profileImgLength   + @profileImgPadding;    }
+.medium-float       { margin-left: @mediumImgLength    + @mediumImgPadding;     }
+                    
+.profile-inline     { margin-left: @profileImgPadding;  }
+
+.photo-elastic {
+  width:auto;
+}
+
+@media (max-width: 979px) {
+  .photo-elastic {
+    height:100%;
+    img {
+      height:auto;
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  .elastic-float    { margin-left: auto;    }
+}
+
+@media (max-width: 480px) {
+  .profile-float    { margin-left: @thumbnailImgLength + @profileImgPadding;    }
+}
+

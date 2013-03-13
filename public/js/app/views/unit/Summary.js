@@ -31,6 +31,11 @@
         this.model.on("save:success", function() {
           return _this.render();
         });
+        this.model.on("remove", function() {
+          _this.remove();
+          _this.undelegateEvents();
+          return delete _this;
+        });
         return this.model.on("invalid", function(unit, error) {
           _this.$('.error').removeClass('error');
           _this.$el.addClass('error');

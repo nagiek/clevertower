@@ -27,6 +27,21 @@
     return response.success();
   });
 
+  Parse.Cloud.afterSave("Property", function(request) {
+    var current, invited, pending, propertyACL;
+    console.log(request.object);
+    if (request.object.isNew()) {
+      propertyACL = new Parse.ACL(request.user);
+      current = new Parse.Role(request.object.id + "-mgr-current", propertyACL).save();
+      invited = new Parse.Role(request.object.id + "-mgr-invited", new Parse.ACL).save();
+      pending = new Parse.Role(request.object.id + "-mgr-pending", new Parse.ACL).save();
+      propertyACL.setRoleWriteAccess(current);
+      propertyACL.setRoleReadAccess(invited);
+      request.object.setACL(propertyACL);
+      return request.object.save;
+    }
+  });
+
   Parse.Cloud.beforeSave("Unit", function(request, response) {
     return request.object.set("user", request.user);
   });

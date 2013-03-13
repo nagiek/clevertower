@@ -21,6 +21,7 @@ define [
       'click #units-show a' : 'switchToShow'
       'click #units-edit a' : 'switchToEdit'
       'click #add-x'        : 'addX'
+      'click .undo'         : 'undo'
       'click .save'         : 'save'
     
     initialize: (attrs) ->
@@ -30,10 +31,11 @@ define [
       
       @editing = false
       
-      @$messages = $("#messages")
-      @$table = @$("#units-table")
-      @$list = @$("#units-table tbody")
-      @$actions = @$(".form-actions")
+      @$messages  = $("#messages")
+      @$table     = @$("#units-table")
+      @$list      = @$("#units-table tbody")
+      @$actions   = @$(".form-actions")
+      @$undo      = @$actions.find('.undo')
       
       # Create our collection of Properties
       @units = new UnitList(property: @model)
@@ -90,14 +92,11 @@ define [
       view = new UnitView(model: unit)
       @$list.append view.render().el
       view.$el.find('.view-specific').toggleClass('hide') if @editing
-        
-    # Add a single todo item to the list by creating a view for it, and
+      
     addX: (e) =>
       e.preventDefault()
       x = Number $('#x').val()
-      inc = Number $('#increment').val()
       x = 1 unless x?
-      inc = 0 unless inc?
             
       until x <= 0
         if @units.length is 0
@@ -105,12 +104,30 @@ define [
         else
           unit = @units.at(@units.length - 1).clone()
           title = unit.get('title')
+          
+          newTitle = title.substr 0, title.length-1
+          char = title.charAt title.length - 1
           # Convert to string for Parse DB
-          unit.set 'title', String(Number title + inc) if _.isNumber(title) and title isnt ''
+          newChar = if isNaN(char) then String.fromCharCode char.charCodeAt() + 1 else String Number(char) + 1
+          unit.set 'title', newTitle + newChar
         @units.add unit
         x--
-        
+
+      @$undo.removeProp 'disabled'
       @$list.last().find('.title-group input').focus()
+      
+    undo: (e) =>
+      e.preventDefault()
+      x = Number $('#x').val()
+      x = 1 unless x?
+
+      until x <= 0
+        unless @units.length is 0
+          # @units.pop() doesn't exist.
+          @units.last().destroy() if @units.last().isNew()
+        x--
+
+      @$undo.prop 'disabled', 'disabled'
     
     save: (e) =>
       e.preventDefault()

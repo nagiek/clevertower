@@ -12,6 +12,8 @@
       function PropertyUnitsView() {
         this.save = __bind(this.save, this);
 
+        this.undo = __bind(this.undo, this);
+
         this.addX = __bind(this.addX, this);
 
         this.addOne = __bind(this.addOne, this);
@@ -32,6 +34,7 @@
         'click #units-show a': 'switchToShow',
         'click #units-edit a': 'switchToEdit',
         'click #add-x': 'addX',
+        'click .undo': 'undo',
         'click .save': 'save'
       };
 
@@ -49,6 +52,7 @@
         this.$table = this.$("#units-table");
         this.$list = this.$("#units-table tbody");
         this.$actions = this.$(".form-actions");
+        this.$undo = this.$actions.find('.undo');
         this.units = new UnitList({
           property: this.model
         });
@@ -113,15 +117,11 @@
       };
 
       PropertyUnitsView.prototype.addX = function(e) {
-        var inc, title, unit, x;
+        var char, newChar, newTitle, title, unit, x;
         e.preventDefault();
         x = Number($('#x').val());
-        inc = Number($('#increment').val());
         if (x == null) {
           x = 1;
-        }
-        if (inc == null) {
-          inc = 0;
         }
         while (!(x <= 0)) {
           if (this.units.length === 0) {
@@ -131,14 +131,34 @@
           } else {
             unit = this.units.at(this.units.length - 1).clone();
             title = unit.get('title');
-            if (_.isNumber(title) && title !== '') {
-              unit.set('title', String(Number(title + inc)));
-            }
+            newTitle = title.substr(0, title.length - 1);
+            char = title.charAt(title.length - 1);
+            newChar = isNaN(char) ? String.fromCharCode(char.charCodeAt() + 1) : String(Number(char) + 1);
+            unit.set('title', newTitle + newChar);
           }
           this.units.add(unit);
           x--;
         }
+        this.$undo.removeProp('disabled');
         return this.$list.last().find('.title-group input').focus();
+      };
+
+      PropertyUnitsView.prototype.undo = function(e) {
+        var x;
+        e.preventDefault();
+        x = Number($('#x').val());
+        if (x == null) {
+          x = 1;
+        }
+        while (!(x <= 0)) {
+          if (this.units.length !== 0) {
+            if (this.units.last().isNew()) {
+              this.units.last().destroy();
+            }
+          }
+          x--;
+        }
+        return this.$undo.prop('disabled', 'disabled');
       };
 
       PropertyUnitsView.prototype.save = function(e) {

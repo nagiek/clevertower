@@ -17,23 +17,9 @@
 /**
  * Property
  */
-.property { // Summary
-  .photo {
-    float:left;
-    height:100px;
-    width:100px;
-    overflow:hidden;
-    img {
-      min-height:100px;
-      min-width:100px;
-      max-width:150px;
-      max-width:150px;
-    }
-  }
-}
 #property { // Show
   .photo { // includes profile photo
-    position:relative;  
+    position:relative;
     .photo-actions {
       position:absolute;
       top:4px;
@@ -62,76 +48,44 @@
   }
   .page-header {
     margin-top:0;
-    .photo {
-      float:left;
-      height:100px;
-      width:100px;
-      overflow:hidden;
-      img {
-        min-height:100px;
-        min-width:100px;
-        max-width:150px;
-        max-width:150px;
-      }
-    }
+    border-bottom:0;
     h1 {
-      display: block;
       margin-top:8px;
       margin-bottom:8px;
       min-height:44px;
-      color:@black; // Keep, as it will be a link
-      text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
-    }
-  }
-  .header-wrapper {
-    margin-bottom:18px;
-    //zoom:1; // Fix IE7
-  }
-  .header-info {
-    padding-right: 12px; // If the property title is less than the width of the tabs.
-    margin-bottom: 18px; 
-    margin-right: 15px;
-    min-width:430px;
-//    margin-left: -4px;
-//    vertical-align: middle;
-//    padding:0;
-//    margin-left:0px;
-//    border: 1px solid #ccc; // Borders will throw off the span tags
-/*    border-bottom-color: #bbb;*/
-    .border-radius(4px);
-    @shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05);
-    .box-shadow(@shadow);
-    .buttonBackground(lighten(#5bc0de, 20%), lighten(desaturate(#2f96b4, 20%), 10%));
-    &:hover {
-      background-color:#8fc8d9;
-    }
-  }
-  .breadcrumb {
-    margin-left:-0.2em;
-    padding: 4px 0;
-  /*  display:inline-block;*/
-    a {
-      margin: 0 0.2em;
-      border-bottom: none; /* 'a' override */
-      &:hover {
-        border-bottom-style:solid;
-        border-bottom-width:2px;
+      a {
+        color:@propertyLinkColor;
+        text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
+        &:hover {
+          color:@propertyLinkColorHover;
+        }
       }
     }
-  }
-/*  .region-title-header {
-    margin-top:17px;
-    margin-left:15px;
-  }*/
-  
-  
-  #title-blocks {
+    .photo {
+      img {
+        max-height:95px; // Max height of the adjecent container.
+        max-width:200px;
+      }
+    }
+    > .header {
+      min-height:64px;
+      // min-width:430px; // Arbitrary
+      padding-right: 12px; // If the property title is less than the width of the tabs.
+      margin-bottom: 18px; 
+      .border-radius(4px);
+      @shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05);
+      .box-shadow(@shadow);
+      .buttonBackground(lighten(#5bc0de, 20%), lighten(desaturate(#2f96b4, 20%), 10%));
+      &:hover {
+        background-color:#8fc8d9;
+      }
+    }
     .nav-tabs {
       margin-right:3px; /* LTR */
       margin-bottom:0;
-      position:relative;
-      top:5px; // 4px border radius +1.
-      //border-bottom:solid 1px @white;
+      // position:relative;
+      // top:5px; // 4px border radius +1.
+
       border-bottom:none;
 
       > li {
@@ -157,7 +111,7 @@
         }
         > a {
           text-shadow:none;
-          color:@white;
+          color:@propertyLinkColor;
           border-bottom-color:@white;
           zoom:1; // Fix ie7.
           .caret {
@@ -176,7 +130,7 @@
             }
           }
           &:hover {
-            color:@grayDarker;
+            color:@propertyLinkColorHover;
             .caret {
               border-top-color:@grayDark;
             }
@@ -189,62 +143,63 @@
 
 
 
+/*
 @media (max-width:979px) {
   #property {
     .page-header {
       width:100%;
+      > .header {
+        max-width: 500px; // max-width - container padding - max thumbnail length - image padding = ?
+      }
     }
   }
 }
-
+*/
 @media (max-width: 480px) {
   #property {
-    .header-wrapper {
-      width:100%;
-    }
-    .header-info {
-      min-width:0;
-      margin-left:0;
-      img {
-        min-width:64px;
-        min-height:64px;
-      }
-      h1 {
-        font-size:20px;
+    .page-header {
+      > .header {
+        min-width:0;
         min-height:0;
-        margin-bottom:7px;
-      }
-    }
-    #title-blocks > .nav-tabs {
-      top: 0;
-      > li > a {
-        font-size:10px;
-        padding-left:10px;
-        padding-right:9px;
-        padding-top:5px;
-        padding-bottom:5px;
-      }
-    }
-    #primary-tabs {
-      > li {
-        display:none;
-        &.active {
-          display:block;
-          > a.active {
-            .border-radius(4px);
+        height:30px;
+        margin-left:0;
+        h1 {
+          position:relative;
+          top:-80px;
+          font-size:20px;
+          min-height:0;
+          margin-bottom:7px;
+          a {
+            color:@black;            
           }
         }
       }
+      .photo {
+        height:80px;
+        width:100%;
+        img {
+          max-height:none;
+          max-width: 100%;
+        }
+      }
     }
-    #secondary-tabs {
-      margin-top:18px;
+    #title-blocks > .nav-tabs {
+      position:relative;
+      top: -50px;
+      > li > a {
+        font-size:12px;
+        padding-left:12px;
+        padding-right:11px;
+        padding-top:6px;
+        padding-bottom:6px;
+      }
     }
   }
 }
 
 @media (max-width:320px) {
   #property {
-    .header-info {
+    .header {
       h1 {
         min-height:64px;
       }

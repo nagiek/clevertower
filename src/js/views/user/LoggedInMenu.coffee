@@ -24,7 +24,6 @@ define [
         delete this
 
     render: ->
-      console.log 'loggedinmenu'
       @$el.html JST["src/js/templates/user/logged_in_menu.jst"](i18nDevise: i18nDevise)
       @delegateEvents()
       this

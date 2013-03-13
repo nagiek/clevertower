@@ -19,8 +19,6 @@
       };
 
       AppView.prototype.render = function() {
-        console.log('app');
-        new UserView();
         return new ManageNetworkView();
       };
 

@@ -61,6 +61,20 @@ Parse.Cloud.beforeSave "Property", (request, response) ->
   request.object.set "user", request.user
   return response.error 'title_missing' unless request.object.get("title")?
   response.success()
+
+# Property permissions  
+Parse.Cloud.afterSave "Property", (request) ->
+
+  console.log request.object
+  if request.object.isNew()
+    propertyACL = new Parse.ACL(request.user);
+    current = new Parse.Role(request.object.id + "-mgr-current", propertyACL).save()
+    invited = new Parse.Role(request.object.id + "-mgr-invited", new Parse.ACL).save()
+    pending = new Parse.Role(request.object.id + "-mgr-pending", new Parse.ACL).save()  
+    propertyACL.setRoleWriteAccess current
+    propertyACL.setRoleReadAccess invited
+    request.object.setACL propertyACL
+    request.object.save
   
 # Unit validation
 Parse.Cloud.beforeSave "Unit", (request, response) ->

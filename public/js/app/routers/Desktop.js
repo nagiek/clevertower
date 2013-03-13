@@ -40,7 +40,10 @@
       };
 
       DesktopRouter.prototype.index = function() {
-        return new AppView();
+        var _this = this;
+        return require(["views/network/Manage"], function(ManageNetworkView) {
+          return new ManageNetworkView;
+        });
       };
 
       DesktopRouter.prototype.propertiesNew = function() {

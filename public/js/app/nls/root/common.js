@@ -49,7 +49,9 @@
     },
     form: {
       select: {
-        select_value: "- Select a value -"
+        select_value: "- Select a value -",
+        numeric: "Numeric (1 ➡ 2)",
+        alphabetical: "Alpha (A ➡ B)"
       }
     },
     warnings: {

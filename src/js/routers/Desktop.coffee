@@ -39,8 +39,9 @@ define [
           Parse.history.navigate href, true
         
     index: ->
-      new AppView()
-      
+      require ["views/network/Manage"], (ManageNetworkView) =>
+        new ManageNetworkView
+
     propertiesNew: ->
       require ["views/property/Manage"], (ManagePropertiesView) =>
         managePropertiesView = new ManagePropertiesView

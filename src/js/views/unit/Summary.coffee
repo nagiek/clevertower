@@ -31,6 +31,11 @@ define [
       
       @model.on "save:success", =>
         @render()
+        
+      @model.on "remove", =>
+        @remove()
+        @undelegateEvents()
+        delete this
       
       @model.on "invalid", (unit, error) =>
         # Mark up form

@@ -14,8 +14,6 @@ define [
       @render()
 
     render: ->
-      console.log 'app'
-      new UserView()
       new ManageNetworkView()
     
       

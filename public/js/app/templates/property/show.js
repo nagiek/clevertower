@@ -6,33 +6,33 @@ this["JST"]["src/js/templates/property/show.jst"] = function(obj) {
 obj || (obj = {});
 var __t, __p = '', __e = _.escape;
 with (obj) {
-__p += '<div class="page-header">\n  <div class="header-wrapper row">\n    <div class="header-info span clearfix">\n      <div class="photo">\n        <a href="/properties/' +
+__p += '<div class="page-header row">    \n  <div class="photo photo-thumbnail photo-elastic span tablet-left">\n    <a href="/properties/' +
 ((__t = ( objectId )) == null ? '' : __t) +
-'">\n          <img src="' +
+'">\n      <img src="' +
 ((__t = ( cover )) == null ? '' : __t) +
-'" alt="Profile" class="profile-picture">\n        </a>\n        <div class="photo-actions hide">\n          <button id="edit-profile-picture" role="button" class="btn btn-small" title="' +
+'" alt="Profile" class="img-rounded profile-picture">\n    </a>\n    <div class="photo-actions hide">\n      <button id="edit-profile-picture" role="button" class="btn btn-small" title="' +
 ((__t = ( i18nCommon.actions.edit )) == null ? '' : __t) +
-'">\n            <i class="icon-edit"></i>\n          </button>\n        </div>\n      </div>\n\n      <h1 id="page-title" class="profile-float">\n        <a href="/properties/' +
+'">\n        <i class="icon-edit"></i>\n      </button>\n    </div>\n  </div>\n  \n  <header class="header photo-float thumbnail-float elastic-float">\n    <h1 id="page-title" class="inline-block profile-inline">\n      <a href="/properties/' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '">' +
 ((__t = ( title )) == null ? '' : __t) +
-'</a>\n      </h1>\n\n      <div id="title-blocks" class="profile-float">\n        <ul class="nav nav-tabs" role="navigation">\n          <li class="dropdown">\n            <a href="#" class="dropdown-toggle" data-toggle="dropdown">\n              ' +
+'</a>\n    </h1>\n\n    <div id="title-blocks" class="inline-block profile-inline">\n      <ul class="nav nav-tabs" role="navigation">\n        <li class="dropdown">\n          <a href="#" class="dropdown-toggle" data-toggle="dropdown">\n            ' +
 ((__t = ( i18nProperty.menu.day_to_day )) == null ? '' : __t) +
-'\n              <b class="caret"></b>\n            </a>\n            ' +
+'\n            <b class="caret"></b>\n          </a>\n          ' +
 ((__t = ( JST["src/js/templates/property/menu/show.jst"]({objectId: objectId, i18nProperty: i18nProperty}) )) == null ? '' : __t) +
-'\n          </li>\n          <li class="dropdown">\n            <a href="#" class="dropdown-toggle" data-toggle="dropdown">\n              ' +
+'\n        </li>\n        <li class="dropdown">\n          <a href="#" class="dropdown-toggle" data-toggle="dropdown">\n            ' +
 ((__t = ( i18nProperty.menu.reports )) == null ? '' : __t) +
-'\n              <b class="caret"></b>\n            </a>\n            ' +
+'\n            <b class="caret"></b>\n          </a>\n          ' +
 ((__t = ( JST["src/js/templates/property/menu/reports.jst"]({objectId: objectId, i18nProperty: i18nProperty}) )) == null ? '' : __t) +
-'\n          </li>\n          <li class="dropdown">\n            <a href="#" class="dropdown-toggle" data-toggle="dropdown">\n              ' +
+'\n        </li>\n        <li class="dropdown">\n          <a href="#" class="dropdown-toggle" data-toggle="dropdown">\n            ' +
 ((__t = ( i18nProperty.menu.other )) == null ? '' : __t) +
-'\n              <b class="caret"></b>\n            </a>\n            ' +
+'\n            <b class="caret"></b>\n          </a>\n          ' +
 ((__t = ( JST["src/js/templates/property/menu/other.jst"]({objectId: objectId, i18nProperty: i18nProperty}) )) == null ? '' : __t) +
-'\n          </li>\n          <li class="dropdown add-dropdown">\n            <a href="#" class="btn.btn-success dropdown-toggle" data-toggle="dropdown">\n              ' +
+'\n        </li>\n        <li class="dropdown add-dropdown">\n          <a href="#" class="btn.btn-success dropdown-toggle" data-toggle="dropdown">\n            ' +
 ((__t = ( i18nProperty.menu.actions )) == null ? '' : __t) +
-'\n              <b class="caret"></b>\n            </a>\n            ' +
+'\n            <b class="caret"></b>\n          </a>\n          ' +
 ((__t = ( JST["src/js/templates/property/menu/actions.jst"]({objectId: objectId, i18nProperty: i18nProperty}) )) == null ? '' : __t) +
-'\n          </li>\n        </ul>\n      </div>\n    </div>\n  </div>\n</div>\n\n<div id="content"></div>\n\n<div id="edit-profile-picture-modal" class="modal form-modal hide fade">\n  <form id="profile-picture-upload" method="POST">\n    <div class="modal-header">\n      <button type="button" class="close" data-dismiss="modal" aria-labelledby="edit-profile-picture-modal-label" aria-hidden="true">&times;</button>\n      <h3 id="edit-profile-picture-modal-label">' +
+'\n        </li>\n      </ul>\n    </div>\n  </header>\n</div>\n\n<div id="content"></div>\n\n<div id="edit-profile-picture-modal" class="modal form-modal hide fade">\n  <form id="profile-picture-upload" method="POST">\n    <div class="modal-header">\n      <button type="button" class="close" data-dismiss="modal" aria-labelledby="edit-profile-picture-modal-label" aria-hidden="true">&times;</button>\n      <h3 id="edit-profile-picture-modal-label">' +
 ((__t = ( i18nProperty.actions.edit_picture )) == null ? '' : __t) +
 '</h3>\n    </div>\n    <div class="modal-body">\n      <div class="row-fluid">\n        <div id="preview-profile-picture" class="preview template-upload">\n          <img src="' +
 ((__t = ( cover )) == null ? '' : __t) +

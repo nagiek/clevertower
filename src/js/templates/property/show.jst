@@ -1,55 +1,53 @@
-<div class="page-header">
-  <div class="header-wrapper row">
-    <div class="header-info span clearfix">
-      <div class="photo">
-        <a href="/properties/<%= objectId %>">
-          <img src="<%= cover %>" alt="Profile" class="profile-picture">
-        </a>
-        <div class="photo-actions hide">
-          <button id="edit-profile-picture" role="button" class="btn btn-small" title="<%= i18nCommon.actions.edit %>">
-            <i class="icon-edit"></i>
-          </button>
-        </div>
-      </div>
-
-      <h1 id="page-title" class="profile-float">
-        <a href="/properties/<%= objectId %>"><%= title %></a>
-      </h1>
-
-      <div id="title-blocks" class="profile-float">
-        <ul class="nav nav-tabs" role="navigation">
-          <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              <%= i18nProperty.menu.day_to_day %>
-              <b class="caret"></b>
-            </a>
-            <%= JST["src/js/templates/property/menu/show.jst"]({objectId: objectId, i18nProperty: i18nProperty}) %>
-          </li>
-          <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              <%= i18nProperty.menu.reports %>
-              <b class="caret"></b>
-            </a>
-            <%= JST["src/js/templates/property/menu/reports.jst"]({objectId: objectId, i18nProperty: i18nProperty}) %>
-          </li>
-          <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              <%= i18nProperty.menu.other %>
-              <b class="caret"></b>
-            </a>
-            <%= JST["src/js/templates/property/menu/other.jst"]({objectId: objectId, i18nProperty: i18nProperty}) %>
-          </li>
-          <li class="dropdown add-dropdown">
-            <a href="#" class="btn.btn-success dropdown-toggle" data-toggle="dropdown">
-              <%= i18nProperty.menu.actions %>
-              <b class="caret"></b>
-            </a>
-            <%= JST["src/js/templates/property/menu/actions.jst"]({objectId: objectId, i18nProperty: i18nProperty}) %>
-          </li>
-        </ul>
-      </div>
+<div class="page-header row">    
+  <div class="photo photo-thumbnail photo-elastic span tablet-left">
+    <a href="/properties/<%= objectId %>">
+      <img src="<%= cover %>" alt="Profile" class="img-rounded profile-picture">
+    </a>
+    <div class="photo-actions hide">
+      <button id="edit-profile-picture" role="button" class="btn btn-small" title="<%= i18nCommon.actions.edit %>">
+        <i class="icon-edit"></i>
+      </button>
     </div>
   </div>
+  
+  <header class="header photo-float thumbnail-float elastic-float">
+    <h1 id="page-title" class="inline-block profile-inline">
+      <a href="/properties/<%= objectId %>"><%= title %></a>
+    </h1>
+
+    <div id="title-blocks" class="inline-block profile-inline">
+      <ul class="nav nav-tabs" role="navigation">
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            <%= i18nProperty.menu.day_to_day %>
+            <b class="caret"></b>
+          </a>
+          <%= JST["src/js/templates/property/menu/show.jst"]({objectId: objectId, i18nProperty: i18nProperty}) %>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            <%= i18nProperty.menu.reports %>
+            <b class="caret"></b>
+          </a>
+          <%= JST["src/js/templates/property/menu/reports.jst"]({objectId: objectId, i18nProperty: i18nProperty}) %>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            <%= i18nProperty.menu.other %>
+            <b class="caret"></b>
+          </a>
+          <%= JST["src/js/templates/property/menu/other.jst"]({objectId: objectId, i18nProperty: i18nProperty}) %>
+        </li>
+        <li class="dropdown add-dropdown">
+          <a href="#" class="btn.btn-success dropdown-toggle" data-toggle="dropdown">
+            <%= i18nProperty.menu.actions %>
+            <b class="caret"></b>
+          </a>
+          <%= JST["src/js/templates/property/menu/actions.jst"]({objectId: objectId, i18nProperty: i18nProperty}) %>
+        </li>
+      </ul>
+    </div>
+  </header>
 </div>
 
 <div id="content"></div>

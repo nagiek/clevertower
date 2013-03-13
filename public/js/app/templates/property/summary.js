@@ -7,7 +7,7 @@ obj || (obj = {});
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
 with (obj) {
-__p += '<div class="property views-row row">\n  <div class="views-field-title span8">\n    <div class="photo stay-left">\n      <a href="/properties/' +
+__p += '<div class="property views-row row">\n  <div class="views-field-title span8">\n    <div class="photo photo-profile">\n      <a href="/properties/' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '">\n        <img src="' +
 ((__t = ( cover )) == null ? '' : __t) +
