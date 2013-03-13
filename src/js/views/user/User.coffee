@@ -11,6 +11,7 @@ define [
       @render()
 
     render: ->
+      console.log 'usermenu'
       if Parse.User.current()
         require ["views/user/LoggedInMenu"], (LoggedInView) ->
           new LoggedInView() 

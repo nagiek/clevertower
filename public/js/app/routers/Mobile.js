@@ -2,17 +2,17 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "backbone", "views/app/Main", "views/address/Map"], function($, Parse, AppView, NewAddressView) {
-    var MobileRouter;
-    return MobileRouter = (function(_super) {
+  define(["jquery", "backbone", "views/user/User"], function($, Parse, UserView) {
+    var DesktopRouter;
+    return DesktopRouter = (function(_super) {
 
-      __extends(MobileRouter, _super);
+      __extends(DesktopRouter, _super);
 
-      function MobileRouter() {
-        return MobileRouter.__super__.constructor.apply(this, arguments);
+      function DesktopRouter() {
+        return DesktopRouter.__super__.constructor.apply(this, arguments);
       }
 
-      MobileRouter.prototype.routes = {
+      DesktopRouter.prototype.routes = {
         "": "index",
         "properties/new": "propertiesNew",
         "properties/:id": "propertiesShow",
@@ -20,17 +20,18 @@
         "*actions": "index"
       };
 
-      MobileRouter.prototype.initialize = function(options) {
-        return Parse.history.start({
+      DesktopRouter.prototype.initialize = function(options) {
+        Parse.history.start({
           pushState: true
         });
+        return new UserView;
       };
 
-      MobileRouter.prototype.index = function() {
+      DesktopRouter.prototype.index = function() {
         return new AppView();
       };
 
-      MobileRouter.prototype.propertiesNew = function() {
+      DesktopRouter.prototype.propertiesNew = function() {
         var _this = this;
         return require(["views/property/Manage"], function(ManagePropertiesView) {
           var managePropertiesView;
@@ -39,9 +40,9 @@
         });
       };
 
-      MobileRouter.prototype.propertiesShow = function(id, action) {
+      DesktopRouter.prototype.propertiesShow = function(id, action) {
         var _this = this;
-        action || (action = 'current');
+        action || (action = 'units');
         return require(["models/Property", "views/property/Show"], function(Property, PropertyView) {
           $('#main').html('<div id="property"></div>');
           return new Parse.Query("Property").get(id, {
@@ -55,7 +56,7 @@
         });
       };
 
-      return MobileRouter;
+      return DesktopRouter;
 
     })(Parse.Router);
   });

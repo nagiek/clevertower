@@ -2,7 +2,7 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "backbone", "views/app/Main", "views/address/Map"], function($, Parse, AppView, NewAddressView) {
+  define(["jquery", "backbone", "views/user/User"], function($, Parse, UserView) {
     var DesktopRouter;
     return DesktopRouter = (function(_super) {
 
@@ -24,6 +24,7 @@
         Parse.history.start({
           pushState: true
         });
+        new UserView;
         return $(document).delegate("a", "click", function(e) {
           var href, protocol;
           href = $(this).attr("href");

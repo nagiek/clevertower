@@ -19,6 +19,7 @@
       };
 
       UserMenuView.prototype.render = function() {
+        console.log('usermenu');
         if (Parse.User.current()) {
           return require(["views/user/LoggedInMenu"], function(LoggedInView) {
             return new LoggedInView();

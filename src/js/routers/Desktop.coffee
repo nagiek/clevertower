@@ -1,9 +1,8 @@
 define [
   "jquery", 
   "backbone",
-  "views/app/Main"
-  "views/address/Map"
-], ($, Parse, AppView, NewAddressView) ->
+  "views/user/User"
+], ($, Parse, UserView) ->
 
   class DesktopRouter extends Parse.Router
     routes:
@@ -16,6 +15,8 @@ define [
 
     initialize: (options) ->
       Parse.history.start pushState: true
+      
+      new UserView
 
       # Use delegation to avoid initial DOM selection and allow all matching elements to bubble
       $(document).delegate "a", "click", (e) ->

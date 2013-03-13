@@ -1,11 +1,10 @@
 define [
   "jquery", 
   "backbone",
-  "views/app/Main"
-  "views/address/Map"
-], ($, Parse, AppView, NewAddressView) ->
+  "views/user/User"
+], ($, Parse, UserView) ->
 
-  class MobileRouter extends Parse.Router
+  class DesktopRouter extends Parse.Router
     routes:
       ""                          : "index"
       "properties/new"            : "propertiesNew"
@@ -16,6 +15,8 @@ define [
 
     initialize: (options) ->
       Parse.history.start pushState: true
+      
+      new UserView
         
     index: ->
       new AppView()
@@ -26,7 +27,7 @@ define [
         managePropertiesView.$el.find('#new-property').click()
         
     propertiesShow: (id, action) ->
-      action ||= 'current'
+      action ||= 'units'
       require ["models/Property", "views/property/Show"], (Property, PropertyView) =>
         $('#main').html '<div id="property"></div>'
         new Parse.Query("Property").get id, 

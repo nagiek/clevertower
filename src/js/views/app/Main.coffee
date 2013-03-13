@@ -1,8 +1,7 @@
 define [
-  "jquery", 
-  "underscore", 
-  "backbone", 
-  "views/user/User"
+  "jquery"
+  "underscore"
+  "backbone"
   "views/network/Manage"
 ], ($, _, Parse, UserView, ManageNetworkView) ->
 
@@ -15,6 +14,7 @@ define [
       @render()
 
     render: ->
+      console.log 'app'
       new UserView()
       new ManageNetworkView()
     
