@@ -1,12 +1,16 @@
 define [
   'underscore',
   'backbone',
-  "models/address"
-], (_, Parse, Address) ->
+], (_, Parse) ->
 
   Property = Parse.Object.extend "Property",
 
     defaults:
+
+      image_thumb         : ""
+      image_profile       : ""
+      image_full          : ""
+
       description         : ""
       phone               : ""
       email               : ""
@@ -15,6 +19,12 @@ define [
       property_type       : ""
       year                : ""
       mls                 : ""
+      imgs                : []
+      tasks               : []
+      incomes             : []
+      expenses            : []
+      vacant_units        : []
+      units               : []
       air_conditioning    : 0
       back_yard           : 0
       balcony             : 0
@@ -38,3 +48,27 @@ define [
       gas                 : 0
       heat                : 0
       hot_water           : 0
+      # Private
+      init                : 1
+      public              : 1
+
+    cover: (format) ->
+      img = @get "image_#{format}"
+      img = "/img/fallback/property-#{format}.png" unless img?
+      img
+
+    # getImgs : ->
+    #   # Fallback method
+    #   ary = []
+    #   if ary.length is 0 
+    #     [{thumb: 'img/fallback/property/thumb.png'}]
+    #   else 
+    #     ary
+    # getTasks : ->
+    #   []
+    # getIncomes : ->
+    #   []
+    # getExpenses : ->
+    #   []
+    # getUnits : ->
+    #   []

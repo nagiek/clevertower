@@ -5,13 +5,21 @@
     paths: {
       jquery: '//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min',
       jqueryui: 'libs/jqueryui/jquery-ui-1.10.1.custom.min',
-      underscore: "//cdnjs.cloudflare.com/ajax/libs/lodash.js/1.0.1/lodash.min",
+      underscore: '//cdnjs.cloudflare.com/ajax/libs/lodash.js/1.0.1/lodash.min',
       backbone: "//www.parsecdn.com/js/parse-1.1.15.min",
-      json2: "//cdnjs.cloudflare.com/ajax/libs/json2/20121008/json2",
       jquerymobile: '//cdnjs.cloudflare.com/ajax/libs/jquery-mobile/1.2.0/jquery.mobile.min',
       datepickermobile: 'libs/jqueryui/jquery.ui.datepicker.mobile.min',
       serializeObject: "app/plugins/serialize_object",
+      filePicker: "app/plugins/file_picker",
+      "jquery.fileupload-pr": 'app/plugins/jquery-fileupload-pr',
+      "jquery.fileupload-ui": 'app/plugins/jquery-fileupload-ui',
+      "jquery.fileupload-fp": 'app/plugins/jquery-fileupload-fp',
+      "jquery.fileupload": "app/plugins/jquery-fileupload",
+      'load-image': '//blueimp.github.com/JavaScript-Load-Image/load-image.min',
+      'canvas-to-blob': '//blueimp.github.com/JavaScript-Canvas-to-Blob/canvas-to-blob.min',
+      moment: "//cdnjs.cloudflare.com/ajax/libs/moment.js/2.0.0/moment.min",
       bootstrap: "libs/bootstrap/bootstrap",
+      json2: "//cdnjs.cloudflare.com/ajax/libs/json2/20121008/json2",
       text: "libs/plugins/text",
       async: "libs/plugins/async",
       propertyParser: "libs/plugins/propertyParser",
@@ -39,7 +47,7 @@
     return window.google.maps;
   });
 
-  require(["jquery", "backbone", "routers/App", "json2", "jqueryui", "bootstrap", "serializeObject"], function($, Parse, AppRouter) {
+  require(["jquery", "backbone", "routers/Desktop", "json2", "jqueryui", "bootstrap", "serializeObject"], function($, Parse, AppRouter) {
     Parse.initialize("6XgIM84FecTslR8rnXBZsjnDqZgVISa946m9OmfO", "Jf4WgWUgu7R39oy5AZotay42dEDY5neMEoJddKEY");
     return new AppRouter();
   });

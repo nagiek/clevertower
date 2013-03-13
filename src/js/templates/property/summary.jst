@@ -1,6 +1,42 @@
-<li>
-  <div class="view">
-    <label class="property-content"><%= title %></label>
-    <button class="property-destroy"></button>
+<div class="property views-row row">
+  <div class="views-field-title span8">
+    <div class="photo stay-left">
+      <a href="/properties/<%= objectId %>">
+        <img src="<%= cover %>" alt="Profile" class="profile-picture">
+      </a>
+    </div>
+      
+    <div class="btn-toolbar stay-right">
+      <% if (init !== false) { %>
+        <div class="btn-group">
+          <a href="#" class="btn btn-warning">
+            <i class="icon icon-lightning"></i>
+          </a>
+        </div>
+      <% } %>
+      <%= JST["src/js/templates/property/menu.jst"]({objectId: objectId, i18nProperty: i18nProperty}) %>
+    </div>
+    
+    <div class="profile-float">
+      <h3><a href="/properties/<%= objectId %>"><%= title %></a></h3>
+    </div>
+    
+    <dl class="profile-float">
+      <!-- <div class="span"> -->
+        <dt><a href="/properties/<%= objectId %>/tasks"><%= i18nCommon.classes.tasks %></a></dt>
+        <dd><%= tasks %></dd>
+      <!-- </div> -->
+      <!-- <div class="span"> -->
+        <dt><a href="/properties/<%= objectId %>/finance"><%= i18nCommon.classes.finances %></a></dt>
+        <dd>
+          <span class="incomes"><%= incomes %></span>
+          <span class="expenses"><%= expenses %></span>
+        </dd>
+      <!-- </div> -->
+      <!-- <div class="span"> -->
+        <dt><a href="/properties/<%= objectId %>/tasks"><%= i18nProperty.structure.vacancies %></a></dt>
+        <dd><%= vacant_units %> <%= i18nCommon.prepositions.of %> <%= units %></dd>
+      <!-- </div> -->
+    </dl>
   </div>
-</li>
+</div>

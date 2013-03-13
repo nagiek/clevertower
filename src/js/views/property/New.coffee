@@ -6,6 +6,7 @@ define [
   "i18n!nls/property"
   "i18n!nls/common"
   'templates/property/new'
+  'templates/property/form/_basic'
 ], ($, _, Parse, Property, i18nProperty, i18nCommon) ->
 
   # GMapView
@@ -36,4 +37,4 @@ define [
       @render()
 
     render : ->
-      @$el.html JST["src/js/templates/property/new.jst"](i18nProperty: i18nProperty, i18nCommon: i18nCommon, property: @model)
+      @$el.html JST["src/js/templates/property/new.jst"](property: @model, i18nProperty: i18nProperty, i18nCommon: i18nCommon)

@@ -40,17 +40,11 @@
         this.wizard.on("wizard:cancel", function() {
           _this.undelegateEvents();
           _this.remove();
-          delete _this.gmap;
-          delete _this.marker;
-          delete _this.model;
           return delete _this;
         });
         this.wizard.on("property:save", function() {
           _this.undelegateEvents();
           _this.remove();
-          delete _this.gmap;
-          delete _this.marker;
-          delete _this.model;
           return delete _this;
         });
         this.model.marker.on("change", function(updatedPoint) {

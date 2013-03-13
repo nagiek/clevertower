@@ -4,14 +4,12 @@
     var Map;
     return Map = Parse.Object.extend("Map", {
       initialize: function(attrs) {
-        var lat, lng, opts;
+        var opts;
         this.geocoder = new google.maps.Geocoder();
         this.marker = attrs.marker;
-        lat = this.marker.get("lat");
-        lng = this.marker.get("lng");
         opts = {
           zoom: 2,
-          center: new google.maps.LatLng(lat, lng),
+          center: this.marker.toGPoint(),
           mapTypeId: google.maps.MapTypeId.ROADMAP
         };
         return this.set({
@@ -37,8 +35,7 @@
         var components, route, street_number;
         components = {
           'formatted_address': res.formatted_address,
-          'lng': res.geometry.location.lng(),
-          'lat': res.geometry.location.lat(),
+          'center': new Parse.GeoPoint(res.geometry.location.lat(), res.geometry.location.lng()),
           'location_type': res.geometry.location_type
         };
         street_number = '';

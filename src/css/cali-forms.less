@@ -6,9 +6,25 @@
 /**
  * Twitter Bootstrap - Drupal joiners.
  */
-.form-inline .form-type-textfield {
-  display: inline-block;
-  margin-bottom: 0;  
+
+.form-condensed {
+  .control-group,
+  .control-label,
+  .controls {
+    margin-bottom: 0;
+  }
+}
+
+.form-inline {
+  .control-group,
+  .control-label,
+  .controls {
+    display: inline-block;
+  }
+  .form-type-textfield {
+    display: inline-block;
+    margin-bottom: 0;  
+  }
 }
 
 .button_to {
@@ -19,13 +35,108 @@
 }
 
 /**
+ * jQuery File Upload UI Plugin CSS 6.10
+ * https://github.com/blueimp/jQuery-File-Upload
+ *
+ * Copyright 2010, Sebastian Tschan
+ * https://blueimp.net
+ *
+ * Licensed under the MIT license:
+ * http://www.opensource.org/licenses/MIT
+ */
+
+.files {
+    .progress {
+        width: 200px;
+        width: 20px;
+    }
+    .name {
+        * {
+            width: 80px;
+            display: inline-block;
+            word-wrap: break-word;
+        }
+    }
+    .btn {
+        span {
+            display: none;
+        }
+    }
+    .preview {
+        * {
+            width: 40px;
+        }
+    }
+    .delete {
+        width: 60px;
+    }
+}
+.fileinput-button {
+    input {
+        position: absolute;
+        top: 0;
+        right: 0;
+        margin: 0;
+        opacity: 0;
+        filter: alpha(opacity=0);
+        transform: translate(-300px, 0) scale(4);
+        font-size: 23px;
+        direction: ltr;
+        cursor: pointer;
+    }
+}
+.progress-animated {
+    .bar {
+        background: url(../img/progressbar.gif) !important;
+        filter: none;
+    }
+}
+.fileupload-buttonbar .btn,.fileupload-buttonbar .toggle {
+    margin-bottom: 5px;
+}
+.fileinput-button {
+    position: relative;
+    overflow: hidden;
+    float: left;
+    margin-right: 4px;
+}
+
+/* Fix for IE 6: */
+* html .fileinput-button {
+  line-height: 24px;
+  margin: 1px -3px 0 0;
+}
+
+/* Fix for IE 7: */
+* + html .fileinput-button {
+  padding: 2px 15px;
+  margin: 1px 0 0 0;
+}
+
+.fileupload-processing {
+    .fileupload-loading {
+        display: block;
+    }
+}
+.fileupload-loading {
+    position: absolute;
+    left: 50%;
+    width: 128px;
+    height: 128px;
+    background: url(../img/loading.gif) center no-repeat;
+    display: none;
+}
+
+
+
+
+/**
  * Twitter Bootstrap - Drupal joiners.
  */
 .wizard {
   position: absolute;
   overflow-x: hidden;
   height:500px;
-  width: 100%;
   form {
     position: absolute;
     overflow-y: scroll;
@@ -348,6 +459,10 @@ form {
   }
 }
 
+.no-bullet {
+  list-style: none;
+}
+
 .control-group {
   .three-column {
     -moz-column-count: 3;
@@ -357,6 +472,15 @@ form {
     column-count: 3;
     column-gap: 10px;
   }
+  .two-column {
+    -moz-column-count: 2;
+    -moz-column-gap: 10px;
+    -webkit-column-count: 2;
+    -webkit-column-gap: 10px;
+    column-count: 2;
+    column-gap: 10px;
+  }
+  
 }
 
 /**

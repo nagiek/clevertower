@@ -1,0 +1,18 @@
+<% for (var i=0, file; file=files[i]; i++) { %>
+  <tr class="template-download fade">
+    <% if (file.error) { %>
+      <td class="error" colspan="2"><span class="label label-important">Error</span> <%=file.error%></td>
+    <% } else { %>
+      <td class="preview"><% if (file.thumbnail_url) { %>
+        <a href="<%=file.thumbnail_url%>" title="<%=file.name%>" data-gallery="gallery" download="<%=file.name%>"><img src="<%=file.thumbnail_url%>"></a>
+      <% } %></td>
+    <% } %>
+    <td class="delete">
+      <button class="btn btn-danger">
+        <i class="icon-trash icon-white"></i>
+        <span>Delete</span>
+      </button>
+      <input type="checkbox" name="delete" value="1">
+    </td>
+  </tr>
+<% } %>

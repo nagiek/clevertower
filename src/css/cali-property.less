@@ -17,17 +17,62 @@
 /**
  * Property
  */
-.page-property {
+.property { // Summary
+  .photo {
+    float:left;
+    height:100px;
+    width:100px;
+    overflow:hidden;
+    img {
+      min-height:100px;
+      min-width:100px;
+      max-width:150px;
+      max-width:150px;
+    }
+  }
+}
+#property { // Show
+  .photo { // includes profile photo
+    position:relative;  
+    .photo-actions {
+      position:absolute;
+      top:4px;
+      right:4px;
+    }
+  
+    &:hover {
+      .photo-actions {
+        display:block;
+      }
+    }
+  }
+  #photos {
+    .photo {
+      margin-bottom:9px;
+      &.template-upload {
+        .preview {
+          .opacity(30)
+        }
+      }
+    }
+  }
   #back-to-property {
     margin-top:9px;
     margin-left:18px;
   }
   .page-header {
     margin-top:0;
-    img {
+    .photo {
       float:left;
-      position:relative;
-      z-index:1;
+      height:100px;
+      width:100px;
+      overflow:hidden;
+      img {
+        min-height:100px;
+        min-width:100px;
+        max-width:150px;
+        max-width:150px;
+      }
     }
     h1 {
       display: block;
@@ -145,7 +190,7 @@
 
 
 @media (max-width:979px) {
-  .property {
+  #property {
     .page-header {
       width:100%;
     }
@@ -153,7 +198,7 @@
 }
 
 @media (max-width: 480px) {
-  .property {
+  #property {
     .header-wrapper {
       width:100%;
     }
@@ -161,8 +206,8 @@
       min-width:0;
       margin-left:0;
       img {
-        width:64px;
-        height:64px;
+        min-width:64px;
+        min-height:64px;
       }
       h1 {
         font-size:20px;
@@ -198,7 +243,7 @@
 }
 
 @media (max-width:320px) {
-  .property {
+  #property {
     .header-info {
       h1 {
         min-height:64px;

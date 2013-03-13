@@ -13,8 +13,10 @@
       }
 
       AppRouter.prototype.routes = {
-        "address/new": "addressNew",
         "": "index",
+        "properties/new": "propertiesNew",
+        "properties/:id": "propertiesShow",
+        "properties/:id/:action": "propertiesShow",
         "*actions": "index"
       };
 
@@ -28,12 +30,28 @@
         return new AppView();
       };
 
-      AppRouter.prototype.addressNew = function() {
+      AppRouter.prototype.propertiesNew = function() {
         var _this = this;
         return require(["views/property/Manage"], function(ManagePropertiesView) {
           var managePropertiesView;
           managePropertiesView = new ManagePropertiesView;
           return managePropertiesView.$el.find('#new-property').click();
+        });
+      };
+
+      AppRouter.prototype.propertiesShow = function(id, action) {
+        var _this = this;
+        action || (action = 'current');
+        return require(["models/Property", "views/property/Show"], function(Property, PropertyView) {
+          $('#main').html('<div id="property"></div>');
+          return new Parse.Query("Property").get(id, {
+            success: function(model) {
+              return new PropertyView({
+                model: model,
+                action: action
+              });
+            }
+          });
         });
       };
 

@@ -51,8 +51,6 @@
         this.setMapZoom(this.model.get('location_type'));
         this.$searchInput.val(this.model.get('formatted_address'));
         this.model.$location_type.val(this.model.get('location_type'));
-        this.model.$adrsLat.val(this.model.get('lat'));
-        this.model.$adrsLng.val(this.model.get('lng'));
         this.model.$adrsThr.val(this.model.get('thoroughfare'));
         this.model.$adrsLty.val(this.model.get('locality'));
         this.model.$adrsNhd.val(this.model.get('neighbourhood'));

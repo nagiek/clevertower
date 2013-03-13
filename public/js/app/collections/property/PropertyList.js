@@ -14,6 +14,10 @@
 
       PropertyList.prototype.model = Property;
 
+      PropertyList.prototype.url = function() {
+        return "/properties";
+      };
+
       PropertyList.prototype.done = function() {
         return this.filter(function(Property) {
           return Property.get("done");

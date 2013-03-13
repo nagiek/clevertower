@@ -1,0 +1,101 @@
+<div class="page-header">
+  <div class="header-wrapper row">
+    <div class="header-info span clearfix">
+      <div class="photo">
+        <a href="/properties/<%= objectId %>">
+          <img src="<%= cover %>" alt="Profile" class="profile-picture">
+        </a>
+        <div class="photo-actions hide">
+          <button id="edit-profile-picture" role="button" class="btn btn-small" title="<%= i18nCommon.actions.edit %>">
+            <i class="icon-edit"></i>
+          </button>
+        </div>
+      </div>
+
+      <h1 id="page-title" class="profile-float">
+        <a href="/properties/<%= objectId %>"><%= title %></a>
+      </h1>
+
+      <div id="title-blocks" class="profile-float">
+        <ul class="nav nav-tabs" role="navigation">
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <%= i18nProperty.menu.day_to_day %>
+              <b class="caret"></b>
+            </a>
+            <%= JST["src/js/templates/property/menu/show.jst"]({objectId: objectId, i18nProperty: i18nProperty}) %>
+          </li>
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <%= i18nProperty.menu.reports %>
+              <b class="caret"></b>
+            </a>
+            <%= JST["src/js/templates/property/menu/reports.jst"]({objectId: objectId, i18nProperty: i18nProperty}) %>
+          </li>
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <%= i18nProperty.menu.other %>
+              <b class="caret"></b>
+            </a>
+            <%= JST["src/js/templates/property/menu/other.jst"]({objectId: objectId, i18nProperty: i18nProperty}) %>
+          </li>
+          <li class="dropdown add-dropdown">
+            <a href="#" class="btn.btn-success dropdown-toggle" data-toggle="dropdown">
+              <%= i18nProperty.menu.actions %>
+              <b class="caret"></b>
+            </a>
+            <%= JST["src/js/templates/property/menu/actions.jst"]({objectId: objectId, i18nProperty: i18nProperty}) %>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="content"></div>
+
+<div id="edit-profile-picture-modal" class="modal form-modal hide fade">
+  <form id="profile-picture-upload" method="POST">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-labelledby="edit-profile-picture-modal-label" aria-hidden="true">&times;</button>
+      <h3 id="edit-profile-picture-modal-label"><%= i18nProperty.actions.edit_picture %></h3>
+    </div>
+    <div class="modal-body">
+      <div class="row-fluid">
+        <div id="preview-profile-picture" class="preview template-upload">
+          <img src="<%= cover %>" alt="Profile" class="profile-picture span4 offset1">
+        </div>
+        <div id="profile-picture-controls" class="span6 offset1">
+          <div id="preview-profile-picture-name"></div>
+          <div class="fileupload-buttonbar">
+            <button type="button" id="file-input" class="btn fileinput-button">
+                <span><%= i18nCommon.actions.choose_file %></span>
+                <input type="file" name="files[]" accept="photo/*">
+            </button>
+          </div>
+          <!-- The global progress information -->
+          <div class="fileupload-progress fade hide">
+
+            <!-- The global progress bar -->
+            <div class="progress progress-success progress-striped active"
+              role="progressbar"
+              aria-valuemin="0"
+              aria-valuemax="100">
+              <div class="bar" style="width:0%;"></div>
+            </div>
+            <!-- The extended global progress information -->
+            <div class="progress-extended">&nbsp;</div>
+            
+          </div>
+
+          <!-- The loading indicator is shown during file processing -->
+          <div class="fileupload-loading"></div>
+        </div>
+      </div>    
+    </div>
+    <div class="modal-footer">
+      <button class="start btn btn-primary"><%= i18nCommon.actions.upload %></button>
+      <button class="btn" data-dismiss="modal"><%= i18nCommon.actions.close %></button>
+    </div>
+  </form>
+</div>

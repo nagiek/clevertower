@@ -1,0 +1,36 @@
+<!-- Day-to-day -->
+<div class="btn-group">
+  <a href="#" class="btn btn-small dropdown-toggle", data-toggle="dropdown" data-original-title ="<%= i18nProperty.menu.day_to_day %>">
+    <i class="icon icon-eye"></i>
+    <b class="caret"></b>
+  </a>
+  <h4 class="element-invisible"><%= i18nProperty.menu.day_to_day %></h4>
+  <%= JST["src/js/templates/property/menu/show.jst"]({objectId: objectId, i18nProperty: i18nProperty}) %>
+</div>
+
+<div class="btn-group">
+  <a href="#" class="btn btn-small dropdown-toggle", data-toggle="dropdown" data-original-title ="<%= i18nProperty.menu.v %>">
+    <i class="icon icon-file"></i>
+    <b class="caret"></b>
+  </a>
+  <h4 class="element-invisible"><%= i18nProperty.menu.reports %></h4>
+  <%= JST["src/js/templates/property/menu/reports.jst"]({objectId: objectId, i18nProperty: i18nProperty}) %>
+</div>
+
+<div class="btn-group">
+  <a href="#" class="btn btn-small dropdown-toggle", data-toggle="dropdown" data-original-title ="<%= i18nProperty.menu.other %>">
+    <i class="icon icon-ellipsis"></i>
+    <b class="caret"></b>
+  </a>
+  <h4 class="element-invisible"><%= i18nProperty.menu.other %></h4>
+  <%= JST["src/js/templates/property/menu/other.jst"]({objectId: objectId, i18nProperty: i18nProperty}) %>
+</div>
+
+<div class="btn-group">
+  <a href="#" class="btn btn-small btn-success dropdown-toggle", data-toggle="dropdown" data-original-title ="<%= i18nProperty.menu.actions %>">
+    <i class="icon icon-eye icon-white"></i>
+    <b class="caret"></b>
+  </a>
+  <h4 class="element-invisible"><%= i18nProperty.menu.actions %></h4>
+  <%= JST["src/js/templates/property/menu/actions.jst"]({objectId: objectId, i18nProperty: i18nProperty}) %>
+</div>

@@ -1,0 +1,11 @@
+<form class="property-form" enctype="multipart/form-data" method="post" >
+  <div class="alert alert-error" style="display:none"></div>
+  <%= JST["src/js/templates/property/form/_basic.jst"]({property: property, i18nCommon: i18nCommon, i18nProperty: i18nProperty}) %>
+  
+  <div class="form-actions">
+    <button class="save btn btn-primary"><%= i18nCommon.actions.save %></button>
+    <a href="/properties/<%= property.id %>" class="btn"><%= i18nCommon.actions.cancel %></a>
+  </div>
+  
+  <a class="remove"><%= i18nCommon.actions.delete %></a>
+</form>

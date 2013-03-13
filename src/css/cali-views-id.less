@@ -237,7 +237,7 @@
 /**
  * .view-id-my_properties
  */
-.view-id-my_properties {
+#view-id-my_properties {
   .views-row {
     margin-left:0;
     > ul {
@@ -265,46 +265,39 @@
     h3 {
       line-height:1;
       margin-top:5px;
-      margin-bottom:0;
+      margin-bottom:48px;
     }
   }
-  // Subfields
-  .subfield {
-    margin-top:5px + 7px; // account for differents in font size between h3 and h4
-    strong {
-      float:left;
-      margin-right:5px;
+  dt {
+    display:inline;
+    margin-left: 15px;
+    &:first-child {
+      margin-left:0;
     }
-    .field-content {
-      float:left;
-      font-size:110%;
-    }
+  }
+  dd {
+    display:inline;
+    font-size:110%;
   }
 }
 
 @media (max-width: 767px) {
-  .view-id-my_properties {
+  #view-id-my_properties {
     .views-row {
       padding-bottom:12px;
-      > ul {
-        float:left;
-        margin-left: 10px; /* LTR */
-      }
     }
     .views-field-title {
       .stay-right {
         margin-right:10px;
       }
     }
-    .subfield {
-      margin-top:3px; // account for differents in font size between h3 and h4
-      width:200px;
+    dt {
+      width:160px;
+      margin-right:0;
+    }
+    dd {
+      width:60px;
       margin-left:0;
-      strong {
-        float:left;
-        width: 110px;
-        margin-right: 0;
-      }
     }
   }
 }

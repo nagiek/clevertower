@@ -46,18 +46,12 @@ define [
       @wizard.on "wizard:cancel", =>
         @undelegateEvents()
         @remove()
-        delete @gmap
-        delete @marker
-        delete @model
         delete this
       
       # object.listenTo(other, event, callback) 
       @wizard.on "property:save", =>
         @undelegateEvents()
         @remove()
-        delete @gmap
-        delete @marker
-        delete @model
         delete this
 
       # update the center when the point changes
@@ -93,6 +87,6 @@ define [
         @model.geolocate()
       else
         alert i18nAddress.errors.messages.no_geolocation
-
+      
     render: ->
       this

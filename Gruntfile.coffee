@@ -38,6 +38,12 @@ module.exports = (grunt) ->
           ext: '.js'
         },{
           expand: true
+          cwd: 'src/js'
+          src: ['**/*.*.coffee']
+          dest: 'public/js/app/'
+          ext: '.js'
+        },{
+          expand: true
           cwd: 'cloud/Cloud'
           src: ['**/*.coffee']
           dest: 'cloud/Cloud'
@@ -80,6 +86,12 @@ module.exports = (grunt) ->
           expand: true
           cwd: 'src/js/templates'
           src: ['**/*.jst']
+          dest: 'public/js/app/templates'
+          ext: '.js'
+        ,
+          expand: true
+          cwd: 'src/js/templates'
+          src: ['**/**/*.jst']
           dest: 'public/js/app/templates'
           ext: '.js'
         ,
@@ -202,7 +214,7 @@ module.exports = (grunt) ->
         files: ['src/js/**/*.coffee', 'cloud/Cloud/**/*.coffee']
         tasks: 'coffee'
       jst:
-        files: 'src/js/templates/**/*.jst'
+        files: ['src/js/templates/**/*.jst', 'src/js/templates/**/**/*.jst']
         tasks: 'jst'
       jade:
         files: 'src/js/templates/*.jade'

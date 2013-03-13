@@ -1,6 +1,7 @@
 define
   actions:
     new_property: "New Property"
+    edit_picture: "Change Picture"
   menu:
     day_to_day: "Day to Day"
     reports: "Reports"
@@ -27,10 +28,13 @@ define
     cash_transactions: "Cash Transactions"
     lease_history: "Lease History"
     edit_property: "Edit Property"
+    edit_photos: "Edit Photos"
     edit_units: "Edit Units"
     managers: "Managers"
     view_public: "See Public View"
     view_tenant: "See Tenant View"
+  structure:
+    vacancies: "Vacancies"
   form:
     structure:
       marketing: "Marketing"
@@ -39,6 +43,8 @@ define
       features: "Features"
       amenities: "Amenities"
       included: "Included"
+  collection:
+    empty: "You don't have any properties yet."
   fields:
     description         : "Description"
     phone               : "Phone"
@@ -78,7 +84,6 @@ define
     hot_water           : "Hot water"
   
   errors:
-    messages:
-      access_denied: "You do not have access to the property."
-      missing: 'You must select a property.'
-      title_missing: 'A title is required.'
+    access_denied: "You do not have access to the property."
+    missing: 'You must select a property.'
+    title_missing: 'A title is required.'

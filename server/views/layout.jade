@@ -58,8 +58,9 @@ html(lang="en")
 
       // Main      
       .container
-        #property-header
         .row
+          #messages-container.span12
+            #messages.alert(style="display:none;")
           #main.span12
             block content
               #todoapp

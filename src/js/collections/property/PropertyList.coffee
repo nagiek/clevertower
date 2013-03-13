@@ -9,6 +9,9 @@ define [
   
     # Reference to this collection's model.
     model: Property
+
+    url: ->
+      "/properties"
   
     # Filter down the list of all Property items that are finished.
     done: ->

@@ -1,0 +1,13 @@
+<table id="current-units" class="table">
+  <thead>
+    <tr>
+      <th><%=i18nCommon.classes.Unit%></th>
+      <th><%=i18nUnit.fields.status%></th>
+      <th><%=i18nLease.attributes.ending%></th>
+      <th><%=i18nLease.attributes.rent_this_month%></th>
+      <th><span class="element-invisible"><%=i18nCommon.headers.Operations%></span></th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+      

@@ -82,12 +82,8 @@
                 });
               },
               error: function(address, error) {
-                _this.$el.find('.alert-error').html(i18nAddress.errors.messages[error.message]).show();
-                _this.$el.find('.error').removeClass('error');
-                switch (error.message) {
-                  case 'invalid_address':
-                    return _this.$el.find('#address-search-group').addClass('error');
-                }
+                _this.$el.find('.alert-error').html(i18nAddress.errors[error.message]).show();
+                return _this.$el.find('#address-search-group').addClass('error');
               }
             });
           case 'property':
@@ -96,7 +92,7 @@
                 return _this.trigger("property:save", property, _this);
               },
               error: function(property, error) {
-                _this.$el.find('.alert-error').html(i18nProperty.errors.messages[error.message]).show();
+                _this.$el.find('.alert-error').html(i18nProperty.errors[error.message]).show();
                 _this.$el.find('.error').removeClass('error');
                 switch (error.message) {
                   case 'title_missing':

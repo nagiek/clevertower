@@ -1,0 +1,43 @@
+<form id="units" method="post">
+  <h2>Listing units</h2>
+  
+  <div class="well form-actions form-inline form-condensed pull-right">
+    <button class="save btn btn-primary"><%= i18nCommon.actions.save %></button>
+  	<div class="control-group">
+  		<div class="control-label"><%= i18nCommon.actions.add_x_more %></div>
+  		<div class="controls input-append">
+  			<input id="x" type="number" size="2" maxlength="2" class="span1" value="1">
+  			<button id="add-x" class="btn btn-info"><%= i18nCommon.actions.go %></button>
+  		</div>
+  	</div>
+  	<button class="btn undo hide"><%= i18nCommon.actions.undo %></button>
+  	<div class="control-group">
+  		<div class="control-label"><%= i18nUnit.form.increment %></div>
+  		<div class="controls">
+  			<input id="increment" type="number" maxlength="4" class="span1" value="1">
+  		</div>
+  	</div>
+  </div>
+  
+  <ul class="nav nav-pills">
+    <li id="units-show" class="active"><a href="#"><%= i18nCommon.actions.show %></a></li>
+    <li id="units-edit"><a href="#"><%= i18nCommon.actions.edit %></a></li>
+  </ul>
+
+  <table id="units-table" class="table table-condensed form-condensed">
+    <thead>
+      <tr>
+        <th><%=i18nCommon.classes.Unit%></th>
+        <th class="variable-begin"><%=i18nUnit.fields.status%></th>
+        <th class="view-specific view-show"><%=i18nLease.attributes.ending%></th>
+        <th class="view-specific view-show"><%=i18nLease.attributes.rent_this_month%></th>
+        <th class="view-specific view-edit hide"><%=i18nUnit.fields.bedrooms%></th>
+        <th class="view-specific view-edit hide"><%=i18nUnit.fields.bathrooms%></th>
+        <th class="view-specific view-edit hide"><%=i18nUnit.fields.square_feet%></th>
+        <th class="view-specific view-edit hide"><%=i18nUnit.fields.description%></th>
+        <th><span class="element-invisible"><%=i18nCommon.headers.Operations%></span></th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</form>

@@ -1,0 +1,119 @@
+<td class="title-group">
+  <div class="view-specific view-show">
+    <% if (objectId) { %>
+      <a class="unit-link" href="/properties/<%= property.objectId %>/units/<%= objectId %>"><%= title %></a>
+      <% if (has_lease) { %>
+        | <a href="/properties/<%= property.objectId %>/lease/<%= activeLease.objectId %>"><%= i18nCommmon.classes.lease %></a>
+      <% } %>
+    <% } %>
+  </div>
+  <% if (objectId) { %><div class="view-specific view-edit hide"><% } %>
+    <div class="control-group">
+  		<div class="controls">
+  			<input type="text" maxlength="8" name="title" class="span1" value="<%= title %>">
+  		</div>
+  	</div>
+  <% if (objectId) { %></div><% } %>
+</td>
+<td>
+  <% if (isNew) { %>
+    <span class="label label-warning"><%= i18nUnit.status.unsaved %></span>
+  <% } else { %>  
+    <% if (confirmed) { %>
+      <% if (has_lease) { %>
+        <span class="label label-success"><%= i18nUnit.status.confirmed %></span>
+      <% } else { %>
+        <span class="label label-important"><%= i18nUnit.status.vacant %></span>
+      <% } %>
+    <% } else { %>
+      <span class="label label-info"><%= i18nUnit.status.pending %></span>
+    <% } %>
+  <% } %>
+</td>
+<td class="view-specific view-show">
+  <% if (has_lease && active_lease.end_date) { %>
+    <span content="<%= active_lease.end_date %>" datatype="xsd:dateTime" property="dc:date">
+      <%= moment(active_lease.end_date).format("MMM DD YYYY") %>
+    </span>  
+  <% } %>
+</td>
+<td class="view-specific view-show">
+  <% if (has_lease && active_lease.rent) { %>
+    <%= active_lease.rent %>
+  <% } %>
+</td>
+<td class="view-specific view-edit hide">
+  <div class="control-group">
+		<div class="controls">
+			<select value="<%= bedrooms %>" name="bedrooms">
+			  <option value="0" <%= bedrooms == 0 ? 'selected' : '' %>><%= i18nUnit.form.bedrooms.zero %></option>
+			  <option value="1" <%= bedrooms == 1 ? 'selected' : '' %>><%= i18nUnit.form.bedrooms.one %></option>
+			  <option value="2" <%= bedrooms == 2 ? 'selected' : '' %>><%= i18nUnit.form.bedrooms.two %></option>
+			  <option value="3" <%= bedrooms == 3 ? 'selected' : '' %>><%= i18nUnit.form.bedrooms.three %></option>
+			  <option value="4" <%= bedrooms == 4 ? 'selected' : '' %>><%= i18nUnit.form.bedrooms.four %></option>
+			  <option value="5" <%= bedrooms == 5 ? 'selected' : '' %>><%= i18nUnit.form.bedrooms.five %></option>
+			</select>
+		</div>
+	</div>
+</td>
+<td class="view-specific view-edit hide">
+  <div class="control-group">
+		<div class="controls">
+			<select name="bathrooms">
+			  <option value="0" <%= bathrooms == 0 ? 'selected' : '' %>><%= i18nUnit.form.bathrooms.zero %></option>
+			  <option value="1" <%= bathrooms == 1 ? 'selected' : '' %>><%= i18nUnit.form.bathrooms.one %></option>
+			  <option value="1.5" <%= bathrooms == 1.5 ? 'selected' : '' %>><%= i18nUnit.form.bathrooms.oneandahalf %></option>
+			  <option value="2" <%= bathrooms == 2 ? 'selected' : '' %>><%= i18nUnit.form.bathrooms.two %></option>
+			  <option value="2.5" <%= bathrooms == 2.5 ? 'selected' : '' %>><%= i18nUnit.form.bathrooms.twoandahalf %></option>
+			  <option value="3" <%= bathrooms == 3 ? 'selected' : '' %>><%= i18nUnit.form.bathrooms.three %></option>
+			  <option value="3.5" <%= bathrooms == 3.5 ? 'selected' : '' %>><%= i18nUnit.form.bathrooms.threeandahalf %></option>
+			</select>
+		</div>
+	</div>
+</td>
+<td class="view-specific view-edit hide">
+  <div class="control-group">
+		<div class="controls input-append">
+			<input type="text" maxlength="6" name="square_feet" class="span1" value="<%= square_feet %>">
+			<div class="add-on"><%= i18nUnit.form.squarefeetsymbol %></div>
+		</div>
+	</div>
+</td>
+<td class="view-specific view-edit hide">
+  <div class="control-group">
+		<div class="controls">
+      <textarea class="span4" name="description" rows="2"><%= description %></textarea>
+		</div>
+	</div>
+</td>
+<td>
+  <% if (objectId) { %>
+    <a class="btn btn-mini add-lease"
+       href="/properties/<%= property.objectId %>/units/<%= objectId %>/add/lease" 
+       rel="tooltip" 
+       data-original-title="<%= i18nUnit.actions.add_lease %>">
+      <i class="icon-plus"></i>
+    </a>
+    <% if (has_lease) { %>
+      <a class="btn btn-mini add-tenants"
+         href="/properties/<%= property.objectId %>/leases/<%= active_lease.objectId %>/add/tenants" 
+         rel="tooltip" 
+         data-original-title="<%= i18nLease.actions.add_tenants %>">
+        <i class="icon-user"></i>
+      </a>
+      <a class="btn btn-mini extend"
+         href="/properties/<%= property.objectId %>/leases/<%= active_lease.objectId %>/add/task" 
+         rel="tooltip" 
+         data-original-title="<%= i18nLease.actions.extend %>">
+        <i class="icon-repeat"></i>
+      </a>
+    <% } %>
+    <button class="btn btn-mini btn-danger delete"
+            rel="tooltip"
+            data-original-title="<%= i18nCommon.actions.delete %>">
+      <i class="icon-trash icon-white"></i>
+    </button>
+  <% } else { %>
+    <button class="btn btn-mini btn-danger remove"><%= i18nCommon.actions.remove %></button>
+  <% } %>
+</td>

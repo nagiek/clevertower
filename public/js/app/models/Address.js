@@ -4,8 +4,7 @@
     var Address;
     return Address = Parse.Object.extend("Address", {
       defaults: {
-        lat: 0,
-        lng: 0,
+        center: new Parse.GeoPoint,
         formatted_address: '',
         address_components: [],
         location_type: "APPROXIMATE",
@@ -32,7 +31,7 @@
         return this.trigger("marker:add", this);
       },
       toGPoint: function() {
-        return new google.maps.LatLng(this.get("lat"), this.get("lng"));
+        return new google.maps.LatLng(this.get("center")._latitude, this.get("center")._longitude);
       }
     });
   });

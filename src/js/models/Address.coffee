@@ -8,21 +8,20 @@ define [
 
     # explicitly specifiy the model
     defaults:
-      lat: 0
-      lng: 0
-      formatted_address: ''
-      address_components: []
-      location_type: "APPROXIMATE"
-      thoroughfare: ''
-      locality: ''
-      neighbourhood: ''
-      administrative_area_level_1: ''
-      administrative_area_level_2: ''
-      country: ''
-      postal_code: ''
+      center                        : new Parse.GeoPoint
+      formatted_address             : ''
+      address_components            : []
+      location_type                 : "APPROXIMATE"
+      thoroughfare                  : ''
+      locality                      : ''
+      neighbourhood                 : ''
+      administrative_area_level_1   : ''
+      administrative_area_level_2   : ''
+      country                       : ''
+      postal_code                   : ''
 
 
-    initialize : (attrs) ->
+    initialize : (attrs) ->  
       @$adrsLat =           $('#address_lat',                         '.address-form')
       @$adrsLng =           $('#address_lng',                         '.address-form')
       @$resultComponents =  $('#address_components',                  '.address-form')
@@ -40,4 +39,4 @@ define [
 
     # convenience function
     toGPoint: ->
-      new google.maps.LatLng(@get("lat"), @get("lng"))
+      new google.maps.LatLng @get("center")._latitude, @get("center")._longitude

@@ -8,6 +8,11 @@ define [
   "i18n!nls/property"
   "i18n!nls/common"
   "templates/property/manage"
+  "templates/property/menu"
+  "templates/property/menu/show"
+  "templates/property/menu/reports"
+  "templates/property/menu/other"
+  "templates/property/menu/actions"
 ], ($, _, Parse, PropertyList, Property, PropertyView, i18nProperty, i18nCommon) ->
 
   class ManagePropertiesView extends Parse.View
@@ -24,7 +29,7 @@ define [
       
       _.bindAll this, 'newProperty'
       
-      @$list = @$el.find("ul#property-list")
+      @$list = @$el.find("ul#view-id-my_properties")
       
       # Create our collection of Properties
       @properties = new PropertyList
@@ -39,9 +44,7 @@ define [
       # Fetch all the property items for this user
       @properties.fetch()
       
-      @render()
-      
-    render: ->
+    render: =>
       # done = @properties.done().length
       # remaining = @properties.remaining().length
       # @$("#property-stats").html @statsTemplate(
@@ -55,28 +58,38 @@ define [
     # Add a single property item to the list by creating a view for it, and
     # appending its element to the `<ul>`.
     addOne: (property) =>
+      @$list.html '' if @properties.length is 0 # Clear "empty" text
       view = new PropertyView(model: property)
       @$list.append view.render().el
 
     # Add all items in the Properties collection at once.
     addAll: (collection, filter) =>
       @$list.html ""
-      @properties.each @addOne
-    
+      unless @properties.length is 0
+        @properties.each @addOne
+        @$list.children(':even').addClass 'views-row-even'
+        @$list.children(':odd').addClass  'views-row-odd'
+      else
+        @$list.html '<p class="empty">' + i18nProperty.collection.empty + '</p>'
+
+    # showProperty : (id) ->
+    #   Parse.history.navigate "/properties/#{id}"
+    #   require ["views/property/Show"], (PropertyView) =>
+    #     propertyView = new PropertyView
+
     newProperty : ->
 
       require ["views/property/Wizard"], (PropertyWizard) =>
         @$el.find("#new-property").prop disabled: "disabled"
         @$el.find("section").hide()
         propertyWizard = new PropertyWizard
-        Parse.history.navigate "/address/new"
+        Parse.history.navigate "/properties/new"
 
         propertyWizard.on "wizard:cancel", (property) =>
           
           # Reset form
           @$el.find("#new-property").removeProp "disabled"
-          @$el.append '<div id="form"></div>'
-          # @$el.append '<div id="form" class="wizard"></div>'
+          @$el.append '<div id="form" class="wizard"></div>'
           @$el.find("section").show()
 
         
@@ -87,6 +100,5 @@ define [
           
           # Reset form
           @$el.find("#new-property").removeProp "disabled"
-          @$el.append '<div id="form"></div>'
-          # @$el.append '<div id="form" class="wizard"></div>' 
+          @$el.append '<div id="form" class="wizard"></div>' 
           @$el.find("section").show()

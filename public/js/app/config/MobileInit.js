@@ -10,6 +10,8 @@
       json2: "//cdnjs.cloudflare.com/ajax/libs/json2/20121008/json2",
       jquerymobile: '//cdnjs.cloudflare.com/ajax/libs/jquery-mobile/1.2.0/jquery.mobile.min',
       datepickermobile: 'libs/jqueryui/jquery.ui.datepicker.mobile.min',
+      serializeObject: "app/plugins/serialize_object",
+      filePicker: "app/plugins/file_picker",
       bootstrap: "libs/bootstrap/bootstrap.min",
       text: "libs/plugins/text",
       async: "libs/plugins/async",
@@ -39,7 +41,7 @@
     }
   });
 
-  require(["jquery", "backbone", "routers/App", "json2", "jqueryui", "jquerymobile", "datepickermobile", "serializeObject"], function($, Backbone, AppRouter) {
+  require(["jquery", "backbone", "routers/Mobile", "json2", "jqueryui", "jquerymobile", "datepickermobile", "serializeObject"], function($, Backbone, AppRouter) {
     $.mobile.linkBindingEnabled = false;
     $.mobile.hashListeningEnabled = false;
     return new AppRouter();

@@ -18,13 +18,9 @@ define [
       
       @marker = attrs.marker
       
-      lat = @marker.get("lat")
-      lng = @marker.get("lng")
-      
       opts = 
         zoom          : 2
-        center        : new google.maps.LatLng(lat, lng) # Will not work if included directly
-        # center        : new google.maps.LatLng(@marker.get "lat", @marker.get "lng")
+        center        : @marker.toGPoint()
         mapTypeId     : google.maps.MapTypeId.ROADMAP
         
       # @opts = _.defaults(attrs.mapOpts, mapDefaults)
@@ -47,8 +43,7 @@ define [
     parse : (res) ->
       components = 
         'formatted_address'   : res.formatted_address
-        'lng'                 : res.geometry.location.lng()
-        'lat'                 : res.geometry.location.lat()
+        'center'              : new Parse.GeoPoint res.geometry.location.lat(), res.geometry.location.lng()
         'location_type'       : res.geometry.location_type
     
       street_number = '';

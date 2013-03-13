@@ -58,40 +58,55 @@ define [
       
       switch @state
         when 'address'
+          # (new Parse.Query("Address"))
+          # .withinKilometers("center", @address.get("center"), 0)
+          # .first
+          #   success: (object) ->
+          #     @address.set "objectId", object.id
+          # 
+          #     # Perform checks for existing addresses.
+          #     # -------------------------------------
+          #     
+          #     # Validate user does not have a property here.
+          #     (new Parse.Query("Property"))
+          #     .equalTo("user",    Parse.User.current())
+          #     .equalTo("address", object.id )
+          #     .first
+          #       success: (object) -> 
+          #         return console.log 'taken_by_user'
+          #       error: (error) ->
+          #         
+          #   error: (error) ->
+        
           @address.save
-            # The object was saved successfully.
             success: (address) =>
-              
+            
               @state = 'property'
-              
+            
               # @property.set address, @address # Should be in the model section.
               require ["views/property/New", "templates/property/new"], (NewPropertyView) =>
-
+        
                 @$el.find('.address-form').after '<form class="property-form"></form>'
                 @form = new NewPropertyView(wizard: this, model: @property)
-
+        
                 # Animate
                 @map.$el.animate left: "-150%", 500
                 @form.$el.show().animate left: "0", 500
                 @$el.find('.back').prop disabled: false
                 @$el.find('.next').html(i18nCommon.actions.save)
-                
-            # The save failed.
-            # error is a Parse.Error with an error code and description.
+              
             error: (address, error) =>
-              @$el.find('.alert-error').html(i18nAddress.errors.messages[error.message]).show()
-              @$el.find('.error').removeClass('error') # Strip old errors.
-              switch error.message
-                when 'invalid_address'
-                  @$el.find('#address-search-group').addClass('error') # Add class to Control Group
-
-                                  
+              @$el.find('.alert-error').html(i18nAddress.errors[error.message]).show()
+              # Errors always applied to search bar.
+              @$el.find('#address-search-group').addClass('error') # Add class to Control Group
+                
         when 'property'
+        
           @property.save @form.$el.serializeObject().property,
             success: (property) =>
               @trigger "property:save", property, this
             error: (property, error) =>
-              @$el.find('.alert-error').html(i18nProperty.errors.messages[error.message]).show()
+              @$el.find('.alert-error').html(i18nProperty.errors[error.message]).show()
               @$el.find('.error').removeClass('error')
               switch error.message
                 when 'title_missing'

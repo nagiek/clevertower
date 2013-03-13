@@ -11,10 +11,10 @@ require.config
     
     # Core Libraries
     # --------------
-    jquery:       '//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min' # "libs/jquery"
-    jqueryui:     'libs/jqueryui/jquery-ui-1.10.1.custom.min', # includes core, slider, datepicker
+    jquery:       '//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min'     # "libs/jquery"
+    jqueryui:     'libs/jqueryui/jquery-ui-1.10.1.custom.min',                  # includes core, widget, slider, datepicker
     underscore:   "//cdnjs.cloudflare.com/ajax/libs/lodash.js/1.0.1/lodash.min" # "libs/lodash"
-    parse:        "//www.parsecdn.com/js/parse-1.1.15.min" # "libs/parse"
+    parse:        "//www.parsecdn.com/js/parse-1.1.15.min"                      # "libs/parse"
     
     # Bonus Libraries
     # ---------------
@@ -25,6 +25,8 @@ require.config
     
     # Plugins
     # -------
+    serializeObject:        "app/plugins/serialize_object"
+    filePicker:             "app/plugins/file_picker"
     bootstrap:              "libs/bootstrap/bootstrap.min"
     text:                   "libs/plugins/text"
     async:                  "libs/plugins/async"
@@ -72,7 +74,7 @@ require.config
 
 
 # Include Desktop Specific JavaScript files here (or inside of your Desktop router)
-require ["jquery", "backbone", "routers/App", "json2", "jqueryui", "jquerymobile", "datepickermobile", "serializeObject"], ($, Backbone, AppRouter) ->
+require ["jquery", "backbone", "routers/Mobile", "json2", "jqueryui", "jquerymobile", "datepickermobile", "serializeObject"], ($, Backbone, AppRouter) ->
   
   # Prevents all anchor click handling
   $.mobile.linkBindingEnabled = false
