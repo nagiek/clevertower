@@ -6,11 +6,25 @@ define [
   Property = Parse.Object.extend "Property",
 
     defaults:
-
+      # Location
+      center                        : new Parse.GeoPoint
+      formatted_address             : ''
+      address_components            : []
+      location_type                 : "APPROXIMATE"
+      thoroughfare                  : ''
+      locality                      : ''
+      neighbourhood                 : ''
+      administrative_area_level_1   : ''
+      administrative_area_level_2   : ''
+      country                       : ''
+      postal_code                   : ''
+      
+      # Images
       image_thumb         : ""
       image_profile       : ""
       image_full          : ""
 
+      # Attributes
       description         : ""
       phone               : ""
       email               : ""
@@ -52,9 +66,25 @@ define [
       init                : 1
       public              : 1
 
+    initialize : (attrs) ->  
+      # @$adrsLat =           $('#address_lat',                         '.address-form')
+      # @$adrsLng =           $('#address_lng',                         '.address-form')
+      # @$resultComponents =  $('#address_components',                  '.address-form')
+      # @$location_type =     $('#address_location_type',               '.address-form')
+      # @$adrsThr =           $('#address_thoroughfare',                '.address-form')
+      # @$adrsLty =           $('#address_locality',                    '.address-form')
+      # @$adrsNhd =           $('#address_neighbourhood',               '.address-form')
+      # @$adrsAd1 =           $('#address_administrative_area_level_1', '.address-form')
+      # @$adrsAd2 =           $('#address_administrative_area_level_2', '.address-form')
+      # @$adrsCty =           $('#address_country',                     '.address-form')
+      # @$adrsPCd =           $('#address_postal_code',                 '.address-form')
+
+      # route changes to model listeners
+      @trigger "marker:add", this
+
     cover: (format) ->
       img = @get "image_#{format}"
-      img = "/img/fallback/property-#{format}.png" unless img?
+      img = "/img/fallback/property-#{format}.png" if img is ''
       img
 
     # getImgs : ->

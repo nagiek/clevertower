@@ -1,6 +1,6 @@
 (function() {
 
-  define(["jquery", "underscore", "backbone", 'models/Address', "gmaps"], function($, _, Parse, Address) {
+  define(["jquery", "underscore", "backbone", "gmaps"], function($, _, Parse) {
     var Map;
     return Map = Parse.Object.extend("Map", {
       initialize: function(attrs) {
@@ -9,13 +9,16 @@
         this.marker = attrs.marker;
         opts = {
           zoom: 2,
-          center: this.marker.toGPoint(),
+          center: this.GPoint(this.marker.get("center")),
           mapTypeId: google.maps.MapTypeId.ROADMAP
         };
         return this.set({
           "point_exists": false,
           "opts": opts
         });
+      },
+      GPoint: function(GeoPoint) {
+        return new google.maps.LatLng(GeoPoint._latitude, GeoPoint._longitude);
       },
       geocode: function(inputHash) {
         var _this = this;
@@ -78,16 +81,19 @@
           return navigator.geolocation.getCurrentPosition(function(position) {
             _this.marker.set("center", new Parse.GeoPoint(position.coords));
             return _this.geocode({
-              latLng: _this.marker.toGPoint()
+              latLng: _this.GPoint(_this.marker.get("center"))
             });
           });
-        } else {
-          this.marker.set({
-            lat: google.loader.ClientLocation.latitude,
-            lng: google.loader.ClientLocation.longitude
-          });
+        } else if (google.loader.ClientLocation) {
+          this.marker.set("center", new Parse.GeoPoint(google.loader.ClientLocation));
           return this.geocode({
-            'latLng': this.marker.toGPoint()
+            latLng: this.GPoint(this.marker.get("center"))
+          });
+        } else {
+          this.marker.set("center", new Parse.GeoPoint());
+          alert(i18nProperty.errors.no_geolocaiton);
+          return this.geocode({
+            latLng: this.GPoint(this.marker.get("center"))
           });
         }
       }

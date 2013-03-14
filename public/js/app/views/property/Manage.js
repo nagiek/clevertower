@@ -36,15 +36,28 @@
         this.properties.bind("add", this.addOne);
         this.properties.bind("reset", this.addAll);
         this.properties.bind("all", this.render);
-        return this.properties.fetch();
+        return this.properties.fetch({
+          success: function(collection, resp, options) {
+            var query;
+            query = new Parse.Query("Unit");
+            query.containedIn("property", collection.models);
+            return query.count({
+              success: function(number) {
+                return collection.each(function(property) {
+                  return property.unitsLength = number;
+                });
+              }
+            });
+          }
+        });
       };
 
       ManagePropertiesView.prototype.render = function() {};
 
       ManagePropertiesView.prototype.addOne = function(property) {
         var view;
-        if (this.properties.length === 0) {
-          this.$list.html('');
+        if (this.$('p.empty')) {
+          this.$('p.empty').remove();
         }
         view = new PropertyView({
           model: property
@@ -56,8 +69,8 @@
         this.$list.html("");
         if (this.properties.length !== 0) {
           this.properties.each(this.addOne);
-          this.$list.children(':even').addClass('views-row-even');
-          return this.$list.children(':odd').addClass('views-row-odd');
+          this.$list.children(':even').children().addClass('views-row-even');
+          return this.$list.children(':odd').children().addClass('views-row-odd');
         } else {
           return this.$list.html('<p class="empty">' + i18nProperty.collection.empty + '</p>');
         }
@@ -65,7 +78,7 @@
 
       ManagePropertiesView.prototype.newProperty = function() {
         var _this = this;
-        return require(["views/property/Wizard"], function(PropertyWizard) {
+        return require(["views/property/new/Wizard"], function(PropertyWizard) {
           var propertyWizard;
           _this.$el.find("#new-property").prop({
             disabled: "disabled"
@@ -73,7 +86,7 @@
           _this.$el.find("section").hide();
           propertyWizard = new PropertyWizard;
           Parse.history.navigate("/properties/new");
-          propertyWizard.on("wizard:cancel", function(property) {
+          propertyWizard.on("wizard:cancel", function() {
             _this.$el.find("#new-property").removeProp("disabled");
             _this.$el.append('<div id="form" class="row"><div class="wizard span12"></div></div>');
             return _this.$el.find("section").show();
@@ -81,7 +94,7 @@
           return propertyWizard.on("property:save", function(property) {
             _this.properties.add(property);
             _this.$el.find("#new-property").removeProp("disabled");
-            _this.$el.append('<div id="form" class="wizard"></div>');
+            _this.$el.append('<div id="form" class="row"><div class="wizard span12"></div></div>');
             return _this.$el.find("section").show();
           });
         });

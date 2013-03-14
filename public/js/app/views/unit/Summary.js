@@ -2,7 +2,7 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", "moment", 'models/Unit', 'models/Lease', "i18n!nls/lease", "i18n!nls/unit", "i18n!nls/common", 'templates/unit/summary'], function($, _, Parse, moment, Unit, Lease, i18nLease, i18nUnit, i18nCommon) {
+  define(["jquery", "underscore", "backbone", "moment", 'models/Unit', 'models/Lease', 'views/helper/Alert', "i18n!nls/lease", "i18n!nls/unit", "i18n!nls/common", 'templates/unit/summary'], function($, _, Parse, moment, Unit, Lease, Alert, i18nLease, i18nUnit, i18nCommon) {
     var UnitSummaryView;
     return UnitSummaryView = (function(_super) {
 
@@ -24,7 +24,6 @@
 
       UnitSummaryView.prototype.initialize = function() {
         var _this = this;
-        this.$messages = $("#messages");
         this.model.on("change:title", function() {
           return _this.$('.unit-link').html(_this.model.get("title"));
         });
@@ -37,13 +36,19 @@
           return delete _this;
         });
         return this.model.on("invalid", function(unit, error) {
-          _this.$('.error').removeClass('error');
+          var msg;
           _this.$el.addClass('error');
           switch (error.message) {
             case 'title_missing':
               _this.$('.title-group .control-group').addClass('error');
           }
-          return _this.$messages.removeClass('alert-success').addClass('alert-error').show().html(i18nUnit.errors[error.message]);
+          msg = (typeof error.code === "function" ? error.code(i18nCommon.errors[error.message]) : void 0) ? void 0 : i18nUnit.errors[error.message];
+          return new Alert({
+            event: 'unit-invalid',
+            fade: false,
+            message: msg,
+            type: 'error'
+          });
         });
       };
 

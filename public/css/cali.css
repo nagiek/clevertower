@@ -8644,6 +8644,26 @@ form .help-block {
   column-count: 2;
   column-gap: 10px;
 }
+@media (max-width: 767px) {
+  .control-group .three-column {
+    -moz-column-count: 2;
+    -moz-column-gap: 10px;
+    -webkit-column-count: 2;
+    -webkit-column-gap: 10px;
+    column-count: 2;
+    column-gap: 10px;
+  }
+}
+@media (max-width: 480px) {
+  .control-group .three-column {
+    -moz-column-count: 1;
+    -moz-column-gap: 0;
+    -webkit-column-count: 1;
+    -webkit-column-gap: 0;
+    column-count: 1;
+    column-gap: 0;
+  }
+}
 /**
  * Unit field
  */
@@ -9400,6 +9420,7 @@ img[class*="span"] {
   margin-left: 12px;
 }
 .photo-elastic {
+  height: auto;
   width: auto;
 }
 @media (max-width: 979px) {
@@ -9410,7 +9431,7 @@ img[class*="span"] {
     height: auto;
   }
 }
-@media (max-width: 767px) {
+@media (max-width: 480px) {
   .elastic-float {
     margin-left: auto;
     padding-left: 12px;
@@ -10008,16 +10029,18 @@ ul.links .field-label-inline .field-label {
  * @file
  * Message Styling
  */
-#messages-container {
+#messages {
   position: fixed;
+  z-index: 1060;
   text-align: center;
   top: 45px;
 }
-#messages {
+#messages .alert {
   position: relative;
   display: inline-block;
+  min-width: 110px;
 }
-#messages h4 {
+#messages .alert h4 {
   display: inline;
 }
 .alert .btn-group {
@@ -10025,6 +10048,11 @@ ul.links .field-label-inline .field-label {
 }
 .alert ul {
   margin-bottom: 0;
+}
+@media (max-width: 767px) {
+  #messages {
+    padding-right: 20px;
+  }
 }
 /**
  * @file cali-modal.less
@@ -11033,10 +11061,13 @@ table.views-table {
   padding-bottom: 6px;
 }
 #view-id-my_properties h2 {
-  line-height: 1;
-  margin-top: 15px;
+  padding-top: 5px;
+  margin-top: 0;
 }
-#view-id-my_properties .btn-toolbar,
+#view-id-my_properties .btn-toolbar {
+  margin: 0;
+  padding-top: 5px;
+}
 #view-id-my_properties dl {
   margin: 0;
 }

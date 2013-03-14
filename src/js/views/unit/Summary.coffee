@@ -5,11 +5,12 @@ define [
   "moment"
   'models/Unit'
   'models/Lease'
+  'views/helper/Alert'
   "i18n!nls/lease"
   "i18n!nls/unit"
   "i18n!nls/common"
   'templates/unit/summary'
-], ($, _, Parse, moment, Unit, Lease, i18nLease, i18nUnit, i18nCommon) ->
+], ($, _, Parse, moment, Unit, Lease, Alert, i18nLease, i18nUnit, i18nCommon) ->
 
   class UnitSummaryView extends Parse.View
   
@@ -24,7 +25,6 @@ define [
       'click .delete'     : 'kill'
       
     initialize: () ->
-      @$messages = $("#messages")
       
       @model.on "change:title", =>
         @$('.unit-link').html @model.get "title"
@@ -39,20 +39,13 @@ define [
       
       @model.on "invalid", (unit, error) =>
         # Mark up form
-        @$('.error').removeClass('error')
         @$el.addClass('error')
         switch error.message
           when 'title_missing'
             @$('.title-group .control-group').addClass('error')
 
-        # Flash message
-        @$messages
-          .removeClass('alert-success')
-          .addClass('alert-error')
-          .show()
-          .html(i18nUnit.errors[error.message])
-          # .delay(6000)
-          # .fadeOut()
+        msg = if error.code? i18nCommon.errors[error.message] else i18nUnit.errors[error.message]
+        new Alert(event: 'unit-invalid', fade: false, message: msg, type: 'error')
 
     # Re-render the contents of the Unit item.
     render: ->

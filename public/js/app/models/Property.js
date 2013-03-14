@@ -4,6 +4,17 @@
     var Property;
     return Property = Parse.Object.extend("Property", {
       defaults: {
+        center: new Parse.GeoPoint,
+        formatted_address: '',
+        address_components: [],
+        location_type: "APPROXIMATE",
+        thoroughfare: '',
+        locality: '',
+        neighbourhood: '',
+        administrative_area_level_1: '',
+        administrative_area_level_2: '',
+        country: '',
+        postal_code: '',
         image_thumb: "",
         image_profile: "",
         image_full: "",
@@ -47,10 +58,13 @@
         init: 1,
         "public": 1
       },
+      initialize: function(attrs) {
+        return this.trigger("marker:add", this);
+      },
       cover: function(format) {
         var img;
         img = this.get("image_" + format);
-        if (img == null) {
+        if (img === '') {
           img = "/img/fallback/property-" + format + ".png";
         }
         return img;

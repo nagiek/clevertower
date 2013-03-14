@@ -38,6 +38,11 @@
         this.model.on('change:image_profile', function(model, name) {
           return _this.refresh();
         });
+        this.model.on('destroy', function() {
+          _this.remove();
+          _this.undelegateEvents();
+          return delete _this;
+        });
         return this.render();
       };
 

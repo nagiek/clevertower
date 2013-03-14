@@ -42,7 +42,19 @@ define [
       @properties.bind "all", @render
     
       # Fetch all the property items for this user
-      @properties.fetch()
+      @properties.fetch(
+        success: (collection, resp, options) ->          
+          query = new Parse.Query("Unit");
+          query.containedIn "property", collection.models
+          # groupBy not supported yet.
+          # query.groupBy "property"
+          query.count(
+            success: (number) ->
+              collection.each (property) -> 
+                property.unitsLength = number
+          )
+      )
+      #
       
     render: =>
       # done = @properties.done().length
@@ -58,7 +70,7 @@ define [
     # Add a single property item to the list by creating a view for it, and
     # appending its element to the `<ul>`.
     addOne: (property) =>
-      @$list.html '' if @properties.length is 0 # Clear "empty" text
+      @$('p.empty').remove() if @$('p.empty') # Clear "empty" text
       view = new PropertyView(model: property)
       @$list.append view.render().el
 
@@ -67,8 +79,8 @@ define [
       @$list.html ""
       unless @properties.length is 0
         @properties.each @addOne
-        @$list.children(':even').addClass 'views-row-even'
-        @$list.children(':odd').addClass  'views-row-odd'
+        @$list.children(':even').children().addClass 'views-row-even'
+        @$list.children(':odd').children().addClass  'views-row-odd'
       else
         @$list.html '<p class="empty">' + i18nProperty.collection.empty + '</p>'
 
@@ -79,13 +91,13 @@ define [
 
     newProperty : ->
 
-      require ["views/property/Wizard"], (PropertyWizard) =>
+      require ["views/property/new/Wizard"], (PropertyWizard) =>
         @$el.find("#new-property").prop disabled: "disabled"
         @$el.find("section").hide()
         propertyWizard = new PropertyWizard
         Parse.history.navigate "/properties/new"
 
-        propertyWizard.on "wizard:cancel", (property) =>
+        propertyWizard.on "wizard:cancel", =>
           
           # Reset form
           @$el.find("#new-property").removeProp "disabled"
@@ -100,5 +112,5 @@ define [
           
           # Reset form
           @$el.find("#new-property").removeProp "disabled"
-          @$el.append '<div id="form" class="wizard"></div>' 
+          @$el.append '<div id="form" class="row"><div class="wizard span12"></div></div>'
           @$el.find("section").show()

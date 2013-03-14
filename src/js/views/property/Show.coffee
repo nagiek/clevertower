@@ -40,7 +40,12 @@ define [
       
       @model.on 'change:image_profile', (model, name) =>
         @refresh()
-      
+
+      @model.on 'destroy',  =>
+        @remove()
+        @undelegateEvents()
+        delete this
+
       @render()
 
     # Re-render the contents of the property item.

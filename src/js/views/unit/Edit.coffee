@@ -1,13 +1,13 @@
 define [
-  "jquery", 
-  "underscore", 
-  "backbone", 
-  'models/Unit',
+  "jquery"
+  "underscore"
+  "backbone"
+  'models/Unit'
   "i18n!nls/Unit"
   "i18n!nls/common"
-  'templates/unit/new',
-  'templates/unit/edit',
-  'templates/unit/status',
+  'templates/unit/new'
+  'templates/unit/edit'
+  'templates/unit/status'
 ], ($, _, Parse, Unit, i18nUnit, i18nCommon) ->
 
   class UnitEditView extends Parse.View

@@ -24,7 +24,7 @@ define [
         # Get the anchor href and protcol
         href = $(this).attr("href")
         
-        return if href is "#"
+        return if href is "#" or not href?
         
         protocol = @protocol + "//"
 

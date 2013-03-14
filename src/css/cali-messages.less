@@ -3,17 +3,18 @@
  * Message Styling
  */
 
-#messages-container {
+#messages {
   position:fixed;
+  z-index:@zindexMessages;
   text-align:center;
   top:@navbarHeight+5px;
-}
-
-#messages {
-  position:relative;
-  display:inline-block;
-  h4 {
-    display:inline;
+  .alert {
+    position:relative;
+    display:inline-block;
+    min-width: 110px;
+    h4 {
+      display:inline;
+    }
   }
 }
 
@@ -23,5 +24,11 @@
   }
   ul {
     margin-bottom:0;
+  }
+}
+
+@media (max-width: 767px) {
+  #messages {
+    padding-right: 20px;
   }
 }

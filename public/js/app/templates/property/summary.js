@@ -46,7 +46,7 @@ __p += '\n    </h2>\n    \n    <dl>\n      <!-- <div class="span"> -->\n        
 ' ' +
 ((__t = ( i18nCommon.prepositions.of )) == null ? '' : __t) +
 ' ' +
-((__t = ( units )) == null ? '' : __t) +
+((__t = ( unitsLength )) == null ? '' : __t) +
 '</dd>\n      <!-- </div> -->\n    </dl>\n  </div>\n</div>';
 
 }

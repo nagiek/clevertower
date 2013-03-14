@@ -2,6 +2,8 @@
 
   define({
     actions: {
+      search: "Search",
+      geolocate: "Geolocate Me",
       new_property: "New Property",
       setup_property: "Setup Property",
       edit_picture: "Change Picture"
@@ -95,6 +97,16 @@
       hot_water: "Hot water"
     },
     errors: {
+      invalid_address: "You must add an address.",
+      insufficient_data: "We were unable to determine your address.",
+      no_geolocaiton: "Your browser doesn't support geolocation.",
+      taken_by_network: function(id) {
+        return "Your group already has <a href='/properties/" + (_.escape(id)) + "'>a property</a> at this address.";
+      },
+      taken_by_user: function(id) {
+        return "You already have <a href='/properties/" + (_.escape(id)) + "'>a property</a> at this address.";
+      },
+      "success/error was not called": "<strong>D'oh!</strong> Something went wrong. Please try again.",
       access_denied: "You do not have access to the property.",
       missing: "You must select a property.",
       title_missing: "A title is required."

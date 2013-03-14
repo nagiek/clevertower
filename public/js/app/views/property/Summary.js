@@ -16,55 +16,29 @@
 
       PropertySummaryView.prototype.className = "row";
 
-      PropertySummaryView.prototype.events = {
-        "click .toggle": "toggleDone",
-        "dblclick label.property-content": "edit",
-        "keypress .edit": "updateOnEnter",
-        "blur .edit": "close"
-      };
-
       PropertySummaryView.prototype.initialize = function() {
-        _.bindAll(this, "render", "close");
         this.model.set({
-          cover: this.model.cover('profile'),
+          cover: this.model.cover('profile')
+        });
+        this.model.set({
           tasks: '0',
           incomes: '0',
           expenses: '0',
-          vacant_units: '0',
-          units: '0'
+          vacant_units: '0'
         });
         return this.model.bind("change", this.render);
       };
 
       PropertySummaryView.prototype.render = function() {
-        $(this.el).html(JST["src/js/templates/property/summary.jst"](_.merge(this.model.toJSON(), {
+        var vars;
+        vars = _.merge(this.model.toJSON(), {
+          unitsLength: this.model.unitsLength != null ? this.model.unitsLength : 0,
           i18nProperty: i18nProperty,
           i18nCommon: i18nCommon
-        })));
+        });
+        $(this.el).html(JST["src/js/templates/property/summary.jst"](vars));
         this.input = this.$(".edit");
         return this;
-      };
-
-      PropertySummaryView.prototype.toggleDone = function() {
-        return this.model.toggle();
-      };
-
-      PropertySummaryView.prototype.edit = function() {
-        $(this.el).addClass("editing");
-        return this.input.focus();
-      };
-
-      PropertySummaryView.prototype.close = function() {
-        this.model.save({
-          content: this.input.val()
-        });
-        return $(this.el).removeClass("editing");
-      };
-
-      PropertySummaryView.prototype.updateOnEnter = function(e) {
-        if (e.keyCode === 13) {
-          return this.close();
-        }
       };
 
       return PropertySummaryView;

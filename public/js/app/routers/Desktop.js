@@ -28,7 +28,7 @@
         return $(document).delegate("a", "click", function(e) {
           var href, protocol;
           href = $(this).attr("href");
-          if (href === "#") {
+          if (href === "#" || !(href != null)) {
             return;
           }
           protocol = this.protocol + "//";

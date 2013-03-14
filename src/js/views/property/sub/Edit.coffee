@@ -7,7 +7,6 @@ define [
   "i18n!nls/common"
   "templates/property/sub/edit"
   'templates/property/form/_basic'
-  'templates/property/form/_marketing'
 ], ($, _, Parse, Property, i18nProperty, i18nCommon) ->
 
   class PropertyEditView extends Parse.View

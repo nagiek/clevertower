@@ -2,9 +2,8 @@ define [
   "jquery"
   "underscore"
   "backbone"
-  'models/Address'
   "gmaps"
-], ($, _, Parse, Address) ->
+], ($, _, Parse) ->
 
   Map = Parse.Object.extend "Map",
   
@@ -20,15 +19,19 @@ define [
       
       opts = 
         zoom          : 2
-        center        : @marker.toGPoint()
+        center        : @GPoint(@marker.get "center")
         mapTypeId     : google.maps.MapTypeId.ROADMAP
-        
+      
       # @opts = _.defaults(attrs.mapOpts, mapDefaults)
       
       @set 
         "point_exists": false
         "opts": opts
-              
+        
+        
+    GPoint : (GeoPoint)->
+      new google.maps.LatLng GeoPoint._latitude, GeoPoint._longitude
+           
     geocode : (inputHash) ->
       
       @geocoder.geocode inputHash, (results, status) =>
@@ -87,11 +90,14 @@ define [
         # Set current user location, if available
         navigator.geolocation.getCurrentPosition (position) =>
           @marker.set "center", new Parse.GeoPoint(position.coords)
-          @geocode latLng: @marker.toGPoint()
+          @geocode latLng: @GPoint @marker.get "center"
     
       # If browser geolication is not supoprted, try ip location
+      else if google.loader.ClientLocation
+        @marker.set "center", new Parse.GeoPoint(google.loader.ClientLocation)
+        @geocode latLng: @GPoint @marker.get "center"
+        
       else
-        @marker.set 
-          lat: google.loader.ClientLocation.latitude
-          lng: google.loader.ClientLocation.longitude
-        @geocode {'latLng': @marker.toGPoint()}
+        @marker.set "center", new Parse.GeoPoint()
+        alert i18nProperty.errors.no_geolocaiton
+        @geocode latLng: @GPoint @marker.get "center"

@@ -5,13 +5,14 @@ define [
   'collections/unit/UnitList'
   'models/Property'
   'models/Unit'
+  'views/helper/Alert'
   'views/unit/Summary'
   "i18n!nls/common"
   "i18n!nls/property"
   "i18n!nls/unit"
   "i18n!nls/lease"
   'templates/property/sub/units'
-], ($, _, Parse, UnitList, Property, Unit, UnitView, i18nCommon, i18nProperty, i18nUnit, i18nLease) ->
+], ($, _, Parse, UnitList, Property, Unit, Alert, UnitView, i18nCommon, i18nProperty, i18nUnit, i18nLease) ->
 
   class PropertyUnitsView extends Parse.View
   
@@ -44,7 +45,14 @@ define [
       @units.query = new Parse.Query(Unit)
       @units.query.equalTo "property", @model
       @units.comparator = (unit) ->
-        Number unit.get "title"
+        title = unit.get "title"
+        char = title.charAt title.length - 1
+        # Slice off the last digit if it is a letter and add it as a decimal
+        if isNaN(char)
+          Number(title.substr 0, title.length-1) + char.charCodeAt()/128
+        else
+          Number title
+
       @units.bind "add", @addOne
       @units.bind "reset", @addAll
       
@@ -131,19 +139,14 @@ define [
     
     save: (e) =>
       e.preventDefault()
+      @$('.error').removeClass('error') if @$('.error')
       @units.each (unit) =>
         if unit.changed
           error = unit.validate(unit.attributes)
           unless error
             unit.save null,
               success: (unit) =>
-                unless @$messages.hasClass 'alert-error'
-                  @$messages
-                  .addClass('alert-success')
-                  .show()
-                  .html(i18nCommon.actions.changes_saved)
-                  .delay(3000)
-                  .fadeOut()
+                new Alert(event: 'units-saved', fade: true, message: i18nCommon.actions.changes_saved, type: 'success')
                 unit.trigger "save:success" if unit.changed
               error: (unit, error) =>
                 unit.trigger "invalid", unit, error

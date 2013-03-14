@@ -4,7 +4,7 @@
     <div id="property-title-group" class="control-group span">
       <label for="property-title" class="control-label"><%= i18nProperty.fields.title %></label>
       <div class="controls">
-        <input type="text" name="property[title]" id="property-title" class="span4" value="<%= property.title ? property.title : property.get("address").get('thoroughfare') %>">
+        <input type="text" name="property[title]" id="property-title" class="span4" value="<%= property.title ? property.title : property.get('thoroughfare') %>">
       </div>
     </div>
     <div class="control-group span">
@@ -44,58 +44,58 @@
     <div class="control-group span6">
       <label for="property-amenities" class="control-label"><%= i18nProperty.form.structure.amenities %></label>
       <div class="controls three-column">
-        <label for="property-air_conditioning" class="control-label">
+        <label for="property-air_conditioning" class="checkbox">
           <input type="checkbox" name="property[air_conditioning]" id="property-air_conditioning" <%= property.air_conditioning ? checked="checked" : '' %>><%= i18nProperty.fields.air_conditioning %>
         </label>
-        <label for="property-back_yard" class="control-label">
+        <label for="property-back_yard" class="checkbox">
           <input type="checkbox" name="property[back_yard]" id="property-back_yard" <%= property.back_yard ? checked="checked" : '' %>><%= i18nProperty.fields.back_yard %>
         </label>
-        <label for="property-balcony" class="control-label">
+        <label for="property-balcony" class="checkbox">
           <input type="checkbox" name="property[balcony]" id="property-balcony" <%= property.balcony ? checked="checked" : '' %>><%= i18nProperty.fields.balcony %>
         </label>
-        <label for="property-cats_allowed" class="control-label">
+        <label for="property-cats_allowed" class="checkbox">
           <input type="checkbox" name="property[cats_allowed]" id="property-cats_allowed" <%= property.cats_allowed ? checked="checked" : '' %>><%= i18nProperty.fields.cats_allowed %>
         </label>
-        <label for="property-concierge" class="control-label">
+        <label for="property-concierge" class="checkbox">
           <input type="checkbox" name="property[concierge]" id="property-concierge" <%= property.concierge ? checked="checked" : '' %>><%= i18nProperty.fields.concierge %>
         </label>
-        <label for="property-dogs_allowed" class="control-label">
+        <label for="property-dogs_allowed" class="checkbox">
           <input type="checkbox" name="property[dogs_allowed]" id="property-dogs_allowed" <%= property.dogs_allowed ? checked="checked" : '' %>><%= i18nProperty.fields.dogs_allowed %>
         </label>
-        <label for="property-doorman" class="control-label">
+        <label for="property-doorman" class="checkbox">
           <input type="checkbox" name="property[doorman]" id="property-doorman" <%= property.doorman ? checked="checked" : '' %>><%= i18nProperty.fields.doorman %>
         </label>
-        <label for="property-elevator" class="control-label">
+        <label for="property-elevator" class="checkbox">
           <input type="checkbox" name="property[elevator]" id="property-elevator" <%= property.elevator ? checked="checked" : '' %>><%= i18nProperty.fields.elevator %>
         </label>
-        <label for="property-exposed_brick" class="control-label">
+        <label for="property-exposed_brick" class="checkbox">
           <input type="checkbox" name="property[exposed_brick]" id="property-exposed_brick" <%= property.exposed_brick ? checked="checked" : '' %>><%= i18nProperty.fields.exposed_brick %>
         </label>
-        <label for="property-fireplace" class="control-label">
+        <label for="property-fireplace" class="checkbox">
           <input type="checkbox" name="property[fireplace]" id="property-fireplace" <%= property.fireplace ? checked="checked" : '' %>><%= i18nProperty.fields.fireplace %>
         </label>
-        <label for="property-front_yard" class="control-label">
+        <label for="property-front_yard" class="checkbox">
           <input type="checkbox" name="property[front_yard]" id="property-front_yard" <%= property.front_yard ? checked="checked" : '' %>><%= i18nProperty.fields.front_yard %>
         </label>
-        <label for="property-gym" class="control-label">
+        <label for="property-gym" class="checkbox">
           <input type="checkbox" name="property[gym]" id="property-gym" <%= property.gym ? checked="checked" : '' %>><%= i18nProperty.fields.gym %>
         </label>
-        <label for="property-laundry" class="control-label">
+        <label for="property-laundry" class="checkbox">
           <input type="checkbox" name="property[laundry]" id="property-laundry" <%= property.laundry ? checked="checked" : '' %>><%= i18nProperty.fields.laundry %>
         </label>
-        <label for="property-indoor_parking" class="control-label">
+        <label for="property-indoor_parking" class="checkbox">
           <input type="checkbox" name="property[indoor_parking]" id="property-indoor_parking" <%= property.indoor_parking ? checked="checked" : '' %>><%= i18nProperty.fields.indoor_parking %>
         </label>
-        <label for="property-outdoor_parking" class="control-label">
+        <label for="property-outdoor_parking" class="checkbox">
           <input type="checkbox" name="property[outdoor_parking]" id="property-outdoor_parking" <%= property.outdoor_parking ? checked="checked" : '' %>><%= i18nProperty.fields.outdoor_parking %>
         </label>
-        <label for="property-pool" class="control-label">
+        <label for="property-pool" class="checkbox">
           <input type="checkbox" name="property[pool]" id="property-pool" <%= property.pool ? checked="checked" : '' %>><%= i18nProperty.fields.pool %>
         </label>
-        <label for="property-sauna" class="control-label">
+        <label for="property-sauna" class="checkbox">
           <input type="checkbox" name="property[sauna]" id="property-sauna" <%= property.sauna ? checked="checked" : '' %>><%= i18nProperty.fields.sauna %>
         </label>
-        <label for="property-wheelchair" class="control-label">
+        <label for="property-wheelchair" class="checkbox">
           <input type="checkbox" name="property[wheelchair]" id="property-wheelchair" <%= property.wheelchair ? checked="checked" : '' %>><%= i18nProperty.fields.wheelchair %>
         </label>          
       </div>
@@ -103,19 +103,19 @@
     <div class="control-group span2">
       <label for="property-included" class="control-label"><%= i18nProperty.form.structure.included %></label>
       <div class="controls">
-        <label for="property-electricity" class="control-label">
+        <label for="property-electricity" class="checkbox">
           <input type="checkbox" name="property[electricity]" id="property-electricity" <%= property.electricity ? checked="checked" : '' %>><%= i18nProperty.fields.electricity %>
         </label>
-        <label for="property-furniture" class="control-label">
+        <label for="property-furniture" class="checkbox">
           <input type="checkbox" name="property[furniture]" id="property-furniture" <%= property.furniture ? checked="checked" : '' %>><%= i18nProperty.fields.furniture %>
         </label>
-        <label for="property-gas" class="control-label">
+        <label for="property-gas" class="checkbox">
           <input type="checkbox" name="property[gas]" id="property-gas" <%= property.gas ? checked="checked" : '' %>><%= i18nProperty.fields.gas %>
         </label>
-        <label for="property-heat" class="control-label">
+        <label for="property-heat" class="checkbox">
           <input type="checkbox" name="property[heat]" id="property-heat" <%= property.heat ? checked="checked" : '' %>><%= i18nProperty.fields.heat %>
         </label>
-        <label for="property-hot_water" class="control-label">
+        <label for="property-hot_water" class="checkbox">
           <input type="checkbox" name="property[hot_water]" id="property-hot_water" <%= property.hot_water ? checked="checked" : '' %>><%= i18nProperty.fields.hot_water %>
         </label>
       </div>
