@@ -58,7 +58,9 @@
       no_undo: "This action cannot be undone."
     },
     errors: {
-      bad_save: "Something went wrong. Changes were not saved."
+      bad_save: "Something went wrong. Changes were not saved.",
+      access_denied: "Access denied",
+      no_permission: "You do not have permission to do that."
     }
   });
 

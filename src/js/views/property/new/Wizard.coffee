@@ -14,7 +14,8 @@ define [
   
     # Instead of generating a new element, bind to the existing skeleton of
     # the App already present in the HTML.
-    el: "#form .wizard"
+    
+    el: '#form'
     
     state: 'address'
     
@@ -24,10 +25,13 @@ define [
       'click .cancel'       : 'cancel'
     
     initialize : ->
+
       @model = new Property user: Parse.User.current()
 
-      @$el.html   JST["src/js/templates/property/new/map.jst"](i18nProperty: i18nProperty, i18nCommon: i18nCommon)
-      @$el.append JST["src/js/templates/property/new/wizard.jst"](i18nCommon: i18nCommon)
+      @$el
+      .html(JST['src/js/templates/property/new/wizard.jst'](i18nCommon: i18nCommon))
+      .find('.wizard-forms')
+      .html(JST["src/js/templates/property/new/map.jst"](i18nProperty: i18nProperty, i18nCommon: i18nCommon))
       
       @map = new GMapView(wizard: this, marker: @model)
 
@@ -43,27 +47,28 @@ define [
         delete this
         Parse.history.navigate '/'
 
-      
       _.bindAll this, 'next', 'back', 'cancel'
-      @render()
 
     next : (e) ->
       
       switch @state
         when 'address'
+          center = @model.get "center"          
+          return @$('.alert-error').html(i18nProperty.errors.invalid_address).show() if center._latitude is 0 and center._longitude is 0
           @state = 'property'
           Parse.Cloud.run(
-            'CheckForUniqueProperty', { objectId: @model.id, center:   @model.get "center"}, 
+            'CheckForUniqueProperty', { objectId: @model.id, center: center},
             success: =>
               require ["views/property/new/New", "templates/property/new/new"], (NewPropertyView) =>
-                @$('.address-form').after '<form class="property-form"></form>'
+                @$('.address-form').after '<form class="property-form span12"></form>'
                 @form = new NewPropertyView(wizard: this, model: @model)
-                  
+                
                 # Animate
                 @map.$el.animate left: "-150%", 500
                 @form.$el.show().animate left: "0", 500
-                @$el.find('.back').prop disabled: false
-                @$el.find('.next').html(i18nCommon.actions.save)
+                @$('.back').prop disabled: false
+                @$('.next').html(i18nCommon.actions.save)
+                @$('.alert-error').hide()
             error: (error) =>
               @state = 'address'
               args = error.message.split ":"
@@ -77,11 +82,11 @@ define [
             success: (property) =>
               @trigger "property:save", property, this
             error: (property, error) =>
-              @$el.find('.alert-error').html(i18nProperty.errors[error.message]).show()
-              @$el.find('.error').removeClass('error')
+              @$('.alert-error').html(i18nProperty.errors[error.message]).show()
+              @$('.error').removeClass('error')
               switch error.message
                 when 'title_missing'
-                  @$el.find('#property-title-group').addClass('error') # Add class to Control Group
+                  @$('#property-title-group').addClass('error') # Add class to Control Group
 
     back : (e) ->
       return if @state is 'address'
@@ -90,16 +95,16 @@ define [
       @form.$el.animate left: "150%", 500, 'swing', ->
         @remove()
         delete this
-      @$el.find('.back').prop disabled: 'disabled'
-      @$el.find('.next').html(i18nCommon.actions.next)
+      @$('.back').prop disabled: 'disabled'
+      @$('.next').html(i18nCommon.actions.next)
       delete @form
 
     cancel : (e) ->
       @trigger "wizard:cancel", this
       @undelegateEvents()
-      @$el.hide()
       @$el.parent().find("section").show
       delete this
 
-    render : ->
-      @map.$el.show()
+    remove : ->
+      @$el.html ''
+

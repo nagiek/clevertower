@@ -49,8 +49,18 @@ define [
         
     propertiesShow: (id, action) ->
       action ||= 'units'
-      require ["models/Property", "views/property/Show"], (Property, PropertyView) =>
-        $('#main').html '<div id="property"></div>'
-        new Parse.Query("Property").get id, 
-          success: (model) ->
-            new PropertyView(model:model, action: action)
+      new Parse.Query("Property").get id,
+        success: (model) ->
+          $('#main').html '<div id="property"></div>'
+          require ["views/property/Show"], (PropertyView) -> new PropertyView(model:model, action: action)
+        error: => @accessDenied()
+        
+    accessDenied: ->
+      require ["views/helper/Alert", 'i18n!nls/common'], (Alert, i18nCommon) -> 
+        new Alert
+          event:    'access-denied'
+          type:     'error'
+          fade:     true
+          heading:  i18nCommon.errors.access_denied
+          message:  i18nCommon.errors.no_permission
+        Parse.history.navigate "/"

@@ -1,5 +1,5 @@
 <fieldset>
-  <legend><%= i18nProperty.form.structure.building %></legend>
+  <legend><%= i18nProperty.form.building %></legend>
   <div class="row">
     <div id="property-title-group" class="control-group span">
       <label for="property-title" class="control-label"><%= i18nProperty.fields.title %></label>
@@ -33,7 +33,7 @@
 </fieldset>
 
 <fieldset>
-  <legend><%= i18nProperty.form.structure.marketing %></legend>
+  <legend><%= i18nProperty.form.marketing %></legend>
   <div class="row">
     <div class="control-group span">
       <label for="property-description" class="control-label"><%= i18nProperty.fields.description %></label>
@@ -42,7 +42,7 @@
       </div>
     </div>
     <div class="control-group span6">
-      <label for="property-amenities" class="control-label"><%= i18nProperty.form.structure.amenities %></label>
+      <label for="property-amenities" class="control-label"><%= i18nProperty.form.amenities %></label>
       <div class="controls three-column">
         <label for="property-air_conditioning" class="checkbox">
           <input type="checkbox" name="property[air_conditioning]" id="property-air_conditioning" <%= property.air_conditioning ? checked="checked" : '' %>><%= i18nProperty.fields.air_conditioning %>
@@ -101,7 +101,7 @@
       </div>
     </div>
     <div class="control-group span2">
-      <label for="property-included" class="control-label"><%= i18nProperty.form.structure.included %></label>
+      <label for="property-included" class="control-label"><%= i18nProperty.form.included %></label>
       <div class="controls">
         <label for="property-electricity" class="checkbox">
           <input type="checkbox" name="property[electricity]" id="property-electricity" <%= property.electricity ? checked="checked" : '' %>><%= i18nProperty.fields.electricity %>
@@ -124,7 +124,7 @@
 </fieldset>
 
 <fieldset>
-  <legend><%= i18nProperty.form.structure.contact %></legend>
+  <legend><%= i18nProperty.form.contact %></legend>
   <div class="row">
     <div class="control-group span">
       <label for="property-email" class="control-label"><%= i18nProperty.fields.email %></label>

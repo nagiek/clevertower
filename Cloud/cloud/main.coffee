@@ -3,45 +3,25 @@
   
 # Address validation
 Parse.Cloud.define "CheckForUniqueProperty", (request, response) ->
-  # Perform checks for existing addresses.
-  # -------------------------------------
-
-  # Parse.Promise
-  # .when([userAddressQuery(), networkAddressQuery()])
-  # .then(obj1, obj2) ->
-  # Set to existing address, if exists.
+    
   (new Parse.Query("Property"))
   .equalTo("user",            request.user  )
   .withinKilometers("center", request.params.center, 0.001)
-  .first(
-    success: (obj) ->
-      return response.error "#{obj.id}:taken_by_user" if obj
-      # request.object.set "objectId", obj.get("objectId")
-
-      # Validate user does not have a property here.
-      # (new Parse.Query("Property"))
-      # .equalTo          ("network", request.object.get "network")
-      # .withinKilometers ("center" , request.object.get("center"), 0.001)
-      # .first(
-      #   success: (obj) ->
-      #     return response.error 'taken_by_user' if obj
-      #     # Validate network does not have a property here.
-      #     # (new Parse.Query("Property"))
-      #     # .equalTo("network", request.object.get "network")
-      #     # .equalTo("address", orig                         )
-      #     # .first(
-      #     #   success: (obj) ->
-      #     #     return response.error 'taken_by_network' if obj?
-      #     # )
-      #     response.success()
-      #   error: ->
-      #     response.error 'bad_query'
-      #   )
-      response.success()
-    error: ->
-      response.error 'bad_query'
-  )
-
+  .first
+    success: (obj) -> if obj then response.error "#{obj.id}:taken_by_user" else response.success()
+    error: -> response.error 'bad_query'
+  
+  # network = id: request.params.networkId, __type: pointer
+  # (new Parse.Query("Property"))
+  # .equalTo("network",         network  )
+  # .withinKilometers("center", request.params.center, 0.001)
+  # .first
+  #   success: (obj) -> if obj then response.error "#{obj.id}:taken_by_network" else response.success()
+  #   error: -> response.error 'bad_query'
+  # 
+  # Parse.Promise
+  # .when([userAddressQuery(), networkAddressQuery()])
+  # .then(obj1, obj2) ->
 
 # Property validation
 Parse.Cloud.beforeSave "Property", (request, response) ->
@@ -59,23 +39,58 @@ Parse.Cloud.beforeSave "Property", (request, response) ->
   )
     # Insufficient data
     return response.error 'insufficient_data'
-  else      
+  else
     return response.error 'title_missing' unless request.object.get("title")?
   response.success()
 
 # Property permissions  
 Parse.Cloud.afterSave "Property", (request) ->
+  
+  saveFlag = false
+  existed = request.object.existed()
+  propertyACL = if existed then request.object.get "ACL" else new Parse.ACL;
 
   # Parse can only handle one role for now...
-  unless request.object.existed()
-    propertyACL = new Parse.ACL(request.user);
-    current = new Parse.Role(request.object.id + "-mgr-current", propertyACL).save()
-    # invited = new Parse.Role(request.object.id + "-mgr-invited", new Parse.ACL).save()
-    # pending = new Parse.Role(request.object.id + "-mgr-pending", new Parse.ACL).save()  
-    propertyACL.setRoleWriteAccess current
-    # propertyACL.setRoleReadAccess invited
+  unless existed
+    saveFlag = true
+    
+    # Role lists
+    current = request.object.id + "-mgr-current"
+    # invited = request.object.id + "-mgr-invited"
+
+    # Invited
+    # new Parse.Role(invited, propertyACL).save()
+    
+    # Let members see and add other members.
+    propertyACL.setRoleReadAccess current, true
+    propertyACL.setRoleWriteAccess current, true
+    
+    # Create new role (API not chainable)
+    role = new Parse.Role(current, propertyACL)
+    role.getUsers().add(request.user)
+    role.save()
+    
+    # # Invited
+    # new Parse.Role(request.object.id + "-mgr-invited", propertyACL).save null,
+    #   success: (invited) ->
+    #     propertyACL.setRoleReadAccess invited
+    #     request.object.setACL propertyACL
+    #     request.object.save()
+    # 
+
+
+  else
+    isPublic = request.object.get "public"    
+    if propertyACL.getPublicReadAccess() isnt isPublic
+      saveFlag = true
+      propertyACL.setPublicReadAccess(isPublic)
+
+  if saveFlag
+    # Save the ACL
     request.object.setACL propertyACL
-    request.object.save
+    request.object.save()
+
+
   
 # Unit validation
 Parse.Cloud.beforeSave "Unit", (request, response) ->

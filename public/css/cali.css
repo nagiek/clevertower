@@ -8272,6 +8272,11 @@ td.btn-group > .btn {
 .form-condensed .controls {
   margin-bottom: 0;
 }
+.form-inline h4 {
+  margin: 0;
+  margin-right: 5px;
+  display: inline-block;
+}
 .form-inline .control-group,
 .form-inline .control-label,
 .form-inline .controls {
@@ -8363,27 +8368,49 @@ td.btn-group > .btn {
   display: none;
 }
 /**
- * Twitter Bootstrap - Drupal joiners.
+ * Animated Form Wizards
  */
-.wizard {
-  position: absolute;
-  overflow-x: hidden;
-  height: 500px;
+.wizard .wizard-forms {
+  position: relative;
+  height: 450px;
+}
+.wizard .wizard-actions {
+  position: relative;
 }
 .wizard form {
   position: absolute;
   overflow-y: scroll;
-  width: 100%;
   height: 100%;
   margin-bottom: 18px;
 }
-.wizard .form-actions {
-  position: absolute;
-  width: 100%;
-  bottom: -18px;
-}
 .wizard .property-form {
   left: 150%;
+}
+@media (max-width: 767px) {
+  .wizard {
+    height: auto;
+    position: relative;
+  }
+  .wizard .wizard-forms {
+    height: auto;
+  }
+  .wizard form {
+    top: 80px;
+    overflow-y: visible;
+    height: auto;
+  }
+  .wizard .wizard-actions {
+    position: absolute;
+    margin-left: -20px;
+    margin-right: -20px;
+    top: 0;
+    bottom: auto;
+  }
+  .wizard .form-actions {
+    position: absolute;
+    width: 100%;
+    margin-top: 0;
+  }
 }
 .navbar-search .form-type-textfield {
   float: left;
@@ -11661,6 +11688,17 @@ html .form-item-field-reading-date-und-0-value-date label {
 @media (max-width: 767px) and (min-width: 480px) {
   .tablet-left {
     float: left;
+  }
+  .tablet-right {
+    float: right;
+  }
+}
+@media (max-width: 480px) {
+  .phone-left {
+    float: left;
+  }
+  .phone-right {
+    float: right;
   }
 }
 .inline-block {

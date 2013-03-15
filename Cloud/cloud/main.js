@@ -5,8 +5,9 @@
       success: function(obj) {
         if (obj) {
           return response.error("" + obj.id + ":taken_by_user");
+        } else {
+          return response.success();
         }
-        return response.success();
       },
       error: function() {
         return response.error('bad_query');
@@ -29,13 +30,28 @@
   });
 
   Parse.Cloud.afterSave("Property", function(request) {
-    var current, propertyACL;
-    if (!request.object.existed()) {
-      propertyACL = new Parse.ACL(request.user);
-      current = new Parse.Role(request.object.id + "-mgr-current", propertyACL).save();
-      propertyACL.setRoleWriteAccess(current);
+    var current, existed, isPublic, propertyACL, role, saveFlag;
+    saveFlag = false;
+    existed = request.object.existed();
+    propertyACL = existed ? request.object.get("ACL") : new Parse.ACL;
+    if (!existed) {
+      saveFlag = true;
+      current = request.object.id + "-mgr-current";
+      propertyACL.setRoleReadAccess(current, true);
+      propertyACL.setRoleWriteAccess(current, true);
+      role = new Parse.Role(current, propertyACL);
+      role.getUsers().add(request.user);
+      role.save();
+    } else {
+      isPublic = request.object.get("public");
+      if (propertyACL.getPublicReadAccess() !== isPublic) {
+        saveFlag = true;
+        propertyACL.setPublicReadAccess(isPublic);
+      }
+    }
+    if (saveFlag) {
       request.object.setACL(propertyACL);
-      return request.object.save;
+      return request.object.save();
     }
   });
 

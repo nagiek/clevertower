@@ -16,6 +16,11 @@
 }
 
 .form-inline {
+  h4 {
+    margin:0;
+    margin-right:5px;
+    display:inline-block;
+  }
   .control-group,
   .control-label,
   .controls {
@@ -127,30 +132,53 @@
     display: none;
 }
 
-
-
-
 /**
- * Twitter Bootstrap - Drupal joiners.
+ * Animated Form Wizards
  */
 .wizard {
-  position: absolute;
-  overflow-x: hidden;
-  height:500px;
+  .wizard-forms {
+    position: relative;
+    // overflow-x: hidden;
+    height:450px;
+  }
+  .wizard-actions {
+    position: relative;
+  }
   form {
     position: absolute;
     overflow-y: scroll;
-    width:100%;
     height: 100%;
     margin-bottom:18px;
   }
-  .form-actions {
-    position: absolute;
-    width:100%;
-    bottom: -18px;
-  }
   .property-form {
     left: 150%;
+  }
+}
+
+@media (max-width:767px) {
+  .wizard {
+    height:auto;
+    position:relative;
+    .wizard-forms {
+      height:auto;
+    }
+    form {
+      top:80px; // .form-actions height + .navbar height
+      overflow-y: visible;
+      height: auto;
+    }
+    .wizard-actions {
+      position:absolute;
+      margin-left:-20px;
+      margin-right:-20px;
+      top:0;
+      bottom: auto;
+    }
+    .form-actions {
+      position: absolute;
+      width: 100%;
+      margin-top:0;
+    }
   }
 }
 

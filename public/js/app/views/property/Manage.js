@@ -88,13 +88,11 @@
           Parse.history.navigate("/properties/new");
           propertyWizard.on("wizard:cancel", function() {
             _this.$el.find("#new-property").removeProp("disabled");
-            _this.$el.append('<div id="form" class="row"><div class="wizard span12"></div></div>');
             return _this.$el.find("section").show();
           });
           return propertyWizard.on("property:save", function(property) {
             _this.properties.add(property);
             _this.$el.find("#new-property").removeProp("disabled");
-            _this.$el.append('<div id="form" class="row"><div class="wizard span12"></div></div>');
             return _this.$el.find("section").show();
           });
         });

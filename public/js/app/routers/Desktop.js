@@ -58,16 +58,32 @@
       DesktopRouter.prototype.propertiesShow = function(id, action) {
         var _this = this;
         action || (action = 'units');
-        return require(["models/Property", "views/property/Show"], function(Property, PropertyView) {
-          $('#main').html('<div id="property"></div>');
-          return new Parse.Query("Property").get(id, {
-            success: function(model) {
+        return new Parse.Query("Property").get(id, {
+          success: function(model) {
+            $('#main').html('<div id="property"></div>');
+            return require(["views/property/Show"], function(PropertyView) {
               return new PropertyView({
                 model: model,
                 action: action
               });
-            }
+            });
+          },
+          error: function() {
+            return _this.accessDenied();
+          }
+        });
+      };
+
+      DesktopRouter.prototype.accessDenied = function() {
+        return require(["views/helper/Alert", 'i18n!nls/common'], function(Alert, i18nCommon) {
+          new Alert({
+            event: 'access-denied',
+            type: 'error',
+            fade: true,
+            heading: i18nCommon.errors.access_denied,
+            message: i18nCommon.errors.no_permission
           });
+          return Parse.history.navigate("/");
         });
       };
 

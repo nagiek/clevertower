@@ -12,7 +12,7 @@
         return PropertyWizardView.__super__.constructor.apply(this, arguments);
       }
 
-      PropertyWizardView.prototype.el = "#form .wizard";
+      PropertyWizardView.prototype.el = '#form';
 
       PropertyWizardView.prototype.state = 'address';
 
@@ -27,11 +27,10 @@
         this.model = new Property({
           user: Parse.User.current()
         });
-        this.$el.html(JST["src/js/templates/property/new/map.jst"]({
-          i18nProperty: i18nProperty,
+        this.$el.html(JST['src/js/templates/property/new/wizard.jst']({
           i18nCommon: i18nCommon
-        }));
-        this.$el.append(JST["src/js/templates/property/new/wizard.jst"]({
+        })).find('.wizard-forms').html(JST["src/js/templates/property/new/map.jst"]({
+          i18nProperty: i18nProperty,
           i18nCommon: i18nCommon
         }));
         this.map = new GMapView({
@@ -50,22 +49,26 @@
           delete _this;
           return Parse.history.navigate('/');
         });
-        _.bindAll(this, 'next', 'back', 'cancel');
-        return this.render();
+        return _.bindAll(this, 'next', 'back', 'cancel');
       };
 
       PropertyWizardView.prototype.next = function(e) {
-        var _this = this;
+        var center,
+          _this = this;
         switch (this.state) {
           case 'address':
+            center = this.model.get("center");
+            if (center._latitude === 0 && center._longitude === 0) {
+              return this.$('.alert-error').html(i18nProperty.errors.invalid_address).show();
+            }
             this.state = 'property';
             return Parse.Cloud.run('CheckForUniqueProperty', {
               objectId: this.model.id,
-              center: this.model.get("center")
+              center: center
             }, {
               success: function() {
                 return require(["views/property/new/New", "templates/property/new/new"], function(NewPropertyView) {
-                  _this.$('.address-form').after('<form class="property-form"></form>');
+                  _this.$('.address-form').after('<form class="property-form span12"></form>');
                   _this.form = new NewPropertyView({
                     wizard: _this,
                     model: _this.model
@@ -76,10 +79,11 @@
                   _this.form.$el.show().animate({
                     left: "0"
                   }, 500);
-                  _this.$el.find('.back').prop({
+                  _this.$('.back').prop({
                     disabled: false
                   });
-                  return _this.$el.find('.next').html(i18nCommon.actions.save);
+                  _this.$('.next').html(i18nCommon.actions.save);
+                  return _this.$('.alert-error').hide();
                 });
               },
               error: function(error) {
@@ -97,11 +101,11 @@
                 return _this.trigger("property:save", property, _this);
               },
               error: function(property, error) {
-                _this.$el.find('.alert-error').html(i18nProperty.errors[error.message]).show();
-                _this.$el.find('.error').removeClass('error');
+                _this.$('.alert-error').html(i18nProperty.errors[error.message]).show();
+                _this.$('.error').removeClass('error');
                 switch (error.message) {
                   case 'title_missing':
-                    return _this.$el.find('#property-title-group').addClass('error');
+                    return _this.$('#property-title-group').addClass('error');
                 }
               }
             });
@@ -122,23 +126,22 @@
           this.remove();
           return delete this;
         });
-        this.$el.find('.back').prop({
+        this.$('.back').prop({
           disabled: 'disabled'
         });
-        this.$el.find('.next').html(i18nCommon.actions.next);
+        this.$('.next').html(i18nCommon.actions.next);
         return delete this.form;
       };
 
       PropertyWizardView.prototype.cancel = function(e) {
         this.trigger("wizard:cancel", this);
         this.undelegateEvents();
-        this.$el.hide();
         this.$el.parent().find("section").show;
         return delete this;
       };
 
-      PropertyWizardView.prototype.render = function() {
-        return this.map.$el.show();
+      PropertyWizardView.prototype.remove = function() {
+        return this.$el.html('');
       };
 
       return PropertyWizardView;

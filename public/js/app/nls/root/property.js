@@ -42,17 +42,16 @@
       view_tenant: "See Tenant View"
     },
     structure: {
-      vacancies: "Vacancies"
+      vacancies: "Vacancies",
+      units_control: "Units Control"
     },
     form: {
-      structure: {
-        marketing: "Marketing",
-        contact: "Contact",
-        building: "Building",
-        features: "Features",
-        amenities: "Amenities",
-        included: "Included"
-      }
+      marketing: "Marketing",
+      contact: "Contact",
+      building: "Building",
+      features: "Features",
+      amenities: "Amenities",
+      included: "Included"
     },
     collection: {
       empty: "You don't have any properties yet."

@@ -7,7 +7,7 @@ obj || (obj = {});
 var __t, __p = '', __e = _.escape;
 with (obj) {
 __p += '<fieldset>\n  <legend>' +
-((__t = ( i18nProperty.form.structure.building )) == null ? '' : __t) +
+((__t = ( i18nProperty.form.building )) == null ? '' : __t) +
 '</legend>\n  <div class="row">\n    <div id="property-title-group" class="control-group span">\n      <label for="property-title" class="control-label">' +
 ((__t = ( i18nProperty.fields.title )) == null ? '' : __t) +
 '</label>\n      <div class="controls">\n        <input type="text" name="property[title]" id="property-title" class="span4" value="' +
@@ -31,13 +31,13 @@ __p += '<fieldset>\n  <legend>' +
 '</label>\n      <div class="controls">\n        <input type="text" name="property[mls]" id="property-mls" class="span2" ' +
 ((__t = ( property.description ? 'value="' + property.description + '"' : ''  )) == null ? '' : __t) +
 '>\n      </div>\n    </div>\n  </div>\n</fieldset>\n\n<fieldset>\n  <legend>' +
-((__t = ( i18nProperty.form.structure.marketing )) == null ? '' : __t) +
+((__t = ( i18nProperty.form.marketing )) == null ? '' : __t) +
 '</legend>\n  <div class="row">\n    <div class="control-group span">\n      <label for="property-description" class="control-label">' +
 ((__t = ( i18nProperty.fields.description )) == null ? '' : __t) +
 '</label>\n      <div class="controls">\n        <textarea rows="5" name="property[description]" id="property-description" class="span4">' +
 ((__t = ( property.description ? property.description : ''  )) == null ? '' : __t) +
 '</textarea>\n      </div>\n    </div>\n    <div class="control-group span6">\n      <label for="property-amenities" class="control-label">' +
-((__t = ( i18nProperty.form.structure.amenities )) == null ? '' : __t) +
+((__t = ( i18nProperty.form.amenities )) == null ? '' : __t) +
 '</label>\n      <div class="controls three-column">\n        <label for="property-air_conditioning" class="checkbox">\n          <input type="checkbox" name="property[air_conditioning]" id="property-air_conditioning" ' +
 ((__t = ( property.air_conditioning ? checked="checked" : '' )) == null ? '' : __t) +
 '>' +
@@ -111,7 +111,7 @@ __p += '<fieldset>\n  <legend>' +
 '>' +
 ((__t = ( i18nProperty.fields.wheelchair )) == null ? '' : __t) +
 '\n        </label>          \n      </div>\n    </div>\n    <div class="control-group span2">\n      <label for="property-included" class="control-label">' +
-((__t = ( i18nProperty.form.structure.included )) == null ? '' : __t) +
+((__t = ( i18nProperty.form.included )) == null ? '' : __t) +
 '</label>\n      <div class="controls">\n        <label for="property-electricity" class="checkbox">\n          <input type="checkbox" name="property[electricity]" id="property-electricity" ' +
 ((__t = ( property.electricity ? checked="checked" : '' )) == null ? '' : __t) +
 '>' +
@@ -133,7 +133,7 @@ __p += '<fieldset>\n  <legend>' +
 '>' +
 ((__t = ( i18nProperty.fields.hot_water )) == null ? '' : __t) +
 '\n        </label>\n      </div>\n    </div>\n  </div>\n</fieldset>\n\n<fieldset>\n  <legend>' +
-((__t = ( i18nProperty.form.structure.contact )) == null ? '' : __t) +
+((__t = ( i18nProperty.form.contact )) == null ? '' : __t) +
 '</legend>\n  <div class="row">\n    <div class="control-group span">\n      <label for="property-email" class="control-label">' +
 ((__t = ( i18nProperty.fields.email )) == null ? '' : __t) +
 '</label>\n      <div class="controls">\n        <input type="email" name="property[email]" id="property-email" class="span3" ' +
