@@ -56,7 +56,13 @@
   });
 
   Parse.Cloud.beforeSave("Unit", function(request, response) {
+    var property;
+    property = request.object.get("property");
+    if (!property) {
+      response.error('no_property');
+    }
     request.object.set("user", request.user);
+    request.object.setACL(property.get("ACL"));
     return response.success();
   });
 

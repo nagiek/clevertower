@@ -90,11 +90,14 @@ Parse.Cloud.afterSave "Property", (request) ->
     request.object.setACL propertyACL
     request.object.save()
 
-
-  
 # Unit validation
 Parse.Cloud.beforeSave "Unit", (request, response) ->
+  
+  property = request.object.get "property"
+  response.error 'no_property' unless property
+  
   request.object.set "user", request.user
+  request.object.setACL property.get "ACL"
   response.success()
 
 # Lease validation

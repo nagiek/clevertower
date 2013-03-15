@@ -22,6 +22,7 @@
         var collections,
           _this = this;
         this.action = attrs.action;
+        console.log(this.model);
         collections = {
           cover: this.model.cover('profile'),
           tasks: '0',

@@ -22,6 +22,7 @@ define [
     initialize: (attrs) ->
       
       @action = attrs.action
+      console.log @model
       
       # Convert to collections.
       # @model.set 

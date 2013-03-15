@@ -49,12 +49,13 @@ define [
         
     propertiesShow: (id, action) ->
       action ||= 'units'
-      new Parse.Query("Property").get id,
-        success: (model) ->
-          $('#main').html '<div id="property"></div>'
-          require ["views/property/Show"], (PropertyView) -> new PropertyView(model:model, action: action)
-        error: => @accessDenied()
-        
+      require ["models/Property", "views/property/Show"], (Property, PropertyView) => 
+        new Parse.Query("Property").get id,
+          success: (model) ->
+            $('#main').html '<div id="property"></div>'
+            new PropertyView(model:model, action: action)
+          error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
+      
     accessDenied: ->
       require ["views/helper/Alert", 'i18n!nls/common'], (Alert, i18nCommon) -> 
         new Alert

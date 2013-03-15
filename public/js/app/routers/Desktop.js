@@ -58,19 +58,19 @@
       DesktopRouter.prototype.propertiesShow = function(id, action) {
         var _this = this;
         action || (action = 'units');
-        return new Parse.Query("Property").get(id, {
-          success: function(model) {
-            $('#main').html('<div id="property"></div>');
-            return require(["views/property/Show"], function(PropertyView) {
+        return require(["models/Property", "views/property/Show"], function(Property, PropertyView) {
+          return new Parse.Query("Property").get(id, {
+            success: function(model) {
+              $('#main').html('<div id="property"></div>');
               return new PropertyView({
                 model: model,
                 action: action
               });
-            });
-          },
-          error: function() {
-            return _this.accessDenied();
-          }
+            },
+            error: function(object, error) {
+              return _this.accessDenied();
+            }
+          });
         });
       };
 

@@ -3,7 +3,10 @@ define [
   'backbone',
 ], (_, Parse) ->
 
-  Property = Parse.Object.extend "Property",
+  Property = Parse.Object.extend "Property"
+  # class Property extends Parse.Object
+    
+    className: "Property"
 
     defaults:
       # Location

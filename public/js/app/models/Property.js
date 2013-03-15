@@ -3,6 +3,7 @@
   define(['underscore', 'backbone'], function(_, Parse) {
     var Property;
     return Property = Parse.Object.extend("Property", {
+      className: "Property",
       defaults: {
         center: new Parse.GeoPoint,
         formatted_address: '',
