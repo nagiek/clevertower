@@ -5,7 +5,7 @@
       add_lease: "add a new lease"
     },
     constants: {
-      "new": "New Unit",
+      new_unit: "New Unit",
       unassigned: "Unassigned",
       applying: "Applying"
     },

@@ -22,14 +22,16 @@
         var collections,
           _this = this;
         this.action = attrs.action;
-        console.log(this.model);
+        if (this.action === 'add/lease') {
+          this.model.loadUnits();
+        }
         collections = {
           cover: this.model.cover('profile'),
-          tasks: '0',
-          incomes: '0',
-          expenses: '0',
-          vacant_units: '0',
-          units: '0'
+          units: this.model.units ? String(this.model.units.length) : '0',
+          tasks: this.model.tasks ? String(this.model.tasks.length) : '0',
+          incomes: this.model.incomes ? String(this.model.incomes.length) : '0',
+          expenses: this.model.expenses ? String(this.model.expenses.length) : '0',
+          vacant_units: '0'
         };
         $(this.el).html(JST["src/js/templates/property/show.jst"](_.merge(this.model.toJSON(), collections, {
           i18nProperty: i18nProperty,

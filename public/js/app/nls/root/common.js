@@ -4,7 +4,7 @@
     headers: {
       home: "Home",
       search: "Search",
-      Operations: "Operations"
+      operations: "Operations"
     },
     classes: {
       lease: "lease",
@@ -41,13 +41,22 @@
       add_x_more: "Add <strong>x</strong> more",
       changes_saved: "Changes Saved."
     },
+    dates: {
+      datepicker_format: "mm/dd/yy",
+      per_month: "Per month"
+    },
     prepositions: {
-      of: "of"
+      of: "of",
+      eg: "E.g., "
     },
     adjectives: {
       unsaved: "Unsaved"
     },
     form: {
+      title: "Title",
+      info: "Info",
+      required: "Required",
+      comma_separated: "Enter a comma-separated list of email addresses.",
       select: {
         select_value: "- Select a value -",
         numeric: "Numeric (1 ➡ 2)",

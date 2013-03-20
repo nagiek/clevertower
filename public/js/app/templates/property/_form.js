@@ -2,7 +2,7 @@ define(function(){
 
 this["JST"] = this["JST"] || {};
 
-this["JST"]["src/js/templates/property/form/_basic.jst"] = function(obj) {
+this["JST"]["src/js/templates/property/_form.jst"] = function(obj) {
 obj || (obj = {});
 var __t, __p = '', __e = _.escape;
 with (obj) {
@@ -14,13 +14,15 @@ __p += '<fieldset>\n  <legend>' +
 ((__t = ( property.title ? property.title : property.get('thoroughfare') )) == null ? '' : __t) +
 '">\n      </div>\n    </div>\n    <div class="control-group span">\n      <label for="property-email" class="control-label">' +
 ((__t = ( i18nProperty.fields.property_type.label )) == null ? '' : __t) +
-'</label>\n      <div class="controls">\n        <select name="property[property_type]" id="property-property_type" class="span3" ' +
-((__t = ( property.property_type ? 'value="' + property.property_type + '"' : ''  )) == null ? '' : __t) +
-'>\n          <option value="">' +
+'</label>\n      <div class="controls">\n        <select name="property[property_type]" id="property-property_type" class="span3">\n          <option value="" >' +
 ((__t = ( i18nCommon.form.select.select_value )) == null ? '' : __t) +
-'</option>\n          <option value="1">' +
+'</option>\n          <option value="1" ' +
+((__t = ( property.property_type == 1 ? 'selected="selected"' : ''  )) == null ? '' : __t) +
+'>' +
 ((__t = ( i18nProperty.fields.property_type.condo )) == null ? '' : __t) +
-'</option>\n          <option value="2">' +
+'</option>\n          <option value="2" ' +
+((__t = ( property.property_type == 2 ? 'selected="selected"' : ''  )) == null ? '' : __t) +
+'>' +
 ((__t = ( i18nProperty.fields.property_type.apartment )) == null ? '' : __t) +
 '</option>\n        </select>\n      </div>\n    </div>\n    <div class="control-group span">\n      <label for="property-year" class="control-label">' +
 ((__t = ( i18nProperty.fields.year )) == null ? '' : __t) +

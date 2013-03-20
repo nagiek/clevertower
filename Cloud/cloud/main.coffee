@@ -48,7 +48,7 @@ Parse.Cloud.afterSave "Property", (request) ->
   
   saveFlag = false
   existed = request.object.existed()
-  propertyACL = if existed then request.object.get "ACL" else new Parse.ACL;
+  propertyACL = if existed then request.object.getACL() else new Parse.ACL;
 
   # Parse can only handle one role for now...
   unless existed
@@ -95,10 +95,21 @@ Parse.Cloud.beforeSave "Unit", (request, response) ->
   
   property = request.object.get "property"
   response.error 'no_property' unless property
-  
-  request.object.set "user", request.user
-  request.object.setACL property.get "ACL"
-  response.success()
+  response.error 'no_title' unless request.object.get "title"
+
+  unless request.object.existed()
+    (new Parse.Query "Property").get property.objectId,
+      success: (propertyModel) ->
+      
+        request.object.set "user", request.user
+        request.object.setACL propertyModel.getACL()
+        console.log propertyModel.getACL()
+        response.success()
+      
+      error: (propertyModel, error) ->
+        response.error "bad_query"
+  else
+    response.success()
 
 # Lease validation
 Parse.Cloud.beforeSave "Lease", (request, response) ->

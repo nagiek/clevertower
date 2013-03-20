@@ -20,20 +20,19 @@ define [
       'click #edit-profile-picture': 'editProfilePicture'
 
     initialize: (attrs) ->
-      
       @action = attrs.action
-      console.log @model
       
-      # Convert to collections.
-      # @model.set 
+      @model.loadUnits() if @action is 'add/lease'
+      
       collections = 
         cover        : @model.cover('profile')
-
-        tasks        : '0'            # @model.tasks()
-        incomes      : '0'            # @model.incomes().sum()
-        expenses     : '0'            # @model.expenses().sum()
-        vacant_units : '0'            # @model.units().vacant().length
-        units        : '0'            # @model.units().length
+        units        : if @model.units    then String @model.units.length                         else '0'
+        tasks        : if @model.tasks    then String @model.tasks.length                         else '0'
+        incomes      : if @model.incomes  then String @model.incomes.length                       else '0'
+        expenses     : if @model.expenses then String @model.expenses.length                      else '0'
+        vacant_units : '0'
+        # collection.where not defined yet
+        # vacant_units : if @model.units    then String @model.units.where(occupied: false).length  else '0'
       
       $(@el).html JST["src/js/templates/property/show.jst"](_.merge(@model.toJSON(),collections,i18nProperty: i18nProperty, i18nCommon: i18nCommon))
       
@@ -53,8 +52,7 @@ define [
     render: ->
       require ["views/property/sub/#{@action}"], (PropertySubView) =>
         propertyView = new PropertySubView(model: @model)
-      this
-
+      @
   
     # Re-render the contents of the property item.
     refresh: ->
@@ -62,7 +60,7 @@ define [
       
     editProfilePicture: ->
       
-      _this = @
+      _this = @ # Keep for below
       
       require ['jquery.fileupload', 'jquery.fileupload-fp', 'jquery.fileupload-pr'],  =>
         

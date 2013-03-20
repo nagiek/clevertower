@@ -16,7 +16,7 @@
         "": "index",
         "properties/new": "propertiesNew",
         "properties/:id": "propertiesShow",
-        "properties/:id/:action": "propertiesShow",
+        "properties/:id/*action": "propertiesShow",
         "*actions": "index"
       };
 

@@ -3,11 +3,12 @@ define [
   "underscore"
   "backbone"
   "models/Property"
+  'views/helper/Alert'
   "i18n!nls/property"
   "i18n!nls/common"
   "templates/property/sub/edit"
-  'templates/property/form/_basic'
-], ($, _, Parse, Property, i18nProperty, i18nCommon) ->
+  'templates/property/_form'
+], ($, _, Parse, Property, Alert, i18nProperty, i18nCommon) ->
 
   class PropertyEditView extends Parse.View
   
@@ -46,8 +47,8 @@ define [
         success: (property) =>
           @trigger "property:save", property, this
         error: (property, error) =>
-          @$el.find('.alert-error').html(i18nProperty.errors.messages[error.message]).show()
           @$el.find('.error').removeClass('error')
+          new Alert(event: 'property-save', fade: false, message: i18nProperty.errors[error.message], type: 'error')
           switch error.message
             when 'title_missing'
               @$el.find('#property-title-group').addClass('error') # Add class to Control Group

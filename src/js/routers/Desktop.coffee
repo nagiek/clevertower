@@ -6,12 +6,12 @@ define [
 
   class DesktopRouter extends Parse.Router
     routes:
-      ""                          : "index"
-      "properties/new"            : "propertiesNew"
-      # "properties/:id/add/(:action)" : "propertiesAddSub"
-      "properties/:id"            : "propertiesShow"
-      "properties/:id/:action"    : "propertiesShow"
-      "*actions"                  : "index"
+      ""                            : "index"
+      "properties/new"              : "propertiesNew"
+      "properties/:id"              : "propertiesShow"
+      # "properties/:id/add/:model"   : "propertiesAddSub"
+      "properties/:id/*action"      : "propertiesShow"
+      "*actions"                    : "index"
 
     initialize: (options) ->
       Parse.history.start pushState: true
@@ -55,6 +55,15 @@ define [
             $('#main').html '<div id="property"></div>'
             new PropertyView(model:model, action: action)
           error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
+
+    # propertiesAddSub: (id, node) ->
+    #   require ["models/#{node}", "views/property/add/#{node}"], (Property, AddSubPropertyView) => 
+    #     new Parse.Query("Property").get id,
+    #       success: (model) ->
+    #         $('#main').html '<div id="property"></div>'
+    #         new AddSubPropertyView(property:property)
+    #       error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
+
       
     accessDenied: ->
       require ["views/helper/Alert", 'i18n!nls/common'], (Alert, i18nCommon) -> 

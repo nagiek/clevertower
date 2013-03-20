@@ -3,7 +3,7 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", "models/Property", "i18n!nls/property", "i18n!nls/common", "templates/property/sub/edit", 'templates/property/form/_basic'], function($, _, Parse, Property, i18nProperty, i18nCommon) {
+  define(["jquery", "underscore", "backbone", "models/Property", 'views/helper/Alert', "i18n!nls/property", "i18n!nls/common", "templates/property/sub/edit", 'templates/property/_form'], function($, _, Parse, Property, Alert, i18nProperty, i18nCommon) {
     var PropertyEditView;
     return PropertyEditView = (function(_super) {
 
@@ -61,8 +61,13 @@
             return _this.trigger("property:save", property, _this);
           },
           error: function(property, error) {
-            _this.$el.find('.alert-error').html(i18nProperty.errors.messages[error.message]).show();
             _this.$el.find('.error').removeClass('error');
+            new Alert({
+              event: 'property-save',
+              fade: false,
+              message: i18nProperty.errors[error.message],
+              type: 'error'
+            });
             switch (error.message) {
               case 'title_missing':
                 return _this.$el.find('#property-title-group').addClass('error');

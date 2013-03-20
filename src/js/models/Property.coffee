@@ -1,7 +1,9 @@
 define [
   'underscore',
   'backbone',
-], (_, Parse) ->
+  "collections/unit/UnitList"
+  "models/Unit"
+], (_, Parse, UnitList, Unit) ->
 
   Property = Parse.Object.extend "Property"
   # class Property extends Parse.Object
@@ -69,4 +71,19 @@ define [
     cover: (format) ->
       img = @get "image_#{format}"
       img = "/img/fallback/property-#{format}.png" if img is ''
-      img
+      img 
+
+    loadUnits: ->
+      unless @units          
+        @units = new UnitList property: @model
+        # @units.query = new Parse.Query(Unit)
+        # @units.query.equalTo "property", @model
+        @units.comparator = (unit) ->
+          title = unit.get "title"
+          char = title.charAt title.length - 1
+          # Slice off the last digit if it is a letter and add it as a decimal
+          if isNaN(char)
+            Number(title.substr 0, title.length - 1) + char.charCodeAt()/128
+          else
+            Number title
+      @units.fetch()

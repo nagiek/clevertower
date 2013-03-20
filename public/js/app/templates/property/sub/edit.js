@@ -7,7 +7,7 @@ obj || (obj = {});
 var __t, __p = '', __e = _.escape;
 with (obj) {
 __p += '<form class="property-form" enctype="multipart/form-data" method="post" >\n  <div class="alert alert-error" style="display:none"></div>\n  ' +
-((__t = ( JST["src/js/templates/property/form/_basic.jst"]({property: property, i18nCommon: i18nCommon, i18nProperty: i18nProperty}) )) == null ? '' : __t) +
+((__t = ( JST["src/js/templates/property/_form.jst"]({property: property, i18nCommon: i18nCommon, i18nProperty: i18nProperty}) )) == null ? '' : __t) +
 '\n  \n  <div class="form-actions">\n    <button class="save btn btn-primary">' +
 ((__t = ( i18nCommon.actions.save )) == null ? '' : __t) +
 '</button>\n    <a href="/properties/' +

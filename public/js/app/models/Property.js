@@ -1,6 +1,6 @@
 (function() {
 
-  define(['underscore', 'backbone'], function(_, Parse) {
+  define(['underscore', 'backbone', "collections/unit/UnitList", "models/Unit"], function(_, Parse, UnitList, Unit) {
     var Property;
     return Property = Parse.Object.extend("Property", {
       className: "Property",
@@ -60,6 +60,24 @@
           img = "/img/fallback/property-" + format + ".png";
         }
         return img;
+      },
+      loadUnits: function() {
+        if (!this.units) {
+          this.units = new UnitList({
+            property: this.model
+          });
+          this.units.comparator = function(unit) {
+            var char, title;
+            title = unit.get("title");
+            char = title.charAt(title.length - 1);
+            if (isNaN(char)) {
+              return Number(title.substr(0, title.length - 1)) + char.charCodeAt() / 128;
+            } else {
+              return Number(title);
+            }
+          };
+        }
+        return this.units.fetch();
       }
     });
   });

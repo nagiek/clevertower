@@ -33,7 +33,7 @@
     var current, existed, isPublic, propertyACL, role, saveFlag;
     saveFlag = false;
     existed = request.object.existed();
-    propertyACL = existed ? request.object.get("ACL") : new Parse.ACL;
+    propertyACL = existed ? request.object.getACL() : new Parse.ACL;
     if (!existed) {
       saveFlag = true;
       current = request.object.id + "-mgr-current";
@@ -61,9 +61,24 @@
     if (!property) {
       response.error('no_property');
     }
-    request.object.set("user", request.user);
-    request.object.setACL(property.get("ACL"));
-    return response.success();
+    if (!request.object.get("title")) {
+      response.error('no_title');
+    }
+    if (!request.object.existed()) {
+      return (new Parse.Query("Property")).get(property.objectId, {
+        success: function(propertyModel) {
+          request.object.set("user", request.user);
+          request.object.setACL(propertyModel.getACL());
+          console.log(propertyModel.getACL());
+          return response.success();
+        },
+        error: function(propertyModel, error) {
+          return response.error("bad_query");
+        }
+      });
+    } else {
+      return response.success();
+    }
   });
 
   Parse.Cloud.beforeSave("Lease", function(request, response) {

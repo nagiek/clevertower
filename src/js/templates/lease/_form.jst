@@ -1,0 +1,104 @@
+<fieldset>
+  <legend><%= i18nCommon.form.info %></legend>
+  <div class="row">
+    <div class="control-group span">
+      <label for="lease-unit" class="control-label"><%= i18nCommon.classes.Unit %></label>
+      <div class="controls">
+        <%= JST["src/js/templates/helper/field/unit.jst"]({model: lease, units: units, type: 'lease', required: true, i18nUnit: i18nUnit, i18nCommon: i18nCommon}) %>
+      </div>
+    </div>
+    <div class="control-group span">
+      <label for="lease-unit" class="control-label"><%= i18nLease.form.dates %></label>
+      <div class="controls">
+        <input type="text" class="span2 start-date" format="<%= i18nCommon.dates.datepicker_format %>" name="lease[start_date]" value="<%= moment().startOf('month').format('L') %>" maxlength="30" />
+        <input type="text" class="span2 end-date"   format="<%= i18nCommon.dates.datepicker_format %>" name="lease[end_date]"   value="<%= moment().startOf('month').add(1, 'month').format('L') %>" maxlength="30" />
+        <p class="help-block"><%= i18nCommon.prepositions.eg %> <%= moment().format('L') %></p>
+      </div>
+      <ul class="unstyled">
+        <li><small><a href="#" class="starting_this_month"><%= i18nLease.dates.starting_this_month %></a></small></li>
+        <li><small><a href="#" class="starting_next_month"><%= i18nLease.dates.starting_next_month %></a></small></li>
+        <li><small><a href="#" class="july_to_june"><%= i18nLease.dates.july_to_june %></a></small></li>
+      </ul>
+    </div>
+  </div>
+</fieldset>
+
+<fieldset>
+  <legend><%= i18nLease.form.tenants %></legend>
+  <%= JST["src/js/templates/helper/field/tenant.jst"]({i18nCommon: i18nCommon}) %>
+</fieldset>
+
+<fieldset>
+  <legend><%= i18nLease.form.rent %></legend>
+  <div class="row">
+    <div class="control-group span">
+      <label for="lease-rent" class="control-label element-invisible"><%= i18nLease.fields.rent %></label>
+      <div class="controls">
+        <div class="input-prepend">
+          <span class="field-prefix add-on">$</span>
+          <input type="text" class="span1" name="lease[rent]" id="lease-rent" maxlength="12" />
+        </div>
+      </div>
+    </div>
+    <div class="span3">
+      <label for="lease-first_month_paid" class="checkbox">
+        <input type="checkbox" name="lease[first_month_paid]" id="lease-first_month_paid" value="1" <%= lease.first_month_paid ? checked="checked" : '' %>><%= i18nLease.rent.first_month_paid %>
+      </label>
+      <label for="lease-last_month_paid" class="checkbox">
+        <input type="checkbox" name="lease[last_month_paid]" id="lease-last_month_paid" value="1" <%= lease.last_month_paid ? checked="checked" : '' %>><%= i18nLease.rent.last_month_paid %>
+      </label>
+      <label for="lease-checks_received" class="checkbox">
+        <input type="checkbox" name="lease[checks_received]" id="lease-checks_received" value="1" <%= lease.checks_received ? checked="checked" : '' %>><%= i18nLease.rent.checks_received %>
+      </label>
+    </div>
+  </div>
+</fieldset>
+
+<fieldset>
+  <legend><%= i18nLease.form.deposit %></legend>
+  <div class="row">
+    <div class="control-group span">
+      <label for="lease-security_deposit" class="control-label"><%= i18nLease.fields.security_deposit %></label>
+      <div class="controls">
+        <div class="input-prepend">
+          <span class="field-prefix add-on">$</span>
+          <input type="text" class="span1" name="lease[security_deposit]" id="lease-security_deposit" maxlength="12" />
+        </div>
+      </div>
+    </div>
+    <div class="control-group span">
+      <label for="lease-keys" class="control-label"><%= i18nLease.fields.keys %></label>
+      <div class="controls">
+        <input type="text" class="span1" name="lease[keys]" id="lease-keys" maxlength="12" />
+      </div>
+    </div>
+  </div>
+</fieldset>
+
+<fieldset>
+  <legend><%= i18nLease.form.parking %></legend>
+  <div class="row">
+    <div class="control-group span">
+      <label for="lease-parking_fee" class="control-label"><%= i18nLease.fields.parking_fee %></label>
+      <div class="controls">
+        <div class="input-prepend">
+          <span class="field-prefix add-on">$</span>
+          <input type="text" class="span1" name="lease[parking_fee]" id="lease-parking_fee" maxlength="12" />
+        </div>
+        <p class="help-block"><%= i18nCommon.dates.per_month %></p>
+      </div>
+    </div>
+    <div class="control-group span">
+      <label for="lease-parking_space" class="control-label"><%= i18nLease.fields.parking_space %></label>
+      <div class="controls">
+        <input type="text" class="span1" name="lease[parking_space]" id="lease-parking_space" maxlength="12" />
+      </div>
+    </div>
+    <div class="control-group span">
+      <label for="lease-garage_remotes" class="control-label"><%= i18nLease.fields.garage_remotes %></label>
+      <div class="controls">
+        <input type="text" class="span1" name="lease[garage_remotes]" id="lease-garage_remotes" maxlength="12" />
+      </div>
+    </div>
+  </div>
+</fieldset>

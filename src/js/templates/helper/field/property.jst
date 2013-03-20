@@ -1,0 +1,7 @@
+<select name="lease[unit]" id="lease-unit" class="span2" required="true">
+  <option value=""><%= i18nCommon.form.select.select_value %></option>
+  <% units.each(function(unit) { %>
+    <option value="<%= unit.id %>"><%= unit.title %></option>
+  <% }) %>
+  <option value="-1"><%= i18nCommon.constants.new_unit %></option>
+</select>

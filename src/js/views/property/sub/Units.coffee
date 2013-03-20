@@ -38,33 +38,20 @@ define [
       @$actions   = @$(".form-actions")
       @$undo      = @$actions.find('.undo')
       
-      # Create our collection of Properties
-      @units = new UnitList(property: @model)
-      
-      # Setup the query for the collection to look for properties from the current user
-      @units.query = new Parse.Query(Unit)
-      @units.query.equalTo "property", @model
-      @units.comparator = (unit) ->
-        title = unit.get "title"
-        char = title.charAt title.length - 1
-        # Slice off the last digit if it is a letter and add it as a decimal
-        if isNaN(char)
-          Number(title.substr 0, title.length-1) + char.charCodeAt()/128
-        else
-          Number title
+      @model.loadUnits()
 
-      @units.bind "add", @addOne
-      @units.bind "reset", @addAll
+      @model.units.on "add", @addOne
+      @model.units.on "reset", @addAll
       
       # Fetch all the property items for this user
-      @units.fetch()
+      @model.units.fetch()
         # success: (collection, response, options) =>
-        #   @units.add [{property: @model}] if collection.length is 0
+        #   @model.units.add [{property: @model}] if collection.length is 0
                 
     # Re-render the contents of the property item.
     render: =>
       @$list.html ""
-      @$list.html '<p class="empty">' + i18nUnit.collection.empty + '</p>' if @units.length is 0
+      @$list.html '<p class="empty">' + i18nUnit.collection.empty + '</p>' if @model.units.length is 0
       
     switchToShow: (e) =>
       e.preventDefault()
@@ -91,7 +78,7 @@ define [
     # Add all items in the Units collection at once.
     addAll: (collection, filter) =>
       @render()
-      @units.each @addOne
+      @model.units.each @addOne
 
     # Add a single todo item to the list by creating a view for it, and
     # appending its element to the `<ul>`.
@@ -107,10 +94,10 @@ define [
       x = 1 unless x?
             
       until x <= 0
-        if @units.length is 0
+        if @model.units.length is 0
           unit = new Unit property: @model
         else
-          unit = @units.at(@units.length - 1).clone()
+          unit = @model.units.at(@model.units.length - 1).clone()
           title = unit.get('title')
           
           newTitle = title.substr 0, title.length-1
@@ -118,7 +105,7 @@ define [
           # Convert to string for Parse DB
           newChar = if isNaN(char) then String.fromCharCode char.charCodeAt() + 1 else String Number(char) + 1
           unit.set 'title', newTitle + newChar
-        @units.add unit
+        @model.units.add unit
         x--
 
       @$undo.removeProp 'disabled'
@@ -130,9 +117,9 @@ define [
       x = 1 unless x?
 
       until x <= 0
-        unless @units.length is 0
-          # @units.pop() doesn't exist.
-          @units.last().destroy() if @units.last().isNew()
+        unless @model.units.length is 0
+          # @model.units.pop() doesn't exist.
+          @model.units.last().destroy() if @model.units.last().isNew()
         x--
 
       @$undo.prop 'disabled', 'disabled'
@@ -140,13 +127,13 @@ define [
     save: (e) =>
       e.preventDefault()
       @$('.error').removeClass('error') if @$('.error')
-      @units.each (unit) =>
+      @model.units.each (unit) =>
         if unit.changed
           error = unit.validate(unit.attributes)
           unless error
             unit.save null,
               success: (unit) =>
-                new Alert(event: 'units-saved', fade: true, message: i18nCommon.actions.changes_saved, type: 'success')
+                new Alert(event: 'units-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success')
                 unit.trigger "save:success" if unit.changed
               error: (unit, error) =>
                 unit.trigger "invalid", unit, error

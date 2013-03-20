@@ -1,0 +1,9 @@
+<form class="lease-form" enctype="multipart/form-data" method="post">
+  <div class="alert alert-error" style="display:none"></div>
+  <%= JST["src/js/templates/lease/_form.jst"]({lease: lease, units: units, moment: moment, i18nCommon: i18nCommon, i18nUnit: i18nUnit, i18nLease: i18nLease}) %>
+  
+  <div class="form-actions">
+    <button class="save btn btn-primary"><%= i18nCommon.actions.save %></button>
+    <a href="<%= cancel_path %>>" class="btn"><%= i18nCommon.actions.cancel %></a>
+  </div>
+</form>

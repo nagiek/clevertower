@@ -6,3 +6,9 @@ define [
 ], (_, Parse, Property, Unit) ->
 
   Lease = Parse.Object.extend "Lease",
+  
+    className: "Lease"
+
+    defaults:
+
+      rent:                   0

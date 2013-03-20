@@ -6,7 +6,7 @@ define [
   "i18n!nls/property"
   "i18n!nls/common"
   'templates/property/new/new'
-  'templates/property/form/_basic'
+  'templates/property/_form'
 ], ($, _, Parse, Property, i18nProperty, i18nCommon) ->
 
   # GMapView

@@ -53,29 +53,15 @@
         this.$list = this.$("#units-table tbody");
         this.$actions = this.$(".form-actions");
         this.$undo = this.$actions.find('.undo');
-        this.units = new UnitList({
-          property: this.model
-        });
-        this.units.query = new Parse.Query(Unit);
-        this.units.query.equalTo("property", this.model);
-        this.units.comparator = function(unit) {
-          var char, title;
-          title = unit.get("title");
-          char = title.charAt(title.length - 1);
-          if (isNaN(char)) {
-            return Number(title.substr(0, title.length - 1)) + char.charCodeAt() / 128;
-          } else {
-            return Number(title);
-          }
-        };
-        this.units.bind("add", this.addOne);
-        this.units.bind("reset", this.addAll);
-        return this.units.fetch();
+        this.model.loadUnits();
+        this.model.units.on("add", this.addOne);
+        this.model.units.on("reset", this.addAll);
+        return this.model.units.fetch();
       };
 
       PropertyUnitsView.prototype.render = function() {
         this.$list.html("");
-        if (this.units.length === 0) {
+        if (this.model.units.length === 0) {
           return this.$list.html('<p class="empty">' + i18nUnit.collection.empty + '</p>');
         }
       };
@@ -108,7 +94,7 @@
 
       PropertyUnitsView.prototype.addAll = function(collection, filter) {
         this.render();
-        return this.units.each(this.addOne);
+        return this.model.units.each(this.addOne);
       };
 
       PropertyUnitsView.prototype.addOne = function(unit) {
@@ -131,19 +117,19 @@
           x = 1;
         }
         while (!(x <= 0)) {
-          if (this.units.length === 0) {
+          if (this.model.units.length === 0) {
             unit = new Unit({
               property: this.model
             });
           } else {
-            unit = this.units.at(this.units.length - 1).clone();
+            unit = this.model.units.at(this.model.units.length - 1).clone();
             title = unit.get('title');
             newTitle = title.substr(0, title.length - 1);
             char = title.charAt(title.length - 1);
             newChar = isNaN(char) ? String.fromCharCode(char.charCodeAt() + 1) : String(Number(char) + 1);
             unit.set('title', newTitle + newChar);
           }
-          this.units.add(unit);
+          this.model.units.add(unit);
           x--;
         }
         this.$undo.removeProp('disabled');
@@ -158,9 +144,9 @@
           x = 1;
         }
         while (!(x <= 0)) {
-          if (this.units.length !== 0) {
-            if (this.units.last().isNew()) {
-              this.units.last().destroy();
+          if (this.model.units.length !== 0) {
+            if (this.model.units.last().isNew()) {
+              this.model.units.last().destroy();
             }
           }
           x--;
@@ -174,7 +160,7 @@
         if (this.$('.error')) {
           this.$('.error').removeClass('error');
         }
-        return this.units.each(function(unit) {
+        return this.model.units.each(function(unit) {
           var error;
           if (unit.changed) {
             error = unit.validate(unit.attributes);
@@ -182,7 +168,7 @@
               return unit.save(null, {
                 success: function(unit) {
                   new Alert({
-                    event: 'units-saved',
+                    event: 'units-save',
                     fade: true,
                     message: i18nCommon.actions.changes_saved,
                     type: 'success'
