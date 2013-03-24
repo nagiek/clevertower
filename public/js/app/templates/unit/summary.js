@@ -148,7 +148,7 @@ __p += '\n    <a class="btn btn-mini add-lease"\n       href="/properties/' +
 '">\n      <i class="icon-plus"></i>\n    </a>\n    <a class="btn btn-mini add-task"\n       href="/properties/' +
 ((__t = ( property.objectId )) == null ? '' : __t) +
 '/leases/' +
-((__t = ( active_lease.objectId )) == null ? '' : __t) +
+((__t = ( objectId )) == null ? '' : __t) +
 '/add/task" \n       rel="tooltip" \n       data-original-title="' +
 ((__t = ( i18nUnit.actions.add_task )) == null ? '' : __t) +
 '">\n      <i class="icon-plus"></i>\n    </a>\n    ';

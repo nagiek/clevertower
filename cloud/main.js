@@ -118,6 +118,21 @@
     }
   });
 
+  Parse.Cloud.afterSave("Lease", function(request) {
+    var today, unit;
+    today = new Date;
+    if (start_date < today && today < end_date) {
+      unit = request.object.get("unit");
+      return (new Parse.Query("Property")).get(property.objectId, {
+        success: function(model) {
+          model.set("has_lease", true);
+          model.set("active_lease", request.object.objectId);
+          return model.save();
+        }
+      });
+    }
+  });
+
   Parse.Cloud.beforeSave("Task", function(request, response) {
     request.object.set("user", request.user);
     return response.success();

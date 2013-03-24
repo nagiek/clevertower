@@ -113,7 +113,7 @@ Parse.Cloud.beforeSave "Unit", (request, response) ->
 
 # Lease validation
 Parse.Cloud.beforeSave "Lease", (request, response) ->
-  if request.object.get "unit" is ''  then return response.error 'title_missing'
+  if request.object.get "unit" is ''        then return response.error 'title_missing'
 
   moment = require 'moment'  
   start_date  = request.object.get "start_date"
@@ -138,7 +138,18 @@ Parse.Cloud.beforeSave "Lease", (request, response) ->
         response.error "bad_query"
   else
     response.success()
-  
+
+
+Parse.Cloud.afterSave "Lease", (request) ->
+  # Set active lease on unit
+  today = new Date
+  if start_date < today and today < end_date
+    unit = request.object.get "unit"
+    (new Parse.Query "Property").get property.objectId,
+      success: (model) ->
+        model.set "has_lease", true
+        model.set "active_lease", request.object.objectId
+        model.save()
 
 # Task validation
 Parse.Cloud.beforeSave "Task", (request, response) ->

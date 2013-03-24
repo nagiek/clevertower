@@ -49,11 +49,11 @@ define [
 
     # Re-render the contents of the Unit item.
     render: ->
+      console.log @model.toJSON()
       vars = _.merge(
         @model.toJSON(),
         moment: moment
         propertyId: @model.get("property").id
-        objectId: @model.get "objectId"
         isNew: @model.isNew()
         i18nCommon: i18nCommon
         i18nUnit: i18nUnit

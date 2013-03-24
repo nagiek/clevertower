@@ -57,6 +57,18 @@
               return _this.$('.date-group').addClass('error');
           }
         });
+        this.on("save:success", function(model) {
+          new Alert({
+            event: 'units-save',
+            fade: true,
+            message: i18nCommon.actions.changes_saved,
+            type: 'success'
+          });
+          Parse.history.navigate("/properties/" + _this.property.id + "/leases/" + model.id);
+          _this.remove();
+          _this.undelegateEvents();
+          return delete _this;
+        });
         this.model.on('destroy', function() {
           _this.remove();
           _this.undelegateEvents();
@@ -98,7 +110,7 @@
       };
 
       NewLeaseView.prototype.save = function(e) {
-        var data, emails, tenants, unit,
+        var data, tenants, unit,
           _this = this;
         e.preventDefault();
         data = this.$('form').serializeObject();
@@ -121,17 +133,15 @@
         this.model.set(data.lease);
         if (data.unit) {
           if (data.unit.id === "-1") {
-            unit = new Unit(data.unit.attributes, {
-              property: this.property
-            });
+            unit = new Unit(data.unit.attributes);
+            unit.set("property", this.property);
           } else {
             unit = this.units.get(data.unit.id);
           }
           this.model.set("unit", unit);
         }
-        emails = this.$el.serializeObject().emails;
-        if (emails && emails !== '') {
-          tenants = emails.split(", ");
+        if (data.emails && data.emails !== '') {
+          tenants = data.emails.split(", ");
           tenants.each(function(tenant) {
             return this.model.tenants.add(new Tenant({
               lease: model,
@@ -143,12 +153,6 @@
         }
         return this.model.save(null, {
           success: function(model) {
-            new Alert({
-              event: 'units-save',
-              fade: true,
-              message: i18nCommon.actions.changes_saved,
-              type: 'success'
-            });
             return _this.trigger("save:success", model, _this);
           },
           error: function(model, error) {

@@ -46,6 +46,13 @@ define [
           when 'dates_missing' or 'dates_incorrect'
             @$('.date-group').addClass('error')
       
+      @on "save:success", (model) =>
+        new Alert(event: 'units-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success')
+        Parse.history.navigate "/properties/#{@property.id}/leases/#{model.id}"
+        @remove()
+        @undelegateEvents()
+        delete this
+                
       @model.on 'destroy', =>
         @remove()
         @undelegateEvents()
@@ -109,21 +116,20 @@ define [
       # Set unit
       if data.unit
         if data.unit.id is "-1"
-          unit = new Unit data.unit.attributes, property: @property
+          unit = new Unit data.unit.attributes
+          unit.set "property", @property
         else 
           unit = @units.get data.unit.id
         @model.set "unit", unit
 
       # Set tenants
-      emails = @$el.serializeObject().emails
-      if emails and emails isnt ''
-        tenants = emails.split(", ")
+      if data.emails and data.emails isnt ''
+        tenants = data.emails.split(", ")
         tenants.each (tenant) -> 
           @model.tenants.add new Tenant(lease: model, user: new Parse.User(email: tenant))
 
       @model.save null,
         success: (model) => 
-          new Alert(event: 'units-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success')
           @trigger "save:success", model, this
         error: (model, error) => 
           @model.trigger "invalid", error
