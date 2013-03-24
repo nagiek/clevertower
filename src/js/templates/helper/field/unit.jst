@@ -1,11 +1,13 @@
-<select name="<%= type %>[unit]" id="<%= type %>-unit" class="span2 unit-select" required="<%= required %>">
+<input type="hidden" name="unit[__type]" value="Pointer">
+<input type="hidden" name="unit[className]" value="Unit">
+<select name="unit[id]" class="span unit-select" required="<%= required %>">
   <option value=""><%= i18nCommon.form.select.select_value %></option>
   <% units.each(function(unit) { %>
     <option value="<%= unit.id %>"><%= unit.get("title") %></option>
   <% }) %>
   <option value="-1"><%= i18nUnit.constants.new_unit %></option>
 </select>
-<input type="text" class="span1 hide" name="<%= type %>[unit_attributes][title]" placeholder="<%= i18nCommon.form.title %>" />
+<input type="text" class="new-unit span1 hide" name="unit[attributes][title]" placeholder="<%= i18nCommon.form.title %>" />
 <% if (!property) { %>
   No property
   JST["src/js/templates/helper/field/property.jst"]({model: model, i18nCommon: i18nCommon, i18nLease: i18nLease})

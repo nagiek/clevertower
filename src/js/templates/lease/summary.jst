@@ -1,0 +1,32 @@
+<td>
+  <a href="/properties/<%= propertyId %>/units/<%= unitId %>"><%= title %></a>
+  | 
+  <a href="/properties/<%= propertyId %>/leases/<%= objectId %>"><%= i18nCommon.classes.lease %></a>
+</td>
+<td><%= start_date %></td>
+<td><%= end_date %></td>
+<td><%= rent %></td>
+<td>
+  <% if (objectId) { %>
+    <a href="/properties/<%= property.objectId %>/leases/<%= objectId %>/edit" 
+      <%= i18nCommon.actions.edit %>
+    </a>
+    <button class="btn btn-mini add-tenants"
+            rel="tooltip"
+            data-original-title="<%= i18nLease.actions.add_tenants %>">
+      <i class="icon-user"></i>
+    </button>
+    <button class="btn btn-mini extend"
+            rel="tooltip"
+            data-original-title="<%= i18nLease.actions.extend %>">
+      <i class="icon-repeat"></i>
+    </button>
+    <button class="btn btn-mini btn-danger delete"
+            rel="tooltip"
+            data-original-title="<%= i18nCommon.actions.delete %>">
+      <i class="icon-trash icon-white"></i>
+    </button>
+  <% } else { %>
+    <button class="btn btn-mini btn-danger remove"><%= i18nCommon.actions.remove %></button>
+  <% } %>
+</td>

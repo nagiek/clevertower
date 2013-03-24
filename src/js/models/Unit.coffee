@@ -28,7 +28,7 @@ define [
       has_lease       : false
       confirmed       : true
       
-    validate: (attrs, options) ->
-      unless attrs.title isnt ''
+    validate: (attrs = {}, options = {}) ->
+      if attrs.title and attrs.title is ''
         return {message: 'title_missing'}
       false

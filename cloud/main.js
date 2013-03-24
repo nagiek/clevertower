@@ -66,13 +66,13 @@
     }
     if (!request.object.existed()) {
       return (new Parse.Query("Property")).get(property.objectId, {
-        success: function(propertyModel) {
+        success: function(model) {
           request.object.set("user", request.user);
-          request.object.setACL(propertyModel.getACL());
-          console.log(propertyModel.getACL());
+          request.object.setACL(model.getACL());
+          console.log(model.getACL());
           return response.success();
         },
-        error: function(propertyModel, error) {
+        error: function(model, error) {
           return response.error("bad_query");
         }
       });
@@ -82,8 +82,40 @@
   });
 
   Parse.Cloud.beforeSave("Lease", function(request, response) {
-    request.object.set("user", request.user);
-    return response.success();
+    var end_date, moment, property, start_date;
+    if (request.object.get("unit" === '')) {
+      return response.error('title_missing');
+    }
+    moment = require('moment');
+    start_date = request.object.get("start_date");
+    end_date = request.object.get("end_date");
+    if (start_date === '' || end_date === '') {
+      return response.error('date_missing');
+    }
+    if (start_date > end_date) {
+      return response.error('dates_incorrect');
+    }
+    if (moment(start_date) > moment(end_date)) {
+      return response.error('dates_incorrect');
+    }
+    if (!request.object.existed()) {
+      property = request.object.get("property");
+      return (new Parse.Query("Property")).get(property.objectId, {
+        success: function(model) {
+          var modelACL;
+          modelACL = model.getACL();
+          request.object.set("user", request.user);
+          request.object.set("confirmed", modelACL.getReadAccess(request.user));
+          request.object.setACL(modelACL);
+          return response.success();
+        },
+        error: function(model, error) {
+          return response.error("bad_query");
+        }
+      });
+    } else {
+      return response.success();
+    }
   });
 
   Parse.Cloud.beforeSave("Task", function(request, response) {

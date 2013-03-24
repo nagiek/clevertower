@@ -3,13 +3,23 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", "moment", "collections/unit/UnitList", "models/Property", "models/Unit", "models/Lease", "views/helper/Alert", "i18n!nls/common", "i18n!nls/unit", "i18n!nls/lease", "templates/lease/new", "templates/lease/_form", "templates/helper/field/unit", "templates/helper/field/property", "templates/helper/field/tenant"], function($, _, Parse, moment, UnitList, Property, Unit, Lease, Alert, i18nCommon, i18nUnit, i18nLease) {
+  define(["jquery", "underscore", "backbone", "moment", "collections/unit/UnitList", "collections/tenant/TenantList", "models/Property", "models/Unit", "models/Lease", "models/Tenant", "views/helper/Alert", "i18n!nls/common", "i18n!nls/unit", "i18n!nls/lease", "templates/lease/new", "templates/lease/_form", "templates/helper/field/unit", "templates/helper/field/property", "templates/helper/field/tenant", "datepicker"], function($, _, Parse, moment, UnitList, TenantList, Property, Unit, Lease, Tenant, Alert, i18nCommon, i18nUnit, i18nLease) {
     var NewLeaseView;
     return NewLeaseView = (function(_super) {
 
       __extends(NewLeaseView, _super);
 
       function NewLeaseView() {
+        this.setJulyJune = __bind(this.setJulyJune, this);
+
+        this.setNextMonth = __bind(this.setNextMonth, this);
+
+        this.setThisMonth = __bind(this.setThisMonth, this);
+
+        this.showUnitIfNew = __bind(this.showUnitIfNew, this);
+
+        this.save = __bind(this.save, this);
+
         this.addAll = __bind(this.addAll, this);
 
         this.addToSelect = __bind(this.addToSelect, this);
@@ -19,33 +29,56 @@
       NewLeaseView.prototype.el = '#content';
 
       NewLeaseView.prototype.events = {
-        'click .save': 'save'
+        'click .save': 'save',
+        'change .unit-select': 'showUnitIfNew',
+        'click .starting-this-month': 'setThisMonth',
+        'click .starting-next-month': 'setNextMonth',
+        'click .july-to-june': 'setJulyJune'
       };
 
       NewLeaseView.prototype.initialize = function(attrs) {
+        var _this = this;
         if (!this.model) {
           this.model = new Lease;
         }
         this.property = attrs.property;
+        this.model.on('invalid', function(error) {
+          _this.$el.find('.error').removeClass('error');
+          new Alert({
+            event: 'lease-save',
+            fade: false,
+            message: i18nLease.errors[error.message],
+            type: 'error'
+          });
+          switch (error.message) {
+            case 'unit_missing':
+              return _this.$('.unit-group').addClass('error');
+            case 'dates_missing' || 'dates_incorrect':
+              return _this.$('.date-group').addClass('error');
+          }
+        });
+        this.model.on('destroy', function() {
+          _this.remove();
+          _this.undelegateEvents();
+          return delete _this;
+        });
         if (!this.property.units) {
           this.units = new UnitList;
           this.units.query = new Parse.Query(Unit);
           this.units.query.equalTo("network", Parse.User.current().get("network"));
-          this.units.comparator = function(unit) {
-            var char, title;
-            title = unit.get("title");
-            char = title.charAt(title.length - 1);
-            if (isNaN(char)) {
-              return Number(title.substr(0, title.length - 1)) + char.charCodeAt() / 128;
-            } else {
-              return Number(title);
-            }
-          };
         } else {
           this.units = this.property.units;
         }
+        this.current = new Date().setDate(1);
+        this.dates = {
+          start: this.model.get("start_date") ? this.model.get("start_date") : moment(this.current).format("L"),
+          end: this.model.get("end_date") ? this.model.get("end_date") : moment(this.current).add(1, 'year').subtract(1, 'day').format("L")
+        };
         this.render();
         this.$unitSelect = this.$('.unit-select');
+        this.$startDate = this.$('.start-date');
+        this.$endDate = this.$('.end-date');
+        $('.datepicker').datepicker();
         this.units.bind("add", this.addToSelect);
         this.units.bind("reset", this.addAll);
         return this.units.fetch();
@@ -64,32 +97,103 @@
         return this.units.each(this.addToSelect);
       };
 
-      NewLeaseView.prototype.save = function() {
-        var _this = this;
-        return this.model.save(this.$el.serializeObject().property, {
-          success: function(property) {
-            return _this.trigger("property:save", property, _this);
-          },
-          error: function(property, error) {
-            _this.$el.find('.error').removeClass('error');
-            new Alert({
-              event: 'property-save',
-              fade: false,
-              message: i18nProperty.errors[error.message],
-              type: 'error'
-            });
-            switch (error.message) {
-              case 'title_missing':
-                return _this.$el.find('#property-title-group').addClass('error');
-            }
+      NewLeaseView.prototype.save = function(e) {
+        var data, emails, tenants, unit,
+          _this = this;
+        e.preventDefault();
+        data = this.$('form').serializeObject();
+        _.each(['rent', 'keys', 'garage_remotes', 'security_deposit', 'parking_fee'], function(attr) {
+          if (data.lease[attr] === '') {
+            data.lease[attr] = 0;
+          }
+          if (data.lease[attr] && isNaN(data.lease[attr])) {
+            return data.lease[attr] = Number(data.lease[attr]);
           }
         });
+        _.each(['start_date', 'end_date'], function(attr) {
+          if (data.lease[attr] !== '') {
+            return data.lease[attr] = moment(data.lease[attr], i18nCommon.dates.datepicker_format).toDate();
+          }
+        });
+        _.each(['checks_received', 'first_month_paid', 'last_month_paid'], function(attr) {
+          return data.lease[attr] = data.lease[attr] !== "" ? true : false;
+        });
+        this.model.set(data.lease);
+        if (data.unit) {
+          if (data.unit.id === "-1") {
+            unit = new Unit(data.unit.attributes, {
+              property: this.property
+            });
+          } else {
+            unit = this.units.get(data.unit.id);
+          }
+          this.model.set("unit", unit);
+        }
+        emails = this.$el.serializeObject().emails;
+        if (emails && emails !== '') {
+          tenants = emails.split(", ");
+          tenants.each(function(tenant) {
+            return this.model.tenants.add(new Tenant({
+              lease: model,
+              user: new Parse.User({
+                email: tenant
+              })
+            }));
+          });
+        }
+        return this.model.save(null, {
+          success: function(model) {
+            new Alert({
+              event: 'units-save',
+              fade: true,
+              message: i18nCommon.actions.changes_saved,
+              type: 'success'
+            });
+            return _this.trigger("save:success", model, _this);
+          },
+          error: function(model, error) {
+            return _this.model.trigger("invalid", error);
+          }
+        });
+      };
+
+      NewLeaseView.prototype.showUnitIfNew = function(e) {
+        if (e.target.value === "-1") {
+          return this.$('.new-unit').removeClass('hide');
+        } else {
+          return this.$('.new-unit').addClass('hide');
+        }
+      };
+
+      NewLeaseView.prototype.setThisMonth = function(e) {
+        if (e) {
+          e.preventDefault();
+        }
+        this.$startDate.val(moment(this.current).format("L"));
+        return this.$endDate.val(moment(this.current).add(1, 'year').subtract(1, 'day').format("L"));
+      };
+
+      NewLeaseView.prototype.setNextMonth = function(e) {
+        if (e) {
+          e.preventDefault();
+        }
+        this.$startDate.val(moment(this.current).add(1, 'month').format("L"));
+        return this.$endDate.val(moment(this.current).add(1, 'month').add(1, 'year').subtract(1, 'day').format("L"));
+      };
+
+      NewLeaseView.prototype.setJulyJune = function(e) {
+        if (e) {
+          e.preventDefault();
+        }
+        this.$startDate.val(moment(this.current).month(6).format("L"));
+        return this.$endDate.val(moment(this.current).month(6).add(1, 'year').subtract(1, 'day').format("L"));
       };
 
       NewLeaseView.prototype.render = function() {
         var vars;
         vars = _.merge({
           lease: this.model,
+          dates: this.dates,
           cancel_path: "/properties/" + this.property.id,
           units: this.units,
           moment: moment,
@@ -97,7 +201,6 @@
           i18nUnit: i18nUnit,
           i18nLease: i18nLease
         });
-        console.log(this.$el);
         this.$el.html(JST["src/js/templates/lease/new.jst"](vars));
         return this;
       };

@@ -37,11 +37,18 @@ define
     add_x_more:           "Add <strong>x</strong> more"
     changes_saved:        "Changes Saved."
   dates:
-    datepicker_format:    "mm/dd/yy"
+    datepicker_format:    "MM/DD/YYYY" # convenience reference to moment().format("L")
     per_month:            "Per month"
+  status:
+    unsaved:          "Unsaved"
+    vacant:           "Vacant"
+    pending:          "Pending"
+    confirmed:        "Confirmed"
   prepositions:           
     of:                   "of"
     eg:                   "E.g., "
+  verbs:             
+    loading:              "Loading"
   adjectives:             
     unsaved:              "Unsaved"
   form:                   

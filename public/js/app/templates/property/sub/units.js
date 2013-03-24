@@ -38,7 +38,9 @@ __p += '<form id="units" method="post">\n  <h2>Listing units</h2>\n  \n  <div cl
 ((__t = (i18nUnit.fields.description)) == null ? '' : __t) +
 '</th>\n        <th><span class="element-invisible">' +
 ((__t = (i18nCommon.headers.Operations)) == null ? '' : __t) +
-'</span></th>\n      </tr>\n    </thead>\n    <tbody></tbody>\n  </table>\n</form>';
+'</span></th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr><td class="spinner-cell" colspan="9"><img src=\'/img/misc/spinner.gif\' class=\'spinner\' alt="' +
+((__t = ( i18nCommon.verbs.loading )) == null ? '' : __t) +
+'" /></td></tr>\n    </tbody>\n  </table>\n</form>';
 
 }
 return __p

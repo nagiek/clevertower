@@ -7,11 +7,7 @@ obj || (obj = {});
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
 with (obj) {
-__p += '<select name="' +
-((__t = ( type )) == null ? '' : __t) +
-'[unit]" id="' +
-((__t = ( type )) == null ? '' : __t) +
-'-unit" class="span2 unit-select" required="' +
+__p += '<input type="hidden" name="unit[__type]" value="Pointer">\n<input type="hidden" name="unit[className]" value="Unit">\n<select name="unit[id]" class="span unit-select" required="' +
 ((__t = ( required )) == null ? '' : __t) +
 '">\n  <option value="">' +
 ((__t = ( i18nCommon.form.select.select_value )) == null ? '' : __t) +
@@ -25,9 +21,7 @@ __p += '\n    <option value="' +
  }) ;
 __p += '\n  <option value="-1">' +
 ((__t = ( i18nUnit.constants.new_unit )) == null ? '' : __t) +
-'</option>\n</select>\n<input type="text" class="span1 hide" name="' +
-((__t = ( type )) == null ? '' : __t) +
-'[unit_attributes][title]" placeholder="' +
+'</option>\n</select>\n<input type="text" class="new-unit span1 hide" name="unit[attributes][title]" placeholder="' +
 ((__t = ( i18nCommon.form.title )) == null ? '' : __t) +
 '" />\n';
  if (!property) { ;

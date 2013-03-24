@@ -1,0 +1,38 @@
+<form id="leases" method="post">
+  <h2>Listing units</h2>
+  
+  <div class="well form-actions form-inline form-condensed stay-right">
+    <h4><%= i18nProperty.structure.units_control %></h4>
+  	<div class="control-group">
+  		<div class="control-label"><%= i18nCommon.actions.add_x_more %></div>
+  		<div class="controls input-append">
+  			<input id="x" type="number" size="2" maxlength="2" class="span1" value="1">
+  			<button id="add-x" class="btn btn-info"><%= i18nCommon.actions.go %></button>
+  		</div>
+  	</div>
+  	<button class="btn undo" disabled="disabled"><%= i18nCommon.actions.undo %></button>
+    <button class="save btn btn-primary"><%= i18nCommon.actions.save %></button>
+  </div>
+  
+  <ul class="nav nav-pills">
+    <li id="units-show" class="active"><a href="#"><%= i18nCommon.actions.show %></a></li>
+    <li id="units-edit"><a href="#"><%= i18nCommon.actions.edit %></a></li>
+  </ul>
+
+  <table id="leases-table" class="table table-condensed form-condensed">
+    <thead>
+      <tr>
+        <th><%=i18nCommon.classes.Unit%></th>
+        <th class="view-specific view-show"><%=i18nLease.attributes.starting%></th>
+        <th class="view-specific view-show"><%=i18nLease.attributes.ending%></th>
+        <th class="view-specific view-show"><%=i18nLease.attributes.rent_this_month%></th>
+        <th><span class="element-invisible"><%=i18nCommon.headers.Operations%></span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="spinner-cell" colspan="5">
+        <img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" />
+      </td></tr>
+    </tbody>
+  </table>
+</form>

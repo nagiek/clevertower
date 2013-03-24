@@ -2,8 +2,10 @@ define [
   'underscore',
   'backbone',
   "collections/unit/UnitList"
+  "collections/lease/LeaseList"
   "models/Unit"
-], (_, Parse, UnitList, Unit) ->
+  "models/Lease"
+], (_, Parse, UnitList, LeaseList, Unit, Lease) ->
 
   Property = Parse.Object.extend "Property"
   # class Property extends Parse.Object
@@ -23,6 +25,12 @@ define [
       administrative_area_level_2   : ''
       country                       : ''
       postal_code                   : ''
+      
+      # Managers
+      # These break the data browser
+      # managers_pending: new Parse.Relation
+      # managers_invited: new Parse.Relation
+      # managers_current: new Parse.Relation
       
       # Images
       image_thumb         : ""
@@ -74,16 +82,9 @@ define [
       img 
 
     loadUnits: ->
-      unless @units          
-        @units = new UnitList property: @model
-        # @units.query = new Parse.Query(Unit)
-        # @units.query.equalTo "property", @model
-        @units.comparator = (unit) ->
-          title = unit.get "title"
-          char = title.charAt title.length - 1
-          # Slice off the last digit if it is a letter and add it as a decimal
-          if isNaN(char)
-            Number(title.substr 0, title.length - 1) + char.charCodeAt()/128
-          else
-            Number title
+      @units = new UnitList property: @model unless @units
       @units.fetch()
+      
+    loadLeases: ->
+      @leases = new LeaseList property: @model unless @leases
+      @leases.fetch()

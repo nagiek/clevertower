@@ -6,31 +6,26 @@ define [
 ], ($, _, Parse, Unit) ->
 
   class UnitList extends Parse.Collection
-  
+
     # Reference to this collection's model.
     model: Unit
+    
+    initialize: (attrs) ->
+      @property = attrs.property
 
-    url: ->
-      "/properties/#{property.get "id"}/units"
-  
-    # Filter down the list of all Unit items that are finished.
-    done: ->
-      @filter (Unit) ->
-        Unit.get "done"
+    url:  ->
+      "/properties/#{@property.get "id"}/units"
 
-  
-    # Filter down the list to only Unit items that are still not finished.
-    remaining: ->
-      @without.apply this, @done()
-
-  
-    # We keep the Units in sequential order, despite being saved by unordered
-    # GUID in the database. This generates the next order number for new items.
-    nextOrder: ->
-      return 1  unless @length
-      @last().get("order") + 1
-
-  
-    # Units are sorted by their original insertion order.
-    comparator: (Unit) ->
-      Unit.get "order"
+    # query: ->
+    #   query = new Parse.Query(Unit)
+    #   query.equalTo "property", @property
+    #   query
+      
+    comparator = (unit) ->
+      title = unit.get "title"
+      char = title.charAt title.length - 1
+      # Slice off the last digit if it is a letter and add it as a decimal
+      if isNaN(char)
+        Number(title.substr 0, title.length - 1) + char.charCodeAt()/128
+      else
+        Number title

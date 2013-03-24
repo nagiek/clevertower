@@ -7,3 +7,9 @@
 [submodule "almond"]
 	path = vendor/almond
 	url = git://github.com/jrburke/almond.git
+[submodule "moment-datepicker"]
+	path = vendor/moment-datepicker
+	url = git://github.com/MakingSense/moment-datepicker.git
+[submodule "bootstrap-datepicker"]
+	path = vendor/bootstrap-datepicker
+	url = git://github.com/eternicode/bootstrap-datepicker.git

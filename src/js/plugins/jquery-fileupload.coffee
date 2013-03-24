@@ -17,7 +17,7 @@
   if typeof define is "function" and define.amd
     
     # Register as an anonymous AMD module:
-    define ["jquery", "jqueryui"], factory
+    define ["jquery", "jqueryuiwidget"], factory
   else
     
     # Browser globals:

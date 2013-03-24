@@ -21,12 +21,12 @@ define [
       password = @$("#login-password").val()
       Parse.User.logIn username, password,
         success: (user) =>
-          AppView = require "views/app/Main"
-          new AppView()
-
-          this.undelegateEvents();
-          this.remove();
-          delete this
+          new UserView
+          require ["views/network/Manage"], (ManageNetworkView) =>
+            new ManageNetworkView
+            this.undelegateEvents();
+            this.remove();
+            delete this
 
         error: (user, error) =>
           this.$(".login-form .error").html(i18nDevise.errors.invalid_login).show()

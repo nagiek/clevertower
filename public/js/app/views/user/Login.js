@@ -30,12 +30,13 @@
         password = this.$("#login-password").val();
         Parse.User.logIn(username, password, {
           success: function(user) {
-            var AppView;
-            AppView = require("views/app/Main");
-            new AppView();
-            _this.undelegateEvents();
-            _this.remove();
-            return delete _this;
+            new UserView;
+            return require(["views/network/Manage"], function(ManageNetworkView) {
+              new ManageNetworkView;
+              _this.undelegateEvents();
+              _this.remove();
+              return delete _this;
+            });
           },
           error: function(user, error) {
             _this.$(".login-form .error").html(i18nDevise.errors.invalid_login).show();

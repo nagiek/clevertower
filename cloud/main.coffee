@@ -99,22 +99,46 @@ Parse.Cloud.beforeSave "Unit", (request, response) ->
 
   unless request.object.existed()
     (new Parse.Query "Property").get property.objectId,
-      success: (propertyModel) ->
+      success: (model) ->
       
         request.object.set "user", request.user
-        request.object.setACL propertyModel.getACL()
-        console.log propertyModel.getACL()
+        request.object.setACL model.getACL()
+        console.log model.getACL()
         response.success()
       
-      error: (propertyModel, error) ->
+      error: (model, error) ->
         response.error "bad_query"
   else
     response.success()
 
 # Lease validation
 Parse.Cloud.beforeSave "Lease", (request, response) ->
-  request.object.set "user", request.user
-  response.success()
+  if request.object.get "unit" is ''  then return response.error 'title_missing'
+
+  moment = require 'moment'  
+  start_date  = request.object.get "start_date"
+  end_date    = request.object.get "end_date"
+  if start_date is '' or end_date is ''     then return response.error 'date_missing'
+  if start_date > end_date                  then return response.error 'dates_incorrect'
+  if moment(start_date) > moment(end_date)  then return response.error 'dates_incorrect'
+  # if moment(start_date).isAfter(end_date) then return response.error 'dates_incorrect'
+  
+  unless request.object.existed()
+    property = request.object.get "property"
+    (new Parse.Query "Property").get property.objectId,
+      success: (model) ->
+        
+        modelACL = model.getACL()
+        request.object.set "user", request.user
+        request.object.set "confirmed", modelACL.getReadAccess(request.user)
+        request.object.setACL modelACL
+        response.success()
+      
+      error: (model, error) ->
+        response.error "bad_query"
+  else
+    response.success()
+  
 
 # Task validation
 Parse.Cloud.beforeSave "Task", (request, response) ->

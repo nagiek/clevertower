@@ -1,6 +1,6 @@
 (function() {
 
-  define(['underscore', 'backbone', "collections/unit/UnitList", "models/Unit"], function(_, Parse, UnitList, Unit) {
+  define(['underscore', 'backbone', "collections/unit/UnitList", "collections/lease/LeaseList", "models/Unit", "models/Lease"], function(_, Parse, UnitList, LeaseList, Unit, Lease) {
     var Property;
     return Property = Parse.Object.extend("Property", {
       className: "Property",
@@ -66,18 +66,16 @@
           this.units = new UnitList({
             property: this.model
           });
-          this.units.comparator = function(unit) {
-            var char, title;
-            title = unit.get("title");
-            char = title.charAt(title.length - 1);
-            if (isNaN(char)) {
-              return Number(title.substr(0, title.length - 1)) + char.charCodeAt() / 128;
-            } else {
-              return Number(title);
-            }
-          };
         }
         return this.units.fetch();
+      },
+      loadLeases: function() {
+        if (!this.leases) {
+          this.leases = new LeaseList({
+            property: this.model
+          });
+        }
+        return this.leases.fetch();
       }
     });
   });

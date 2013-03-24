@@ -23,10 +23,10 @@ define [
       password = @$("#signup-password").val()
       Parse.User.signUp username, password,
         ACL: new Parse.ACL()
-      ,
         success: (user) =>
-          require ["views/app/Main"], (AppView) ->
-            new AppView()
+          new UserView
+          require ["views/network/Manage"], (ManageNetworkView) =>
+            new ManageNetworkView
             this.undelegateEvents();
             this.remove();
             delete this

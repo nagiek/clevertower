@@ -25,7 +25,7 @@ define [
       'click #new-property' : "newProperty"
     
     initialize : ->
-      @$el.html JST["src/js/templates/property/manage.jst"](i18nProperty: i18nProperty)
+      @$el.html JST["src/js/templates/property/manage.jst"](i18nCommon: i18nCommon, i18nProperty: i18nProperty)
       
       _.bindAll this, 'newProperty'
       

@@ -44,9 +44,9 @@ module.exports = (grunt) ->
           ext: '.js'
         },{
           expand: true
-          cwd: 'cloud/Cloud'
-          src: ['**/*.coffee']
-          dest: 'cloud/Cloud'
+          cwd: 'cloud'
+          src: ['*.coffee']
+          dest: 'cloud'
           ext: '.js' 
         }]
       
@@ -211,7 +211,7 @@ module.exports = (grunt) ->
     # (use if you have a custom server, PhoneGap, Adobe Air, etc.)
     watch:
       coffee:
-        files: ['src/js/**/*.coffee', 'cloud/Cloud/**/*.coffee']
+        files: ['src/js/**/*.coffee', 'cloud/*.coffee']
         tasks: 'coffee'
       jst:
         files: ['src/js/templates/**/*.jst', 'src/js/templates/**/**/*.jst']

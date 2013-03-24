@@ -22,7 +22,8 @@
       };
 
       AddLeaseToPropertyView.prototype.render = function() {
-        return new NewLeaseView({
+        var form;
+        return form = new NewLeaseView({
           model: this.lease,
           property: this.model
         });

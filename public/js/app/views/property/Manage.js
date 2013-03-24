@@ -26,6 +26,7 @@
 
       ManagePropertiesView.prototype.initialize = function() {
         this.$el.html(JST["src/js/templates/property/manage.jst"]({
+          i18nCommon: i18nCommon,
           i18nProperty: i18nProperty
         }));
         _.bindAll(this, 'newProperty');

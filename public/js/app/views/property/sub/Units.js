@@ -93,6 +93,7 @@
       };
 
       PropertyUnitsView.prototype.addAll = function(collection, filter) {
+        this.$list.html('');
         this.render();
         return this.model.units.each(this.addOne);
       };

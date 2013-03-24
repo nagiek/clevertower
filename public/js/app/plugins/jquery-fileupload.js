@@ -3,7 +3,7 @@
   (function(factory) {
     "use strict";
     if (typeof define === "function" && define.amd) {
-      return define(["jquery", "jqueryui"], factory);
+      return define(["jquery", "jqueryuiwidget"], factory);
     } else {
       return factory(window.jQuery);
     }

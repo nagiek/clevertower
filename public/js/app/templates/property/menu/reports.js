@@ -24,7 +24,7 @@ __p += '<ul class="dropdown-menu">\n  <li><a href="/properties/' +
 ((__t = ( i18nProperty.menu.cash_transactions )) == null ? '' : __t) +
 '</a></li>\n  <li><a href="/properties/' +
 ((__t = ( objectId )) == null ? '' : __t) +
-'/lease_history">' +
+'/leases">' +
 ((__t = ( i18nProperty.menu.lease_history )) == null ? '' : __t) +
 '</a></li>\n</ul>';
 

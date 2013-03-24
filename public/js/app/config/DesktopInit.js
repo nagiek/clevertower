@@ -4,11 +4,11 @@
     baseUrl: "/js",
     paths: {
       jquery: '//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min',
-      jqueryui: 'libs/jqueryui/jquery-ui-1.10.1.custom.min',
+      jqueryuiwidget: 'libs/jqueryui/jquery.ui.widget.min',
       underscore: '//cdnjs.cloudflare.com/ajax/libs/lodash.js/1.0.1/lodash.min',
-      backbone: "//www.parsecdn.com/js/parse-1.1.15.min",
+      backbone: "//www.parsecdn.com/js/parse-1.1.16",
       jquerymobile: '//cdnjs.cloudflare.com/ajax/libs/jquery-mobile/1.2.0/jquery.mobile.min',
-      datepickermobile: 'libs/jqueryui/jquery.ui.datepicker.mobile.min',
+      datepicker: 'libs/bootstrap/bootstrap-datepicker.min',
       serializeObject: "app/plugins/serialize_object",
       filePicker: "app/plugins/file_picker",
       "jquery.fileupload-pr": 'app/plugins/jquery-fileupload-pr',
@@ -34,8 +34,8 @@
     shim: {
       bootstrap: ["jquery"],
       jqueryui: ["jquery"],
+      jqueryuiwidget: ["jquery"],
       jquerymobile: ["jquery"],
-      datepickermobile: ["jquerymobile", "jqueryui"],
       backbone: {
         deps: ["underscore", "jquery"],
         exports: "Parse"
@@ -47,8 +47,8 @@
     return window.google.maps;
   });
 
-  require(["jquery", "backbone", "routers/Desktop", "json2", "jqueryui", "bootstrap", "serializeObject"], function($, Parse, AppRouter) {
-    Parse.initialize("6XgIM84FecTslR8rnXBZsjnDqZgVISa946m9OmfO", "Jf4WgWUgu7R39oy5AZotay42dEDY5neMEoJddKEY");
+  require(["jquery", "backbone", "routers/Desktop", "json2", "bootstrap", "serializeObject"], function($, Parse, AppRouter) {
+    Parse.initialize("z00OPdGYL7X4uW9soymp8n5JGBSE6k26ILN1j3Hu", "NifB9pRHfmsTDQSDA9DKxMuux03S4w2WGVdcxPHm");
     return new AppRouter();
   });
 

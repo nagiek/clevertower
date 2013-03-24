@@ -32,14 +32,14 @@
         username = this.$("#signup-username").val();
         password = this.$("#signup-password").val();
         Parse.User.signUp(username, password, {
-          ACL: new Parse.ACL()
-        }, {
+          ACL: new Parse.ACL(),
           success: function(user) {
-            return require(["views/app/Main"], function(AppView) {
-              new AppView();
-              this.undelegateEvents();
-              this.remove();
-              return delete this;
+            new UserView;
+            return require(["views/network/Manage"], function(ManageNetworkView) {
+              new ManageNetworkView;
+              _this.undelegateEvents();
+              _this.remove();
+              return delete _this;
             });
           },
           error: function(user, error) {

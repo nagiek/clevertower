@@ -23,7 +23,7 @@ define [
       @render()
       
     render : ->
-      new NewLeaseView model: @lease, property: @model
+      form = new NewLeaseView model: @lease, property: @model
     
     _return : ->
       @remove()

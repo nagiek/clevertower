@@ -5,6 +5,7 @@
   define(['jquery', 'underscore', 'backbone', 'models/Unit'], function($, _, Parse, Unit) {
     var UnitList;
     return UnitList = (function(_super) {
+      var comparator;
 
       __extends(UnitList, _super);
 
@@ -14,29 +15,23 @@
 
       UnitList.prototype.model = Unit;
 
+      UnitList.prototype.initialize = function(attrs) {
+        return this.property = attrs.property;
+      };
+
       UnitList.prototype.url = function() {
-        return "/properties/" + (property.get("id")) + "/units";
+        return "/properties/" + (this.property.get("id")) + "/units";
       };
 
-      UnitList.prototype.done = function() {
-        return this.filter(function(Unit) {
-          return Unit.get("done");
-        });
-      };
-
-      UnitList.prototype.remaining = function() {
-        return this.without.apply(this, this.done());
-      };
-
-      UnitList.prototype.nextOrder = function() {
-        if (!this.length) {
-          return 1;
+      comparator = function(unit) {
+        var char, title;
+        title = unit.get("title");
+        char = title.charAt(title.length - 1);
+        if (isNaN(char)) {
+          return Number(title.substr(0, title.length - 1)) + char.charCodeAt() / 128;
+        } else {
+          return Number(title);
         }
-        return this.last().get("order") + 1;
-      };
-
-      UnitList.prototype.comparator = function(Unit) {
-        return Unit.get("order");
       };
 
       return UnitList;

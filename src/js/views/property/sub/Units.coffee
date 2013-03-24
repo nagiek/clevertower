@@ -77,6 +77,7 @@ define [
 
     # Add all items in the Units collection at once.
     addAll: (collection, filter) =>
+      @$list.html ''
       @render()
       @model.units.each @addOne
 

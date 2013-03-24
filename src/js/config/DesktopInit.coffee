@@ -12,9 +12,10 @@ require.config
     # Core Libraries
     # --------------
     jquery:                 '//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min'     # "libs/jquery/jquery"
-    jqueryui:               'libs/jqueryui/jquery-ui-1.10.1.custom.min',                  # includes core, widget, slider, datepicker
+    jqueryuiwidget:         'libs/jqueryui/jquery.ui.widget.min',                         # 1.10.2
+    # jqueryui:               'libs/jqueryui/jquery-ui-1.10.1.custom.min',                  # includes core, widget, slider, datepicker
     underscore:             '//cdnjs.cloudflare.com/ajax/libs/lodash.js/1.0.1/lodash.min' # "libs/underscore/lodash"
-    backbone:               "//www.parsecdn.com/js/parse-1.1.15.min"                      # "libs/backbone/parse"
+    backbone:               "//www.parsecdn.com/js/parse-1.1.16" # .min                      # "libs/backbone/parse"
     
     # Async Libraries
     # ---------------
@@ -24,7 +25,9 @@ require.config
     # jQuery Libraries
     # ---------------
     jquerymobile:           '//cdnjs.cloudflare.com/ajax/libs/jquery-mobile/1.2.0/jquery.mobile.min' # "libs/jquery/jquery.mobile.min"
-    datepickermobile:       'libs/jqueryui/jquery.ui.datepicker.mobile.min',
+    datepicker:             'libs/bootstrap/bootstrap-datepicker.min'
+    # datepicker:             'libs/moment/moment-datepicker.min'
+    # datepickermobile:       'libs/jqueryui/jquery.ui.datepicker.mobile.min'
     serializeObject:        "app/plugins/serialize_object"
     filePicker:             "app/plugins/file_picker"
     "jquery.fileupload-pr": 'app/plugins/jquery-fileupload-pr' # Profile  (single)
@@ -66,11 +69,14 @@ require.config
     # jQueryUI
     jqueryui: ["jquery"]
     
+    # jQueryUI
+    jqueryuiwidget: ["jquery"]
+    
     # jQueryMobile
     jquerymobile: ["jquery"]
 
     # jQueryUI Datepicker Mobile
-    datepickermobile: ["jquerymobile", "jqueryui"]
+    # datepickermobile: ["jquerymobile", "jqueryui"]
     
     # Backbone
     backbone:
@@ -95,9 +101,9 @@ define "gmaps", ["async!//maps.googleapis.com/maps/api/js?v=3&sensor=false&key=A
 
 
 # Includes Desktop Specific JavaScript files here (or inside of your Desktop router)
-require ["jquery", "backbone", "routers/Desktop", "json2", "jqueryui", "bootstrap", "serializeObject"], ($, Parse, AppRouter) ->
+require ["jquery", "backbone", "routers/Desktop", "json2", "bootstrap", "serializeObject"], ($, Parse, AppRouter) ->
   
-  Parse.initialize "6XgIM84FecTslR8rnXBZsjnDqZgVISa946m9OmfO", "Jf4WgWUgu7R39oy5AZotay42dEDY5neMEoJddKEY" # JS Key
+  Parse.initialize "z00OPdGYL7X4uW9soymp8n5JGBSE6k26ILN1j3Hu", "NifB9pRHfmsTDQSDA9DKxMuux03S4w2WGVdcxPHm" # JS Key
   
   # Instantiates a new Desktop Router instance
   new AppRouter()

@@ -9,6 +9,7 @@ define [
   "i18n!nls/property"
   "i18n!nls/common"
   "templates/property/sub/photos"
+  'jqueryuiwidget'
   'jquery.fileupload'
   'jquery.fileupload-fp'
   'jquery.fileupload-ui'

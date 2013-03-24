@@ -40,7 +40,7 @@ __p += '</div>';
 __p += '\n</td>\n<td>\n  ';
  if (isNew) { ;
 __p += '\n    <span class="label label-warning">' +
-((__t = ( i18nUnit.status.unsaved )) == null ? '' : __t) +
+((__t = ( i18nCommon.status.unsaved )) == null ? '' : __t) +
 '</span>\n  ';
  } else { ;
 __p += '  \n    ';
@@ -48,17 +48,17 @@ __p += '  \n    ';
 __p += '\n      ';
  if (has_lease) { ;
 __p += '\n        <span class="label label-success">' +
-((__t = ( i18nUnit.status.confirmed )) == null ? '' : __t) +
+((__t = ( i18nCommon.status.confirmed )) == null ? '' : __t) +
 '</span>\n      ';
  } else { ;
 __p += '\n        <span class="label label-important">' +
-((__t = ( i18nUnit.status.vacant )) == null ? '' : __t) +
+((__t = ( i18nCommon.status.vacant )) == null ? '' : __t) +
 '</span>\n      ';
  } ;
 __p += '\n    ';
  } else { ;
 __p += '\n      <span class="label label-info">' +
-((__t = ( i18nUnit.status.pending )) == null ? '' : __t) +
+((__t = ( i18nCommon.status.pending )) == null ? '' : __t) +
 '</span>\n    ';
  } ;
 __p += '\n  ';
@@ -141,10 +141,16 @@ __p += '\n</td>\n<td class="view-specific view-edit hide">\n  <div class="contro
  if (objectId) { ;
 __p += '\n    <a class="btn btn-mini add-lease"\n       href="/properties/' +
 ((__t = ( property.objectId )) == null ? '' : __t) +
-'/units/' +
+'/add/lease?unit=' +
 ((__t = ( objectId )) == null ? '' : __t) +
-'/add/lease" \n       rel="tooltip" \n       data-original-title="' +
+'" \n       rel="tooltip" \n       data-original-title="' +
 ((__t = ( i18nUnit.actions.add_lease )) == null ? '' : __t) +
+'">\n      <i class="icon-plus"></i>\n    </a>\n    <a class="btn btn-mini add-task"\n       href="/properties/' +
+((__t = ( property.objectId )) == null ? '' : __t) +
+'/leases/' +
+((__t = ( active_lease.objectId )) == null ? '' : __t) +
+'/add/task" \n       rel="tooltip" \n       data-original-title="' +
+((__t = ( i18nUnit.actions.add_task )) == null ? '' : __t) +
 '">\n      <i class="icon-plus"></i>\n    </a>\n    ';
  if (has_lease) { ;
 __p += '\n      <a class="btn btn-mini add-tenants"\n         href="/properties/' +
@@ -157,7 +163,7 @@ __p += '\n      <a class="btn btn-mini add-tenants"\n         href="/properties/
 ((__t = ( property.objectId )) == null ? '' : __t) +
 '/leases/' +
 ((__t = ( active_lease.objectId )) == null ? '' : __t) +
-'/add/task" \n         rel="tooltip" \n         data-original-title="' +
+'/extend"\n         rel="tooltip" \n         data-original-title="' +
 ((__t = ( i18nLease.actions.extend )) == null ? '' : __t) +
 '">\n        <i class="icon-repeat"></i>\n      </a>\n    ';
  } ;

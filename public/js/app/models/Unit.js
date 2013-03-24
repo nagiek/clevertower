@@ -27,7 +27,13 @@
       };
 
       Unit.prototype.validate = function(attrs, options) {
-        if (attrs.title === '') {
+        if (attrs == null) {
+          attrs = {};
+        }
+        if (options == null) {
+          options = {};
+        }
+        if (attrs.title && attrs.title === '') {
           return {
             message: 'title_missing'
           };

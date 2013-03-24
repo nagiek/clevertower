@@ -6,7 +6,7 @@ define
     unassigned:       "Unassigned"
     applying:         "Applying"
   collection:         
-    empty:            "You don't have any units in the propery yet."
+    empty:            "You don't have any units in the property yet."
   form:               
     increment:        "Increment"
     unit_info:        "unit info"
@@ -35,8 +35,3 @@ define
     bedrooms:         "Bedrooms"
     square_feet:      "Square Feet"
     description:      "Description"
-  status:
-    unsaved:          "Unsaved"
-    vacant:           "Vacant"
-    pending:          "Pending"
-    confirmed:        "Confirmed"

@@ -10,7 +10,7 @@
       applying: "Applying"
     },
     collection: {
-      empty: "You don't have any units in the propery yet."
+      empty: "You don't have any units in the property yet."
     },
     form: {
       increment: "Increment",
@@ -44,12 +44,6 @@
       bedrooms: "Bedrooms",
       square_feet: "Square Feet",
       description: "Description"
-    },
-    status: {
-      unsaved: "Unsaved",
-      vacant: "Vacant",
-      pending: "Pending",
-      confirmed: "Confirmed"
     }
   });
 
