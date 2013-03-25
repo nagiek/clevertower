@@ -96,9 +96,9 @@
         return this.units.fetch();
       };
 
-      NewLeaseView.prototype.addToSelect = function(unit) {
+      NewLeaseView.prototype.addToSelect = function(u) {
         var HTML;
-        HTML = "<option value='" + unit.id + "'>" + (unit.get('title')) + "</option>";
+        HTML = ("<option value='" + u.id + "'") + (this.model.get("unit").id === u.id ? "selected='selected'" : "") + (">" + (u.get('title')) + "</option>");
         return this.$unitSelect.children(':last').before(HTML);
       };
 
@@ -205,6 +205,9 @@
           i18nUnit: i18nUnit,
           i18nLease: i18nLease
         });
+        if (this.model.get("unit")) {
+          vars.unit = this.model.get("unit");
+        }
         this.$el.html(JST["src/js/templates/lease/new.jst"](vars));
         return this;
       };

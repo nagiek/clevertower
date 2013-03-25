@@ -54,7 +54,6 @@
 
       UnitSummaryView.prototype.render = function() {
         var vars;
-        console.log(this.model.toJSON());
         vars = _.merge(this.model.toJSON(), {
           moment: moment,
           propertyId: this.model.get("property").id,

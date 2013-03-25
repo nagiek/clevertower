@@ -22,6 +22,7 @@
         var collections,
           _this = this;
         this.action = attrs.action;
+        this.params = attrs.params;
         if (this.action === 'add/lease') {
           this.model.loadUnits();
         }
@@ -52,10 +53,14 @@
       PropertyView.prototype.render = function() {
         var _this = this;
         require(["views/property/sub/" + this.action], function(PropertySubView) {
-          var propertyView;
-          return propertyView = new PropertySubView({
+          var propertyView, vars;
+          vars = {
             model: _this.model
-          });
+          };
+          if (_this.params) {
+            vars.params = _this.params;
+          }
+          return propertyView = new PropertySubView(vars);
         });
         return this;
       };

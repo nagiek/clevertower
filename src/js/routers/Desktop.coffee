@@ -37,6 +37,17 @@ define [
           # triggered.  If this is a problem, change this to navigate on your
           # router.
           Parse.history.navigate href, true
+    
+    deparam : (querystring) ->
+      # remove any preceding url and split
+      querystring = querystring.substring(querystring.indexOf('?')+1).split('&')
+      params = {}
+      d = decodeURIComponent
+      # march and parse
+      for combo in querystring
+        pair = combo.split('=')
+        params[d(pair[0])] = d(pair[1])
+      params
         
     index: ->
       require ["views/network/Manage"], (ManageNetworkView) =>
@@ -49,11 +60,17 @@ define [
         
     propertiesShow: (id, action) ->
       action ||= 'units'
+      if action.indexOf("?") > 0
+        combo = action.split("?")
+        action = combo[0]
+        params = @deparam combo[1]
       require ["models/Property", "views/property/Show"], (Property, PropertyView) => 
         new Parse.Query("Property").get id,
           success: (model) ->
             $('#main').html '<div id="property"></div>'
-            new PropertyView(model:model, action: action)
+            vars = model:model, action: action
+            vars.params = params if params
+            new PropertyView(vars)
           error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
 
     # propertiesAddSub: (id, node) ->

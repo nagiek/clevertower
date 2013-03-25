@@ -21,6 +21,7 @@ define [
 
     initialize: (attrs) ->
       @action = attrs.action
+      @params = attrs.params
       
       @model.loadUnits() if @action is 'add/lease'
       
@@ -51,7 +52,9 @@ define [
     # Re-render the contents of the property item.
     render: ->
       require ["views/property/sub/#{@action}"], (PropertySubView) =>
-        propertyView = new PropertySubView(model: @model)
+        vars = model: @model
+        vars.params = @params if @params 
+        propertyView = new PropertySubView(vars)
       @
   
     # Re-render the contents of the property item.

@@ -15,9 +15,19 @@
       AddLeaseToPropertyView.prototype.el = "#content";
 
       AddLeaseToPropertyView.prototype.initialize = function(attrs) {
-        this.lease = new Lease({
+        var vars;
+        vars = {
           property: this.model
-        });
+        };
+        if (attrs.params.unit) {
+          this.model.loadUnits();
+          vars.unit = {
+            __type: "Pointer",
+            className: "Unit",
+            objectId: attrs.params.unit
+          };
+        }
+        this.lease = new Lease(vars);
         return this.render();
       };
 

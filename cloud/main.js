@@ -82,7 +82,7 @@
   });
 
   Parse.Cloud.beforeSave("Lease", function(request, response) {
-    var end_date, moment, property, start_date;
+    var end_date, moment, property, start_date, unit_date_query;
     if (request.object.get("unit" === '')) {
       return response.error('title_missing');
     }
@@ -98,6 +98,24 @@
     if (moment(start_date) > moment(end_date)) {
       return response.error('dates_incorrect');
     }
+    unit_date_query = (new Parse.Query("Lease")).equalTo("unit", request.object.get("unit"));
+    unit_date_query.notEqualTo("id", request.object.get("unit")(request.object.existed().find ? {
+      success: function(objs) {
+        var _;
+        _ = require('underscore');
+        return _.each(objs, function(obj) {
+          var ed, sd;
+          sd = obj.get("start_date");
+          if (start_date < sd && sd < end_date) {
+            response.error("" + obj.id + ":overlapping_dates");
+          }
+          ed = obj.get("end_date");
+          if (start_date < ed && ed < end_date) {
+            return response.error("" + obj.id + ":overlapping_dates");
+          }
+        });
+      }
+    } : void 0));
     if (!request.object.existed()) {
       property = request.object.get("property");
       return (new Parse.Query("Property")).get(property.objectId, {

@@ -11,7 +11,7 @@ __p += '<fieldset>\n  <legend>' +
 '</legend>\n  <div class="row">\n    <div class="unit-group control-group span4">\n      <label for="lease-unit" class="control-label">' +
 ((__t = ( i18nCommon.classes.Unit )) == null ? '' : __t) +
 ' <span class="required">*</span></label>\n      <div class="controls">\n        ' +
-((__t = ( JST["src/js/templates/helper/field/unit.jst"]({units: units, required: true, i18nUnit: i18nUnit, i18nCommon: i18nCommon}) )) == null ? '' : __t) +
+((__t = ( JST["src/js/templates/helper/field/unit.jst"]({units: units, unit: unit, required: true, i18nUnit: i18nUnit, i18nCommon: i18nCommon}) )) == null ? '' : __t) +
 '\n      </div>\n    </div>\n    <div class="date-group control-group span">\n      <label for="lease-unit" class="control-label">' +
 ((__t = ( i18nLease.form.dates )) == null ? '' : __t) +
 ' <span class="required">*</span></label>\n      <div class="controls">\n        <input type="text" class="span2 start-date datepicker" name="lease[start_date]" maxlength="12" value="' +

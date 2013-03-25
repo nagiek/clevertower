@@ -84,8 +84,8 @@ define [
       @units.bind "reset", @addAll
       @units.fetch()
 
-    addToSelect : (unit) =>
-      HTML = "<option value='#{unit.id}'>#{unit.get('title')}</option>"
+    addToSelect : (u) =>
+      HTML = "<option value='#{u.id}'" + (if @model.get("unit").id == u.id then "selected='selected'" else "") + ">#{u.get('title')}</option>"
       @$unitSelect.children(':last').before HTML
 
     addAll : =>
@@ -171,5 +171,6 @@ define [
         i18nUnit: i18nUnit
         i18nLease: i18nLease
       )
+      vars.unit = @model.get "unit" if @model.get "unit"
       @$el.html JST["src/js/templates/lease/new.jst"](vars)
       @

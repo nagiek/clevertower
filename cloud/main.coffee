@@ -122,6 +122,18 @@ Parse.Cloud.beforeSave "Lease", (request, response) ->
   if start_date > end_date                  then return response.error 'dates_incorrect'
   if moment(start_date) > moment(end_date)  then return response.error 'dates_incorrect'
   # if moment(start_date).isAfter(end_date) then return response.error 'dates_incorrect'
+
+  # Check for overlapping dates
+  unit_date_query = (new Parse.Query("Lease")).equalTo("unit", request.object.get "unit")
+  unit_date_query.notEqualTo "id", request.object.get("unit")  if request.object.existed()
+  .find
+    success: (objs) -> 
+      _ = require 'underscore'
+      _.each objs, (obj) ->
+        sd = obj.get "start_date"
+        if start_date < sd and sd < end_date then response.error "#{obj.id}:overlapping_dates"
+        ed = obj.get "end_date"
+        if start_date < ed and ed < end_date then response.error "#{obj.id}:overlapping_dates"
   
   unless request.object.existed()
     property = request.object.get "property"

@@ -49,7 +49,6 @@ define [
 
     # Re-render the contents of the Unit item.
     render: ->
-      console.log @model.toJSON()
       vars = _.merge(
         @model.toJSON(),
         moment: moment

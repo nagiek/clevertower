@@ -39,6 +39,19 @@
         });
       };
 
+      DesktopRouter.prototype.deparam = function(querystring) {
+        var combo, d, pair, params, _i, _len;
+        querystring = querystring.substring(querystring.indexOf('?') + 1).split('&');
+        params = {};
+        d = decodeURIComponent;
+        for (_i = 0, _len = querystring.length; _i < _len; _i++) {
+          combo = querystring[_i];
+          pair = combo.split('=');
+          params[d(pair[0])] = d(pair[1]);
+        }
+        return params;
+      };
+
       DesktopRouter.prototype.index = function() {
         var _this = this;
         return require(["views/network/Manage"], function(ManageNetworkView) {
@@ -56,16 +69,27 @@
       };
 
       DesktopRouter.prototype.propertiesShow = function(id, action) {
-        var _this = this;
+        var combo, params,
+          _this = this;
         action || (action = 'units');
+        if (action.indexOf("?") > 0) {
+          combo = action.split("?");
+          action = combo[0];
+          params = this.deparam(combo[1]);
+        }
         return require(["models/Property", "views/property/Show"], function(Property, PropertyView) {
           return new Parse.Query("Property").get(id, {
             success: function(model) {
+              var vars;
               $('#main').html('<div id="property"></div>');
-              return new PropertyView({
+              vars = {
                 model: model,
                 action: action
-              });
+              };
+              if (params) {
+                vars.params = params;
+              }
+              return new PropertyView(vars);
             },
             error: function(object, error) {
               return _this.accessDenied();
