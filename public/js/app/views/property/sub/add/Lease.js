@@ -19,7 +19,7 @@
         vars = {
           property: this.model
         };
-        if (attrs.params.unit) {
+        if (attrs.params && attrs.params.unit) {
           this.model.loadUnits();
           vars.unit = {
             __type: "Pointer",

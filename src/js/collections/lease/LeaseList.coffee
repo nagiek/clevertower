@@ -12,6 +12,8 @@ define [
     
     initialize: (attrs) ->
       @property = attrs.property
+      @query = new Parse.Query(Lease)
+      @query.equalTo "property", @property
 
     url:  ->
       "/properties/#{@property.get "id"}/leases"

@@ -17,6 +17,8 @@
       "jquery.fileupload": "app/plugins/jquery-fileupload",
       'load-image': '//blueimp.github.com/JavaScript-Load-Image/load-image.min',
       'canvas-to-blob': '//blueimp.github.com/JavaScript-Canvas-to-Blob/canvas-to-blob.min',
+      "underscore.email": "app/plugins/underscore-email",
+      "underscore.inflection": "app/plugins/underscore-inflection",
       moment: "//cdnjs.cloudflare.com/ajax/libs/moment.js/2.0.0/moment.min",
       bootstrap: "libs/bootstrap/bootstrap",
       json2: "//cdnjs.cloudflare.com/ajax/libs/json2/20121008/json2",
@@ -39,6 +41,14 @@
       backbone: {
         deps: ["underscore", "jquery"],
         exports: "Parse"
+      },
+      underscore: {
+        deps: ['underscore.email', 'underscore.inflection'],
+        exports: '_',
+        init: function(UnderscoreString) {
+          _.mixin(UnderscoreEmail);
+          return _.mixin(UnderscoreInflection);
+        }
       }
     }
   });

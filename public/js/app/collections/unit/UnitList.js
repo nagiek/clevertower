@@ -2,7 +2,7 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(['jquery', 'underscore', 'backbone', 'models/Unit'], function($, _, Parse, Unit) {
+  define(['jquery', 'underscore', 'backbone', 'models/Unit', 'models/Lease'], function($, _, Parse, Unit, Lease) {
     var UnitList;
     return UnitList = (function(_super) {
       var comparator;
@@ -16,7 +16,8 @@
       UnitList.prototype.model = Unit;
 
       UnitList.prototype.initialize = function(attrs) {
-        return this.property = attrs.property;
+        this.property = attrs.property;
+        return this.query = new Parse.Query(Unit).equalTo("property", this.property).include("activeLease");
       };
 
       UnitList.prototype.url = function() {

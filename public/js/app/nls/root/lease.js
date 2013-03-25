@@ -2,10 +2,7 @@
 
   define({
     headers: {
-      add_lease: "Add Lease",
-      show: function(title) {
-        return "Lease on unit " + (_.escape(title));
-      }
+      add_lease: "Add Lease"
     },
     actions: {
       add_tenants: "add tenants to lease",
@@ -31,8 +28,8 @@
     collection: {
       empty: "You don't have any leases in the property yet."
     },
-    form: {
-      enter_emails: "Enter the email addresses of the people you wish to add."
+    tenants: {
+      empty: "You haven't added any tenants to the lease yet."
     },
     errors: {
       unit_missing: "You must enter a unit",
@@ -59,6 +56,7 @@
       garage_remotes: "Remotes"
     },
     form: {
+      enter_emails: "Enter the email addresses of the people you wish to add.",
       to_existing: "To existing lease on unit",
       dates: "Dates",
       rent: "Rent",

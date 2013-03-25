@@ -41,6 +41,9 @@
         if (!this.model) {
           this.model = new Lease;
         }
+        if (!this.model.tenants) {
+          this.model.tenants = new TenantList;
+        }
         this.property = attrs.property;
         this.model.on('invalid', function(error) {
           _this.$el.find('.error').removeClass('error');
@@ -58,6 +61,10 @@
           }
         });
         this.on("save:success", function(model) {
+          _this.model.tenants.createQuery(model);
+          _this.model.tenants.each(function(t) {
+            return t.save();
+          });
           new Alert({
             event: 'units-save',
             fade: true,
@@ -98,7 +105,7 @@
 
       NewLeaseView.prototype.addToSelect = function(u) {
         var HTML;
-        HTML = ("<option value='" + u.id + "'") + (this.model.get("unit").id === u.id ? "selected='selected'" : "") + (">" + (u.get('title')) + "</option>");
+        HTML = ("<option value='" + u.id + "'") + (this.model.get("unit") && this.model.get("unit").id === u.id ? "selected='selected'" : "") + (">" + (u.get('title')) + "</option>");
         return this.$unitSelect.children(':last').before(HTML);
       };
 
@@ -110,7 +117,7 @@
       };
 
       NewLeaseView.prototype.save = function(e) {
-        var data, tenants, unit,
+        var data, unit,
           _this = this;
         e.preventDefault();
         data = this.$('form').serializeObject();
@@ -124,14 +131,17 @@
         });
         _.each(['start_date', 'end_date'], function(attr) {
           if (data.lease[attr] !== '') {
-            return data.lease[attr] = moment(data.lease[attr], i18nCommon.dates.datepicker_format).toDate();
+            data.lease[attr] = moment(data.lease[attr], i18nCommon.dates.datepicker_format).toDate();
+          }
+          if (typeof data.lease[attr] === 'string') {
+            return data.lease[attr] = new Date;
           }
         });
         _.each(['checks_received', 'first_month_paid', 'last_month_paid'], function(attr) {
           return data.lease[attr] = data.lease[attr] !== "" ? true : false;
         });
         this.model.set(data.lease);
-        if (data.unit) {
+        if (data.unit && data.unit.id !== "") {
           if (data.unit.id === "-1") {
             unit = new Unit(data.unit.attributes);
             unit.set("property", this.property);
@@ -141,13 +151,9 @@
           this.model.set("unit", unit);
         }
         if (data.emails && data.emails !== '') {
-          tenants = data.emails.split(", ");
-          tenants.each(function(tenant) {
-            return this.model.tenants.add(new Tenant({
-              lease: model,
-              user: new Parse.User({
-                email: tenant
-              })
+          _.each(data.emails.split(","), function(email) {
+            return _this.model.tenants.add(new Parse.User({
+              email: $.trim(email)
             }));
           });
         }
@@ -156,6 +162,7 @@
             return _this.trigger("save:success", model, _this);
           },
           error: function(model, error) {
+            console.log(error);
             return _this.model.trigger("invalid", error);
           }
         });
@@ -205,9 +212,7 @@
           i18nUnit: i18nUnit,
           i18nLease: i18nLease
         });
-        if (this.model.get("unit")) {
-          vars.unit = this.model.get("unit");
-        }
+        vars.unit = this.model.get("unit") ? this.model.get("unit") : false;
         this.$el.html(JST["src/js/templates/lease/new.jst"](vars));
         return this;
       };

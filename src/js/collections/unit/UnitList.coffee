@@ -3,7 +3,8 @@ define [
   'underscore',
   'backbone',
   'models/Unit'
-], ($, _, Parse, Unit) ->
+  'models/Lease'
+], ($, _, Parse, Unit, Lease) ->
 
   class UnitList extends Parse.Collection
 
@@ -12,14 +13,19 @@ define [
     
     initialize: (attrs) ->
       @property = attrs.property
+      # today = new Date
+      # innerQuery = new Parse.Query(Lease)
+      # innerQuery.equalTo "property", @property
+      # innerQuery.lessThan "start_date", today
+      # innerQuery.greaterThan "end_date", today
+      
+      @query = new Parse.Query(Unit)
+      .equalTo("property", @property)
+      .include("activeLease")
+
 
     url:  ->
       "/properties/#{@property.get "id"}/units"
-
-    # query: ->
-    #   query = new Parse.Query(Unit)
-    #   query.equalTo "property", @property
-    #   query
       
     comparator = (unit) ->
       title = unit.get "title"

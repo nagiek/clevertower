@@ -35,8 +35,10 @@ define [
     
     initialize : (attrs) ->
       @model = new Lease unless @model
-      @property = attrs.property
+      @model.tenants = new TenantList unless @model.tenants
       
+      @property = attrs.property
+            
       @model.on 'invalid', (error) =>
         @$el.find('.error').removeClass('error')
         new Alert(event: 'lease-save', fade: false, message: i18nLease.errors[error.message], type: 'error')
@@ -47,6 +49,12 @@ define [
             @$('.date-group').addClass('error')
       
       @on "save:success", (model) =>
+        # Save the tenants, now that we have an ID
+        @model.tenants.createQuery(model)
+        @model.tenants.each (t) ->
+          t.save()
+        
+        # Alert the user and move on
         new Alert(event: 'units-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success')
         Parse.history.navigate "/properties/#{@property.id}/leases/#{model.id}"
         @remove()
@@ -85,7 +93,7 @@ define [
       @units.fetch()
 
     addToSelect : (u) =>
-      HTML = "<option value='#{u.id}'" + (if @model.get("unit").id == u.id then "selected='selected'" else "") + ">#{u.get('title')}</option>"
+      HTML = "<option value='#{u.id}'" + (if @model.get("unit") and @model.get("unit").id == u.id then "selected='selected'" else "") + ">#{u.get('title')}</option>"
       @$unitSelect.children(':last').before HTML
 
     addAll : =>
@@ -107,6 +115,7 @@ define [
 
       _.each ['start_date', 'end_date'], (attr) ->
         data.lease[attr] = moment(data.lease[attr], i18nCommon.dates.datepicker_format).toDate() unless data.lease[attr] is ''
+        data.lease[attr] = new Date if typeof data.lease[attr] is 'string'
       
       _.each ['checks_received', 'first_month_paid', 'last_month_paid'], (attr) ->
         data.lease[attr] = if data.lease[attr] isnt "" then true else false
@@ -114,7 +123,7 @@ define [
       @model.set data.lease
 
       # Set unit
-      if data.unit
+      if data.unit and data.unit.id isnt ""
         if data.unit.id is "-1"
           unit = new Unit data.unit.attributes
           unit.set "property", @property
@@ -122,16 +131,16 @@ define [
           unit = @units.get data.unit.id
         @model.set "unit", unit
 
-      # Set tenants
       if data.emails and data.emails isnt ''
-        tenants = data.emails.split(", ")
-        tenants.each (tenant) -> 
-          @model.tenants.add new Tenant(lease: model, user: new Parse.User(email: tenant))
+        _.each data.emails.split(","), (email) => 
+          # return @model.trigger "invalid", "incorrect_format" unless 
+          @model.tenants.add new Parse.User(email: $.trim(email))
 
       @model.save null,
         success: (model) => 
           @trigger "save:success", model, this
         error: (model, error) => 
+          console.log error
           @model.trigger "invalid", error
         
 
@@ -171,6 +180,6 @@ define [
         i18nUnit: i18nUnit
         i18nLease: i18nLease
       )
-      vars.unit = @model.get "unit" if @model.get "unit"
+      vars.unit = if @model.get "unit" then @model.get "unit" else false
       @$el.html JST["src/js/templates/lease/new.jst"](vars)
       @

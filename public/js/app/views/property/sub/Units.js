@@ -124,6 +124,8 @@
             });
           } else {
             unit = this.model.units.at(this.model.units.length - 1).clone();
+            unit.set("has_lease", false);
+            unit.unset("activeLease");
             title = unit.get('title');
             newTitle = title.substr(0, title.length - 1);
             char = title.charAt(title.length - 1);
@@ -162,30 +164,22 @@
           this.$('.error').removeClass('error');
         }
         return this.model.units.each(function(unit) {
-          var error;
-          if (unit.changed) {
-            error = unit.validate(unit.attributes);
-            if (!error) {
-              return unit.save(null, {
-                success: function(unit) {
-                  new Alert({
-                    event: 'units-save',
-                    fade: true,
-                    message: i18nCommon.actions.changes_saved,
-                    type: 'success'
-                  });
-                  if (unit.changed) {
-                    return unit.trigger("save:success");
-                  }
-                },
-                error: function(unit, error) {
-                  return unit.trigger("invalid", unit, error);
-                }
+          return unit.save(null, {
+            success: function(unit) {
+              new Alert({
+                event: 'units-save',
+                fade: true,
+                message: i18nCommon.actions.changes_saved,
+                type: 'success'
               });
-            } else {
+              if (unit.changed) {
+                return unit.trigger("save:success");
+              }
+            },
+            error: function(unit, error) {
               return unit.trigger("invalid", unit, error);
             }
-          }
+          });
         });
       };
 

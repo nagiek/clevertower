@@ -1,7 +1,6 @@
 define
   headers:
     add_lease:            "Add Lease"
-    show:      (title) -> "Lease on unit #{_.escape(title)}"
   actions:
     add_tenants:          "add tenants to lease"
     extend:               "extend lease"
@@ -21,8 +20,8 @@ define
     checks_received:      "Checks Received"
   collection:         
     empty:                "You don't have any leases in the property yet."
-  form: 
-    enter_emails:         "Enter the email addresses of the people you wish to add."
+  tenants:         
+    empty:                "You haven't added any tenants to the lease yet."
   errors:
     unit_missing:         "You must enter a unit"
     dates_missing:        "You must enter a start and end date"
@@ -42,6 +41,7 @@ define
     parking_space:        "Space"
     garage_remotes:       "Remotes"
   form:
+    enter_emails:         "Enter the email addresses of the people you wish to add."
     to_existing:          "To existing lease on unit"
     dates:                "Dates"
     rent:                 "Rent"

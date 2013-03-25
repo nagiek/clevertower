@@ -113,15 +113,13 @@ Parse.Cloud.beforeSave "Unit", (request, response) ->
 
 # Lease validation
 Parse.Cloud.beforeSave "Lease", (request, response) ->
-  if request.object.get "unit" is ''        then return response.error 'title_missing'
+  unless request.object.get "unit"  then return response.error 'unit_missing'
 
-  moment = require 'moment'  
   start_date  = request.object.get "start_date"
   end_date    = request.object.get "end_date"
-  if start_date is '' or end_date is ''     then return response.error 'date_missing'
-  if start_date > end_date                  then return response.error 'dates_incorrect'
-  if moment(start_date) > moment(end_date)  then return response.error 'dates_incorrect'
-  # if moment(start_date).isAfter(end_date) then return response.error 'dates_incorrect'
+  unless start_date and end_date    then return response.error 'date_missing'
+  if start_date is end_date         then return response.error 'date_missing'
+  if start_date > end_date          then return response.error 'dates_incorrect'
 
   # Check for overlapping dates
   unit_date_query = (new Parse.Query("Lease")).equalTo("unit", request.object.get "unit")
@@ -154,14 +152,31 @@ Parse.Cloud.beforeSave "Lease", (request, response) ->
 
 Parse.Cloud.afterSave "Lease", (request) ->
   # Set active lease on unit
-  today = new Date
+  today       = new Date
+  start_date  = request.object.get "start_date"
+  end_date    = request.object.get "end_date"
   if start_date < today and today < end_date
     unit = request.object.get "unit"
-    (new Parse.Query "Property").get property.objectId,
+    (new Parse.Query "Unit").get unit.objectId,
       success: (model) ->
         model.set "has_lease", true
-        model.set "active_lease", request.object.objectId
+        model.set "activeLease", request.object
         model.save()
+
+# Lease validation
+Parse.Cloud.beforeSave "Tenant", (request, response) ->
+  unless request.object.existed()
+    (new Parse.Query "Lease").get request.object.get("lease").objectId,
+      success: (lease) ->
+        propertyId = lease.get("property").objectId
+        # Change the status depending on who is creating the link.
+        (new Parse.Query "Role").get lease.get("property").objectId + "-mgr-current",
+          success: (property) ->
+            _ = require "underscore"
+            status = if property and _.contains(role.getUsers(), request.object.get("User")) then 'invited' else 'pending'
+            request.object.set "status", status
+            response.success()    
+
 
 # Task validation
 Parse.Cloud.beforeSave "Task", (request, response) ->

@@ -3,7 +3,7 @@
     <% if (objectId) { %>
       <a class="unit-link" href="/properties/<%= property.objectId %>/units/<%= objectId %>"><%= title %></a>
       <% if (has_lease) { %>
-        | <a href="/properties/<%= property.objectId %>/lease/<%= activeLease.objectId %>"><%= i18nCommmon.classes.lease %></a>
+        | <a href="/properties/<%= property.objectId %>/leases/<%= activeLease.id %>"><%= i18nCommon.classes.lease %></a>
       <% } %>
     <% } %>
   </div>
@@ -31,15 +31,13 @@
   <% } %>
 </td>
 <td class="view-specific view-show">
-  <% if (has_lease && active_lease.end_date) { %>
-    <span content="<%= active_lease.end_date %>" datatype="xsd:dateTime" property="dc:date">
-      <%= moment(active_lease.end_date).format("MMM DD YYYY") %>
-    </span>  
+  <% if (has_lease && end_date) { %>
+    <%= end_date %>
   <% } %>
 </td>
 <td class="view-specific view-show">
-  <% if (has_lease && active_lease.rent) { %>
-    <%= active_lease.rent %>
+  <% if (has_lease && activeLease.get("rent")) { %>
+    <%= activeLease.get("rent") %>
   <% } %>
 </td>
 <td class="view-specific view-edit hide">
@@ -102,13 +100,13 @@
     </a>
     <% if (has_lease) { %>
       <a class="btn btn-mini add-tenants"
-         href="/properties/<%= property.objectId %>/leases/<%= active_lease.objectId %>/add/tenants" 
+         href="/properties/<%= property.objectId %>/leases/<%= activeLease.objectId %>/add/tenants" 
          rel="tooltip" 
          data-original-title="<%= i18nLease.actions.add_tenants %>">
         <i class="icon-user"></i>
       </a>
       <a class="btn btn-mini extend"
-         href="/properties/<%= property.objectId %>/leases/<%= active_lease.objectId %>/extend"
+         href="/properties/<%= property.objectId %>/leases/<%= activeLease.objectId %>/extend"
          rel="tooltip" 
          data-original-title="<%= i18nLease.actions.extend %>">
         <i class="icon-repeat"></i>

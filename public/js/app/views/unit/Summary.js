@@ -53,15 +53,20 @@
       };
 
       UnitSummaryView.prototype.render = function() {
-        var vars;
+        var end_date, vars;
         vars = _.merge(this.model.toJSON(), {
           moment: moment,
+          objectId: this.model.id ? this.model.id : false,
           propertyId: this.model.get("property").id,
-          isNew: this.model.isNew(),
           i18nCommon: i18nCommon,
           i18nUnit: i18nUnit,
-          i18nLease: i18nLease
+          i18nLease: i18nLease,
+          isNew: this.model.isNew()
         });
+        if (vars.activeLease = this.model.get("activeLease")) {
+          end_date = this.model.get("activeLease").get("end_date");
+          vars.end_date = this.model.get("has_lease") && end_date ? moment(end_date).format("MMM DD YYYY") : false;
+        }
         $(this.el).html(JST["src/js/templates/unit/summary.jst"](vars));
         return this;
       };

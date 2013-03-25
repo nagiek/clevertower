@@ -82,20 +82,19 @@
   });
 
   Parse.Cloud.beforeSave("Lease", function(request, response) {
-    var end_date, moment, property, start_date, unit_date_query;
-    if (request.object.get("unit" === '')) {
-      return response.error('title_missing');
+    var end_date, property, start_date, unit_date_query;
+    if (!request.object.get("unit")) {
+      return response.error('unit_missing');
     }
-    moment = require('moment');
     start_date = request.object.get("start_date");
     end_date = request.object.get("end_date");
-    if (start_date === '' || end_date === '') {
+    if (!(start_date && end_date)) {
+      return response.error('date_missing');
+    }
+    if (start_date === end_date) {
       return response.error('date_missing');
     }
     if (start_date > end_date) {
-      return response.error('dates_incorrect');
-    }
-    if (moment(start_date) > moment(end_date)) {
       return response.error('dates_incorrect');
     }
     unit_date_query = (new Parse.Query("Lease")).equalTo("unit", request.object.get("unit"));
@@ -140,15 +139,37 @@
   });
 
   Parse.Cloud.afterSave("Lease", function(request) {
-    var today, unit;
+    var end_date, start_date, today, unit;
     today = new Date;
+    start_date = request.object.get("start_date");
+    end_date = request.object.get("end_date");
     if (start_date < today && today < end_date) {
       unit = request.object.get("unit");
-      return (new Parse.Query("Property")).get(property.objectId, {
+      return (new Parse.Query("Unit")).get(unit.objectId, {
         success: function(model) {
           model.set("has_lease", true);
-          model.set("active_lease", request.object.objectId);
+          model.set("activeLease", request.object);
           return model.save();
+        }
+      });
+    }
+  });
+
+  Parse.Cloud.beforeSave("Tenant", function(request, response) {
+    if (!request.object.existed()) {
+      return (new Parse.Query("Lease")).get(request.object.get("lease").objectId, {
+        success: function(lease) {
+          var propertyId;
+          propertyId = lease.get("property").objectId;
+          return (new Parse.Query("Role")).get(lease.get("property").objectId + "-mgr-current", {
+            success: function(property) {
+              var status, _;
+              _ = require("underscore");
+              status = property && _.contains(role.getUsers(), request.object.get("User")) ? 'invited' : 'pending';
+              request.object.set("status", status);
+              return response.success();
+            }
+          });
         }
       });
     }

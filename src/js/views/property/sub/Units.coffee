@@ -45,6 +45,7 @@ define [
       
       # Fetch all the property items for this user
       @model.units.fetch()
+      
         # success: (collection, response, options) =>
         #   @model.units.add [{property: @model}] if collection.length is 0
                 
@@ -99,8 +100,11 @@ define [
           unit = new Unit property: @model
         else
           unit = @model.units.at(@model.units.length - 1).clone()
-          title = unit.get('title')
-          
+
+          unit.set "has_lease", false
+          unit.unset "activeLease"
+
+          title = unit.get 'title'
           newTitle = title.substr 0, title.length-1
           char = title.charAt title.length - 1
           # Convert to string for Parse DB
@@ -129,25 +133,10 @@ define [
       e.preventDefault()
       @$('.error').removeClass('error') if @$('.error')
       @model.units.each (unit) =>
-        if unit.changed
-          error = unit.validate(unit.attributes)
-          unless error
-            unit.save null,
-              success: (unit) =>
-                new Alert(event: 'units-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success')
-                unit.trigger "save:success" if unit.changed
-              error: (unit, error) =>
-                unit.trigger "invalid", unit, error
-          else
+        # if unit.changed
+        unit.save null,
+          success: (unit) =>
+            new Alert(event: 'units-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success')
+            unit.trigger "save:success" if unit.changed
+          error: (unit, error) =>
             unit.trigger "invalid", unit, error
-
-    # handleError: (error) =>
-    #   console.log error
-    #   # Mark up form
-    #   @$('.error').removeClass('error')
-    #   switch error.message
-    #     when 'title_missing'
-    #       @$('#unit-' + unit.get "id").find('.title-group').addClass('error') # Add class to Control Group
-    # 
-    #   # Flash message
-    #   @$messages.addClass('alert-error').show().html(i18nCommon.errors[error.message]).delay(3000).fadeOut().children().removeClass('alert-error')

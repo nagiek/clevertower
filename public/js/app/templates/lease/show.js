@@ -7,19 +7,19 @@ obj || (obj = {});
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
 with (obj) {
-__p += '<header>\n  <h2><a href="/properties/' +
+__p += '<header class="row">\n  <hgroup class="span">\n    <h2>' +
+((__t = ( i18nLease.attributes.lease_on_unit )) == null ? '' : __t) +
+' <a href="/properties/' +
 ((__t = ( propertyId )) == null ? '' : __t) +
 '/units/' +
 ((__t = ( unitId )) == null ? '' : __t) +
 '">' +
-((__t = ( i18nLease.headers.show(title) )) == null ? '' : __t) +
-'</a></h2>  \n  <div><strong>' +
-((__t = ( i18nLease.form.dates )) == null ? '' : __t) +
-':</strong> ' +
+((__t = (title )) == null ? '' : __t) +
+'</a></h2>\n    <h3>' +
 ((__t = ( start_date )) == null ? '' : __t) +
 ' - ' +
 ((__t = ( end_date )) == null ? '' : __t) +
-'</div>\n  <div>\n    <a href="/properties/' +
+'</h3>\n  </hgroup>\n  <div class="span offset1">\n    <a href="/properties/' +
 ((__t = ( property.objectId )) == null ? '' : __t) +
 '/leases/' +
 ((__t = ( objectId )) == null ? '' : __t) +
@@ -45,37 +45,11 @@ __p += '<div><strong>' +
  } ;
 __p += '\n    </div>\n    ';
  } ;
-__p += '\n  </div>\n  <div class="span3">\n    ';
- if (tenants) { ;
-__p += '\n    <div>\n      <h3>' +
+__p += '\n  </div>\n  <div class="span3">\n    <div>\n      <h3>' +
 ((__t = ( i18nLease.form.tenants )) == null ? '' : __t) +
-'</h3> \n      ';
- if (parking_fee) { ;
-__p += '<div><strong>' +
-((__t = ( i18nLease.fields.parking_fee )) == null ? '' : __t) +
-'</strong>' +
-((__t = ( parking_fee )) == null ? '' : __t) +
-'</div>';
- } ;
-__p += '\n      ';
- if (parking_space) { ;
-__p += '<div><strong>' +
-((__t = ( i18nLease.fields.parking_space )) == null ? '' : __t) +
-'</strong>' +
-((__t = ( parking_space )) == null ? '' : __t) +
-'</div>';
- } ;
-__p += '\n      ';
- if (garage_remotes) { ;
-__p += '<div><strong>' +
-((__t = ( i18nLease.fields.garage_remotes )) == null ? '' : __t) +
-'</strong>' +
-((__t = ( garage_remotes )) == null ? '' : __t) +
-'</div>';
- } ;
-__p += '\n    </div>\n    ';
- } ;
-__p += '\n\n    ';
+'</h3> \n      <p class="empty">' +
+((__t = ( i18nLease.tenants.empty )) == null ? '' : __t) +
+'</p>\n      <ul class="tenants"></ul>\n    </div>\n\n    ';
  if (parking_fee || parking_space || garage_remotes) { ;
 __p += '\n    <div>\n      <h3>' +
 ((__t = ( i18nLease.form.parking )) == null ? '' : __t) +

@@ -15,28 +15,7 @@
       PropertyList.prototype.model = Property;
 
       PropertyList.prototype.url = function() {
-        return "/properties";
-      };
-
-      PropertyList.prototype.done = function() {
-        return this.filter(function(Property) {
-          return Property.get("done");
-        });
-      };
-
-      PropertyList.prototype.remaining = function() {
-        return this.without.apply(this, this.done());
-      };
-
-      PropertyList.prototype.nextOrder = function() {
-        if (!this.length) {
-          return 1;
-        }
-        return this.last().get("order") + 1;
-      };
-
-      PropertyList.prototype.comparator = function(Property) {
-        return Property.get("order");
+        return "/";
       };
 
       return PropertyList;

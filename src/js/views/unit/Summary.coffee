@@ -25,7 +25,6 @@ define [
       'click .delete'     : 'kill'
       
     initialize: () ->
-      
       @model.on "change:title", =>
         @$('.unit-link').html @model.get "title"
       
@@ -52,12 +51,17 @@ define [
       vars = _.merge(
         @model.toJSON(),
         moment: moment
+        objectId: if @model.id then @model.id else false
         propertyId: @model.get("property").id
-        isNew: @model.isNew()
         i18nCommon: i18nCommon
         i18nUnit: i18nUnit
         i18nLease: i18nLease
+        isNew: @model.isNew()
       )
+      if vars.activeLease = @model.get("activeLease") 
+        end_date = @model.get("activeLease").get("end_date")
+        vars.end_date = if @model.get("has_lease") and end_date then moment(end_date).format("MMM DD YYYY") else false
+        
       $(@el).html JST["src/js/templates/unit/summary.jst"](vars)
       @
 

@@ -3,26 +3,26 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(['jquery', 'underscore', 'backbone', 'models/Lease'], function($, _, Parse, Lease) {
-    var LeaseList;
-    return LeaseList = (function(_super) {
+    var CurrentLeaseList;
+    return CurrentLeaseList = (function(_super) {
       var comparator;
 
-      __extends(LeaseList, _super);
+      __extends(CurrentLeaseList, _super);
 
-      function LeaseList() {
-        return LeaseList.__super__.constructor.apply(this, arguments);
+      function CurrentLeaseList() {
+        return CurrentLeaseList.__super__.constructor.apply(this, arguments);
       }
 
-      LeaseList.prototype.model = Lease;
+      CurrentLeaseList.prototype.model = Lease;
 
-      LeaseList.prototype.initialize = function(attrs) {
+      CurrentLeaseList.prototype.initialize = function(attrs) {
+        var today;
         this.property = attrs.property;
+        today = new Date;
         this.query = new Parse.Query(Lease);
-        return this.query.equalTo("property", this.property);
-      };
-
-      LeaseList.prototype.url = function() {
-        return "/properties/" + (this.property.get("id")) + "/leases";
+        this.query.equalTo("property", this.property);
+        this.query.lessThan("start_date", today);
+        return this.query.greaterThan("end_date", today);
       };
 
       comparator = function(lease) {
@@ -36,7 +36,7 @@
         }
       };
 
-      return LeaseList;
+      return CurrentLeaseList;
 
     })(Parse.Collection);
   });

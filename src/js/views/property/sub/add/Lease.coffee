@@ -20,7 +20,7 @@ define [
   
     initialize : (attrs) ->
       vars = property: @model
-      if attrs.params.unit
+      if attrs.params and attrs.params.unit
         @model.loadUnits()
         # vars.unit = @model.units.get attrs.params.unit # Won't complete in time
         vars.unit = __type: "Pointer", className: "Unit", objectId: attrs.params.unit

@@ -14,27 +14,6 @@
 
       PhotoList.prototype.model = Photo;
 
-      PhotoList.prototype.done = function() {
-        return this.filter(function(Photo) {
-          return Photo.get("done");
-        });
-      };
-
-      PhotoList.prototype.remaining = function() {
-        return this.without.apply(this, this.done());
-      };
-
-      PhotoList.prototype.nextOrder = function() {
-        if (!this.length) {
-          return 1;
-        }
-        return this.last().get("order") + 1;
-      };
-
-      PhotoList.prototype.comparator = function(Photo) {
-        return Photo.get("order");
-      };
-
       return PhotoList;
 
     })(Parse.Collection);
