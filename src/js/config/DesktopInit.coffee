@@ -15,7 +15,7 @@ require.config
     jqueryuiwidget:         'libs/jqueryui/jquery.ui.widget.min',                         # 1.10.2
     # jqueryui:               'libs/jqueryui/jquery-ui-1.10.1.custom.min',                  # includes core, widget, slider, datepicker
     underscore:             '//cdnjs.cloudflare.com/ajax/libs/lodash.js/1.0.1/lodash.min' # "libs/underscore/lodash"
-    backbone:               "//www.parsecdn.com/js/parse-1.1.16" # .min                      # "libs/backbone/parse"
+    backbone:               "//www.parsecdn.com/js/parse-1.2.2.min"                       # "libs/backbone/parse"
     
     # Async Libraries
     # ---------------

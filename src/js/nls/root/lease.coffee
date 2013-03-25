@@ -1,8 +1,11 @@
 define
+  headers:
+    add_lease:            "Add Lease"
+    show:      (title) -> "Lease on unit #{_.escape(title)}"
   actions:
     add_tenants:          "add tenants to lease"
     extend:               "extend lease"
-    new:                  "New lease"
+    new:                  "new lease"
   attributes:
     starting:             "Starting"
     ending:               "Ending"

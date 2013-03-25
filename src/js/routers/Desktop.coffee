@@ -60,14 +60,17 @@ define [
         
     propertiesShow: (id, action) ->
       action ||= 'units'
+
+      # Split the querystring
       if action.indexOf("?") > 0
         combo = action.split("?")
         action = combo[0]
         params = @deparam combo[1]
+        
       require ["models/Property", "views/property/Show"], (Property, PropertyView) => 
         new Parse.Query("Property").get id,
           success: (model) ->
-            $('#main').html '<div id="property"></div>'
+            $('#main').html '<div id="property"></div>'            
             vars = model:model, action: action
             vars.params = params if params
             new PropertyView(vars)

@@ -27,6 +27,8 @@ define [
     initialize: (attrs) ->
       
       @title = attrs.title
+      @onUnit = if attrs.onUnit then true else false
+      @link_text = if @onUnit then i18nCommon.nouns.link else i18nCommon.classes.lease
           
       @model.on "save:success", =>
         @render()
@@ -56,6 +58,8 @@ define [
       
       vars = _.merge(
         modelVars,
+        link_text: @link_text
+        onUnit: @onUnit
         propertyId: @model.get("property").id
         unitId: @model.get("unit").id
         title: @title

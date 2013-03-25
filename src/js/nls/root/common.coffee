@@ -5,6 +5,7 @@ define
     operations:           "Operations"
   classes:                
     lease:                "lease"
+    Lease:                "Lease"
     Leases:               "Leases"
     Network:              "Network"
     Unit:                 "Unit"
@@ -40,15 +41,17 @@ define
     datepicker_format:    "MM/DD/YYYY" # convenience reference to moment().format("L")
     per_month:            "Per month"
   status:
-    unsaved:          "Unsaved"
-    vacant:           "Vacant"
-    pending:          "Pending"
-    confirmed:        "Confirmed"
+    unsaved:              "Unsaved"
+    vacant:               "Vacant"
+    pending:              "Pending"
+    confirmed:            "Confirmed"
   prepositions:           
     of:                   "of"
     eg:                   "E.g., "
   verbs:             
     loading:              "Loading"
+  nouns:             
+    link:                 "link"
   adjectives:             
     unsaved:              "Unsaved"
   form:                   

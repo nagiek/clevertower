@@ -126,7 +126,7 @@ Parse.Cloud.beforeSave "Lease", (request, response) ->
   # Check for overlapping dates
   unit_date_query = (new Parse.Query("Lease")).equalTo("unit", request.object.get "unit")
   unit_date_query.notEqualTo "id", request.object.get("unit")  if request.object.existed()
-  .find
+  unit_date_query.find
     success: (objs) -> 
       _ = require 'underscore'
       _.each objs, (obj) ->

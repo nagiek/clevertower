@@ -1,0 +1,51 @@
+<header>
+  <h2><%=i18nCommon.classes.Unit%> <%= title %></a></h2>  
+  <div>
+    <a href="/properties/<%= property.objectId %>/units/<%= objectId %>/edit" class="btn">
+      <%= i18nCommon.actions.edit %>
+    </a>
+    <button class="btn add-lease"
+            rel="tooltip"
+            data-original-title="<%= i18nUnit.actions.add_lease %>">
+      <i class="icon-plus"></i>
+    </button>
+    <button class="btn add-task"
+            rel="tooltip"
+            data-original-title="<%= i18nUnit.actions.add_task %>">
+      <i class="icon-plus"></i>
+    </button>
+  </div>
+</header>
+<div class="row">
+  <div class="span9">
+    <div class="well">
+      <h2><%= i18nUnit.show.leases %></h2>
+      <table id="leases-table" class="table">
+        <thead>
+          <tr>
+            <th><%=i18nCommon.classes.Lease%></th>
+            <th><%=i18nLease.attributes.starting%></th>
+            <th><%=i18nLease.attributes.ending%></th>
+            <th><%=i18nLease.attributes.rent_this_month%></th>
+            <th><span class="element-invisible"><%=i18nCommon.headers.Operations%></span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="spinner-cell" colspan="5">
+            <img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" />
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="span3">
+    <% if (bathrooms || bedrooms || square_feet) { %>
+    <div>
+      <h3><%= i18nUnit.show.layout %></h3> 
+      <% if (parking_fee) { %><div><strong><%= i18nUnit.fields.parking_fee %></strong><%= parking_fee %></div><% } %>
+      <% if (parking_space) { %><div><strong><%= i18nUnit.fields.parking_space %></strong><%= parking_space %></div><% } %>
+      <% if (garage_remotes) { %><div><strong><%= i18nUnit.fields.garage_remotes %></strong><%= garage_remotes %></div><% } %>
+    </div>
+    <% } %>
+  </div>
+</div>

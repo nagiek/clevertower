@@ -1,0 +1,61 @@
+<header>
+  <h2><a href="/properties/<%= propertyId %>/units/<%= unitId %>"><%= i18nLease.headers.show(title) %></a></h2>  
+  <div><strong><%= i18nLease.form.dates %>:</strong> <%= start_date %> - <%= end_date %></div>
+  <div>
+    <a href="/properties/<%= property.objectId %>/leases/<%= objectId %>/edit" class="btn">
+      <%= i18nCommon.actions.edit %>
+    </a>
+    <button class="btn add-tenants"
+            rel="tooltip"
+            data-original-title="<%= i18nLease.actions.add_tenants %>">
+      <i class="icon-user"></i>
+    </button>
+    <button class="btn extend"
+            rel="tooltip"
+            data-original-title="<%= i18nLease.actions.extend %>">
+      <i class="icon-repeat"></i>
+    </button>
+    <button class="btn btn-danger delete"
+            rel="tooltip"
+            data-original-title="<%= i18nCommon.actions.delete %>">
+      <i class="icon-trash icon-white"></i>
+    </button>
+  </div>
+</header>
+<div class="row">
+  <div class="span9">
+    <% if (rent) { %>
+    <div>
+      <h3><%= i18nLease.form.payments %></h3> 
+      <% if (rent) { %><div><strong><%= i18nLease.fields.rent %></strong><%= rent %></div><% } %>
+    </div>
+    <% } %>
+  </div>
+  <div class="span3">
+    <% if (tenants) { %>
+    <div>
+      <h3><%= i18nLease.form.tenants %></h3> 
+      <% if (parking_fee) { %><div><strong><%= i18nLease.fields.parking_fee %></strong><%= parking_fee %></div><% } %>
+      <% if (parking_space) { %><div><strong><%= i18nLease.fields.parking_space %></strong><%= parking_space %></div><% } %>
+      <% if (garage_remotes) { %><div><strong><%= i18nLease.fields.garage_remotes %></strong><%= garage_remotes %></div><% } %>
+    </div>
+    <% } %>
+
+    <% if (parking_fee || parking_space || garage_remotes) { %>
+    <div>
+      <h3><%= i18nLease.form.parking %></h3> 
+      <% if (parking_fee) { %><div><strong><%= i18nLease.fields.parking_fee %></strong><%= parking_fee %></div><% } %>
+      <% if (parking_space) { %><div><strong><%= i18nLease.fields.parking_space %></strong><%= parking_space %></div><% } %>
+      <% if (garage_remotes) { %><div><strong><%= i18nLease.fields.garage_remotes %></strong><%= garage_remotes %></div><% } %>
+    </div>
+    <% } %>
+    
+    <% if (security_deposit || keys) { %>
+    <div>
+      <h3><%= i18nLease.form.deposit %></h3> 
+      <% if (security_deposit) { %><div><strong><%= i18nLease.fields.security_deposit %></strong><%= security_deposit %></div><% } %>
+      <% if (keys) { %><div><strong><%= i18nLease.fields.keys %></strong><%= keys %></div><% } %>
+    </div>
+    <% } %>
+  </div>
+</div>

@@ -9,6 +9,10 @@
       unassigned: "Unassigned",
       applying: "Applying"
     },
+    show: {
+      leases: "Leases",
+      layout: "Layout"
+    },
     collection: {
       empty: "You don't have any units in the property yet."
     },

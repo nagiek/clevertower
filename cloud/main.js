@@ -99,7 +99,10 @@
       return response.error('dates_incorrect');
     }
     unit_date_query = (new Parse.Query("Lease")).equalTo("unit", request.object.get("unit"));
-    unit_date_query.notEqualTo("id", request.object.get("unit")(request.object.existed().find ? {
+    if (request.object.existed()) {
+      unit_date_query.notEqualTo("id", request.object.get("unit"));
+    }
+    unit_date_query.find({
       success: function(objs) {
         var _;
         _ = require('underscore');
@@ -115,7 +118,7 @@
           }
         });
       }
-    } : void 0));
+    });
     if (!request.object.existed()) {
       property = request.object.get("property");
       return (new Parse.Query("Property")).get(property.objectId, {

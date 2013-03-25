@@ -2,7 +2,7 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", 'models/Property', "i18n!nls/property", "i18n!nls/common", 'templates/property/show', "templates/property/menu/show", "templates/property/menu/reports", "templates/property/menu/other", "templates/property/menu/actions"], function($, _, Parse, Property, i18nProperty, i18nCommon) {
+  define(["jquery", "underscore", "backbone", 'models/Property', 'views/helper/Inflection', "i18n!nls/property", "i18n!nls/common", 'templates/property/show', "templates/property/menu/show", "templates/property/menu/reports", "templates/property/menu/other", "templates/property/menu/actions"], function($, _, Parse, Property, Inflection, i18nProperty, i18nCommon) {
     var PropertyView;
     return PropertyView = (function(_super) {
 
@@ -19,12 +19,28 @@
       };
 
       PropertyView.prototype.initialize = function(attrs) {
-        var collections,
+        var collections, combo, node, subaction,
           _this = this;
-        this.action = attrs.action;
-        this.params = attrs.params;
-        if (this.action === 'add/lease') {
-          this.model.loadUnits();
+        if (attrs.action.indexOf("/") > 0 && attrs.action.indexOf("add") !== 0) {
+          combo = attrs.action.split("/");
+          this.vars = {
+            property: this.model,
+            subId: combo[1]
+          };
+          node = Inflection.singularize[combo[0]];
+          subaction = combo[2] ? combo[2] : "show";
+          this.subView = "views/" + node + "/" + subaction;
+        } else {
+          this.vars = {
+            model: this.model
+          };
+          if (attrs.action === 'add/lease') {
+            this.model.loadUnits();
+          }
+          this.subView = "views/property/sub/" + attrs.action;
+        }
+        if (attrs.params) {
+          this.vars.params = attrs.params;
         }
         collections = {
           cover: this.model.cover('profile'),
@@ -52,15 +68,9 @@
 
       PropertyView.prototype.render = function() {
         var _this = this;
-        require(["views/property/sub/" + this.action], function(PropertySubView) {
-          var propertyView, vars;
-          vars = {
-            model: _this.model
-          };
-          if (_this.params) {
-            vars.params = _this.params;
-          }
-          return propertyView = new PropertySubView(vars);
+        require([this.subView], function(PropertySubView) {
+          var propertyView;
+          return propertyView = new PropertySubView(_this.vars);
         });
         return this;
       };

@@ -3,6 +3,7 @@ define [
   "underscore"
   "backbone"
   'models/Property'
+  'views/helper/Inflection'
   "i18n!nls/property"
   "i18n!nls/common"
   'templates/property/show'
@@ -10,7 +11,7 @@ define [
   "templates/property/menu/reports"
   "templates/property/menu/other"
   "templates/property/menu/actions"
-], ($, _, Parse, Property, i18nProperty, i18nCommon) ->
+], ($, _, Parse, Property, Inflection, i18nProperty, i18nCommon) ->
 
   class PropertyView extends Parse.View
   
@@ -20,10 +21,20 @@ define [
       'click #edit-profile-picture': 'editProfilePicture'
 
     initialize: (attrs) ->
-      @action = attrs.action
-      @params = attrs.params
-      
-      @model.loadUnits() if @action is 'add/lease'
+      if attrs.action.indexOf("/") > 0 and attrs.action.indexOf("add") isnt 0
+        # Subnode view
+        combo = attrs.action.split("/")
+        @vars = property: @model, subId: combo[1]
+        node = Inflection.singularize[combo[0]]
+        subaction = if combo[2] then combo[2] else "show"
+        @subView = "views/#{node}/#{subaction}"
+      else
+        # Property view
+        @vars = model: @model
+        @model.loadUnits() if attrs.action is 'add/lease'
+        @subView = "views/property/sub/#{attrs.action}"
+        
+      @vars.params = attrs.params if attrs.params
       
       collections = 
         cover        : @model.cover('profile')
@@ -51,10 +62,8 @@ define [
 
     # Re-render the contents of the property item.
     render: ->
-      require ["views/property/sub/#{@action}"], (PropertySubView) =>
-        vars = model: @model
-        vars.params = @params if @params 
-        propertyView = new PropertySubView(vars)
+      require [@subView], (PropertySubView) =>
+        propertyView = new PropertySubView(@vars)
       @
   
     # Re-render the contents of the property item.

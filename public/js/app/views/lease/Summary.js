@@ -25,6 +25,8 @@
       LeaseSummaryView.prototype.initialize = function(attrs) {
         var _this = this;
         this.title = attrs.title;
+        this.onUnit = attrs.onUnit ? true : false;
+        this.link_text = this.onUnit ? i18nCommon.nouns.link : i18nCommon.classes.lease;
         this.model.on("save:success", function() {
           return _this.render();
         });
@@ -56,6 +58,8 @@
         modelVars.start_date = moment(this.model.get("start_date")).format("LL");
         modelVars.end_date = moment(this.model.get("end_date")).format("LL");
         vars = _.merge(modelVars, {
+          link_text: this.link_text,
+          onUnit: this.onUnit,
           propertyId: this.model.get("property").id,
           unitId: this.model.get("unit").id,
           title: this.title,

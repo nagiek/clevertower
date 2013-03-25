@@ -8,6 +8,7 @@
     },
     classes: {
       lease: "lease",
+      Lease: "Lease",
       Leases: "Leases",
       Network: "Network",
       Unit: "Unit",
@@ -57,6 +58,9 @@
     },
     verbs: {
       loading: "Loading"
+    },
+    nouns: {
+      link: "link"
     },
     adjectives: {
       unsaved: "Unsaved"
