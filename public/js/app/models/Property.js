@@ -64,7 +64,7 @@
       loadUnits: function() {
         if (!this.units) {
           this.units = new UnitList({
-            property: this.model
+            property: this
           });
         }
         return this.units.fetch();
@@ -72,7 +72,7 @@
       loadLeases: function() {
         if (!this.leases) {
           this.leases = new LeaseList({
-            property: this.model
+            property: this
           });
         }
         return this.leases.fetch();

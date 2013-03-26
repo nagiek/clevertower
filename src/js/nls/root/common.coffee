@@ -38,7 +38,8 @@ define
     add_x_more:           "Add <strong>x</strong> more"
     changes_saved:        "Changes Saved."
   dates:
-    datepicker_format:    "MM/DD/YYYY" # convenience reference to moment().format("L")
+    moment_format:        "MM/DD/YYYY" # Convenience reference to moment().format("L")
+    datepicker_format:    "mm/dd/yyyy" # Same as above, but for datepicker widget
     per_month:            "Per month"
   status:
     unsaved:              "Unsaved"

@@ -43,12 +43,7 @@
         exports: "Parse"
       },
       underscore: {
-        deps: ['underscore.email', 'underscore.inflection'],
-        exports: '_',
-        init: function(UnderscoreString) {
-          _.mixin(UnderscoreEmail);
-          return _.mixin(UnderscoreInflection);
-        }
+        exports: '_'
       }
     }
   });

@@ -3,7 +3,6 @@ define [
   "underscore"
   "backbone"
   "moment"
-  "collections/unit/UnitList"
   "collections/tenant/TenantList"
   "models/Property"
   "models/Unit"
@@ -14,12 +13,13 @@ define [
   "i18n!nls/unit"
   "i18n!nls/lease"
   "templates/lease/new"
+  "templates/lease/edit"
   "templates/lease/_form"
   "templates/helper/field/unit"
   "templates/helper/field/property"
   "templates/helper/field/tenant"
   "datepicker"
-], ($, _, Parse, moment, UnitList, TenantList, Property, Unit, Lease, Tenant, Alert, i18nCommon, i18nUnit, i18nLease) ->
+], ($, _, Parse, moment, TenantList, Property, Unit, Lease, Tenant, Alert, i18nCommon, i18nUnit, i18nLease) ->
 
   class NewLeaseView extends Parse.View
     
@@ -66,35 +66,33 @@ define [
         @undelegateEvents()
         delete this
       
-      unless @property.units
-        @units = new UnitList
-        @units.query = new Parse.Query(Unit)
-        @units.query.equalTo "network", Parse.User.current().get "network"
-      else
+      if @property
+        @property.loadUnits()
         @units = @property.units
-      
+              
       @current = new Date().setDate(1)
       @dates =
-        start:  if @model.get "start_date"  then @model.get "start_date"  else moment(@current).format("L")
-        end:    if @model.get "end_date"    then @model.get "end_date"    else moment(@current).add(1, 'year').subtract(1, 'day').format("L")
+        start:  if @model.get "start_date"  then moment(@model.get("start_date")).format("L")  else moment(@current).format("L")
+        end:    if @model.get "end_date"    then moment(@model.get("end_date")).format("L")    else moment(@current).add(1, 'year').subtract(1, 'day').format("L")
       
       @render()
-
+      
       # @el = "form.lease-form"
       # @$el = $("#content form.lease-form")
       @$unitSelect = @$('.unit-select')
-      
+          
       @$startDate = @$('.start-date')
       @$endDate = @$('.end-date')
       $('.datepicker').datepicker()
-      
+          
       @units.bind "add", @addToSelect
       @units.bind "reset", @addAll
       @units.fetch()
 
     addToSelect : (u) =>
       HTML = "<option value='#{u.id}'" + (if @model.get("unit") and @model.get("unit").id == u.id then "selected='selected'" else "") + ">#{u.get('title')}</option>"
-      @$unitSelect.children(':last').before HTML
+      @$unitSelect.children(':first').after HTML
+      # @$unitSelect.children(':last').before HTML
 
     addAll : =>
       if @$unitSelect.children().length > 2
@@ -114,7 +112,7 @@ define [
         data.lease[attr] = Number data.lease[attr] if data.lease[attr] and isNaN data.lease[attr]
 
       _.each ['start_date', 'end_date'], (attr) ->
-        data.lease[attr] = moment(data.lease[attr], i18nCommon.dates.datepicker_format).toDate() unless data.lease[attr] is ''
+        data.lease[attr] = moment(data.lease[attr], i18nCommon.dates.moment_format).toDate() unless data.lease[attr] is ''
         data.lease[attr] = new Date if typeof data.lease[attr] is 'string'
       
       _.each ['checks_received', 'first_month_paid', 'last_month_paid'], (attr) ->
@@ -169,17 +167,16 @@ define [
       @$startDate.val moment(@current).month(6).format("L")
       @$endDate.val moment(@current).month(6).add(1, 'year').subtract(1, 'day').format("L")
 
-    render : ->
+    render: ->
       vars = _.merge(
         lease: @model
         dates: @dates
-        cancel_path: "/properties/#{@property.id}"
-        units: @units
+        cancel_path: if @model.isNew() then "/properties/#{@property.id}" else "/properties/#{@property.id}/leases/#{@model.id}"
+        # units: @units
         moment: moment
         i18nCommon: i18nCommon
         i18nUnit: i18nUnit
         i18nLease: i18nLease
       )
       vars.unit = if @model.get "unit" then @model.get "unit" else false
-      @$el.html JST["src/js/templates/lease/new.jst"](vars)
-      @
+      @$el.html JST["src/js/templates/lease/#{if @model.isNew() then 'new' else 'edit'}.jst"](vars)

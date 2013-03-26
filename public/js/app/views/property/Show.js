@@ -2,7 +2,7 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", 'models/Property', 'views/helper/Inflection', "i18n!nls/property", "i18n!nls/common", 'templates/property/show', "templates/property/menu/show", "templates/property/menu/reports", "templates/property/menu/other", "templates/property/menu/actions"], function($, _, Parse, Property, Inflection, i18nProperty, i18nCommon) {
+  define(["jquery", "underscore", "backbone", 'models/Property', "i18n!nls/property", "i18n!nls/common", "underscore.inflection", 'templates/property/show', "templates/property/menu/show", "templates/property/menu/reports", "templates/property/menu/other", "templates/property/menu/actions"], function($, _, Parse, Property, i18nProperty, i18nCommon, inflection) {
     var PropertyView;
     return PropertyView = (function(_super) {
 
@@ -27,7 +27,7 @@
             property: this.model,
             subId: combo[1]
           };
-          node = Inflection.singularize[combo[0]];
+          node = inflection.singularize[combo[0]];
           subaction = combo[2] ? combo[2] : "show";
           this.subView = "views/" + node + "/" + subaction;
         } else {

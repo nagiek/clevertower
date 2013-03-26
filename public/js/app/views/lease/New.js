@@ -3,7 +3,7 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", "moment", "collections/unit/UnitList", "collections/tenant/TenantList", "models/Property", "models/Unit", "models/Lease", "models/Tenant", "views/helper/Alert", "i18n!nls/common", "i18n!nls/unit", "i18n!nls/lease", "templates/lease/new", "templates/lease/_form", "templates/helper/field/unit", "templates/helper/field/property", "templates/helper/field/tenant", "datepicker"], function($, _, Parse, moment, UnitList, TenantList, Property, Unit, Lease, Tenant, Alert, i18nCommon, i18nUnit, i18nLease) {
+  define(["jquery", "underscore", "backbone", "moment", "collections/tenant/TenantList", "models/Property", "models/Unit", "models/Lease", "models/Tenant", "views/helper/Alert", "i18n!nls/common", "i18n!nls/unit", "i18n!nls/lease", "templates/lease/new", "templates/lease/edit", "templates/lease/_form", "templates/helper/field/unit", "templates/helper/field/property", "templates/helper/field/tenant", "datepicker"], function($, _, Parse, moment, TenantList, Property, Unit, Lease, Tenant, Alert, i18nCommon, i18nUnit, i18nLease) {
     var NewLeaseView;
     return NewLeaseView = (function(_super) {
 
@@ -81,17 +81,14 @@
           _this.undelegateEvents();
           return delete _this;
         });
-        if (!this.property.units) {
-          this.units = new UnitList;
-          this.units.query = new Parse.Query(Unit);
-          this.units.query.equalTo("network", Parse.User.current().get("network"));
-        } else {
+        if (this.property) {
+          this.property.loadUnits();
           this.units = this.property.units;
         }
         this.current = new Date().setDate(1);
         this.dates = {
-          start: this.model.get("start_date") ? this.model.get("start_date") : moment(this.current).format("L"),
-          end: this.model.get("end_date") ? this.model.get("end_date") : moment(this.current).add(1, 'year').subtract(1, 'day').format("L")
+          start: this.model.get("start_date") ? moment(this.model.get("start_date")).format("L") : moment(this.current).format("L"),
+          end: this.model.get("end_date") ? moment(this.model.get("end_date")).format("L") : moment(this.current).add(1, 'year').subtract(1, 'day').format("L")
         };
         this.render();
         this.$unitSelect = this.$('.unit-select');
@@ -106,7 +103,7 @@
       NewLeaseView.prototype.addToSelect = function(u) {
         var HTML;
         HTML = ("<option value='" + u.id + "'") + (this.model.get("unit") && this.model.get("unit").id === u.id ? "selected='selected'" : "") + (">" + (u.get('title')) + "</option>");
-        return this.$unitSelect.children(':last').before(HTML);
+        return this.$unitSelect.children(':first').after(HTML);
       };
 
       NewLeaseView.prototype.addAll = function() {
@@ -131,7 +128,7 @@
         });
         _.each(['start_date', 'end_date'], function(attr) {
           if (data.lease[attr] !== '') {
-            data.lease[attr] = moment(data.lease[attr], i18nCommon.dates.datepicker_format).toDate();
+            data.lease[attr] = moment(data.lease[attr], i18nCommon.dates.moment_format).toDate();
           }
           if (typeof data.lease[attr] === 'string') {
             return data.lease[attr] = new Date;
@@ -205,16 +202,14 @@
         vars = _.merge({
           lease: this.model,
           dates: this.dates,
-          cancel_path: "/properties/" + this.property.id,
-          units: this.units,
+          cancel_path: this.model.isNew() ? "/properties/" + this.property.id : "/properties/" + this.property.id + "/leases/" + this.model.id,
           moment: moment,
           i18nCommon: i18nCommon,
           i18nUnit: i18nUnit,
           i18nLease: i18nLease
         });
         vars.unit = this.model.get("unit") ? this.model.get("unit") : false;
-        this.$el.html(JST["src/js/templates/lease/new.jst"](vars));
-        return this;
+        return this.$el.html(JST["src/js/templates/lease/" + (this.model.isNew() ? 'new' : 'edit') + ".jst"](vars));
       };
 
       return NewLeaseView;

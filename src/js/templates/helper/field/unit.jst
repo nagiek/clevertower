@@ -2,14 +2,17 @@
 <input type="hidden" name="unit[className]" value="Unit">
 <select name="unit[id]" class="span unit-select" required="<%= required %>">
   <option value=""><%= i18nCommon.form.select.select_value %></option>
-  <% units.each(function(u) { %>
-    <option value="<%= u.id %>" <% if (u.id == unit.id) { %>selected="selected"<% } %>><%= u.get("title") %></option>
-  <% }) %>
   <option value="-1"><%= i18nUnit.constants.new_unit %></option>
 </select>
 
 <input type="text" class="new-unit span1 hide" name="unit[attributes][title]" placeholder="<%= i18nCommon.form.title %>" />
 <% if (!property) { %>
+  
+  units.each(function(u) {
+    <option value="<%= u.id %>" <% if (u.id == unit.id) { %>selected="selected"<% } %>><%= u.get("title") %></option>
+  })
+  
   No property
   JST["src/js/templates/helper/field/property.jst"]({model: model, i18nCommon: i18nCommon, i18nLease: i18nLease})
 <% } %>
+

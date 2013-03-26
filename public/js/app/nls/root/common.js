@@ -43,7 +43,8 @@
       changes_saved: "Changes Saved."
     },
     dates: {
-      datepicker_format: "MM/DD/YYYY",
+      moment_format: "MM/DD/YYYY",
+      datepicker_format: "mm/dd/yyyy",
       per_month: "Per month"
     },
     status: {

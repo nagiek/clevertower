@@ -4,14 +4,15 @@ this["JST"] = this["JST"] || {};
 
 this["JST"]["src/js/templates/lease/_form.jst"] = function(obj) {
 obj || (obj = {});
-var __t, __p = '', __e = _.escape;
+var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
+function print() { __p += __j.call(arguments, '') }
 with (obj) {
 __p += '<fieldset>\n  <legend>' +
 ((__t = ( i18nCommon.form.info )) == null ? '' : __t) +
 '</legend>\n  <div class="row">\n    <div class="unit-group control-group span4">\n      <label for="lease-unit" class="control-label">' +
 ((__t = ( i18nCommon.classes.Unit )) == null ? '' : __t) +
 ' <span class="required">*</span></label>\n      <div class="controls">\n        ' +
-((__t = ( JST["src/js/templates/helper/field/unit.jst"]({units: units, unit: unit, required: true, i18nUnit: i18nUnit, i18nCommon: i18nCommon}) )) == null ? '' : __t) +
+((__t = ( JST["src/js/templates/helper/field/unit.jst"]({required: true, i18nUnit: i18nUnit, i18nCommon: i18nCommon}) )) == null ? '' : __t) +
 '\n      </div>\n    </div>\n    <div class="date-group control-group span">\n      <label for="lease-unit" class="control-label">' +
 ((__t = ( i18nLease.form.dates )) == null ? '' : __t) +
 ' <span class="required">*</span></label>\n      <div class="controls">\n        <input type="text" class="span2 start-date datepicker" name="lease[start_date]" maxlength="12" value="' +
@@ -36,11 +37,15 @@ __p += '<fieldset>\n  <legend>' +
 ((__t = ( i18nLease.dates.starting_next_month )) == null ? '' : __t) +
 '</a></small></li>\n        <li><small><a href="#" class="july-to-june">' +
 ((__t = ( i18nLease.dates.july_to_june )) == null ? '' : __t) +
-'</a></small></li>\n      </ul>\n    </div>\n  </div>\n</fieldset>\n\n<fieldset>\n  <legend>' +
+'</a></small></li>\n      </ul>\n    </div>\n  </div>\n</fieldset>\n\n';
+ if (isNew) { ;
+__p += '\n  <fieldset>\n    <legend>' +
 ((__t = ( i18nLease.form.tenants )) == null ? '' : __t) +
-'</legend>\n  ' +
+'</legend>\n    ' +
 ((__t = ( JST["src/js/templates/helper/field/tenant.jst"]({i18nCommon: i18nCommon}) )) == null ? '' : __t) +
-'\n</fieldset>\n\n<div class="row">\n  <fieldset class="span4">\n    <legend>' +
+'\n  </fieldset>\n';
+ } ;
+__p += '\n\n<div class="row">\n  <fieldset class="span4">\n    <legend>' +
 ((__t = ( i18nLease.form.rent )) == null ? '' : __t) +
 '</legend>\n    <div class="row">\n      <div class="control-group span">\n        <label for="lease-rent" class="control-label">' +
 ((__t = ( i18nLease.fields.rent )) == null ? '' : __t) +

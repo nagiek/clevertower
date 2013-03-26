@@ -3,15 +3,15 @@ define [
   "underscore"
   "backbone"
   'models/Property'
-  'views/helper/Inflection'
   "i18n!nls/property"
   "i18n!nls/common"
+  "underscore.inflection"
   'templates/property/show'
   "templates/property/menu/show"
   "templates/property/menu/reports"
   "templates/property/menu/other"
   "templates/property/menu/actions"
-], ($, _, Parse, Property, Inflection, i18nProperty, i18nCommon) ->
+], ($, _, Parse, Property, i18nProperty, i18nCommon, inflection) ->
 
   class PropertyView extends Parse.View
   
@@ -25,7 +25,7 @@ define [
         # Subnode view
         combo = attrs.action.split("/")
         @vars = property: @model, subId: combo[1]
-        node = Inflection.singularize[combo[0]]
+        node = inflection.singularize[combo[0]]
         subaction = if combo[2] then combo[2] else "show"
         @subView = "views/#{node}/#{subaction}"
       else
@@ -38,10 +38,10 @@ define [
       
       collections = 
         cover        : @model.cover('profile')
-        units        : if @model.units    then String @model.units.length                         else '0'
-        tasks        : if @model.tasks    then String @model.tasks.length                         else '0'
-        incomes      : if @model.incomes  then String @model.incomes.length                       else '0'
-        expenses     : if @model.expenses then String @model.expenses.length                      else '0'
+        units        : if @model.units    then String @model.units.length    else '0'
+        tasks        : if @model.tasks    then String @model.tasks.length    else '0'
+        incomes      : if @model.incomes  then String @model.incomes.length  else '0'
+        expenses     : if @model.expenses then String @model.expenses.length else '0'
         vacant_units : '0'
         # collection.where not defined yet
         # vacant_units : if @model.units    then String @model.units.where(occupied: false).length  else '0'

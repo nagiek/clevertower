@@ -82,9 +82,9 @@ define [
       img 
 
     loadUnits: ->
-      @units = new UnitList property: @model unless @units
+      @units = new UnitList property: @ unless @units
       @units.fetch()
       
     loadLeases: ->
-      @leases = new LeaseList property: @model unless @leases
+      @leases = new LeaseList property: @ unless @leases
       @leases.fetch()
