@@ -13,9 +13,9 @@ __p += '<div id="alert-' +
 ((__t = ( type )) == null ? '' : __t) +
 ' fade in">\n  ';
  if (dismiss) { ;
-__p += '<button type="button" class="close" data-dismiss="alert">&times;</button>';
+__p += '<button type="button" class="close pull-right" data-dismiss="alert">&times;</button>';
  } ;
-__p += '\n  ';
+__p += '\n  <div class="inline-block">\n  ';
  if (heading) { ;
 __p += '<h4 class="alert-heading">' +
 ((__t = ( heading )) == null ? '' : __t) +
@@ -33,7 +33,7 @@ __p += '<p class="buttons">' +
 ((__t = ( buttons )) == null ? '' : __t) +
 '</p>';
  } ;
-__p += '\n</div>';
+__p += '\n  </div>\n</div>';
 
 }
 return __p

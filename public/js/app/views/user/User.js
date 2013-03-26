@@ -12,24 +12,21 @@
         return UserMenuView.__super__.constructor.apply(this, arguments);
       }
 
-      UserMenuView.prototype.el = "#user-menu";
-
       UserMenuView.prototype.initialize = function() {
+        _.bindAll(this, 'render');
         return this.render();
       };
 
       UserMenuView.prototype.render = function() {
-        if (Parse.User.current()) {
-          return require(["views/user/LoggedInMenu"], function(LoggedInView) {
-            return new LoggedInView();
-          });
-        } else {
-          this.$el.html('<li id="login" class="dropdown"></li><li id="signup" class="dropdown"></li>');
-          return require(["views/user/Login", "views/user/Signup"], function(LogInView, SignUpView) {
-            new LogInView();
-            return new SignUpView();
-          });
-        }
+        var viewName,
+          _this = this;
+        console.log('re-render');
+        viewName = Parse.User.current() ? "views/user/LoggedIn" : "views/user/LoggedOut";
+        return require([viewName], function(UserView) {
+          var view;
+          view = new UserView();
+          return view.on("user:change", _this.render);
+        });
       };
 
       return UserMenuView;

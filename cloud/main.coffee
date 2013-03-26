@@ -23,6 +23,21 @@ Parse.Cloud.define "CheckForUniqueProperty", (request, response) ->
   # .when([userAddressQuery(), networkAddressQuery()])
   # .then(obj1, obj2) ->
 
+
+# Parse.Cloud.beforeSave "_User", (request, response) ->
+#   request.object.set "createdBy", request.user
+#   email = request.object.get "email"
+#   return response.error 'missing_username' if email is ''
+#   return response.error 'invalid_email' unless /^([a-zA-Z0-9_.-])+@([a-zA-Z0-9_.-])+\.([a-zA-Z])+([a-zA-Z])+/.test email
+#   # if request.object.get "password" is ''
+#   #   return response.error 'missing_password' unless request.user.id # Anonymous users must set a password
+#   #   password = ""
+#   #   possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+#   #   for [1...8]
+#   #     password += possible.charAt Math.floor(Math.random() * possible.length)
+#   #   request.object.set "password", password
+#   response.success()
+
 # Property validation
 Parse.Cloud.beforeSave "Property", (request, response) ->
   request.object.set "user", request.user

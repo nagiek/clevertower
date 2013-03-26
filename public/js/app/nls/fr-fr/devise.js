@@ -16,21 +16,20 @@
       unlock_account: "Déverrouiller mon compte"
     },
     form: {
-      structure: {
-        email: "Courriel",
-        password: "Mot de passe",
-        edit_resource: "Modifier %{resource}",
-        password_change_hint: "Laissez vide si vous ne voulez pas le changer",
-        password_current_hint: "Nous avons besoin de votre mot de passe actuel pour confirmer vos modifications",
-        cancel_account: "Annuler mon compte",
-        cancel_account_instructions: "Malheureux? %{href}",
-        new_password: "Nouveau mot de passe",
-        new_password_confirm: "Confirmer nouveau mot de passe",
-        send_instructions: "Envoyer des instructions"
-      },
-      errors: {
-        invalid_login: "Invalid email ou mot de passe. S'il vous plaît essayez de nouveau."
-      }
+      email: "Courriel",
+      password: "Mot de passe",
+      edit_resource: "Modifier %{resource}",
+      password_change_hint: "Laissez vide si vous ne voulez pas le changer",
+      password_current_hint: "Nous avons besoin de votre mot de passe actuel pour confirmer vos modifications",
+      cancel_account: "Annuler mon compte",
+      cancel_account_instructions: "Malheureux? %{href}",
+      new_password: "Nouveau mot de passe",
+      new_password_confirm: "Confirmer nouveau mot de passe",
+      send_instructions: "Envoyer des instructions"
+    },
+    errors: {
+      username_taken: "That email is in use. Have you forgotten your password?",
+      invalid_login: "Invalid email ou mot de passe. S'il vous plaît essayez de nouveau."
     },
     mailer: {
       general: {

@@ -48,7 +48,7 @@
         this.model.on('invalid', function(error) {
           _this.$el.find('.error').removeClass('error');
           new Alert({
-            event: 'lease-save',
+            event: 'model-save',
             fade: false,
             message: i18nLease.errors[error.message],
             type: 'error'
@@ -66,7 +66,7 @@
             return t.save();
           });
           new Alert({
-            event: 'units-save',
+            event: 'model-save',
             fade: true,
             message: i18nCommon.actions.changes_saved,
             type: 'success'
@@ -114,7 +114,7 @@
       };
 
       NewLeaseView.prototype.save = function(e) {
-        var data, unit,
+        var data, tenants, unit, userError,
           _this = this;
         e.preventDefault();
         data = this.$('form').serializeObject();
@@ -147,22 +147,42 @@
           }
           this.model.set("unit", unit);
         }
+        userError = false;
         if (data.emails && data.emails !== '') {
+          tenants = [];
           _.each(data.emails.split(","), function(email) {
-            return _this.model.tenants.add(new Parse.User({
+            var account;
+            account = new Parse.User({
+              username: $.trim(email),
               email: $.trim(email)
-            }));
+            });
+            if (account.isValid()) {
+              console.log('valid');
+              return tenants.push(account);
+            } else {
+              console.log('invalid');
+              return userError = account.validationError;
+            }
           });
         }
-        return this.model.save(null, {
-          success: function(model) {
-            return _this.trigger("save:success", model, _this);
-          },
-          error: function(model, error) {
-            console.log(error);
-            return _this.model.trigger("invalid", error);
-          }
-        });
+        if (userError) {
+          return new Alert({
+            event: 'model-save',
+            fade: false,
+            message: i18nLease.errors.incorrect_tenants,
+            type: 'error'
+          });
+        } else {
+          return this.model.save(null, {
+            success: function(model) {
+              _this.trigger("save:success", model, _this);
+              return _this.model.tenants.add(tenants);
+            },
+            error: function(model, error) {
+              return _this.model.trigger("invalid", error);
+            }
+          });
+        }
       };
 
       NewLeaseView.prototype.showUnitIfNew = function(e) {
@@ -202,7 +222,7 @@
         vars = _.merge({
           lease: this.model,
           dates: this.dates,
-          cancel_path: this.model.isNew() ? "/properties/" + this.property.id : "/properties/" + this.property.id + "/leases/" + this.model.id,
+          cancel_path: ("/properties/" + this.property.id) + (!this.model.isNew() ? "/leases/" + this.model.id : void 0),
           moment: moment,
           i18nCommon: i18nCommon,
           i18nUnit: i18nUnit,

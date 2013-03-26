@@ -195,30 +195,28 @@
   }
 }
 
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="url"],
+input[type="email"] {
+  &.input-tall {
+    font-size: 18px;
+    height: 44px;
+    line-height: 24px;
+    padding: 8px 16px;
+  }
+}
+
 .input-xsmall {
   width: 60px;
 }
-
-.form-text + .form-text {
-  margin-left:5px;
-}
-
 
 /* Default form fields to auto */
 input, textarea, select, .uneditable-input {
   width:auto;
 }
 
-/* throbber fix */
-html.js {
-  input.form-autocomplete {
-    background-position: 100% 7px; /* LTR */
-    background-repeat: no-repeat;
-  }
-  input.throbbing {
-    background-position: 100% -13px; /* LTR */
-  }
-}
 
 /*.field_with_errors {
   padding: 2px;
@@ -235,37 +233,8 @@ html.js {
   }
 }
 
-#error_explanation {
-  width: 450px;
-  border: 2px solid red;
-  padding: 7px;
-  padding-bottom: 0;
-  margin-bottom: 20px;
-  background-color: #f0f0f0;
-  h2 {
-    text-align: left;
-    font-weight: bold;
-    padding: 5px 5px 5px 15px;
-    font-size: 12px;
-    margin: -7px;
-    margin-bottom: 0px;
-    background-color: #c00;
-    color: #fff;
-  }
-  ul li {
-    font-size: 12px;
-    list-style: square;
-  }
-}
-
-
-
 .controls-text {
   text-align: center;
-}
-
-.form-horizontal .controls .controls {
-  margin-left:0;
 }
 
 input.span1 {
@@ -279,39 +248,16 @@ form {
   }
 }
 
-#ruumies-listings-taxonomy-region-search-form {
-  a {
-    float:left;
-    display:block;
-    margin-top:5px;
-    margin-left:5px;
-  }
-  .help-block {
-    margin-bottom:0;
-  }
-}
-
 .help-block,
 .help-inline {
   color: @grayLight; // lighten the text some for contrast
 }
-
 
 // Round the button if it is appended.
 .input-append .btn {
   -webkit-border-radius: 0 3px 3px 0;
   -moz-border-radius: 0 3px 3px 0;
   border-radius: 0 3px 3px 0;
-}
-
-/**
- * Override twitter_bootstrap.css 
- */
-.container-inline {
-  div,
-  label {
-    display: inline;
-  }
 }
 
 .form-actions {
@@ -330,160 +276,6 @@ form {
     margin-right: 20px;
     display:inline-block;
     vertical-align:middle;
-  }
-}
-
-/**
- * Dropdowns
- */
-@media (max-width: 767px) { 
-  .view-content .dropdown-menu {
-    left:auto;
-    right:0;
-  }
-}
-
-
-/**
- * Vertical Tabs
- */
-.vertical-tabs-panes {
-  padding-top:0; // Fixing a problem of vertical tabs with only inputs
-  margin-bottom:18px;
-}
-
-
-/**
- * block-user-login
- */
-#user-login {
-  a.control-group {
-    margin-top:10px;
-    display:block;
-  }
-}
-
-/**
- * Forms
- */
-/**
- * Actions
- */
-#edit-actions label,
-#edit-actions div {
-  display:inline-block;
-} 
-
-/**
- * Floorplan
- */
-.multi-unit-add-form {
-  .form-actions > .btn {
-    vertical-align:top;
-  }
-  .undo {
-    margin-left:5px;
-  }
-  .modal-footer {
-    text-align:left;
-  }
-  .form-inline .form-item {
-    vertical-align:top;
-  }
-}
-
-@media (max-width: 767px) {
-  .multi-unit-add-form {
-    // Hide as it gets too big
-    .btn-danger,
-    .cell-field_description {
-      display:none;
-    }
-    .input-append .span1,
-    .span1 {
-      width: 44px;
-    }
-  }
-}
-
-@media (max-width: 560px) {
-  .multi-unit-add-form {
-    // Hide as it gets too big
-    .cell-field_bedrooms,
-    .cell-field_bathrooms {
-      display:none;
-    }
-  }
-}
-
-@media (max-width: 480px) {
-  .multi-unit-add-form {
-    // Hide as it gets too big
-    .cell-status,
-    .cell-field_footage,
-    .cell-field_description {
-      display:none;
-    }
-    .row {
-      > div {
-        margin-bottom:18px;
-      }
-    }
-    .modal-footer {
-      .form-item-x {
-        margin-left:40px;
-      }
-      .form-item-increment {
-        margin-left:25px;
-      }
-    }
-  }
-}
-
-/**
- * Image Fieldsets
- */
-.field-type-image {
-  legend {
-    padding-top:0;
-    font-size:@baseFontSize;
-  }
-}
-
-
-/*.table {
-  tbody tr:hover td,
-  tbody tr:hover th {
-    background-color: @tableBackgroundHover;
-  }
-}*/
-
-/*#edit-insert-actions {
-  .form-item,
-  .control-group,
-  .controls,
-  label {
-    display: inline-block;
-    margin:0;
-  }
-  input {
-    margin-bottom: 0;
-  }
-}*/
-
-/**
- * Users Form
- */
-.ruumies-users-fieldset {
-  .form-type-textfield {
-    float:left;
-  }
-  .btn-group {
-    float:left;
-    margin-left:5px;
-  }
-  .row {
-    margin-left:0;
   }
 }
 
@@ -532,117 +324,6 @@ form {
       -webkit-column-gap: 0;
       column-count: 1;
       column-gap: 0;
-    }
-  }
-}
-
-
-/**
- * Unit field
- */
-.field-name-field-unit {
-  > div {
-    vertical-align:top;
-    display:inline-block;
-    margin-right:5px; /* LTR */
-  }
-}
-
-/**
- * Choose Intent
- */
-#ruumies-property-find-property-none-form {
-  #edit-options {
-    > div {
-      text-align:center;
-    }
-  }
-}
-
-/**
- * Lease Form
- */
-.node-lease-form {
-  .group-rent {
-    /*padding-top:@baseFontSize;*/
-  }
-  .field-widget-number {
-/*    margin-left:30px;*/
-  }
-  .field-name-field-rent {
-/*    padding-top:@baseLineHeight; // 2 form items down, to be in the middle of the form.*/
-  }
-  .group_info {
-    margin-bottom:@baseLineHeight;
-  }
-}
-
-/**
- * Fieldsets
- */
-fieldset {
-  .fieldset-wrapper {
-    // Bug fix to give padding to legend.
-    padding-top: 18px;
-  }
-  legend {
-    margin-bottom: 0;
-  }
-  .fieldset-description {
-    color: @grayLight;
-  }
-}
-
-.collapsible .fieldset-wrapper {
-  // Bug fix to give padding to legend.
-  // legend has 27px margin-bottom, but it doesn't work.
-  padding-top: 0;
-}
- 
-html.js .accordion-group.collapsed {
-  // Override system.base.css
-  border-bottom: 1px solid #E5E5E5;
-  border-left: 1px solid #E5E5E5;
-  border-right: 1px solid #E5E5E5;
-  height: @baseLineHeight + @baseFontSize;
-}
-
-.accordion-group {
-  > legend {
-    font-size: @baseFontSize;
-    line-height: @baseLineHeight;
-
-
-    display: block;
-    width: 100%;
-    left: -1px;
-    padding: 0;
-    position: absolute;
-/*    text-indent: 10px;*/
-/*    top: @baseFontSize;*/
-    border-bottom:0;
-    .caret {
-      margin-top: 7px;
-      margin-left: 0;
-      margin-right: 7px;
-    }
-
-  }
-  > .fieldset-wrapper {
-    margin-top: @baseLineHeight + @baseFontSize;
-  }
-  &.collapsed {
-    .caret {
-      // Adjust placement by 2px
-      margin-top: 5px;
-      margin-left: 2px;
-      margin-right: 5px;
-
-      // Adjust direction
-      border-bottom: 4px solid transparent;
-      border-top: 4px solid transparent;
-      border-left: 4px solid black;
-      border-right: 4px solid transparent;
     }
   }
 }

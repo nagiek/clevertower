@@ -1,6 +1,8 @@
 <div id="alert-<%= event %>" class="alert alert-block alert-<%= type %> fade in">
-  <% if (dismiss) { %><button type="button" class="close" data-dismiss="alert">&times;</button><% } %>
+  <% if (dismiss) { %><button type="button" class="close pull-right" data-dismiss="alert">&times;</button><% } %>
+  <div class="inline-block">
   <% if (heading) { %><h4 class="alert-heading"><%= heading %></h4><% } %>
   <% if (message) { %><p class="message"><%= message %></p><% } %>
   <% if (buttons) { %><p class="buttons"><%= buttons %></p><% } %>
+  </div>
 </div>

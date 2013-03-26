@@ -6,7 +6,7 @@
       jquery: '//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min',
       jqueryuiwidget: 'libs/jqueryui/jquery.ui.widget.min',
       underscore: '//cdnjs.cloudflare.com/ajax/libs/lodash.js/1.0.1/lodash.min',
-      backbone: "//www.parsecdn.com/js/parse-1.2.2.min",
+      backbone: "//www.parsecdn.com/js/parse-1.2.2",
       jquerymobile: '//cdnjs.cloudflare.com/ajax/libs/jquery-mobile/1.2.0/jquery.mobile.min',
       datepicker: 'libs/bootstrap/bootstrap-datepicker.min',
       serializeObject: "app/plugins/serialize_object",

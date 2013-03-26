@@ -16,7 +16,7 @@ require.config
     # jqueryui:                 'libs/jqueryui/jquery-ui-1.10.1.custom.min',                  # includes core, widget, slider, datepicker
     # underscore:               "//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min"
     underscore:               '//cdnjs.cloudflare.com/ajax/libs/lodash.js/1.0.1/lodash.min' # "libs/underscore/lodash"
-    backbone:                 "//www.parsecdn.com/js/parse-1.2.2.min"                       # "libs/backbone/parse"
+    backbone:                 "//www.parsecdn.com/js/parse-1.2.2"                       # "libs/backbone/parse"
                               
                               
                               
@@ -117,6 +117,15 @@ define "gmaps", ["async!//maps.googleapis.com/maps/api/js?v=3&sensor=false&key=A
 require ["jquery", "backbone", "routers/Desktop", "json2", "bootstrap", "serializeObject"], ($, Parse, AppRouter) ->
   
   Parse.initialize "z00OPdGYL7X4uW9soymp8n5JGBSE6k26ILN1j3Hu", "NifB9pRHfmsTDQSDA9DKxMuux03S4w2WGVdcxPHm" # JS Key
+  
+  # Extend Parse User
+  # _.extend Parse.User,
+  #   validate: (attrs = {}, options = {}) ->
+  #     console.log 'validate'
+  #     if attrs.email and attrs.email isnt ''
+  #       return {message: 'invalid_email'} unless /^([a-zA-Z0-9_.-])+@([a-zA-Z0-9_.-])+\.([a-zA-Z])+([a-zA-Z])+/.test attrs.email
+  #     false
+    
   
   # Instantiates a new Desktop Router instance
   new AppRouter()

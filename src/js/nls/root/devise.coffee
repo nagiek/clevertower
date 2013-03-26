@@ -4,6 +4,7 @@ define
     signup:                         "Sign up"
     logout:                         "Logout"
     login:                          "Login"
+    reset_password:                 "Reset password"
     forgot_your_password:           "Forgot your password?"
     missing_confirmation:           "Didn't receive confirmation instructions?"
     missing_unlock:                 "Didn't receive unlock instructions?"
@@ -13,19 +14,25 @@ define
     resend_unlock_instructions:     "Resend unlock instructions"
     unlock_account:                 "Unlock my account"
   form:
-    structure:
-      email:                        "Email"
-      password:                     "Password"
-      edit_resource:                "Edit %{resource}"
-      password_change_hint:         "Leave blank if you don't want to change it"
-      password_current_hint:        "We need your current password to confirm your changes"
-      cancel_account:               "Cancel my account"
-      cancel_account_instructions:  "Unhappy? %{href}"
-      new_password:                 "New password"
-      new_password_confirm:         "Confirm new password"
-      send_instructions:            "Send instructions"
-    errors:
-      invalid_login:                "Invalid email or password. Please try again."
+    email:                          "Email"
+    password:                       "Password"
+    edit_resource:                  "Edit %{resource}"
+    password_change_hint:           "Leave blank if you don't want to change it"
+    password_current_hint:          "We need your current password to confirm your changes"
+    cancel_account:                 "Cancel my account"
+    cancel_account_instructions:    "Unhappy? %{href}"
+    new_password:                   "New password"
+    new_password_confirm:           "Confirm new password"
+    send_instructions:              "Send instructions"
+    instructions_to_email:          "Instructions to change your password will be emailed to you."
+  messages:
+    password_reset:                 "Password has been successfully reset. We have send further instructions to your email"
+  errors:
+    username_doesnt_exist:          "We don't have that email in our system. Why not sign up?"
+    username_taken:                 "That email is in use. Have you forgotten your password?"
+    fields_missing:                 "You must enter a username and password."
+    invalid_login:                  "Invalid email or password. Please try again."
+    invalid_email_format:           "Please enter a valid email address."
   mailer:
     general:
       greeting:                     "Hello %{name}"

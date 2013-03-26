@@ -28,3 +28,51 @@ fieldset.collapsible .accordion-inner {
     margin-right: 5px;
   }
 }
+
+html.js .accordion-group.collapsed {
+  // Override system.base.css
+  border-bottom: 1px solid #E5E5E5;
+  border-left: 1px solid #E5E5E5;
+  border-right: 1px solid #E5E5E5;
+  height: @baseLineHeight + @baseFontSize;
+}
+
+.accordion-group {
+  > legend {
+    font-size: @baseFontSize;
+    line-height: @baseLineHeight;
+
+
+    display: block;
+    width: 100%;
+    left: -1px;
+    padding: 0;
+    position: absolute;
+/*    text-indent: 10px;*/
+/*    top: @baseFontSize;*/
+    border-bottom:0;
+    .caret {
+      margin-top: 7px;
+      margin-left: 0;
+      margin-right: 7px;
+    }
+
+  }
+  > .fieldset-wrapper {
+    margin-top: @baseLineHeight + @baseFontSize;
+  }
+  &.collapsed {
+    .caret {
+      // Adjust placement by 2px
+      margin-top: 5px;
+      margin-left: 2px;
+      margin-right: 5px;
+
+      // Adjust direction
+      border-bottom: 4px solid transparent;
+      border-top: 4px solid transparent;
+      border-left: 4px solid black;
+      border-right: 4px solid transparent;
+    }
+  }
+}

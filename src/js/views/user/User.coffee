@@ -4,19 +4,15 @@ define [
   "backbone"
 ], ($, _, Parse) ->
 
-  class UserMenuView extends Parse.View    
-    el: "#user-menu"
+  class UserMenuView extends Parse.View
 
     initialize: ->
+      _.bindAll this, 'render'
       @render()
-
+      
     render: ->
-      if Parse.User.current()
-        require ["views/user/LoggedInMenu"], (LoggedInView) ->
-          new LoggedInView() 
-      else
-        # Logged out menu backbone
-        @$el.html '<li id="login" class="dropdown"></li><li id="signup" class="dropdown"></li>'
-        require ["views/user/Login", "views/user/Signup"], (LogInView, SignUpView) ->
-          new LogInView()
-          new SignUpView()
+      console.log 're-render'
+      viewName = if Parse.User.current() then "views/user/LoggedIn" else "views/user/LoggedOut"
+      require [viewName], (UserView) =>
+        view = new UserView()
+        view.on "user:change", @render

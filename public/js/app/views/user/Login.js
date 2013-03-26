@@ -24,27 +24,35 @@
       };
 
       LoginView.prototype.logIn = function(e) {
-        var password, username,
-          _this = this;
-        username = this.$("#login-username").val();
-        password = this.$("#login-password").val();
-        Parse.User.logIn(username, password, {
+        var _this = this;
+        e.preventDefault();
+        this.$(".login-form button").attr("disabled", "disabled");
+        return Parse.User.logIn(this.$("#login-username").val(), {
+          password: this.$("#login-password").val()
+        }, {
           success: function(user) {
             new UserView;
-            return require(["views/network/Manage"], function(ManageNetworkView) {
-              new ManageNetworkView;
-              _this.undelegateEvents();
-              _this.remove();
-              return delete _this;
-            });
+            Parse.history.navigate("/");
+            _this.undelegateEvents();
+            _this.remove();
+            return delete _this;
           },
           error: function(user, error) {
-            _this.$(".login-form .error").html(i18nDevise.errors.invalid_login).show();
+            var msg;
+            _this.$('.username-group').addClass('error');
+            _this.$('.password-group').addClass('error');
+            msg = (function() {
+              switch (error.code) {
+                case -1:
+                  return i18nDevise.errors.fields_missing;
+                default:
+                  return i18nDevise.errors.invalid_login;
+              }
+            })();
+            _this.$(".login-form .alert-error").html(msg).show();
             return _this.$(".login-form button").removeAttr("disabled");
           }
         });
-        this.$(".login-form button").attr("disabled", "disabled");
-        return e.preventDefault();
       };
 
       LoginView.prototype.render = function() {

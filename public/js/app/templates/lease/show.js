@@ -31,7 +31,11 @@ __p += '<header class="row">\n  <hgroup class="span">\n    <h2>' +
 ((__t = ( i18nLease.actions.extend )) == null ? '' : __t) +
 '">\n      <i class="icon-repeat"></i>\n    </button>\n    <button class="btn btn-danger delete"\n            rel="tooltip"\n            data-original-title="' +
 ((__t = ( i18nCommon.actions.delete )) == null ? '' : __t) +
-'">\n      <i class="icon-trash icon-white"></i>\n    </button>\n  </div>\n</header>\n<div class="row">\n  <div class="span9">\n    ';
+'">\n      <i class="icon-trash icon-white"></i>\n    </button>\n  </div>\n</header>\n<div class="row">\n  <div class="span9">\n    <div>\n      <h3>' +
+((__t = ( i18nLease.form.tenants )) == null ? '' : __t) +
+'</h3> \n      <p class="empty">' +
+((__t = ( i18nLease.tenants.empty )) == null ? '' : __t) +
+'</p>\n      <ul class="tenants"></ul>\n    </div>\n    \n    ';
  if (rent) { ;
 __p += '\n    <div>\n      <h3>' +
 ((__t = ( i18nLease.form.payments )) == null ? '' : __t) +
@@ -45,11 +49,7 @@ __p += '<div><strong>' +
  } ;
 __p += '\n    </div>\n    ';
  } ;
-__p += '\n  </div>\n  <div class="span3">\n    <div>\n      <h3>' +
-((__t = ( i18nLease.form.tenants )) == null ? '' : __t) +
-'</h3> \n      <p class="empty">' +
-((__t = ( i18nLease.tenants.empty )) == null ? '' : __t) +
-'</p>\n      <ul class="tenants"></ul>\n    </div>\n\n    ';
+__p += '\n  </div>\n  <div class="span3">\n    ';
  if (parking_fee || parking_space || garage_remotes) { ;
 __p += '\n    <div>\n      <h3>' +
 ((__t = ( i18nLease.form.parking )) == null ? '' : __t) +

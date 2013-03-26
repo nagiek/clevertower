@@ -1,0 +1,48 @@
+<li class="dropdown">
+  <a id="lLabel" data-toggle="dropdown" href="#" role="button" class="dropdown-toggle">
+    <%= i18nDevise.actions.login %>
+  </a>
+  <div aria-labelledby="lLabel" class="dropdown-menu pull-right">
+    <form class="login-form form-inline">
+      <div class="alert alert-error" style="display:none"></div>
+      <div class="control-group username-group">
+        <label for="login-username" class="control-label element-invisible"><%= i18nDevise.form.email %>:</label>
+        <div class="controls">
+          <input type="email" name="login-username" id="login-username" class="span" size="22" placeholder="<%= i18nDevise.form.email %>">
+        </div>
+      </div>
+      <div class="control-group password-group">
+        <label for="login-password" class="control-label element-invisible"><%= i18nDevise.form.password %>:</label>
+        <div class="controls">
+          <input type="password" name="password" id="login-password" class="span" size="22" placeholder="<%= i18nDevise.form.password %>">
+        </div>
+      </div>
+      <button class="btn btn-block"><%= i18nDevise.actions.login %></button>
+      <small><a class="reset-password-modal" href="#"><%= i18nDevise.actions.forgot_your_password %></a></small>
+    </form>
+  </div>
+</li>
+<li class="dropdown">
+  <a id="sLabel" data-toggle="dropdown" href="#" role="button" class="dropdown-toggle">
+    <%= i18nDevise.actions.signup %>
+  </a>
+  <div aria-labelledby="sLabel" class="dropdown-menu pull-right">
+    <form class="signup-form form-inline">
+      <div class="alert alert-error" style="display:none"></div>
+      <div class="control-group username-group">
+        <label for="email" class="control-label element-invisible"><%= i18nDevise.form.email %>:</label>
+        <div class="controls">
+          <input type="email" name="email" id="signup-username" class="span" size="22" placeholder="<%= i18nDevise.form.email %>">
+        </div>
+      </div>
+      <div class="control-group password-group">
+        <label for="password" class="control-label element-invisible"><%= i18nDevise.form.password %>:</label>
+        <div class="controls">
+          <input type="password" name="password" id="signup-password" class="span" size="22" placeholder="<%= i18nDevise.form.password %>">
+        </div>
+      </div>
+      <button class="btn btn-block"><%= i18nDevise.actions.signup %></button>
+      <small><a class="reset-password-modal" href="#"><%= i18nDevise.actions.forgot_your_password %></a></small>
+    </form>
+  </div>
+</li>

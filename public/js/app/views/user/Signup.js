@@ -27,28 +27,47 @@
       };
 
       SignupView.prototype.signUp = function(e) {
-        var password, username,
+        var user,
           _this = this;
-        username = this.$("#signup-username").val();
-        password = this.$("#signup-password").val();
-        Parse.User.signUp(username, password, {
-          ACL: new Parse.ACL(),
+        e.preventDefault();
+        this.$(".signup-form button").attr("disabled", "disabled");
+        user = new Parse.User({
+          username: this.$("#signup-username").val(),
+          password: this.$("#signup-password").val()
+        });
+        return user.signUp(null, {
           success: function(user) {
             new UserView;
-            return require(["views/network/Manage"], function(ManageNetworkView) {
-              new ManageNetworkView;
-              _this.undelegateEvents();
-              _this.remove();
-              return delete _this;
-            });
+            Parse.history.navigate("/");
+            _this.undelegateEvents();
+            _this.remove();
+            return delete _this;
           },
           error: function(user, error) {
-            self.$(".signup-form .error").html(error.message).show();
-            return this.$(".signup-form button").removeAttr("disabled");
+            var msg;
+            _this.$(".signup-form .error").removeClass('error');
+            msg = (function() {
+              switch (error.code) {
+                case 202:
+                  return i18nDevise.errors.username_taken;
+                case -1:
+                  return i18nDevise.errors.fields_missing;
+                default:
+                  return error.message;
+              }
+            })();
+            switch (error.code) {
+              case 202:
+                _this.$('.username-group').addClass('error');
+                break;
+              case -1:
+                _this.$('.username-group').addClass('error');
+                _this.$('.password-group').addClass('error');
+            }
+            _this.$(".signup-form .alert-error").html(msg).show();
+            return _this.$(".signup-form button").removeAttr("disabled");
           }
         });
-        this.$(".signup-form button").attr("disabled", "disabled");
-        return e.preventDefault();
       };
 
       SignupView.prototype.render = function() {

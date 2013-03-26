@@ -41,7 +41,7 @@ define [
             
       @model.on 'invalid', (error) =>
         @$el.find('.error').removeClass('error')
-        new Alert(event: 'lease-save', fade: false, message: i18nLease.errors[error.message], type: 'error')
+        new Alert(event: 'model-save', fade: false, message: i18nLease.errors[error.message], type: 'error')
         switch error.message
           when 'unit_missing'
             @$('.unit-group').addClass('error')
@@ -55,7 +55,7 @@ define [
           t.save()
         
         # Alert the user and move on
-        new Alert(event: 'units-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success')
+        new Alert(event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success')
         Parse.history.navigate "/properties/#{@property.id}/leases/#{model.id}"
         @remove()
         @undelegateEvents()
@@ -129,17 +129,31 @@ define [
           unit = @units.get data.unit.id
         @model.set "unit", unit
 
+      # Validate tenants (setting comes after)
+      userError = false
       if data.emails and data.emails isnt ''
-        _.each data.emails.split(","), (email) => 
-          # return @model.trigger "invalid", "incorrect_format" unless 
-          @model.tenants.add new Parse.User(email: $.trim(email))
+        # Create a temporary array to temporarily hold accounts unvalidated users.
+        tenants = []
+        _.each data.emails.split(","), (email) =>         
+          account = new Parse.User(username: $.trim(email), email: $.trim(email))
+          
+          if account.isValid()
+            console.log 'valid'
+            tenants.push account
+          else
+            console.log 'invalid'
+            userError = account.validationError
+            
 
-      @model.save null,
-        success: (model) => 
-          @trigger "save:success", model, this
-        error: (model, error) => 
-          console.log error
-          @model.trigger "invalid", error
+      if userError  
+        new Alert(event: 'model-save', fade: false, message: i18nLease.errors.incorrect_tenants, type: 'error')
+      else
+        @model.save null,
+          success: (model) => 
+            @trigger "save:success", model, this
+            @model.tenants.add tenants
+          error: (model, error) => 
+            @model.trigger "invalid", error
         
 
     showUnitIfNew : (e) =>
@@ -171,7 +185,7 @@ define [
       vars = _.merge(
         lease: @model
         dates: @dates
-        cancel_path: if @model.isNew() then "/properties/#{@property.id}" else "/properties/#{@property.id}/leases/#{@model.id}"
+        cancel_path: "/properties/#{@property.id}" + unless @model.isNew() then "/leases/#{@model.id}"
         # units: @units
         moment: moment
         i18nCommon: i18nCommon

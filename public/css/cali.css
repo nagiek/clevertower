@@ -8225,6 +8225,43 @@ fieldset.collapsible .accordion-inner {
 fieldset.collapsible .accordion-inner .form-item {
   margin-right: 5px;
 }
+html.js .accordion-group.collapsed {
+  border-bottom: 1px solid #E5E5E5;
+  border-left: 1px solid #E5E5E5;
+  border-right: 1px solid #E5E5E5;
+  height: 31px;
+}
+.accordion-group > legend {
+  font-size: 13px;
+  line-height: 18px;
+  display: block;
+  width: 100%;
+  left: -1px;
+  padding: 0;
+  position: absolute;
+  /*    text-indent: 10px;*/
+
+  /*    top: @baseFontSize;*/
+
+  border-bottom: 0;
+}
+.accordion-group > legend .caret {
+  margin-top: 7px;
+  margin-left: 0;
+  margin-right: 7px;
+}
+.accordion-group > .fieldset-wrapper {
+  margin-top: 31px;
+}
+.accordion-group.collapsed .caret {
+  margin-top: 5px;
+  margin-left: 2px;
+  margin-right: 5px;
+  border-bottom: 4px solid transparent;
+  border-top: 4px solid transparent;
+  border-left: 4px solid black;
+  border-right: 4px solid transparent;
+}
 /**
  * @file
  * Block Styling
@@ -8718,11 +8755,18 @@ td.btn-group > .btn {
 .navbar-search .control-group {
   margin-bottom: 0px;
 }
+input[type="text"].input-tall,
+input[type="number"].input-tall,
+input[type="date"].input-tall,
+input[type="url"].input-tall,
+input[type="email"].input-tall {
+  font-size: 18px;
+  height: 44px;
+  line-height: 24px;
+  padding: 8px 16px;
+}
 .input-xsmall {
   width: 60px;
-}
-.form-text + .form-text {
-  margin-left: 5px;
 }
 /* Default form fields to auto */
 input,
@@ -8730,18 +8774,6 @@ textarea,
 select,
 .uneditable-input {
   width: auto;
-}
-/* throbber fix */
-html.js input.form-autocomplete {
-  background-position: 100% 7px;
-  /* LTR */
-
-  background-repeat: no-repeat;
-}
-html.js input.throbbing {
-  background-position: 100% -13px;
-  /* LTR */
-
 }
 /*.field_with_errors {
   padding: 2px;
@@ -8757,33 +8789,8 @@ html.js input.throbbing {
 .error input.btn {
   color: #ffffff;
 }
-#error_explanation {
-  width: 450px;
-  border: 2px solid red;
-  padding: 7px;
-  padding-bottom: 0;
-  margin-bottom: 20px;
-  background-color: #f0f0f0;
-}
-#error_explanation h2 {
-  text-align: left;
-  font-weight: bold;
-  padding: 5px 5px 5px 15px;
-  font-size: 12px;
-  margin: -7px;
-  margin-bottom: 0px;
-  background-color: #c00;
-  color: #fff;
-}
-#error_explanation ul li {
-  font-size: 12px;
-  list-style: square;
-}
 .controls-text {
   text-align: center;
-}
-.form-horizontal .controls .controls {
-  margin-left: 0;
 }
 input.span1 {
   min-width: 40px;
@@ -8791,15 +8798,6 @@ input.span1 {
 }
 form .help-block {
   margin-top: 0;
-}
-#ruumies-listings-taxonomy-region-search-form a {
-  float: left;
-  display: block;
-  margin-top: 5px;
-  margin-left: 5px;
-}
-#ruumies-listings-taxonomy-region-search-form .help-block {
-  margin-bottom: 0;
 }
 .help-block,
 .help-inline {
@@ -8809,13 +8807,6 @@ form .help-block {
   -webkit-border-radius: 0 3px 3px 0;
   -moz-border-radius: 0 3px 3px 0;
   border-radius: 0 3px 3px 0;
-}
-/**
- * Override twitter_bootstrap.css 
- */
-.container-inline div,
-.container-inline label {
-  display: inline;
 }
 .form-actions .btn-group .btn + .btn {
   margin-left: -1px;
@@ -8830,124 +8821,6 @@ form .help-block {
   margin-right: 20px;
   display: inline-block;
   vertical-align: middle;
-}
-/**
- * Dropdowns
- */
-@media (max-width: 767px) {
-  .view-content .dropdown-menu {
-    left: auto;
-    right: 0;
-  }
-}
-/**
- * Vertical Tabs
- */
-.vertical-tabs-panes {
-  padding-top: 0;
-  margin-bottom: 18px;
-}
-/**
- * block-user-login
- */
-#user-login a.control-group {
-  margin-top: 10px;
-  display: block;
-}
-/**
- * Forms
- */
-/**
- * Actions
- */
-#edit-actions label,
-#edit-actions div {
-  display: inline-block;
-}
-/**
- * Floorplan
- */
-.multi-unit-add-form .form-actions > .btn {
-  vertical-align: top;
-}
-.multi-unit-add-form .undo {
-  margin-left: 5px;
-}
-.multi-unit-add-form .modal-footer {
-  text-align: left;
-}
-.multi-unit-add-form .form-inline .form-item {
-  vertical-align: top;
-}
-@media (max-width: 767px) {
-  .multi-unit-add-form .btn-danger,
-  .multi-unit-add-form .cell-field_description {
-    display: none;
-  }
-  .multi-unit-add-form .input-append .span1,
-  .multi-unit-add-form .span1 {
-    width: 44px;
-  }
-}
-@media (max-width: 560px) {
-  .multi-unit-add-form .cell-field_bedrooms,
-  .multi-unit-add-form .cell-field_bathrooms {
-    display: none;
-  }
-}
-@media (max-width: 480px) {
-  .multi-unit-add-form .cell-status,
-  .multi-unit-add-form .cell-field_footage,
-  .multi-unit-add-form .cell-field_description {
-    display: none;
-  }
-  .multi-unit-add-form .row > div {
-    margin-bottom: 18px;
-  }
-  .multi-unit-add-form .modal-footer .form-item-x {
-    margin-left: 40px;
-  }
-  .multi-unit-add-form .modal-footer .form-item-increment {
-    margin-left: 25px;
-  }
-}
-/**
- * Image Fieldsets
- */
-.field-type-image legend {
-  padding-top: 0;
-  font-size: 13px;
-}
-/*.table {
-  tbody tr:hover td,
-  tbody tr:hover th {
-    background-color: @tableBackgroundHover;
-  }
-}*/
-/*#edit-insert-actions {
-  .form-item,
-  .control-group,
-  .controls,
-  label {
-    display: inline-block;
-    margin:0;
-  }
-  input {
-    margin-bottom: 0;
-  }
-}*/
-/**
- * Users Form
- */
-.ruumies-users-fieldset .form-type-textfield {
-  float: left;
-}
-.ruumies-users-fieldset .btn-group {
-  float: left;
-  margin-left: 5px;
-}
-.ruumies-users-fieldset .row {
-  margin-left: 0;
 }
 .no-bullet {
   list-style: none;
@@ -8987,92 +8860,6 @@ form .help-block {
     column-count: 1;
     column-gap: 0;
   }
-}
-/**
- * Unit field
- */
-.field-name-field-unit > div {
-  vertical-align: top;
-  display: inline-block;
-  margin-right: 5px;
-  /* LTR */
-
-}
-/**
- * Choose Intent
- */
-#ruumies-property-find-property-none-form #edit-options > div {
-  text-align: center;
-}
-/**
- * Lease Form
- */
-.node-lease-form .group-rent {
-  /*padding-top:@baseFontSize;*/
-
-}
-.node-lease-form .field-widget-number {
-  /*    margin-left:30px;*/
-
-}
-.node-lease-form .field-name-field-rent {
-  /*    padding-top:@baseLineHeight; // 2 form items down, to be in the middle of the form.*/
-
-}
-.node-lease-form .group_info {
-  margin-bottom: 18px;
-}
-/**
- * Fieldsets
- */
-fieldset .fieldset-wrapper {
-  padding-top: 18px;
-}
-fieldset legend {
-  margin-bottom: 0;
-}
-fieldset .fieldset-description {
-  color: #999999;
-}
-.collapsible .fieldset-wrapper {
-  padding-top: 0;
-}
-html.js .accordion-group.collapsed {
-  border-bottom: 1px solid #E5E5E5;
-  border-left: 1px solid #E5E5E5;
-  border-right: 1px solid #E5E5E5;
-  height: 31px;
-}
-.accordion-group > legend {
-  font-size: 13px;
-  line-height: 18px;
-  display: block;
-  width: 100%;
-  left: -1px;
-  padding: 0;
-  position: absolute;
-  /*    text-indent: 10px;*/
-
-  /*    top: @baseFontSize;*/
-
-  border-bottom: 0;
-}
-.accordion-group > legend .caret {
-  margin-top: 7px;
-  margin-left: 0;
-  margin-right: 7px;
-}
-.accordion-group > .fieldset-wrapper {
-  margin-top: 31px;
-}
-.accordion-group.collapsed .caret {
-  margin-top: 5px;
-  margin-left: 2px;
-  margin-right: 5px;
-  border-bottom: 4px solid transparent;
-  border-top: 4px solid transparent;
-  border-left: 4px solid black;
-  border-right: 4px solid transparent;
 }
 /**
  * @file
@@ -10366,6 +10153,9 @@ ul.links .field-label-inline .field-label {
 }
 #messages .alert h4 {
   display: inline;
+}
+#messages p.message {
+  margin-bottom: 0;
 }
 .alert .btn-group {
   display: inline-block;

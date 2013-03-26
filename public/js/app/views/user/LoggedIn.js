@@ -3,36 +3,35 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(["jquery", "underscore", "backbone", "i18n!nls/devise", "templates/user/logged_in_menu"], function($, _, Parse, i18nDevise) {
-    var LoggedInMenuView;
-    return LoggedInMenuView = (function(_super) {
+    var LoggedInView;
+    return LoggedInView = (function(_super) {
 
-      __extends(LoggedInMenuView, _super);
+      __extends(LoggedInView, _super);
 
-      function LoggedInMenuView() {
-        return LoggedInMenuView.__super__.constructor.apply(this, arguments);
+      function LoggedInView() {
+        return LoggedInView.__super__.constructor.apply(this, arguments);
       }
 
-      LoggedInMenuView.prototype.events = {
+      LoggedInView.prototype.events = {
         "click #logout": "logOut"
       };
 
-      LoggedInMenuView.prototype.el = "#user-menu";
+      LoggedInView.prototype.el = "#user-menu";
 
-      LoggedInMenuView.prototype.initialize = function() {
+      LoggedInView.prototype.initialize = function() {
         _.bindAll(this, "logOut");
         return this.render();
       };
 
-      LoggedInMenuView.prototype.logOut = function(e) {
-        return require(["views/app/Main"], function(AppView) {
-          Parse.User.logOut();
-          new AppView();
-          this.undelegateEvents();
-          return delete this;
-        });
+      LoggedInView.prototype.logOut = function(e) {
+        Parse.User.logOut();
+        Parse.history.navigate("/");
+        this.trigger("user:change");
+        this.undelegateEvents();
+        return delete this;
       };
 
-      LoggedInMenuView.prototype.render = function() {
+      LoggedInView.prototype.render = function() {
         this.$el.html(JST["src/js/templates/user/logged_in_menu.jst"]({
           i18nDevise: i18nDevise
         }));
@@ -40,7 +39,7 @@
         return this;
       };
 
-      return LoggedInMenuView;
+      return LoggedInView;
 
     })(Parse.View);
   });
