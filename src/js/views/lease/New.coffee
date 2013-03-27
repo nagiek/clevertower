@@ -26,22 +26,39 @@ define [
     el: '#content'
     
     events:
-      'click .save'                 : 'save'
-      'change .unit-select'         : 'showUnitIfNew'
-      # 'change .start-date'          : 'adjustEndDate'
+      'submit .lease-form'          : 'save'
       'click .starting-this-month'  : 'setThisMonth'
       'click .starting-next-month'  : 'setNextMonth'
       'click .july-to-june'         : 'setJulyJune'
+      
+      # 'change .start-date'          : 'adjustEndDate'
+      'change .unit-select'         : 'showUnitIfNew'
     
     initialize : (attrs) ->
+      
+      _.bindAll this, 'addOne', 'addAll', 'save', 'setThisMonth', 'setNextMonth', 'setJulyJune'
+      
       @model = new Lease unless @model
       @model.tenants = new TenantList unless @model.tenants
       
       @property = attrs.property
             
       @model.on 'invalid', (error) =>
-        @$el.find('.error').removeClass('error')
-        new Alert(event: 'model-save', fade: false, message: i18nLease.errors[error.message], type: 'error')
+        @$('.error').removeClass('error')
+        @$('button.save').removeProp "disabled"
+
+        msg = if error.message.indexOf(":") > 0
+          args = error.message.split ":"
+          fn = args.pop()
+          switch fn
+            when "overlapping_dates"
+              i18nLease.errors[fn]("/properties/#{@property.id}/leases/#{args[0]}")
+            else
+              i18nLease.errors[fn](args[0])
+        else 
+          i18nLease.errors[error.message]
+                  
+        new Alert(event: 'model-save', fade: false, message: msg, type: 'error')
         switch error.message
           when 'unit_missing'
             @$('.unit-group').addClass('error')
@@ -51,8 +68,7 @@ define [
       @on "save:success", (model) =>
         # Save the tenants, now that we have an ID
         @model.tenants.createQuery(model)
-        @model.tenants.each (t) ->
-          t.save()
+        @model.tenants.fetch()
         
         # Alert the user and move on
         new Alert(event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success')
@@ -85,11 +101,11 @@ define [
       @$endDate = @$('.end-date')
       $('.datepicker').datepicker()
           
-      @units.bind "add", @addToSelect
+      @units.bind "add", @addOne
       @units.bind "reset", @addAll
       @units.fetch()
 
-    addToSelect : (u) =>
+    addOne : (u) =>
       HTML = "<option value='#{u.id}'" + (if @model.get("unit") and @model.get("unit").id == u.id then "selected='selected'" else "") + ">#{u.get('title')}</option>"
       @$unitSelect.children(':first').after HTML
       # @$unitSelect.children(':last').before HTML
@@ -100,11 +116,13 @@ define [
           <option value=''>#{i18nCommon.form.select.select_value}</option>
           <option value='-1'>#{i18nUnit.constants.new_unit}</option>
         """
-      @units.each @addToSelect
+      @units.each @addOne
 
-    save : (e) =>
+    save : (e) ->
       e.preventDefault()
+      @$('button.save').prop "disabled", "disabled"
       data = @$('form').serializeObject()
+      @$('.error').removeClass('error')
       
       # Massage the Only-String data from serializeObject()
       _.each ['rent', 'keys', 'garage_remotes', 'security_deposit', 'parking_fee'], (attr) ->
@@ -118,7 +136,7 @@ define [
       _.each ['checks_received', 'first_month_paid', 'last_month_paid'], (attr) ->
         data.lease[attr] = if data.lease[attr] isnt "" then true else false
 
-      @model.set data.lease
+      attrs = data.lease
 
       # Set unit
       if data.unit and data.unit.id isnt ""
@@ -127,57 +145,49 @@ define [
           unit.set "property", @property
         else 
           unit = @units.get data.unit.id
-        @model.set "unit", unit
-
-      # Validate tenants (setting comes after)
-      userError = false
+        attrs.unit = unit
+      
+      # Validate tenants (assignment done in Cloud)
+      userValid = true
       if data.emails and data.emails isnt ''
         # Create a temporary array to temporarily hold accounts unvalidated users.
-        tenants = []
-        _.each data.emails.split(","), (email) =>         
-          account = new Parse.User(username: $.trim(email), email: $.trim(email))
-          
-          if account.isValid()
-            console.log 'valid'
-            tenants.push account
-          else
-            console.log 'invalid'
-            userError = account.validationError
-            
-
-      if userError  
-        new Alert(event: 'model-save', fade: false, message: i18nLease.errors.incorrect_tenants, type: 'error')
+        attrs.emails = []
+        _.each data.emails.split(","), (email) =>
+          email = $.trim(email)
+          # account will not be saved directly. We create one only for validation.
+          account = new Parse.User(username: email, email: email)
+          attrs.emails.push email if userValid = account.isValid()
+      
+      unless userValid
+        @$('.emails-group').addClass('error')
+        @model.trigger "invalid", {message: 'tenants_incorrect'}
       else
-        @model.save null,
-          success: (model) => 
-            @trigger "save:success", model, this
-            @model.tenants.add tenants
-          error: (model, error) => 
-            @model.trigger "invalid", error
+        @model.save attrs,
+        success: (model) => 
+          @trigger "save:success", model, this
+        error: (model, error) => 
+          @model.trigger "invalid", error
         
 
     showUnitIfNew : (e) =>
       if e.target.value is "-1" then @$('.new-unit').removeClass 'hide' else @$('.new-unit').addClass 'hide'
 
-    # adjustEndDate : (e) =>
+    # adjustEndDate : ->
     #   console.log e
     #   start = moment(e.target.value)
     #   end = moment(@$endDate.val())
     #   diff = end.diff(start, 'days')
     #   @$endDate.val start.add(diff, 'days').format("L")
 
-    setThisMonth : (e) =>
-      e.preventDefault() if e
+    setThisMonth : ->
       @$startDate.val moment(@current).format("L")
       @$endDate.val moment(@current).add(1, 'year').subtract(1, 'day').format("L")
       
-    setNextMonth : (e) =>
-      e.preventDefault() if e
+    setNextMonth : ->
       @$startDate.val moment(@current).add(1, 'month').format("L")
       @$endDate.val moment(@current).add(1, 'month').add(1, 'year').subtract(1, 'day').format("L")
       
-    setJulyJune : (e) =>
-      e.preventDefault() if e
+    setJulyJune : ->
       @$startDate.val moment(@current).month(6).format("L")
       @$endDate.val moment(@current).month(6).add(1, 'year').subtract(1, 'day').format("L")
 

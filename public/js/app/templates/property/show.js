@@ -21,13 +21,13 @@ __p += '<div class="page-header clearfix">    \n  <div class="photo photo-thumbn
 '\n          <b class="caret"></b>\n        </a>\n        ' +
 ((__t = ( JST["src/js/templates/property/menu/show.jst"]({objectId: objectId, i18nProperty: i18nProperty}) )) == null ? '' : __t) +
 '\n      </li>\n      <li class="dropdown">\n        <a href="#" class="dropdown-toggle" data-toggle="dropdown">\n          ' +
+((__t = ( i18nProperty.menu.building )) == null ? '' : __t) +
+'\n          <b class="caret"></b>\n        </a>\n        ' +
+((__t = ( JST["src/js/templates/property/menu/building.jst"]({objectId: objectId, i18nProperty: i18nProperty}) )) == null ? '' : __t) +
+'\n      </li>\n      <li class="dropdown">\n        <a href="#" class="dropdown-toggle" data-toggle="dropdown">\n          ' +
 ((__t = ( i18nProperty.menu.reports )) == null ? '' : __t) +
 '\n          <b class="caret"></b>\n        </a>\n        ' +
 ((__t = ( JST["src/js/templates/property/menu/reports.jst"]({objectId: objectId, i18nProperty: i18nProperty}) )) == null ? '' : __t) +
-'\n      </li>\n      <li class="dropdown">\n        <a href="#" class="dropdown-toggle" data-toggle="dropdown">\n          ' +
-((__t = ( i18nProperty.menu.other )) == null ? '' : __t) +
-'\n          <b class="caret"></b>\n        </a>\n        ' +
-((__t = ( JST["src/js/templates/property/menu/other.jst"]({objectId: objectId, i18nProperty: i18nProperty}) )) == null ? '' : __t) +
 '\n      </li>\n      <li class="dropdown add-dropdown">\n        <a href="#" class="btn.btn-success dropdown-toggle" data-toggle="dropdown">\n          ' +
 ((__t = ( i18nProperty.menu.actions )) == null ? '' : __t) +
 '\n          <b class="caret"></b>\n        </a>\n        ' +

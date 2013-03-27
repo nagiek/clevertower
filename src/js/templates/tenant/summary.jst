@@ -1,9 +1,9 @@
-<div class="photo template-download row fade in">
-  <img src="<%=url%>" class="img-rounded span4" width="370">
+<div class="photo span">
+  <img src="<%=url%>" class="img-rounded photo-profile" width="100">
   <div class="photo-actions hide">
-    <button class="photo-destroy btn btn-danger" title="<%= i18nCommon.actions.delete %>">
-      <i class="icon-trash icon-white"></i>
+    <button class="photo-destroy btn btn-mini" title="<%= i18nCommon.actions.delete %>">
+      <strong>&times;</strong>
     </button>
-    <!-- <input type="checkbox" name="delete" value="1"> -->
+    <a href="/users/<%= objectId %>"><%= first_name %> <%= last_name %></a>
   </div>
 </div>

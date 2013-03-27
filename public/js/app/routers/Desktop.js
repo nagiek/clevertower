@@ -71,6 +71,7 @@
       DesktopRouter.prototype.propertiesShow = function(id, action) {
         var combo, params,
           _this = this;
+        console.log('propertiesShow');
         action || (action = 'units');
         if (action.indexOf("?") > 0) {
           combo = action.split("?");

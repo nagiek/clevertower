@@ -32,7 +32,7 @@
       PropertySummaryView.prototype.render = function() {
         var vars;
         vars = _.merge(this.model.toJSON(), {
-          unitsLength: this.model.unitsLength != null ? this.model.unitsLength : 0,
+          unitsLength: this.model.unitsLength ? this.model.unitsLength : 0,
           i18nProperty: i18nProperty,
           i18nCommon: i18nCommon
         });

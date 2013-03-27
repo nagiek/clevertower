@@ -75,5 +75,16 @@ img[class*="span"] {
 }
 
 @media (max-width: 480px) {
+  .photo-elastic {
+    height:80px;
+    width:100%;
+    img {
+      max-height:none;
+      width: 100%;
+    }
+  }
+}
+
+@media (max-width: 480px) {
   .elastic-float    { margin-left: auto; padding-left: @profileImgPadding; }
 }

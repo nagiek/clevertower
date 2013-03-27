@@ -9,7 +9,7 @@ with (obj) {
 __p += '<ul class="dropdown-menu">\n  <li><a href="/properties/' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '">' +
-((__t = ( i18nProperty.menu.building )) == null ? '' : __t) +
+((__t = ( i18nProperty.menu.dashboard )) == null ? '' : __t) +
 '</a></li>\n  <li><a href="/properties/' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '/tenants">' +

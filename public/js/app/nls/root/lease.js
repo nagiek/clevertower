@@ -35,8 +35,9 @@
       unit_missing: "You must enter a unit",
       dates_missing: "You must enter a start and end date",
       dates_incorrect: "The start date cannot be after the end date",
-      existing_lease: function(lease_url, unit_url, unit) {
-        return "There is <a href='" + (_.escape(lease_url)) + "'>another lease</a> on <a href='" + (_.escape(unit_url)) + "'>unit " + (_.escape(unit)) + "</a> for those dates.";
+      tenants_incorrect: "You did not enter a valid email",
+      overlapping_dates: function(lease_url) {
+        return "There is <a href='" + (_.escape(lease_url)) + "'>another lease</a> on that unit which conflicts with these dates.";
       },
       existing_payments: 'Payments have already been paid past the end date. Adjust the payment schedule to make this change.',
       insufficient_time: function(paid_incomes_count, months) {

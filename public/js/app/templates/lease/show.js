@@ -35,7 +35,7 @@ __p += '<header class="row">\n  <hgroup class="span">\n    <h2>' +
 ((__t = ( i18nLease.form.tenants )) == null ? '' : __t) +
 '</h3> \n      <p class="empty">' +
 ((__t = ( i18nLease.tenants.empty )) == null ? '' : __t) +
-'</p>\n      <ul class="tenants"></ul>\n    </div>\n    \n    ';
+'</p>\n      <ul class="row no-bullet tenants"></ul>\n    </div>\n    \n    ';
  if (rent) { ;
 __p += '\n    <div>\n      <h3>' +
 ((__t = ( i18nLease.form.payments )) == null ? '' : __t) +

@@ -15,6 +15,7 @@
       Tenant: "Tenant",
       unit: "unit",
       units: "units",
+      Units: "Units",
       tasks: "tasks",
       finances: "finances"
     },
@@ -45,7 +46,8 @@
     dates: {
       moment_format: "MM/DD/YYYY",
       datepicker_format: "mm/dd/yyyy",
-      per_month: "Per month"
+      per_month: "Per month",
+      date: "Date"
     },
     status: {
       unsaved: "Unsaved",
@@ -64,7 +66,8 @@
       link: "link"
     },
     adjectives: {
-      unsaved: "Unsaved"
+      unsaved: "Unsaved",
+      all: "All"
     },
     form: {
       title: "Title",

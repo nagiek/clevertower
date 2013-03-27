@@ -10,34 +10,27 @@
       __extends(NewLeaseView, _super);
 
       function NewLeaseView() {
-        this.setJulyJune = __bind(this.setJulyJune, this);
-
-        this.setNextMonth = __bind(this.setNextMonth, this);
-
-        this.setThisMonth = __bind(this.setThisMonth, this);
-
         this.showUnitIfNew = __bind(this.showUnitIfNew, this);
-
-        this.save = __bind(this.save, this);
 
         this.addAll = __bind(this.addAll, this);
 
-        this.addToSelect = __bind(this.addToSelect, this);
+        this.addOne = __bind(this.addOne, this);
         return NewLeaseView.__super__.constructor.apply(this, arguments);
       }
 
       NewLeaseView.prototype.el = '#content';
 
       NewLeaseView.prototype.events = {
-        'click .save': 'save',
-        'change .unit-select': 'showUnitIfNew',
+        'submit .lease-form': 'save',
         'click .starting-this-month': 'setThisMonth',
         'click .starting-next-month': 'setNextMonth',
-        'click .july-to-june': 'setJulyJune'
+        'click .july-to-june': 'setJulyJune',
+        'change .unit-select': 'showUnitIfNew'
       };
 
       NewLeaseView.prototype.initialize = function(attrs) {
         var _this = this;
+        _.bindAll(this, 'addOne', 'addAll', 'save', 'setThisMonth', 'setNextMonth', 'setJulyJune');
         if (!this.model) {
           this.model = new Lease;
         }
@@ -46,11 +39,27 @@
         }
         this.property = attrs.property;
         this.model.on('invalid', function(error) {
-          _this.$el.find('.error').removeClass('error');
+          var args, fn, msg;
+          _this.$('.error').removeClass('error');
+          _this.$('button.save').removeProp("disabled");
+          msg = (function() {
+            if (error.message.indexOf(":") > 0) {
+              args = error.message.split(":");
+              fn = args.pop();
+              switch (fn) {
+                case "overlapping_dates":
+                  return i18nLease.errors[fn]("/properties/" + this.property.id + "/leases/" + args[0]);
+                default:
+                  return i18nLease.errors[fn](args[0]);
+              }
+            } else {
+              return i18nLease.errors[error.message];
+            }
+          }).call(_this);
           new Alert({
             event: 'model-save',
             fade: false,
-            message: i18nLease.errors[error.message],
+            message: msg,
             type: 'error'
           });
           switch (error.message) {
@@ -62,9 +71,7 @@
         });
         this.on("save:success", function(model) {
           _this.model.tenants.createQuery(model);
-          _this.model.tenants.each(function(t) {
-            return t.save();
-          });
+          _this.model.tenants.fetch();
           new Alert({
             event: 'model-save',
             fade: true,
@@ -95,12 +102,12 @@
         this.$startDate = this.$('.start-date');
         this.$endDate = this.$('.end-date');
         $('.datepicker').datepicker();
-        this.units.bind("add", this.addToSelect);
+        this.units.bind("add", this.addOne);
         this.units.bind("reset", this.addAll);
         return this.units.fetch();
       };
 
-      NewLeaseView.prototype.addToSelect = function(u) {
+      NewLeaseView.prototype.addOne = function(u) {
         var HTML;
         HTML = ("<option value='" + u.id + "'") + (this.model.get("unit") && this.model.get("unit").id === u.id ? "selected='selected'" : "") + (">" + (u.get('title')) + "</option>");
         return this.$unitSelect.children(':first').after(HTML);
@@ -110,14 +117,16 @@
         if (this.$unitSelect.children().length > 2) {
           this.$unitSelect.html("<option value=''>" + i18nCommon.form.select.select_value + "</option>\n<option value='-1'>" + i18nUnit.constants.new_unit + "</option>");
         }
-        return this.units.each(this.addToSelect);
+        return this.units.each(this.addOne);
       };
 
       NewLeaseView.prototype.save = function(e) {
-        var data, tenants, unit, userError,
+        var attrs, data, unit, userValid,
           _this = this;
         e.preventDefault();
+        this.$('button.save').prop("disabled", "disabled");
         data = this.$('form').serializeObject();
+        this.$('.error').removeClass('error');
         _.each(['rent', 'keys', 'garage_remotes', 'security_deposit', 'parking_fee'], function(attr) {
           if (data.lease[attr] === '') {
             data.lease[attr] = 0;
@@ -137,7 +146,7 @@
         _.each(['checks_received', 'first_month_paid', 'last_month_paid'], function(attr) {
           return data.lease[attr] = data.lease[attr] !== "" ? true : false;
         });
-        this.model.set(data.lease);
+        attrs = data.lease;
         if (data.unit && data.unit.id !== "") {
           if (data.unit.id === "-1") {
             unit = new Unit(data.unit.attributes);
@@ -145,38 +154,32 @@
           } else {
             unit = this.units.get(data.unit.id);
           }
-          this.model.set("unit", unit);
+          attrs.unit = unit;
         }
-        userError = false;
+        userValid = true;
         if (data.emails && data.emails !== '') {
-          tenants = [];
+          attrs.emails = [];
           _.each(data.emails.split(","), function(email) {
             var account;
+            email = $.trim(email);
             account = new Parse.User({
-              username: $.trim(email),
-              email: $.trim(email)
+              username: email,
+              email: email
             });
-            if (account.isValid()) {
-              console.log('valid');
-              return tenants.push(account);
-            } else {
-              console.log('invalid');
-              return userError = account.validationError;
+            if (userValid = account.isValid()) {
+              return attrs.emails.push(email);
             }
           });
         }
-        if (userError) {
-          return new Alert({
-            event: 'model-save',
-            fade: false,
-            message: i18nLease.errors.incorrect_tenants,
-            type: 'error'
+        if (!userValid) {
+          this.$('.emails-group').addClass('error');
+          return this.model.trigger("invalid", {
+            message: 'tenants_incorrect'
           });
         } else {
-          return this.model.save(null, {
+          return this.model.save(attrs, {
             success: function(model) {
-              _this.trigger("save:success", model, _this);
-              return _this.model.tenants.add(tenants);
+              return _this.trigger("save:success", model, _this);
             },
             error: function(model, error) {
               return _this.model.trigger("invalid", error);
@@ -193,26 +196,17 @@
         }
       };
 
-      NewLeaseView.prototype.setThisMonth = function(e) {
-        if (e) {
-          e.preventDefault();
-        }
+      NewLeaseView.prototype.setThisMonth = function() {
         this.$startDate.val(moment(this.current).format("L"));
         return this.$endDate.val(moment(this.current).add(1, 'year').subtract(1, 'day').format("L"));
       };
 
-      NewLeaseView.prototype.setNextMonth = function(e) {
-        if (e) {
-          e.preventDefault();
-        }
+      NewLeaseView.prototype.setNextMonth = function() {
         this.$startDate.val(moment(this.current).add(1, 'month').format("L"));
         return this.$endDate.val(moment(this.current).add(1, 'month').add(1, 'year').subtract(1, 'day').format("L"));
       };
 
-      NewLeaseView.prototype.setJulyJune = function(e) {
-        if (e) {
-          e.preventDefault();
-        }
+      NewLeaseView.prototype.setJulyJune = function() {
         this.$startDate.val(moment(this.current).month(6).format("L"));
         return this.$endDate.val(moment(this.current).month(6).add(1, 'year').subtract(1, 'day').format("L"));
       };

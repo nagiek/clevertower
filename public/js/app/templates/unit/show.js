@@ -17,11 +17,19 @@ __p += '<header>\n  <h2>' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '/edit" class="btn">\n      ' +
 ((__t = ( i18nCommon.actions.edit )) == null ? '' : __t) +
-'\n    </a>\n    <button class="btn add-lease"\n            rel="tooltip"\n            data-original-title="' +
+'\n    </a>\n    <a  class="btn add-lease"\n        href="/properties/' +
+((__t = ( property.objectId )) == null ? '' : __t) +
+'/add/lease?unit=' +
+((__t = ( objectId )) == null ? '' : __t) +
+'"\n        rel="tooltip"\n        data-original-title="' +
 ((__t = ( i18nUnit.actions.add_lease )) == null ? '' : __t) +
-'">\n      <i class="icon-plus"></i>\n    </button>\n    <button class="btn add-task"\n            rel="tooltip"\n            data-original-title="' +
+'">\n      <i class="icon-plus"></i>\n    </a>\n    <a  class="btn add-task"\n        href="/properties/' +
+((__t = ( property.objectId )) == null ? '' : __t) +
+'/add/task?unit=' +
+((__t = ( objectId )) == null ? '' : __t) +
+'"\n        rel="tooltip"\n        data-original-title="' +
 ((__t = ( i18nUnit.actions.add_task )) == null ? '' : __t) +
-'">\n      <i class="icon-plus"></i>\n    </button>\n  </div>\n</header>\n<div class="row">\n  <div class="span9">\n    <div class="well">\n      <h2>' +
+'">\n      <i class="icon-plus"></i>\n    </a>\n  </div>\n</header>\n<div class="row">\n  <div class="span9">\n    <div class="well">\n      <h2>' +
 ((__t = ( i18nUnit.show.leases )) == null ? '' : __t) +
 '</h2>\n      <table id="leases-table" class="table">\n        <thead>\n          <tr>\n            <th>' +
 ((__t = (i18nCommon.classes.Lease)) == null ? '' : __t) +

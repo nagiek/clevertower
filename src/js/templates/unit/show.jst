@@ -4,16 +4,18 @@
     <a href="/properties/<%= property.objectId %>/units/<%= objectId %>/edit" class="btn">
       <%= i18nCommon.actions.edit %>
     </a>
-    <button class="btn add-lease"
-            rel="tooltip"
-            data-original-title="<%= i18nUnit.actions.add_lease %>">
+    <a  class="btn add-lease"
+        href="/properties/<%= property.objectId %>/add/lease?unit=<%= objectId %>"
+        rel="tooltip"
+        data-original-title="<%= i18nUnit.actions.add_lease %>">
       <i class="icon-plus"></i>
-    </button>
-    <button class="btn add-task"
-            rel="tooltip"
-            data-original-title="<%= i18nUnit.actions.add_task %>">
+    </a>
+    <a  class="btn add-task"
+        href="/properties/<%= property.objectId %>/add/task?unit=<%= objectId %>"
+        rel="tooltip"
+        data-original-title="<%= i18nUnit.actions.add_task %>">
       <i class="icon-plus"></i>
-    </button>
+    </a>
   </div>
 </header>
 <div class="row">

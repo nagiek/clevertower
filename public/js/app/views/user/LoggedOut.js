@@ -110,7 +110,6 @@
           ACL: new Parse.ACL()
         }, {
           success: function(user) {
-            console.log(user);
             _this.trigger("user:change");
             $('#reset-password-modal').remove();
             Parse.history.navigate("/");
@@ -119,8 +118,6 @@
           },
           error: function(user, error) {
             var msg;
-            console.log(user);
-            console.log(error);
             _this.$(".signup-form .error").removeClass('error');
             msg = (function() {
               switch (error.code) {

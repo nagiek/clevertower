@@ -20,7 +20,6 @@
       UserMenuView.prototype.render = function() {
         var viewName,
           _this = this;
-        console.log('re-render');
         viewName = Parse.User.current() ? "views/user/LoggedIn" : "views/user/LoggedOut";
         return require([viewName], function(UserView) {
           var view;

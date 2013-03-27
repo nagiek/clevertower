@@ -1,23 +1,30 @@
 <form id="units" method="post">
-  <h2>Listing units</h2>
+  <header>
+    <h2 class="pull-left"><%= i18nProperty.menu.dashboard %></h2>
+    <div>
+      <!-- <div class="well form-actions form-inline form-condensed pull-left">
+        <div class="control-group">
+          <div class="control-label"><%= i18nCommon.dates.date %></div>
+          <div class="controls">
+            <input id="date" type="text" class="input-small" value="<%= today %>">
+          </div>
+        </div>
+      </div> -->
   
-  <div class="well form-actions form-inline form-condensed stay-right">
-    <h4><%= i18nProperty.structure.units_control %></h4>
-  	<div class="control-group">
-  		<div class="control-label"><%= i18nCommon.actions.add_x_more %></div>
-  		<div class="controls input-append">
-  			<input id="x" type="number" size="2" maxlength="2" class="span1" value="1">
-  			<button id="add-x" class="btn btn-info"><%= i18nCommon.actions.go %></button>
-  		</div>
-  	</div>
-  	<button class="btn undo" disabled="disabled"><%= i18nCommon.actions.undo %></button>
-    <button class="save btn btn-primary"><%= i18nCommon.actions.save %></button>
-  </div>
-  
-  <ul class="nav nav-pills">
-    <li id="units-show" class="active"><a href="#"><%= i18nCommon.actions.show %></a></li>
-    <li id="units-edit"><a href="#"><%= i18nCommon.actions.edit %></a></li>
-  </ul>
+      <div class="well form-actions form-inline form-condensed pull-right">
+        <button id="units-edit" class="btn" data-toggle="button"><%= i18nUnit.actions.edit_units %></button>
+      	<div class="control-group">
+      		<div class="control-label"><%= i18nUnit.actions.add_x_units %></div>
+      		<div class="controls input-append">
+      			<input id="x" type="number" size="2" maxlength="2" class="span1" value="1">
+      			<button id="add-x" class="btn btn-info"><%= i18nCommon.actions.go %></button>
+      		</div>
+      	</div>
+      	<button class="btn undo" disabled="disabled"><%= i18nCommon.actions.undo %></button>
+        <button class="save btn btn-primary"><%= i18nCommon.actions.save %></button>
+      </div>
+    </div>
+  </header>
 
   <table id="units-table" class="table table-condensed form-condensed">
     <thead>

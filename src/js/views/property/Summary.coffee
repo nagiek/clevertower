@@ -37,7 +37,7 @@ define [
     render: ->
       vars = _.merge(
         @model.toJSON(),
-        unitsLength: if @model.unitsLength? then @model.unitsLength else 0
+        unitsLength: if @model.unitsLength then @model.unitsLength else 0
         i18nProperty: i18nProperty
         i18nCommon: i18nCommon
       )

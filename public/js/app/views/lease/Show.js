@@ -3,7 +3,7 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", "moment", 'collections/tenant/TenantList', 'models/Unit', 'models/Lease', 'views/tenant/Summary', "i18n!nls/unit", "i18n!nls/lease", "i18n!nls/common", 'templates/lease/show'], function($, _, Parse, moment, TenantList, Unit, Lease, TenantView, i18nUnit, i18nLease, i18nCommon) {
+  define(["jquery", "underscore", "backbone", "moment", 'collections/tenant/TenantList', 'models/Unit', 'models/Lease', 'models/Tenant', 'views/tenant/Summary', "i18n!nls/unit", "i18n!nls/lease", "i18n!nls/common", 'templates/lease/show'], function($, _, Parse, moment, TenantList, Unit, Lease, Tenant, TenantView, i18nUnit, i18nLease, i18nCommon) {
     var ShowLeaseView;
     return ShowLeaseView = (function(_super) {
 
@@ -22,20 +22,18 @@
         var _this = this;
         this.property = attrs.property;
         this.property.loadUnits();
-        return Parse.Promise.when([
-          new Parse.Query("Lease").include("unit").get(attrs.subId, {
-            success: function(model) {
-              _this.model = model;
-              _this.tenants = new TenantList([], {
-                lease: _this.model
-              });
-              _this.tenants.on("add", _this.addOne);
-              _this.tenants.on("reset", _this.addAll);
-              return _this.tenants.fetch();
-            }
-          })
-        ]).then(function() {
-          return _this.render();
+        return new Parse.Query("Lease").include("unit").get(attrs.subId, {
+          success: function(model) {
+            _this.model = model;
+            _this.render();
+            _this.$list = _this.$('ul.tenants');
+            _this.tenants = new TenantList([], {
+              lease: _this.model
+            });
+            _this.tenants.on("add", _this.addOne);
+            _this.tenants.on("reset", _this.addAll);
+            return _this.tenants.fetch();
+          }
         });
       };
 
@@ -60,9 +58,9 @@
 
       ShowLeaseView.prototype.addOne = function(t) {
         this.$("p.empty").text('');
-        return new TenantView({
+        return this.$list.append((new TenantView({
           model: t
-        });
+        })).render());
       };
 
       ShowLeaseView.prototype.addAll = function() {

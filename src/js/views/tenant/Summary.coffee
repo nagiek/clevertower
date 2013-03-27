@@ -5,19 +5,25 @@ define [
   'models/Lease'
   "i18n!nls/tenant"
   "i18n!nls/common"
-  'templates/tenant/current'
+  'templates/tenant/summary'
 ], ($, _, Parse, Lease, i18nTenant, i18nCommon) ->
 
   class TenantSummaryView extends Parse.View
   
     tagName: "li"
+
+    initialize: ->
+      @user = new Parse.User @model.get("user").attributes
+      @render()
   
     # Re-render the contents of the property item.
     render: ->
       vars = _.merge(
-        @model.toJSON(),
+        @user.toJSON(),
+        status: @model.get 'status'
+        url: @user.cover 'thumb'
+        objectId: @user.id
         i18nTenant: i18nTenant
         i18nCommon: i18nCommon
       )
-      $(@el).html JST["src/js/templates/tenant/current.jst"](vars)
-      @
+      JST["src/js/templates/tenant/summary.jst"](vars)

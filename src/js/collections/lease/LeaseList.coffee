@@ -11,9 +11,13 @@ define [
     model: Lease
     
     initialize: (attrs) ->
-      @property = attrs.property
       @query = new Parse.Query(Lease)
-      @query.equalTo "property", @property
+      if attrs.property
+        @property = attrs.property
+        @query.equalTo "property", @property
+      else if attrs.unit
+        @unit = attrs.unit
+        @query.equalTo "unit", @unit
 
     url:  ->
       "/properties/#{@property.get "id"}/leases"

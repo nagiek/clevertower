@@ -118,15 +118,50 @@ require ["jquery", "backbone", "routers/Desktop", "json2", "bootstrap", "seriali
   
   Parse.initialize "z00OPdGYL7X4uW9soymp8n5JGBSE6k26ILN1j3Hu", "NifB9pRHfmsTDQSDA9DKxMuux03S4w2WGVdcxPHm" # JS Key
   
-  # Extend Parse User
-  # _.extend Parse.User,
-  #   validate: (attrs = {}, options = {}) ->
-  #     console.log 'validate'
-  #     if attrs.email and attrs.email isnt ''
-  #       return {message: 'invalid_email'} unless /^([a-zA-Z0-9_.-])+@([a-zA-Z0-9_.-])+\.([a-zA-Z])+([a-zA-Z])+/.test attrs.email
-  #     false
-    
   
+  
+  # Setup
+  # Extend Parse User
+  Parse.User.prototype.defaults = 
+    first_name          : ""
+    last_name           : ""
+    # Images
+    image_thumb         : ""
+    image_profile       : ""
+    image_full          : ""
+
+  Parse.User.prototype.cover = (format) ->
+    img = @get "image_#{format}"
+    img = "/img/fallback/avatar-#{format}.png" if img is ''
+    img
+  
+  Parse.User.prototype.validate = (attrs, options) ->
+
+    # Original function
+    if _.has(attrs, "ACL") and !(attrs.ACL instanceof Parse.ACL)
+      return new Parse.Error Parse.Error.OTHER_CAUSE, "ACL must be a Parse.ACL."
+
+    # Our new validations
+    if attrs.email and attrs.email isnt ''
+      return {message: 'invalid_email'} unless /^([a-zA-Z0-9_.-])+@([a-zA-Z0-9_.-])+\.([a-zA-Z])+([a-zA-Z])+/.test attrs.email
+    false  
+  
+  Parse.User.prototype.validate = (attrs = {}, options = {}) ->
+
+    # Original function
+    if _.has(attrs, "ACL") and !(attrs.ACL instanceof Parse.ACL)
+      return new Parse.Error Parse.Error.OTHER_CAUSE, "ACL must be a Parse.ACL."
+
+    # Our new validations
+    if attrs.email and attrs.email isnt ''
+      return {message: 'invalid_email'} unless /^([a-zA-Z0-9_.-])+@([a-zA-Z0-9_.-])+\.([a-zA-Z])+([a-zA-Z])+/.test attrs.email
+    false
+
+
+
+
+
+
   # Instantiates a new Desktop Router instance
   new AppRouter()
   

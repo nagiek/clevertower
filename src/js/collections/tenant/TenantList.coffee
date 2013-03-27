@@ -16,7 +16,6 @@ define [
     createQuery: (lease) ->
       @lease = lease if lease
       if @lease and @lease.id      
-        @query = new Parse.Query(Parse.User)
-        innerQuery = new Parse.Query(Tenant)
-        innerQuery.equalTo "lease", @lease
-        @query.matchesQuery "tenant", innerQuery
+        @query = new Parse.Query(Tenant)
+        .equalTo("lease", @lease)
+        .include("user")

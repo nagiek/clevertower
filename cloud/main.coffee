@@ -7,9 +7,9 @@ Parse.Cloud.define "CheckForUniqueProperty", (request, response) ->
   (new Parse.Query("Property"))
   .equalTo("user",            request.user  )
   .withinKilometers("center", request.params.center, 0.001)
-  .first
-    success: (obj) -> if obj then response.error "#{obj.id}:taken_by_user" else response.success()
-    error: -> response.error 'bad_query'
+  .first()
+  .then (obj) -> if obj then response.error "#{obj.id}:taken_by_user" else response.success(),
+  -> response.error 'bad_query'
   
   # network = id: request.params.networkId, __type: pointer
   # (new Parse.Query("Property"))
@@ -24,19 +24,12 @@ Parse.Cloud.define "CheckForUniqueProperty", (request, response) ->
   # .then(obj1, obj2) ->
 
 
-# Parse.Cloud.beforeSave "_User", (request, response) ->
-#   request.object.set "createdBy", request.user
-#   email = request.object.get "email"
-#   return response.error 'missing_username' if email is ''
-#   return response.error 'invalid_email' unless /^([a-zA-Z0-9_.-])+@([a-zA-Z0-9_.-])+\.([a-zA-Z])+([a-zA-Z])+/.test email
-#   # if request.object.get "password" is ''
-#   #   return response.error 'missing_password' unless request.user.id # Anonymous users must set a password
-#   #   password = ""
-#   #   possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-#   #   for [1...8]
-#   #     password += possible.charAt Math.floor(Math.random() * possible.length)
-#   #   request.object.set "password", password
-#   response.success()
+Parse.Cloud.beforeSave "_User", (request, response) ->
+  request.object.set "createdBy", request.user
+  email = request.object.get "email"
+  return response.error 'missing_username' if email is ''
+  return response.error 'invalid_email' unless /^([a-zA-Z0-9_.-])+@([a-zA-Z0-9_.-])+\.([a-zA-Z])+([a-zA-Z])+/.test email
+  response.success()
 
 # Property validation
 Parse.Cloud.beforeSave "Property", (request, response) ->
@@ -114,15 +107,15 @@ Parse.Cloud.beforeSave "Unit", (request, response) ->
 
   unless request.object.existed()
     (new Parse.Query "Property").get property.objectId,
-      success: (model) ->
-      
-        request.object.set "user", request.user
-        request.object.setACL model.getACL()
-        console.log model.getACL()
-        response.success()
-      
-      error: (model, error) ->
-        response.error "bad_query"
+    success: (model) ->
+    
+      request.object.set "user", request.user
+      request.object.setACL model.getACL()
+      console.log model.getACL()
+      response.success()
+    
+    error: (model, error) ->
+      response.error "bad_query"
   else
     response.success()
 
@@ -139,59 +132,113 @@ Parse.Cloud.beforeSave "Lease", (request, response) ->
   # Check for overlapping dates
   unit_date_query = (new Parse.Query("Lease")).equalTo("unit", request.object.get "unit")
   unit_date_query.notEqualTo "id", request.object.get("unit")  if request.object.existed()
-  unit_date_query.find
-    success: (objs) -> 
-      _ = require 'underscore'
-      _.each objs, (obj) ->
-        sd = obj.get "start_date"
-        if start_date < sd and sd < end_date then response.error "#{obj.id}:overlapping_dates"
-        ed = obj.get "end_date"
-        if start_date < ed and ed < end_date then response.error "#{obj.id}:overlapping_dates"
-  
-  unless request.object.existed()
-    property = request.object.get "property"
-    (new Parse.Query "Property").get property.objectId,
-      success: (model) ->
-        
-        modelACL = model.getACL()
-        request.object.set "user", request.user
-        request.object.set "confirmed", modelACL.getReadAccess(request.user)
-        request.object.setACL modelACL
-        response.success()
+  unit_date_query.find()
+  .then (objs) -> 
+    _ = require 'underscore'
+    _.each objs, (obj) ->
+      sd = obj.get "start_date"
+      if start_date < sd and sd < end_date then return response.error "#{obj.id}:overlapping_dates"
+      ed = obj.get "end_date"
+      if start_date < ed and ed < end_date then return response.error "#{obj.id}:overlapping_dates"
       
-      error: (model, error) ->
-        response.error "bad_query"
-  else
-    response.success()
+    return response.success() if request.object.existed()
+    
+    property = request.object.get "property"
+    
+    (new Parse.Query "Property").get property.objectId,
+    success: (model) ->
+      modelACL = model.getACL()
+      request.object.set 
+        user: request.user
+        confirmed: modelACL.getReadAccess(request.user) # _.contains(role.getUsers(), request.object.get("User"))
+        
+      request.object.setACL modelACL
+      response.success()
+    error: (model, error) ->
+      response.error "bad_query"
 
 
+# Lease After Save
 Parse.Cloud.afterSave "Lease", (request) ->
+  
   # Set active lease on unit
   today       = new Date
   start_date  = request.object.get "start_date"
   end_date    = request.object.get "end_date"
   if start_date < today and today < end_date
-    unit = request.object.get "unit"
-    (new Parse.Query "Unit").get unit.objectId,
-      success: (model) ->
-        model.set "has_lease", true
-        model.set "activeLease", request.object
-        model.save()
+    (new Parse.Query "Unit").get request.object.get("unit").objectId,
+    success: (model) ->
+      model.set "has_lease", true
+      model.set "activeLease", request.object
+      model.save()
+  
+  # Check to see if we are adding people to the lease.
+  # This is the same code as in Tenant BeforeSave, but done en masse.
+  emails = request.object.get "emails"
+  if emails
+    propertyId = request.object.get("property").objectId
+    
+    # Change the status depending on who is creating the link.
+    (new Parse.Query "Role").equalTo("name", "#{propertyId}-mgr-current").first()
+    .then (property) ->
+      _ = require "underscore"
+      
+      # Status is always 'invited', as we are saving a lease with
+      # a joined tenant, instead of being a tenant trying to join.
+      status = 'invited'
+    
+      # Create the tenants.
+      _.each emails, (email) ->
+        (new Parse.Query "_User").equalTo("username", email).first()
+        .then (user) ->
+          if user
+            # User exists
+            tenant = new Parse.Object("Tenant")
+            tenant.save(lease: request.object, status: status, user: user, bypassToken: "AZeRP2WAmb")
+            
+          else
 
-# Lease validation
+            # Generate random password.
+            password = ""
+            possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+            for [1...8]
+              password += possible.charAt Math.floor(Math.random() * possible.length)
+
+            # Sign up new user.
+            Parse.User.signUp email, password, { email: email, ACL: new Parse.ACL() }, 
+            success: (user) ->
+              tenant = new Parse.Object("Tenant")
+              tenant.save(lease: request.object, status: status, user: user, bypassToken: "AZeRP2WAmb")
+      
+
+# Tenant validation
 Parse.Cloud.beforeSave "Tenant", (request, response) ->
-  unless request.object.existed()
-    (new Parse.Query "Lease").get request.object.get("lease").objectId,
-      success: (lease) ->
-        propertyId = lease.get("property").objectId
-        # Change the status depending on who is creating the link.
-        (new Parse.Query "Role").get lease.get("property").objectId + "-mgr-current",
-          success: (property) ->
-            _ = require "underscore"
-            status = if property and _.contains(role.getUsers(), request.object.get("User")) then 'invited' else 'pending'
-            request.object.set "status", status
-            response.success()    
+  return response.success() if request.object.existed() or request.object.get("bypassToken") is "AZeRP2WAmb"
 
+  (new Parse.Query "Lease").get request.object.get("lease").objectId,
+  success: (lease) ->
+    propertyId = lease.get("property").objectId
+    # Change the status depending on who is creating the link.
+    (new Parse.Query "Role").equalTo("name", "#{propertyId}-mgr-current").first()
+    .then (role) ->
+      if role
+        # Check if the user is in the role.
+        # Users are in a Parse.Relation, which requires a second query.
+        users = role.getUsers()
+        users.query().equalTo("user", request.object.get("User")).first()
+        .then (obj) ->
+          if obj      
+            status = 'invited'
+            request.object.set "status", status
+            response.success()
+          else
+            status = 'pending'
+            request.object.set "status", status
+            response.success()
+      else
+        response.error "no matching role"
+    , ->
+      response.error "bad_query"
 
 # Task validation
 Parse.Cloud.beforeSave "Task", (request, response) ->

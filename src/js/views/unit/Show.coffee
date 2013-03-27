@@ -21,12 +21,14 @@ define [
       @property = attrs.property
       @property.loadUnits()
       
-      @leases = new LeaseList(unit: @model)
-      @leases.on "reset", @addAll
-      @leases.on "add", @addOne
-      
       Parse.Promise.when([
-        new Parse.Query("Unit").get attrs.subId, success: (model) => @model = model
+        new Parse.Query("Unit").get attrs.subId, 
+        success: (model) => 
+          @model = model
+          @leases = new LeaseList(unit: @model)
+          @leases.on "reset", @addAll
+          @leases.on "add", @addOne
+          
         # new Parse.Query("Unit").relation.query().get attrs.subId, success: (model) => @model = model
         # new Parse.Query("Income").where("unit", attrs.subId)
         # new Parse.Query("Expense").where("unit", attrs.subId)
@@ -38,6 +40,9 @@ define [
 
       @model = _this.model
       @$list = _this.$list
+      
+
+      
       
     # Re-render the contents of the Unit item.
     render: ->      

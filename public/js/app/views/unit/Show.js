@@ -22,15 +22,15 @@
         var _this = this;
         this.property = attrs.property;
         this.property.loadUnits();
-        this.leases = new LeaseList({
-          unit: this.model
-        });
-        this.leases.on("reset", this.addAll);
-        this.leases.on("add", this.addOne);
         Parse.Promise.when([
           new Parse.Query("Unit").get(attrs.subId, {
             success: function(model) {
-              return _this.model = model;
+              _this.model = model;
+              _this.leases = new LeaseList({
+                unit: _this.model
+              });
+              _this.leases.on("reset", _this.addAll);
+              return _this.leases.on("add", _this.addOne);
             }
           })
         ]).then(function() {

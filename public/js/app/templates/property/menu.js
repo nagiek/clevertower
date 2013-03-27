@@ -13,17 +13,17 @@ __p += '<!-- Day-to-day -->\n<div class="btn-group">\n  <a href="#" class="btn b
 '</h4>\n  ' +
 ((__t = ( JST["src/js/templates/property/menu/show.jst"]({objectId: objectId, i18nProperty: i18nProperty}) )) == null ? '' : __t) +
 '\n</div>\n\n<div class="btn-group">\n  <a href="#" class="btn btn-small dropdown-toggle", data-toggle="dropdown" data-original-title ="' +
+((__t = ( i18nProperty.menu.other )) == null ? '' : __t) +
+'">\n    <i class="icon icon-ellipsis"></i>\n    <b class="caret"></b>\n  </a>\n  <h4 class="element-invisible">' +
+((__t = ( i18nProperty.menu.building )) == null ? '' : __t) +
+'</h4>\n  ' +
+((__t = ( JST["src/js/templates/property/menu/building.jst"]({objectId: objectId, i18nProperty: i18nProperty}) )) == null ? '' : __t) +
+'\n</div>\n\n<div class="btn-group">\n  <a href="#" class="btn btn-small dropdown-toggle", data-toggle="dropdown" data-original-title ="' +
 ((__t = ( i18nProperty.menu.v )) == null ? '' : __t) +
 '">\n    <i class="icon icon-file"></i>\n    <b class="caret"></b>\n  </a>\n  <h4 class="element-invisible">' +
 ((__t = ( i18nProperty.menu.reports )) == null ? '' : __t) +
 '</h4>\n  ' +
 ((__t = ( JST["src/js/templates/property/menu/reports.jst"]({objectId: objectId, i18nProperty: i18nProperty}) )) == null ? '' : __t) +
-'\n</div>\n\n<div class="btn-group">\n  <a href="#" class="btn btn-small dropdown-toggle", data-toggle="dropdown" data-original-title ="' +
-((__t = ( i18nProperty.menu.other )) == null ? '' : __t) +
-'">\n    <i class="icon icon-ellipsis"></i>\n    <b class="caret"></b>\n  </a>\n  <h4 class="element-invisible">' +
-((__t = ( i18nProperty.menu.other )) == null ? '' : __t) +
-'</h4>\n  ' +
-((__t = ( JST["src/js/templates/property/menu/other.jst"]({objectId: objectId, i18nProperty: i18nProperty}) )) == null ? '' : __t) +
 '\n</div>\n\n<div class="btn-group">\n  <a href="#" class="btn btn-small btn-success dropdown-toggle", data-toggle="dropdown" data-original-title ="' +
 ((__t = ( i18nProperty.menu.actions )) == null ? '' : __t) +
 '">\n    <i class="icon icon-eye icon-white"></i>\n    <b class="caret"></b>\n  </a>\n  <h4 class="element-invisible">' +

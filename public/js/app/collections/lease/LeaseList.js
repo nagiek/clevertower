@@ -16,9 +16,14 @@
       LeaseList.prototype.model = Lease;
 
       LeaseList.prototype.initialize = function(attrs) {
-        this.property = attrs.property;
         this.query = new Parse.Query(Lease);
-        return this.query.equalTo("property", this.property);
+        if (attrs.property) {
+          this.property = attrs.property;
+          return this.query.equalTo("property", this.property);
+        } else if (attrs.unit) {
+          this.unit = attrs.unit;
+          return this.query.equalTo("unit", this.unit);
+        }
       };
 
       LeaseList.prototype.url = function() {

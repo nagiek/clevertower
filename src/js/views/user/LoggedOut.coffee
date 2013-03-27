@@ -78,7 +78,6 @@ define [
       password = @$("#signup-password").val()
       Parse.User.signUp email, password, { email: email, ACL: new Parse.ACL() },
         success: (user) =>
-          console.log user
           @trigger "user:change"
           $('#reset-password-modal').remove()
           Parse.history.navigate "/"
@@ -86,8 +85,6 @@ define [
           delete this
 
         error: (user, error) =>
-          console.log user
-          console.log error
           @$(".signup-form .error").removeClass('error')
           msg = switch error.code
             when 125  then i18nDevise.errors.invalid_email_format

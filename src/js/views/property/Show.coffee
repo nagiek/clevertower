@@ -9,7 +9,7 @@ define [
   'templates/property/show'
   "templates/property/menu/show"
   "templates/property/menu/reports"
-  "templates/property/menu/other"
+  "templates/property/menu/building"
   "templates/property/menu/actions"
 ], ($, _, Parse, Property, i18nProperty, i18nCommon, inflection) ->
 

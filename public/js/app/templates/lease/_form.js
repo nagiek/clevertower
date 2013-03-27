@@ -27,11 +27,7 @@ __p += '<fieldset>\n  <legend>' +
 ((__t = ( dates.end )) == null ? '' : __t) +
 '"   data-date-format="' +
 ((__t = ( i18nCommon.dates.datepicker_format )) == null ? '' : __t) +
-'"  />\n        <p class="help-block">' +
-((__t = ( i18nCommon.prepositions.eg )) == null ? '' : __t) +
-' ' +
-((__t = ( moment().format('L') )) == null ? '' : __t) +
-'</p>\n      </div>\n    </div>\n    <div class="help-inline">\n      <ul class="unstyled">\n        <li><small><a href="#" class="starting-this-month">' +
+'"  />\n      </div>\n    </div>\n    <div class="help-inline">\n      <ul class="unstyled">\n        <li><small><a href="#" class="starting-this-month">' +
 ((__t = ( i18nLease.dates.starting_this_month )) == null ? '' : __t) +
 '</a></small></li>\n        <li><small><a href="#" class="starting-next-month">' +
 ((__t = ( i18nLease.dates.starting_next_month )) == null ? '' : __t) +

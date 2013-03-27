@@ -12,6 +12,7 @@ define
     Tenant:               "Tenant"
     unit:                 "unit"
     units:                "units"
+    Units:                "Units"
     tasks:                "tasks"
     finances:             "finances"
   actions:                
@@ -41,6 +42,7 @@ define
     moment_format:        "MM/DD/YYYY" # Convenience reference to moment().format("L")
     datepicker_format:    "mm/dd/yyyy" # Same as above, but for datepicker widget
     per_month:            "Per month"
+    date:                 "Date"
   status:
     unsaved:              "Unsaved"
     vacant:               "Vacant"
@@ -55,6 +57,7 @@ define
     link:                 "link"
   adjectives:             
     unsaved:              "Unsaved"
+    all:                  "All"
   form:                   
     title:                "Title"
     info:                 "Info"

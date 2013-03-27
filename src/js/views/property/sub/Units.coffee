@@ -12,6 +12,7 @@ define [
   "i18n!nls/unit"
   "i18n!nls/lease"
   'templates/property/sub/units'
+  'datepicker'
 ], ($, _, Parse, UnitList, Property, Unit, Alert, UnitView, i18nCommon, i18nProperty, i18nUnit, i18nLease) ->
 
   class PropertyUnitsView extends Parse.View
@@ -19,15 +20,15 @@ define [
     el: "#content"
     
     events:
-      'click #units-show a' : 'switchToShow'
-      'click #units-edit a' : 'switchToEdit'
-      'click #add-x'        : 'addX'
-      'click .undo'         : 'undo'
-      'click .save'         : 'save'
+      'click #units-edit' : 'switchView'
+      'click #add-x'      : 'addX'
+      'click .undo'       : 'undo'
+      'click .save'       : 'save'
     
     initialize: (attrs) ->
       
-      vars = _.merge(i18nProperty: i18nProperty, i18nCommon: i18nCommon, i18nUnit: i18nUnit, i18nLease: i18nLease)
+      today = moment(new Date).format('L')
+      vars = _.merge(i18nProperty: i18nProperty, i18nCommon: i18nCommon, i18nUnit: i18nUnit, i18nLease: i18nLease, today: today)
       @$el.html JST["src/js/templates/property/sub/units.jst"](vars)
       
       @editing = false
@@ -53,28 +54,16 @@ define [
     render: =>
       @$list.html ""
       @$list.html '<p class="empty">' + i18nUnit.collection.empty + '</p>' if @model.units.length is 0
-      
-    switchToShow: (e) =>
+    
+    switchView: (e) =>
       e.preventDefault()
-      return unless @editing
-      @$('ul.nav').children().removeClass('active')
-      e.currentTarget.parentNode.className = 'active'
       @$table.find('.view-specific').toggleClass('hide')
-      # @$table.find('.view-occupancy').show()
       @$actions.toggleClass('hide')
-      @editing = false
-      e
-      
-    switchToEdit: (e) =>
-      e.preventDefault()
-      return if @editing
-      @$('ul.nav').children().removeClass('active')
-      e.currentTarget.parentNode.className = 'active'
-      @$table.find('.view-specific').toggleClass('hide')
-      # @$table.find('.view-specific').show()
-      @$actions.toggleClass('hide')
-      @editing = true
-      e
+      @editing = if @editing then false else true
+
+    # switchToShow: (e) =>      
+    # switchToEdit: (e) =>
+
 
     # Add all items in the Units collection at once.
     addAll: (collection, filter) =>

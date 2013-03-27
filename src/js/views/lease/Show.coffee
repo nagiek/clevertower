@@ -6,12 +6,13 @@ define [
   'collections/tenant/TenantList'
   'models/Unit'
   'models/Lease'
+  'models/Tenant'
   'views/tenant/Summary'
   "i18n!nls/unit"
   "i18n!nls/lease"
   "i18n!nls/common"
   'templates/lease/show'
-], ($, _, Parse, moment, TenantList, Unit, Lease, TenantView, i18nUnit, i18nLease, i18nCommon) ->
+], ($, _, Parse, moment, TenantList, Unit, Lease, Tenant, TenantView, i18nUnit, i18nLease, i18nCommon) ->
 
   class ShowLeaseView extends Parse.View
   
@@ -20,26 +21,31 @@ define [
     initialize: (attrs) ->
       @property = attrs.property
       @property.loadUnits()
-      Parse.Promise.when([
-        new Parse.Query("Lease").include("unit").get attrs.subId, success: (model) => 
-          @model = model
-          @tenants = new TenantList([], lease: @model)
-          
-          @tenants.on "add",   @addOne
-          @tenants.on "reset", @addAll
-          
-          @tenants.fetch()
-          # @rel_tenants_current = @model.relation("tenants_current")
-          # @rel_tenants_current.on "add",   @addOneCurrent
-          # @rel_tenants_current.on "reset", @addAllCurrent
-          # @rel_tenants_current.query().find success: (list) => @tenants_current = list
-          
+
+      new Parse.Query("Lease").include("unit").get attrs.subId, 
+      success: (model) => 
+        @model = model
+        @render()
+
+        @$list = @$('ul.tenants')
+
+        @tenants = new TenantList([], lease: @model)
+        
+        @tenants.on "add",   @addOne
+        @tenants.on "reset", @addAll
+
+        @tenants.fetch()
+                
+
+        # @rel_tenants_current = @model.relation("tenants_current")
+        # @rel_tenants_current.on "add",   @addOneCurrent
+        # @rel_tenants_current.on "reset", @addAllCurrent
+        # @rel_tenants_current.query().find success: (list) => @tenants_current = list
+        
         # new Parse.Query("Lease").relation.query().get attrs.subId, success: (model) => @model = model
         # new Parse.Query("Income").where("lease", attrs.subId)
         # new Parse.Query("Expense").where("lease", attrs.subId)
-      ])
-      .then =>
-        @render()
+
         # @tenants_pending = _this.tenants_pending
         # @tenants_invited = _this.tenants_invited
         # @tenants_current = _this.tenants_current
@@ -66,7 +72,7 @@ define [
       
     addOne : (t) =>
       @$("p.empty").text ''
-      new TenantView model: t
+      @$list.append (new TenantView(model: t)).render()
 
     addAll : =>
       @tenants.each @addOne

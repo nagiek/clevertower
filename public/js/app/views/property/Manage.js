@@ -3,7 +3,7 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", 'collections/property/PropertyList', "models/Property", "views/property/summary", "i18n!nls/property", "i18n!nls/common", "templates/property/manage", "templates/property/menu", "templates/property/menu/show", "templates/property/menu/reports", "templates/property/menu/other", "templates/property/menu/actions"], function($, _, Parse, PropertyList, Property, PropertyView, i18nProperty, i18nCommon) {
+  define(["jquery", "underscore", "backbone", 'collections/property/PropertyList', "models/Property", "views/property/summary", "i18n!nls/property", "i18n!nls/common", "templates/property/manage", "templates/property/menu", "templates/property/menu/show", "templates/property/menu/reports", "templates/property/menu/building", "templates/property/menu/actions"], function($, _, Parse, PropertyList, Property, PropertyView, i18nProperty, i18nCommon) {
     var ManagePropertiesView;
     return ManagePropertiesView = (function(_super) {
 

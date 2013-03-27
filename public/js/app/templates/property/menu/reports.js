@@ -8,10 +8,6 @@ var __t, __p = '', __e = _.escape;
 with (obj) {
 __p += '<ul class="dropdown-menu">\n  <li><a href="/properties/' +
 ((__t = ( objectId )) == null ? '' : __t) +
-'/occupancy">' +
-((__t = ( i18nProperty.menu.occupancy )) == null ? '' : __t) +
-'</a></li>\n  <li><a href="/properties/' +
-((__t = ( objectId )) == null ? '' : __t) +
 '/income">' +
 ((__t = ( i18nProperty.menu.income )) == null ? '' : __t) +
 '</a></li>\n  <li><a href="/properties/' +

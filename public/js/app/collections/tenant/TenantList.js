@@ -21,15 +21,11 @@
       };
 
       TenantList.prototype.createQuery = function(lease) {
-        var innerQuery;
         if (lease) {
           this.lease = lease;
         }
         if (this.lease && this.lease.id) {
-          this.query = new Parse.Query(Parse.User);
-          innerQuery = new Parse.Query(Tenant);
-          innerQuery.equalTo("lease", this.lease);
-          return this.query.matchesQuery("tenant", innerQuery);
+          return this.query = new Parse.Query(Tenant).equalTo("lease", this.lease).include("user");
         }
       };
 

@@ -6,6 +6,7 @@ define
     setup_property:       "Setup Property"
     edit_picture:         "Change Picture"
   menu:                     
+    dashboard:            "Dashboard"
     day_to_day:           "Day to Day"
     reports:              "Reports"
     income:               "Income"

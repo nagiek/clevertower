@@ -59,6 +59,7 @@ define [
         managePropertiesView.$el.find('#new-property').click()
         
     propertiesShow: (id, action) ->
+      console.log 'propertiesShow'
       action ||= 'units'
 
       # Split the querystring
