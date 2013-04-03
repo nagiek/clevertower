@@ -4,7 +4,7 @@
       <img src="<%= cover %>" alt="Profile" class="img-rounded profile-picture">
     </a>
     <div class="photo-actions hide">
-      <button id="edit-profile-picture" role="button" class="btn btn-small" title="<%= i18nCommon.actions.edit %>">
+      <button role="button" class="btn btn-small edit-profile-picture" title="<%= i18nCommon.actions.edit %>">
         <i class="icon-edit"></i>
       </button>
     </div>
@@ -48,7 +48,7 @@
   </header>
 </div>
 
-<div id="content"></div>
+<div class="content"></div>
 
 <div id="edit-profile-picture-modal" class="modal form-modal hide fade">
   <form id="profile-picture-upload-form" method="POST">

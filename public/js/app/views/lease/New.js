@@ -18,7 +18,7 @@
         return NewLeaseView.__super__.constructor.apply(this, arguments);
       }
 
-      NewLeaseView.prototype.el = '#content';
+      NewLeaseView.prototype.el = '.content';
 
       NewLeaseView.prototype.events = {
         'submit .lease-form': 'save',
@@ -43,17 +43,21 @@
           _this.$('.error').removeClass('error');
           _this.$('button.save').removeProp("disabled");
           msg = (function() {
-            if (error.message.indexOf(":") > 0) {
-              args = error.message.split(":");
-              fn = args.pop();
-              switch (fn) {
-                case "overlapping_dates":
-                  return i18nLease.errors[fn]("/properties/" + this.property.id + "/leases/" + args[0]);
-                default:
-                  return i18nLease.errors[fn](args[0]);
+            if (error.message) {
+              if (error.message.indexOf(":") > 0) {
+                args = error.message.split(":");
+                fn = args.pop();
+                switch (fn) {
+                  case "overlapping_dates":
+                    return i18nLease.errors[fn]("/properties/" + this.property.id + "/leases/" + args[0]);
+                  default:
+                    return i18nLease.errors[fn](args[0]);
+                }
+              } else {
+                return i18nLease.errors[error.message];
               }
             } else {
-              return i18nLease.errors[error.message];
+              return i18nCommon.errors.unknown;
             }
           }).call(_this);
           new Alert({
@@ -216,7 +220,7 @@
         vars = _.merge({
           lease: this.model,
           dates: this.dates,
-          cancel_path: ("/properties/" + this.property.id) + (!this.model.isNew() ? "/leases/" + this.model.id : void 0),
+          cancel_path: ("/properties/" + this.property.id) + (!this.model.isNew() ? "/leases/" + this.model.id : ""),
           moment: moment,
           i18nCommon: i18nCommon,
           i18nUnit: i18nUnit,

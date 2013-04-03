@@ -9,29 +9,27 @@ define [
   "views/lease/New"
 ], ($, _, Parse, UnitList, Property, Unit, Lease, NewLeaseView, i18nCommon, i18nLease) ->
 
-# define [
-#   "models/Property"
-#   "models/Lease"
-# ], (Property, Lease) ->
-
   class AddLeaseToPropertyView extends Parse.View
 
-    el: "#content"
+    el: ".content"
   
     initialize : (attrs) ->
+      
+      @on "view:change", @clear
+      
       vars = property: @model
       if attrs.params and attrs.params.unit
         @model.loadUnits()
         # vars.unit = @model.units.get attrs.params.unit # Won't complete in time
         vars.unit = __type: "Pointer", className: "Unit", objectId: attrs.params.unit
       @lease = new Lease(vars)
-      @render()
       
     render : ->
-      form = new NewLeaseView model: @lease, property: @model
+      @form = new NewLeaseView model: @lease, property: @model
     
-    _return : ->
-      @remove()
+    clear : ->
+      delete @form.undelegateEvents()
+      delete @form
       @undelegateEvents()
       delete this
       Parse.history.navigate "/properties/#{@model.id}"

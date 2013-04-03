@@ -22,7 +22,6 @@
         square_feet: "",
         title: "",
         appliances: "",
-        has_lease: false,
         confirmed: true
       };
 

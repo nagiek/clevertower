@@ -15,61 +15,91 @@ define [
 
   class PropertyView extends Parse.View
   
-    el: "#property"
+    tagName: "div"
+    id: "property"
     
     events:
-      'click #edit-profile-picture': 'editProfilePicture'
+      'click .edit-profile-picture': 'editProfilePicture'
+      'click .nav .dropdown-menu a': 'changeSubView'
+      'click .content a': 'changeSubView'
 
     initialize: (attrs) ->
-      if attrs.action.indexOf("/") > 0 and attrs.action.indexOf("add") isnt 0
-        # Subnode view
-        combo = attrs.action.split("/")
-        @vars = property: @model, subId: combo[1]
-        node = inflection.singularize[combo[0]]
-        subaction = if combo[2] then combo[2] else "show"
-        @subView = "views/#{node}/#{subaction}"
-      else
-        # Property view
-        @vars = model: @model
-        @model.loadUnits() if attrs.action is 'add/lease'
-        @subView = "views/property/sub/#{attrs.action}"
-        
-      @vars.params = attrs.params if attrs.params
       
-      collections = 
-        cover        : @model.cover('profile')
-        units        : if @model.units    then String @model.units.length    else '0'
-        tasks        : if @model.tasks    then String @model.tasks.length    else '0'
-        incomes      : if @model.incomes  then String @model.incomes.length  else '0'
-        expenses     : if @model.expenses then String @model.expenses.length else '0'
-        vacant_units : '0'
-        # collection.where not defined yet
-        # vacant_units : if @model.units    then String @model.units.where(occupied: false).length  else '0'
-      
-      $(@el).html JST["src/js/templates/property/show.jst"](_.merge(@model.toJSON(),collections,i18nProperty: i18nProperty, i18nCommon: i18nCommon))
-      
+      # Bind this outside of events, as it is not with $el
+      $('.home').on 'click', @clear
+            
       @$form = $("#profile-picture-upload")
       
-      @model.on 'change:image_profile', (model, name) =>
-        @refresh()
-
-      @model.on 'destroy',  =>
-        @remove()
-        @undelegateEvents()
-        delete this
-
-      @render()
+      @model.on 'change:image_profile', (model, name) => @refresh
+      @model.on 'destroy',  @clear
+      
+      @changeSubView attrs.e
 
     # Re-render the contents of the property item.
     render: ->
-      require [@subView], (PropertySubView) =>
-        propertyView = new PropertySubView(@vars)
+      vars = _.merge(
+        @model.toJSON(),
+        cover: @model.cover 'profile'
+        i18nProperty: i18nProperty
+        i18nCommon: i18nCommon
+      )
+      
+      @$el.html JST["src/js/templates/property/show.jst"](vars)
       @
+
+    changeSubView: (e) =>
+      subViewName = @subViewName
+
+      url = e.currentTarget.pathname.split('?')
+
+      # Remove the leading "/" and split into urlComponents
+      urlComponents = url[0].substring(1).split("/")
+      action = if urlComponents.length > 2 then urlComponents.slice(2) else new Array('units')
+      
+      # Get the query string, if it exists.
+      if url.length > 1
+        # # remove any preceding url and split
+        querystring = url[1].split('&')
+        vars.params = {}
+        d = decodeURIComponent
+        # march and parse
+        for combo in querystring
+          pair = combo.split('=')
+          vars.params[d(pair[0])] = d(pair[1])
+      
+      if action.length > 1 and action[0] isnt "add"
+        # Subnode view
+        node = inflection.singularize[action[0]]
+        subaction = if action[2] then action[2] else "show"
+        vars = property: @model, subId: action[1]
+        @subViewName = "views/#{node}/#{subaction}"
+      else      
+        # Property view
+        @model.loadUnits() if action[0] is "add"
+        vars = model: @model
+        @subViewName = "views/property/sub/#{action.join("/")}"
+      
+      @renderSubView(vars) if @subViewName isnt subViewName
+
+    renderSubView: (vars) =>
+      if @subView
+        @subView.trigger "view:change" 
+      
+      require [@subViewName], (PropertySubView) =>
+        @subView = new PropertySubView(vars)
+        @subView.render()
+        @delegateEvents()
   
     # Re-render the contents of the property item.
     refresh: ->
       $('#preview-profile-picture img').prop('src', @model.cover('profile'))
-      
+    
+    clear: =>
+      @model.collection.trigger "close"
+      @undelegateEvents()
+      @remove()
+      delete this
+    
     editProfilePicture: ->
       
       _this = @ # Keep for below

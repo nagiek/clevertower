@@ -26,6 +26,22 @@
         return $('form#reset-password-form').on("submit", this.resetPassword);
       };
 
+      LoggedOutView.prototype.render = function() {
+        var _this = this;
+        require(["views/todo/Manage"], function(ManageTodosView) {
+          return new ManageTodosView;
+        });
+        this.$el.html(JST["src/js/templates/user/logged_out_menu.jst"]({
+          i18nDevise: i18nDevise,
+          i18nUser: i18nUser
+        }));
+        $('body').append(JST["src/js/templates/user/reset_password.jst"]({
+          i18nCommon: i18nCommon,
+          i18nDevise: i18nDevise
+        }));
+        return this;
+      };
+
       LoggedOutView.prototype.showResetPasswordModal = function(e) {
         $('#reset-password-modal').modal();
         return e.preventDefault();
@@ -143,19 +159,6 @@
             return _this.$(".signup-form button").removeAttr("disabled");
           }
         });
-      };
-
-      LoggedOutView.prototype.render = function() {
-        this.$el.html(JST["src/js/templates/user/logged_out_menu.jst"]({
-          i18nDevise: i18nDevise,
-          i18nUser: i18nUser
-        }));
-        $('body').append(JST["src/js/templates/user/reset_password.jst"]({
-          i18nCommon: i18nCommon,
-          i18nDevise: i18nDevise
-        }));
-        this.delegateEvents();
-        return this;
       };
 
       return LoggedOutView;

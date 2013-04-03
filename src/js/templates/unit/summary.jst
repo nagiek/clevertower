@@ -2,7 +2,7 @@
   <div class="view-specific view-show">
     <% if (objectId) { %>
       <a class="unit-link" href="/properties/<%= property.objectId %>/units/<%= objectId %>"><%= title %></a>
-      <% if (has_lease) { %>
+      <% if (activeLease) { %>
         | <a href="/properties/<%= property.objectId %>/leases/<%= activeLease.id %>"><%= i18nCommon.classes.lease %></a>
       <% } %>
     <% } %>
@@ -20,7 +20,7 @@
     <span class="label label-warning"><%= i18nCommon.status.unsaved %></span>
   <% } else { %>  
     <% if (confirmed) { %>
-      <% if (has_lease) { %>
+      <% if (activeLease) { %>
         <span class="label label-success"><%= i18nCommon.status.confirmed %></span>
       <% } else { %>
         <span class="label label-important"><%= i18nCommon.status.vacant %></span>
@@ -31,12 +31,12 @@
   <% } %>
 </td>
 <td class="view-specific view-show">
-  <% if (has_lease && end_date) { %>
+  <% if (activeLease && end_date) { %>
     <%= end_date %>
   <% } %>
 </td>
 <td class="view-specific view-show">
-  <% if (has_lease && activeLease.get("rent")) { %>
+  <% if (activeLease && activeLease.get("rent")) { %>
     <%= activeLease.get("rent") %>
   <% } %>
 </td>
@@ -98,7 +98,7 @@
        data-original-title="<%= i18nUnit.actions.add_task %>">
       <i class="icon-plus"></i>
     </a>
-    <% if (has_lease) { %>
+    <% if (activeLease) { %>
       <a class="btn btn-mini add-tenants"
          href="/properties/<%= property.objectId %>/leases/<%= activeLease.objectId %>/add/tenants" 
          rel="tooltip" 

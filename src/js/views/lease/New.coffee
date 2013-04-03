@@ -23,10 +23,11 @@ define [
 
   class NewLeaseView extends Parse.View
     
-    el: '#content'
+    el: '.content'
     
     events:
       'submit .lease-form'          : 'save'
+
       'click .starting-this-month'  : 'setThisMonth'
       'click .starting-next-month'  : 'setNextMonth'
       'click .july-to-june'         : 'setJulyJune'
@@ -47,16 +48,20 @@ define [
         @$('.error').removeClass('error')
         @$('button.save').removeProp "disabled"
 
-        msg = if error.message.indexOf(":") > 0
-          args = error.message.split ":"
-          fn = args.pop()
-          switch fn
-            when "overlapping_dates"
-              i18nLease.errors[fn]("/properties/#{@property.id}/leases/#{args[0]}")
-            else
-              i18nLease.errors[fn](args[0])
-        else 
-          i18nLease.errors[error.message]
+        msg = if error.message
+          if error.message.indexOf(":") > 0
+            args = error.message.split ":"
+            fn = args.pop()
+            switch fn
+              when "overlapping_dates"
+                i18nLease.errors[fn]("/properties/#{@property.id}/leases/#{args[0]}")
+              else
+                i18nLease.errors[fn](args[0])
+          else 
+            i18nLease.errors[error.message]
+        else
+          i18nCommon.errors.unknown
+            
                   
         new Alert(event: 'model-save', fade: false, message: msg, type: 'error')
         switch error.message
@@ -120,6 +125,7 @@ define [
 
     save : (e) ->
       e.preventDefault()
+      
       @$('button.save').prop "disabled", "disabled"
       data = @$('form').serializeObject()
       @$('.error').removeClass('error')
@@ -192,10 +198,11 @@ define [
       @$endDate.val moment(@current).month(6).add(1, 'year').subtract(1, 'day').format("L")
 
     render: ->
+      
       vars = _.merge(
         lease: @model
         dates: @dates
-        cancel_path: "/properties/#{@property.id}" + unless @model.isNew() then "/leases/#{@model.id}"
+        cancel_path: "/properties/#{@property.id}" + unless @model.isNew() then "/leases/#{@model.id}" else ""
         # units: @units
         moment: moment
         i18nCommon: i18nCommon

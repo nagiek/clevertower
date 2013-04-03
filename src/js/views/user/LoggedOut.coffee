@@ -27,6 +27,15 @@ define [
       $('form#reset-password-form').on "submit", @resetPassword
       
 
+
+    render: ->
+      require ["views/todo/Manage"], (ManageTodosView) =>
+        new ManageTodosView
+        
+      @$el.html JST["src/js/templates/user/logged_out_menu.jst"](i18nDevise: i18nDevise, i18nUser: i18nUser)
+      $('body').append JST["src/js/templates/user/reset_password.jst"](i18nCommon: i18nCommon, i18nDevise: i18nDevise)
+      @
+
     showResetPasswordModal: (e) ->
       $('#reset-password-modal').modal()
       e.preventDefault()
@@ -101,9 +110,3 @@ define [
 
           @$(".signup-form .alert-error").html(msg).show()
           @$(".signup-form button").removeAttr "disabled"
-
-    render: ->
-      @$el.html JST["src/js/templates/user/logged_out_menu.jst"](i18nDevise: i18nDevise, i18nUser: i18nUser)
-      $('body').append JST["src/js/templates/user/reset_password.jst"](i18nCommon: i18nCommon, i18nDevise: i18nDevise)
-      @delegateEvents()
-      @

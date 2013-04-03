@@ -20,22 +20,32 @@
 
         this.addAll = __bind(this.addAll, this);
 
-        this.switchView = __bind(this.switchView, this);
+        this.switchMode = __bind(this.switchMode, this);
+
+        this.clear = __bind(this.clear, this);
 
         this.render = __bind(this.render, this);
         return PropertyUnitsView.__super__.constructor.apply(this, arguments);
       }
 
-      PropertyUnitsView.prototype.el = "#content";
+      PropertyUnitsView.prototype.el = ".content";
 
       PropertyUnitsView.prototype.events = {
-        'click #units-edit': 'switchView',
+        'click #units-edit': 'switchMode',
         'click #add-x': 'addX',
         'click .undo': 'undo',
         'click .save': 'save'
       };
 
       PropertyUnitsView.prototype.initialize = function(attrs) {
+        this.editing = false;
+        this.on("view:change", this.clear);
+        this.model.loadUnits();
+        this.model.units.on("add", this.addOne);
+        return this.model.units.on("reset", this.addAll);
+      };
+
+      PropertyUnitsView.prototype.render = function() {
         var today, vars;
         today = moment(new Date).format('L');
         vars = _.merge({
@@ -46,26 +56,20 @@
           today: today
         });
         this.$el.html(JST["src/js/templates/property/sub/units.jst"](vars));
-        this.editing = false;
-        this.$messages = $("#messages");
         this.$table = this.$("#units-table");
         this.$list = this.$("#units-table tbody");
         this.$actions = this.$(".form-actions");
         this.$undo = this.$actions.find('.undo');
-        this.model.loadUnits();
-        this.model.units.on("add", this.addOne);
-        this.model.units.on("reset", this.addAll);
-        return this.model.units.fetch();
+        this.model.units.fetch();
+        return this;
       };
 
-      PropertyUnitsView.prototype.render = function() {
-        this.$list.html("");
-        if (this.model.units.length === 0) {
-          return this.$list.html('<p class="empty">' + i18nUnit.collection.empty + '</p>');
-        }
+      PropertyUnitsView.prototype.clear = function(e) {
+        this.undelegateEvents();
+        return delete this;
       };
 
-      PropertyUnitsView.prototype.switchView = function(e) {
+      PropertyUnitsView.prototype.switchMode = function(e) {
         e.preventDefault();
         this.$table.find('.view-specific').toggleClass('hide');
         this.$actions.toggleClass('hide');
@@ -74,8 +78,10 @@
 
       PropertyUnitsView.prototype.addAll = function(collection, filter) {
         this.$list.html('');
-        this.render();
-        return this.model.units.each(this.addOne);
+        this.model.units.each(this.addOne);
+        if (this.model.units.length === 0) {
+          return this.$list.html('<p class="empty">' + i18nUnit.collection.empty + '</p>');
+        }
       };
 
       PropertyUnitsView.prototype.addOne = function(unit) {
@@ -86,7 +92,7 @@
         });
         this.$list.append(view.render().el);
         if (this.editing) {
-          return view.$el.find('.view-specific').toggleClass('hide');
+          return view.$('.view-specific').toggleClass('hide');
         }
       };
 

@@ -13,24 +13,34 @@
         this.addAll = __bind(this.addAll, this);
 
         this.addOne = __bind(this.addOne, this);
+
+        this.clear = __bind(this.clear, this);
+
+        this.render = __bind(this.render, this);
         return PropertyPhotosView.__super__.constructor.apply(this, arguments);
       }
 
-      PropertyPhotosView.prototype.el = "#content";
+      PropertyPhotosView.prototype.el = ".content";
 
       PropertyPhotosView.prototype.initialize = function() {
         var _this;
         _this = this;
+        _.bindAll(this, 'save');
+        this.on("view:change", this.clear);
+        this.unUploadedPhotos = 0;
+        this.photos = new PhotoList;
+        this.photos.query = new Parse.Query(Photo);
+        this.photos.query.equalTo("property", this.model);
+        this.photos.bind("add", this.addOne);
+        this.photos.bind("reset", this.addAll);
         this.$el.append(JST["src/js/templates/property/sub/photos.jst"](_.merge({
           property: this.model,
           i18nProperty: i18nProperty,
           i18nCommon: i18nCommon
         })));
-        _.bindAll(this, 'save');
         this.$list = $("#photo-list");
-        this.unUploadedPhotos = 0;
         this.$fileForm = $("#fileupload");
-        this.$fileForm.fileupload({
+        return this.$fileForm.fileupload({
           autoUpload: false,
           type: "POST",
           dataType: "json",
@@ -80,12 +90,17 @@
             });
           }
         });
-        this.photos = new PhotoList;
-        this.photos.query = new Parse.Query(Photo);
-        this.photos.query.equalTo("property", this.model);
-        this.photos.bind("add", this.addOne);
-        this.photos.bind("reset", this.addAll);
-        return this.photos.fetch();
+      };
+
+      PropertyPhotosView.prototype.render = function() {
+        this.photos.fetch();
+        return this;
+      };
+
+      PropertyPhotosView.prototype.clear = function(e) {
+        this.undelegateEvents();
+        delete this.photos;
+        return delete this;
       };
 
       PropertyPhotosView.prototype.addOne = function(photo) {

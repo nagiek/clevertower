@@ -11,7 +11,10 @@ define [
   # class Property extends Parse.Object
     
     className: "Property"
-
+      
+    initialize: ->
+      _.bindAll @, "cover", "loadUnits", "loadLeases"
+          
     defaults:
       # Location
       center                        : new Parse.GeoPoint

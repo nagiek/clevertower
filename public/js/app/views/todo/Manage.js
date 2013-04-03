@@ -21,7 +21,7 @@
         "click ul#filters a": "selectFilter"
       };
 
-      ManageTodosView.prototype.el = ".content";
+      ManageTodosView.prototype.el = "#main";
 
       ManageTodosView.prototype.initialize = function() {
         var self;

@@ -17,45 +17,48 @@ define [
 
   class PropertyUnitsView extends Parse.View
   
-    el: "#content"
+    el: ".content"
     
     events:
-      'click #units-edit' : 'switchView'
+      'click #units-edit' : 'switchMode'
       'click #add-x'      : 'addX'
       'click .undo'       : 'undo'
       'click .save'       : 'save'
     
     initialize: (attrs) ->
-      
-      today = moment(new Date).format('L')
-      vars = _.merge(i18nProperty: i18nProperty, i18nCommon: i18nCommon, i18nUnit: i18nUnit, i18nLease: i18nLease, today: today)
-      @$el.html JST["src/js/templates/property/sub/units.jst"](vars)
-      
       @editing = false
       
-      @$messages  = $("#messages")
-      @$table     = @$("#units-table")
-      @$list      = @$("#units-table tbody")
-      @$actions   = @$(".form-actions")
-      @$undo      = @$actions.find('.undo')
+      @on "view:change", @clear
       
       @model.loadUnits()
 
       @model.units.on "add", @addOne
       @model.units.on "reset", @addAll
       
-      # Fetch all the property items for this user
-      @model.units.fetch()
-      
         # success: (collection, response, options) =>
         #   @model.units.add [{property: @model}] if collection.length is 0
                 
     # Re-render the contents of the property item.
     render: =>
-      @$list.html ""
-      @$list.html '<p class="empty">' + i18nUnit.collection.empty + '</p>' if @model.units.length is 0
+      today = moment(new Date).format('L')
+      vars = _.merge(i18nProperty: i18nProperty, i18nCommon: i18nCommon, i18nUnit: i18nUnit, i18nLease: i18nLease, today: today)
+
+      @$el.html JST["src/js/templates/property/sub/units.jst"](vars)      
+      
+      @$table     = @$("#units-table")
+      @$list      = @$("#units-table tbody")
+      @$actions   = @$(".form-actions")
+      @$undo      = @$actions.find('.undo')
+      
+      # Fetch all the property items for this user
+      @model.units.fetch()
+      @
     
-    switchView: (e) =>
+    clear: (e) =>
+      @undelegateEvents()
+      delete this
+    
+    switchMode: (e) =>
       e.preventDefault()
       @$table.find('.view-specific').toggleClass('hide')
       @$actions.toggleClass('hide')
@@ -68,8 +71,8 @@ define [
     # Add all items in the Units collection at once.
     addAll: (collection, filter) =>
       @$list.html ''
-      @render()
       @model.units.each @addOne
+      if @model.units.length is 0 then @$list.html '<p class="empty">' + i18nUnit.collection.empty + '</p>'
 
     # Add a single todo item to the list by creating a view for it, and
     # appending its element to the `<ul>`.
@@ -77,7 +80,7 @@ define [
       @$('p.empty').hide()
       view = new UnitView(model: unit)
       @$list.append view.render().el
-      view.$el.find('.view-specific').toggleClass('hide') if @editing
+      view.$('.view-specific').toggleClass('hide') if @editing
       
     addX: (e) =>
       e.preventDefault()

@@ -24,11 +24,13 @@
 
         this.switchToShow = __bind(this.switchToShow, this);
 
+        this.clear = __bind(this.clear, this);
+
         this.render = __bind(this.render, this);
         return PropertyLeasesView.__super__.constructor.apply(this, arguments);
       }
 
-      PropertyLeasesView.prototype.el = "#content";
+      PropertyLeasesView.prototype.el = ".content";
 
       PropertyLeasesView.prototype.events = {
         'click #leases-show a': 'switchToShow',
@@ -39,6 +41,15 @@
       };
 
       PropertyLeasesView.prototype.initialize = function(attrs) {
+        this.editing = false;
+        this.on("view:change", this.clear);
+        this.model.loadUnits();
+        this.model.loadLeases();
+        this.model.leases.on("add", this.addOne);
+        return this.model.leases.on("reset", this.addAll);
+      };
+
+      PropertyLeasesView.prototype.render = function() {
         var vars;
         vars = _.merge({
           i18nProperty: i18nProperty,
@@ -47,24 +58,17 @@
           i18nLease: i18nLease
         });
         this.$el.html(JST["src/js/templates/property/sub/leases.jst"](vars));
-        this.editing = false;
-        this.$messages = $("#messages");
         this.$table = this.$("#leases-table");
         this.$list = this.$("#leases-table tbody");
         this.$actions = this.$(".form-actions");
         this.$undo = this.$actions.find('.undo');
-        this.model.loadUnits();
-        this.model.loadLeases();
-        this.model.leases.on("add", this.addOne);
-        this.model.leases.on("reset", this.addAll);
-        return this.model.leases.fetch();
+        this.model.leases.fetch();
+        return this;
       };
 
-      PropertyLeasesView.prototype.render = function() {
-        this.$list.html("");
-        if (this.model.leases.length === 0) {
-          return this.$list.html('<p class="empty">' + i18nLease.collection.empty + '</p>');
-        }
+      PropertyLeasesView.prototype.clear = function(e) {
+        this.undelegateEvents();
+        return delete this;
       };
 
       PropertyLeasesView.prototype.switchToShow = function(e) {
@@ -95,8 +99,10 @@
 
       PropertyLeasesView.prototype.addAll = function(collection, filter) {
         this.$list.html('');
-        this.render();
-        return this.model.leases.each(this.addOne);
+        this.model.leases.each(this.addOne);
+        if (this.model.leases.length === 0) {
+          return this.$list.html('<p class="empty">' + i18nLease.collection.empty + '</p>');
+        }
       };
 
       PropertyLeasesView.prototype.addOne = function(lease) {

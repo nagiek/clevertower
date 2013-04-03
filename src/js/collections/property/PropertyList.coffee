@@ -10,5 +10,4 @@ define [
     # Reference to this collection's model.
     model: Property
 
-    url: ->
-      "/"
+    query: new Parse.Query("Property").equalTo("user", Parse.User.current())

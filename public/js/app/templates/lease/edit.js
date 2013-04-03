@@ -14,7 +14,7 @@ __p += '<h2>' +
 ((__t = ( i18nCommon.actions.save )) == null ? '' : __t) +
 '</button>\n    <a href="' +
 ((__t = ( cancel_path )) == null ? '' : __t) +
-'" class="btn">' +
+'" class="cancel btn">' +
 ((__t = ( i18nCommon.actions.cancel )) == null ? '' : __t) +
 '</a>\n  </div>\n  \n  <a class="remove">' +
 ((__t = ( i18nCommon.actions.delete )) == null ? '' : __t) +

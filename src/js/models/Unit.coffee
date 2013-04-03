@@ -25,7 +25,6 @@ define [
       # active_lease    : false
 
       # Private
-      has_lease       : false
       confirmed       : true
       
     validate: (attrs = {}, options = {}) ->

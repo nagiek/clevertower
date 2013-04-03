@@ -3,22 +3,23 @@
   require.config({
     baseUrl: "/js",
     paths: {
-      jquery: '//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min',
-      jqueryuiwidget: 'libs/jqueryui/jquery.ui.widget.min',
-      underscore: '//cdnjs.cloudflare.com/ajax/libs/lodash.js/1.0.1/lodash.min',
+      jquery: "//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min",
+      underscore: "//cdnjs.cloudflare.com/ajax/libs/lodash.js/1.0.1/lodash.min",
       backbone: "//www.parsecdn.com/js/parse-1.2.2",
-      jquerymobile: '//cdnjs.cloudflare.com/ajax/libs/jquery-mobile/1.2.0/jquery.mobile.min',
-      datepicker: 'libs/bootstrap/bootstrap-datepicker.min',
+      jqueryuiwidget: "libs/jqueryui/jquery.ui.widget.min",
+      jquerymobile: "//cdnjs.cloudflare.com/ajax/libs/jquery-mobile/1.2.0/jquery.mobile.min",
+      datepicker: "libs/bootstrap/bootstrap-datepicker.min",
       serializeObject: "app/plugins/serialize_object",
       filePicker: "app/plugins/file_picker",
-      "jquery.fileupload-pr": 'app/plugins/jquery-fileupload-pr',
-      "jquery.fileupload-ui": 'app/plugins/jquery-fileupload-ui',
-      "jquery.fileupload-fp": 'app/plugins/jquery-fileupload-fp',
+      "jquery.fileupload-pr": "app/plugins/jquery-fileupload-pr",
+      "jquery.fileupload-ui": "app/plugins/jquery-fileupload-ui",
+      "jquery.fileupload-fp": "app/plugins/jquery-fileupload-fp",
       "jquery.fileupload": "app/plugins/jquery-fileupload",
-      'load-image': '//blueimp.github.com/JavaScript-Load-Image/load-image.min',
-      'canvas-to-blob': '//blueimp.github.com/JavaScript-Canvas-to-Blob/canvas-to-blob.min',
+      "load-image": "//blueimp.github.com/JavaScript-Load-Image/load-image.min",
+      "canvas-to-blob": "//blueimp.github.com/JavaScript-Canvas-to-Blob/canvas-to-blob.min",
       "underscore.email": "app/plugins/underscore-email",
       "underscore.inflection": "app/plugins/underscore-inflection",
+      pusher: "//d3dy5gmtp8yhk7.cloudfront.net/2.0/pusher.min",
       moment: "//cdnjs.cloudflare.com/ajax/libs/moment.js/2.0.0/moment.min",
       bootstrap: "libs/bootstrap/bootstrap",
       json2: "//cdnjs.cloudflare.com/ajax/libs/json2/20121008/json2",
@@ -42,8 +43,11 @@
         deps: ["underscore", "jquery"],
         exports: "Parse"
       },
+      pusher: {
+        exports: "Pusher"
+      },
       underscore: {
-        exports: '_'
+        exports: "_"
       }
     }
   });
@@ -64,7 +68,7 @@
     Parse.User.prototype.cover = function(format) {
       var img;
       img = this.get("image_" + format);
-      if (img === '') {
+      if (img === "") {
         img = "/img/fallback/avatar-" + format + ".png";
       }
       return img;
@@ -73,10 +77,10 @@
       if (_.has(attrs, "ACL") && !(attrs.ACL instanceof Parse.ACL)) {
         return new Parse.Error(Parse.Error.OTHER_CAUSE, "ACL must be a Parse.ACL.");
       }
-      if (attrs.email && attrs.email !== '') {
+      if (attrs.email && attrs.email !== "") {
         if (!/^([a-zA-Z0-9_.-])+@([a-zA-Z0-9_.-])+\.([a-zA-Z])+([a-zA-Z])+/.test(attrs.email)) {
           return {
-            message: 'invalid_email'
+            message: "invalid_email"
           };
         }
       }
@@ -92,10 +96,10 @@
       if (_.has(attrs, "ACL") && !(attrs.ACL instanceof Parse.ACL)) {
         return new Parse.Error(Parse.Error.OTHER_CAUSE, "ACL must be a Parse.ACL.");
       }
-      if (attrs.email && attrs.email !== '') {
+      if (attrs.email && attrs.email !== "") {
         if (!/^([a-zA-Z0-9_.-])+@([a-zA-Z0-9_.-])+\.([a-zA-Z])+([a-zA-Z])+/.test(attrs.email)) {
           return {
-            message: 'invalid_email'
+            message: "invalid_email"
           };
         }
       }

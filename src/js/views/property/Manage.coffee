@@ -13,7 +13,7 @@ define [
   "templates/property/menu/reports"
   "templates/property/menu/building"
   "templates/property/menu/actions"
-], ($, _, Parse, PropertyList, Property, PropertyView, i18nProperty, i18nCommon) ->
+], ($, _, Parse, PropertyList, Property, SummaryPropertyView, i18nProperty, i18nCommon) ->
 
   class ManagePropertiesView extends Parse.View
   
@@ -29,38 +29,34 @@ define [
       
       _.bindAll this, 'newProperty'
       
-      @$list = @$el.find("ul#view-id-my_properties")
-      
-      # Create our collection of Properties
-      @properties = new PropertyList
+      @$list = @$("ul#view-id-my_properties")
       
       # Setup the query for the collection to look for properties from the current user
-      @properties.query = new Parse.Query(Property)
-      @properties.query.equalTo "user", Parse.User.current()
-      @properties.bind "add", @addOne
-      @properties.bind "reset", @addAll
-      @properties.bind "all", @render
+      @collection.on "add", @addOne
+      @collection.on "reset", @addAll
+      @collection.on "all", @render
+      
+      # custom listeners for seeing properties.
+      @collection.on "show", => @$list.hide()
+      @collection.on "close", => @$list.show()
     
       # Fetch all the property items for this user
-      @properties.fetch(
+      @collection.fetch
         success: (collection, resp, options) ->          
           query = new Parse.Query("Unit");
           query.containedIn "property", collection.models
-          # groupBy not supported yet.
+          # TODO: groupBy not supported yet.
           # query.groupBy "property"
-          query.count(
+          query.count
             success: (number) ->
               collection.each (property) -> 
                 property.unitsLength = number
-          )
-      )
-      #
-      
+
     render: =>
-      # done = @properties.done().length
-      # remaining = @properties.remaining().length
+      # done = @collection.done().length
+      # remaining = @collection.remaining().length
       # @$("#property-stats").html @statsTemplate(
-      #   total: @properties.length
+      #   total: @collection.length
       #   done: done
       #   remaining: remaining
       # )
@@ -71,14 +67,14 @@ define [
     # appending its element to the `<ul>`.
     addOne: (property) =>
       @$('p.empty').remove() if @$('p.empty') # Clear "empty" text
-      view = new PropertyView(model: property)
+      view = new SummaryPropertyView(model: property)
       @$list.append view.render().el
 
     # Add all items in the Properties collection at once.
     addAll: (collection, filter) =>
       @$list.html ""
-      unless @properties.length is 0
-        @properties.each @addOne
+      unless @collection.length is 0
+        @collection.each @addOne
         @$list.children(':even').children().addClass 'views-row-even'
         @$list.children(':odd').children().addClass  'views-row-odd'
       else
@@ -92,23 +88,23 @@ define [
     newProperty : ->
 
       require ["views/property/new/Wizard"], (PropertyWizard) =>
-        @$el.find("#new-property").prop disabled: "disabled"
-        @$el.find("section").hide()
+        @$("#new-property").prop disabled: "disabled"
+        @$("section").hide()
         propertyWizard = new PropertyWizard
         Parse.history.navigate "/properties/new"
 
         propertyWizard.on "wizard:cancel", =>
           
           # Reset form
-          @$el.find("#new-property").removeProp "disabled"
-          @$el.find("section").show()
+          @$("#new-property").removeProp "disabled"
+          @$("section").show()
 
         
         propertyWizard.on "property:save", (property) =>
           
           # Add new property to collection
-          @properties.add property
+          @collection.add property
           
           # Reset form
-          @$el.find("#new-property").removeProp "disabled"
-          @$el.find("section").show()
+          @$("#new-property").removeProp "disabled"
+          @$("section").show()

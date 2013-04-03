@@ -1,46 +1,54 @@
 define [
-  "jquery", 
-  "underscore", 
-  "backbone", 
-  'models/Property',
+  "jquery"
+  "underscore"
+  "backbone"
+  'models/Property'
+  "views/property/Show"
   "i18n!nls/property"
   "i18n!nls/common"
   'templates/property/summary',
-], ($, _, Parse, Property, i18nProperty, i18nCommon) ->
+], ($, _, Parse, Property, ShowPropertyView, i18nProperty, i18nCommon) ->
 
   class PropertySummaryView extends Parse.View
   
     tagName: "li"
     className: "row"
   
-    # The PropertyView listens for changes to its model, re-rendering. Since there's
-    # a one-to-one correspondence between a Property and a PropertyView in this
-    # app, we set a direct reference on the model for convenience.
+    events:
+      'click h2 a' : 'show'
+      'click dl dt a' : 'show'
+      'click .btn-toolbar .dropdown-menu a' : 'show'
+  
     initialize: ->
       
-      # Convert to collections.
-      @model.set 
+      @model.collection.on 'show', => @undelegateEvents()
+      @model.collection.on 'close', => @delegateEvents()
+      
+      @model.on "change", @render
+      
+    show: (e) =>
+      $('#main').append new ShowPropertyView(model:@model, e: e).render().el
+      @model.collection.trigger 'show'
+  
+    # Re-render the contents of the property item.
+    render: ->
+      details = 
         cover        : @model.cover('profile')
-
-      @model.set 
+        # Convert to collections.
         tasks        : '0'            # @model.tasks()
         incomes      : '0'            # @model.incomes().sum()
         expenses     : '0'            # @model.expenses().sum()
         vacant_units : '0'            # @model.units().vacant().length
         # units        : '0'            # @model.units().length
-
       
-      @model.bind "change", @render
-
-  
-    # Re-render the contents of the property item.
-    render: ->
       vars = _.merge(
         @model.toJSON(),
+        details,
         unitsLength: if @model.unitsLength then @model.unitsLength else 0
         i18nProperty: i18nProperty
         i18nCommon: i18nCommon
       )
+      
       $(@el).html JST["src/js/templates/property/summary.jst"](vars)
       @input = @$(".edit")
-      this
+      @

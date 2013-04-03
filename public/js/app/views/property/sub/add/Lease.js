@@ -12,10 +12,11 @@
         return AddLeaseToPropertyView.__super__.constructor.apply(this, arguments);
       }
 
-      AddLeaseToPropertyView.prototype.el = "#content";
+      AddLeaseToPropertyView.prototype.el = ".content";
 
       AddLeaseToPropertyView.prototype.initialize = function(attrs) {
         var vars;
+        this.on("view:change", this.clear);
         vars = {
           property: this.model
         };
@@ -27,20 +28,19 @@
             objectId: attrs.params.unit
           };
         }
-        this.lease = new Lease(vars);
-        return this.render();
+        return this.lease = new Lease(vars);
       };
 
       AddLeaseToPropertyView.prototype.render = function() {
-        var form;
-        return form = new NewLeaseView({
+        return this.form = new NewLeaseView({
           model: this.lease,
           property: this.model
         });
       };
 
-      AddLeaseToPropertyView.prototype._return = function() {
-        this.remove();
+      AddLeaseToPropertyView.prototype.clear = function() {
+        delete this.form.undelegateEvents();
+        delete this.form;
         this.undelegateEvents();
         delete this;
         return Parse.history.navigate("/properties/" + this.model.id);

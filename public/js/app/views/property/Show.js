@@ -1,5 +1,6 @@
 (function() {
-  var __hasProp = {}.hasOwnProperty,
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(["jquery", "underscore", "backbone", 'models/Property', "i18n!nls/property", "i18n!nls/common", "underscore.inflection", 'templates/property/show', "templates/property/menu/show", "templates/property/menu/reports", "templates/property/menu/building", "templates/property/menu/actions"], function($, _, Parse, Property, i18nProperty, i18nCommon, inflection) {
@@ -9,74 +10,105 @@
       __extends(PropertyView, _super);
 
       function PropertyView() {
+        this.clear = __bind(this.clear, this);
+
+        this.renderSubView = __bind(this.renderSubView, this);
+
+        this.changeSubView = __bind(this.changeSubView, this);
         return PropertyView.__super__.constructor.apply(this, arguments);
       }
 
-      PropertyView.prototype.el = "#property";
+      PropertyView.prototype.tagName = "div";
+
+      PropertyView.prototype.id = "property";
 
       PropertyView.prototype.events = {
-        'click #edit-profile-picture': 'editProfilePicture'
+        'click .edit-profile-picture': 'editProfilePicture',
+        'click .nav .dropdown-menu a': 'changeSubView',
+        'click .content a': 'changeSubView'
       };
 
       PropertyView.prototype.initialize = function(attrs) {
-        var collections, combo, node, subaction,
-          _this = this;
-        if (attrs.action.indexOf("/") > 0 && attrs.action.indexOf("add") !== 0) {
-          combo = attrs.action.split("/");
-          this.vars = {
-            property: this.model,
-            subId: combo[1]
-          };
-          node = inflection.singularize[combo[0]];
-          subaction = combo[2] ? combo[2] : "show";
-          this.subView = "views/" + node + "/" + subaction;
-        } else {
-          this.vars = {
-            model: this.model
-          };
-          if (attrs.action === 'add/lease') {
-            this.model.loadUnits();
-          }
-          this.subView = "views/property/sub/" + attrs.action;
-        }
-        if (attrs.params) {
-          this.vars.params = attrs.params;
-        }
-        collections = {
-          cover: this.model.cover('profile'),
-          units: this.model.units ? String(this.model.units.length) : '0',
-          tasks: this.model.tasks ? String(this.model.tasks.length) : '0',
-          incomes: this.model.incomes ? String(this.model.incomes.length) : '0',
-          expenses: this.model.expenses ? String(this.model.expenses.length) : '0',
-          vacant_units: '0'
-        };
-        $(this.el).html(JST["src/js/templates/property/show.jst"](_.merge(this.model.toJSON(), collections, {
-          i18nProperty: i18nProperty,
-          i18nCommon: i18nCommon
-        })));
+        var _this = this;
+        $('.home').on('click', this.clear);
         this.$form = $("#profile-picture-upload");
         this.model.on('change:image_profile', function(model, name) {
-          return _this.refresh();
+          return _this.refresh;
         });
-        this.model.on('destroy', function() {
-          _this.remove();
-          _this.undelegateEvents();
-          return delete _this;
-        });
-        return this.render();
+        this.model.on('destroy', this.clear);
+        return this.changeSubView(attrs.e);
       };
 
       PropertyView.prototype.render = function() {
-        var _this = this;
-        require([this.subView], function(PropertySubView) {
-          var propertyView;
-          return propertyView = new PropertySubView(_this.vars);
+        var vars;
+        vars = _.merge(this.model.toJSON(), {
+          cover: this.model.cover('profile'),
+          i18nProperty: i18nProperty,
+          i18nCommon: i18nCommon
         });
+        this.$el.html(JST["src/js/templates/property/show.jst"](vars));
         return this;
+      };
+
+      PropertyView.prototype.changeSubView = function(e) {
+        var action, combo, d, node, pair, querystring, subViewName, subaction, url, urlComponents, vars, _i, _len;
+        subViewName = this.subViewName;
+        url = e.currentTarget.pathname.split('?');
+        urlComponents = url[0].substring(1).split("/");
+        action = urlComponents.length > 2 ? urlComponents.slice(2) : new Array('units');
+        if (url.length > 1) {
+          querystring = url[1].split('&');
+          vars.params = {};
+          d = decodeURIComponent;
+          for (_i = 0, _len = querystring.length; _i < _len; _i++) {
+            combo = querystring[_i];
+            pair = combo.split('=');
+            vars.params[d(pair[0])] = d(pair[1]);
+          }
+        }
+        if (action.length > 1 && action[0] !== "add") {
+          node = inflection.singularize[action[0]];
+          subaction = action[2] ? action[2] : "show";
+          vars = {
+            property: this.model,
+            subId: action[1]
+          };
+          this.subViewName = "views/" + node + "/" + subaction;
+        } else {
+          if (action[0] === "add") {
+            this.model.loadUnits();
+          }
+          vars = {
+            model: this.model
+          };
+          this.subViewName = "views/property/sub/" + (action.join("/"));
+        }
+        if (this.subViewName !== subViewName) {
+          return this.renderSubView(vars);
+        }
+      };
+
+      PropertyView.prototype.renderSubView = function(vars) {
+        var _this = this;
+        if (this.subView) {
+          this.subView.trigger("view:change");
+        }
+        return require([this.subViewName], function(PropertySubView) {
+          _this.subView = new PropertySubView(vars);
+          _this.subView.render();
+          return _this.delegateEvents();
+        });
       };
 
       PropertyView.prototype.refresh = function() {
         return $('#preview-profile-picture img').prop('src', this.model.cover('profile'));
+      };
+
+      PropertyView.prototype.clear = function() {
+        this.model.collection.trigger("close");
+        this.undelegateEvents();
+        this.remove();
+        return delete this;
       };
 
       PropertyView.prototype.editProfilePicture = function() {

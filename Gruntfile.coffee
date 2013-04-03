@@ -55,12 +55,12 @@ module.exports = (grunt) ->
     less:
       development:
         files:
-          'public/css/cali.css': 'src/css/cali.less'
+          'public/css/app/cali.css': 'src/css/cali.less'
       release:
         options:
           yuicompress: true
         files:
-          'public/css/cali.min.css': 'src/css/cali.less'
+          'public/css/app/cali.min.css': 'src/css/cali.less'
     
     # Uglify JS
     uglify:

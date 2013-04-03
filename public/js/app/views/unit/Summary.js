@@ -66,6 +66,8 @@
         if (vars.activeLease = this.model.get("activeLease")) {
           end_date = this.model.get("activeLease").get("end_date");
           vars.end_date = this.model.get("has_lease") && end_date ? moment(end_date).format("MMM DD YYYY") : false;
+        } else {
+          vars.activeLease = false;
         }
         $(this.el).html(JST["src/js/templates/unit/summary.jst"](vars));
         return this;

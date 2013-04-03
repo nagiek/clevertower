@@ -22,7 +22,7 @@ define [
       "click #toggle-all": "toggleAllComplete"
       "click ul#filters a": "selectFilter"
 
-    el: ".content"
+    el: "#main"
   
     # At initialization we bind to the relevant events on the `Todos`
     # collection, when items are added or changed. Kick things off by

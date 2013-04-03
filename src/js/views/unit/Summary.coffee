@@ -61,6 +61,8 @@ define [
       if vars.activeLease = @model.get("activeLease") 
         end_date = @model.get("activeLease").get("end_date")
         vars.end_date = if @model.get("has_lease") and end_date then moment(end_date).format("MMM DD YYYY") else false
+      else
+        vars.activeLease = false
         
       $(@el).html JST["src/js/templates/unit/summary.jst"](vars)
       @

@@ -3,7 +3,7 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", 'collections/property/PropertyList', "models/Property", "views/property/summary", "i18n!nls/property", "i18n!nls/common", "templates/property/manage", "templates/property/menu", "templates/property/menu/show", "templates/property/menu/reports", "templates/property/menu/building", "templates/property/menu/actions"], function($, _, Parse, PropertyList, Property, PropertyView, i18nProperty, i18nCommon) {
+  define(["jquery", "underscore", "backbone", 'collections/property/PropertyList', "models/Property", "views/property/summary", "i18n!nls/property", "i18n!nls/common", "templates/property/manage", "templates/property/menu", "templates/property/menu/show", "templates/property/menu/reports", "templates/property/menu/building", "templates/property/menu/actions"], function($, _, Parse, PropertyList, Property, SummaryPropertyView, i18nProperty, i18nCommon) {
     var ManagePropertiesView;
     return ManagePropertiesView = (function(_super) {
 
@@ -25,19 +25,23 @@
       };
 
       ManagePropertiesView.prototype.initialize = function() {
+        var _this = this;
         this.$el.html(JST["src/js/templates/property/manage.jst"]({
           i18nCommon: i18nCommon,
           i18nProperty: i18nProperty
         }));
         _.bindAll(this, 'newProperty');
-        this.$list = this.$el.find("ul#view-id-my_properties");
-        this.properties = new PropertyList;
-        this.properties.query = new Parse.Query(Property);
-        this.properties.query.equalTo("user", Parse.User.current());
-        this.properties.bind("add", this.addOne);
-        this.properties.bind("reset", this.addAll);
-        this.properties.bind("all", this.render);
-        return this.properties.fetch({
+        this.$list = this.$("ul#view-id-my_properties");
+        this.collection.on("add", this.addOne);
+        this.collection.on("reset", this.addAll);
+        this.collection.on("all", this.render);
+        this.collection.on("show", function() {
+          return _this.$list.hide();
+        });
+        this.collection.on("close", function() {
+          return _this.$list.show();
+        });
+        return this.collection.fetch({
           success: function(collection, resp, options) {
             var query;
             query = new Parse.Query("Unit");
@@ -60,7 +64,7 @@
         if (this.$('p.empty')) {
           this.$('p.empty').remove();
         }
-        view = new PropertyView({
+        view = new SummaryPropertyView({
           model: property
         });
         return this.$list.append(view.render().el);
@@ -68,8 +72,8 @@
 
       ManagePropertiesView.prototype.addAll = function(collection, filter) {
         this.$list.html("");
-        if (this.properties.length !== 0) {
-          this.properties.each(this.addOne);
+        if (this.collection.length !== 0) {
+          this.collection.each(this.addOne);
           this.$list.children(':even').children().addClass('views-row-even');
           return this.$list.children(':odd').children().addClass('views-row-odd');
         } else {
@@ -81,20 +85,20 @@
         var _this = this;
         return require(["views/property/new/Wizard"], function(PropertyWizard) {
           var propertyWizard;
-          _this.$el.find("#new-property").prop({
+          _this.$("#new-property").prop({
             disabled: "disabled"
           });
-          _this.$el.find("section").hide();
+          _this.$("section").hide();
           propertyWizard = new PropertyWizard;
           Parse.history.navigate("/properties/new");
           propertyWizard.on("wizard:cancel", function() {
-            _this.$el.find("#new-property").removeProp("disabled");
-            return _this.$el.find("section").show();
+            _this.$("#new-property").removeProp("disabled");
+            return _this.$("section").show();
           });
           return propertyWizard.on("property:save", function(property) {
-            _this.properties.add(property);
-            _this.$el.find("#new-property").removeProp("disabled");
-            return _this.$el.find("section").show();
+            _this.collection.add(property);
+            _this.$("#new-property").removeProp("disabled");
+            return _this.$("section").show();
           });
         });
       };

@@ -4,6 +4,9 @@
     var Property;
     return Property = Parse.Object.extend("Property", {
       className: "Property",
+      initialize: function() {
+        return _.bindAll(this, "cover", "loadUnits", "loadLeases");
+      },
       defaults: {
         center: new Parse.GeoPoint,
         formatted_address: '',

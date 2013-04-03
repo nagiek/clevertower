@@ -10,11 +10,13 @@
       __extends(PropertyEditView, _super);
 
       function PropertyEditView() {
-        this.addOne = __bind(this.addOne, this);
+        this.render = __bind(this.render, this);
+
+        this.clear = __bind(this.clear, this);
         return PropertyEditView.__super__.constructor.apply(this, arguments);
       }
 
-      PropertyEditView.prototype.el = "#content";
+      PropertyEditView.prototype.el = ".content";
 
       PropertyEditView.prototype.events = {
         'click .save': 'save',
@@ -22,27 +24,24 @@
       };
 
       PropertyEditView.prototype.initialize = function() {
-        var _this = this;
-        this.$el.append(JST["src/js/templates/property/sub/edit.jst"](_.merge({
+        _.bindAll(this, 'save');
+        this.on("view:change", this.clear);
+        this.on("property:save", this.clear);
+        return this.on("property:cancel", this.clear);
+      };
+
+      PropertyEditView.prototype.clear = function(e) {
+        this.undelegateEvents();
+        return delete this;
+      };
+
+      PropertyEditView.prototype.render = function() {
+        this.$el.html(JST["src/js/templates/property/sub/edit.jst"](_.merge({
           property: this.model,
           i18nProperty: i18nProperty,
           i18nCommon: i18nCommon
         })));
-        _.bindAll(this, 'save');
-        this.on("property:save", function() {
-          return _this._clear();
-        });
-        return this.on("property:cancel", function() {
-          return _this._clear();
-        });
-      };
-
-      PropertyEditView.prototype.addOne = function(image) {
-        var view;
-        view = new ImageView({
-          model: image
-        });
-        return this.$photos.append(view.render().el);
+        return this;
       };
 
       PropertyEditView.prototype.save = function(e) {
@@ -74,13 +73,6 @@
             }
           }
         });
-      };
-
-      PropertyEditView.prototype._return = function() {
-        this.remove();
-        this.undelegateEvents();
-        delete this;
-        return Parse.history.navigate("/properties/" + this.model.id);
       };
 
       PropertyEditView.prototype.kill = function() {

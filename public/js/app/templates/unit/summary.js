@@ -16,7 +16,7 @@ __p += '\n      <a class="unit-link" href="/properties/' +
 '">' +
 ((__t = ( title )) == null ? '' : __t) +
 '</a>\n      ';
- if (has_lease) { ;
+ if (activeLease) { ;
 __p += '\n        | <a href="/properties/' +
 ((__t = ( property.objectId )) == null ? '' : __t) +
 '/leases/' +
@@ -46,7 +46,7 @@ __p += '\n    <span class="label label-warning">' +
 __p += '  \n    ';
  if (confirmed) { ;
 __p += '\n      ';
- if (has_lease) { ;
+ if (activeLease) { ;
 __p += '\n        <span class="label label-success">' +
 ((__t = ( i18nCommon.status.confirmed )) == null ? '' : __t) +
 '</span>\n      ';
@@ -64,13 +64,13 @@ __p += '\n      <span class="label label-info">' +
 __p += '\n  ';
  } ;
 __p += '\n</td>\n<td class="view-specific view-show">\n  ';
- if (has_lease && end_date) { ;
+ if (activeLease && end_date) { ;
 __p += '\n    ' +
 ((__t = ( end_date )) == null ? '' : __t) +
 '\n  ';
  } ;
 __p += '\n</td>\n<td class="view-specific view-show">\n  ';
- if (has_lease && activeLease.get("rent")) { ;
+ if (activeLease && activeLease.get("rent")) { ;
 __p += '\n    ' +
 ((__t = ( activeLease.get("rent") )) == null ? '' : __t) +
 '\n  ';
@@ -150,7 +150,7 @@ __p += '\n    <a class="btn btn-mini add-lease"\n       href="/properties/' +
 '/add/task" \n       rel="tooltip" \n       data-original-title="' +
 ((__t = ( i18nUnit.actions.add_task )) == null ? '' : __t) +
 '">\n      <i class="icon-plus"></i>\n    </a>\n    ';
- if (has_lease) { ;
+ if (activeLease) { ;
 __p += '\n      <a class="btn btn-mini add-tenants"\n         href="/properties/' +
 ((__t = ( property.objectId )) == null ? '' : __t) +
 '/leases/' +

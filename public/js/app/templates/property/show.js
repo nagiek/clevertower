@@ -10,7 +10,7 @@ __p += '<div class="page-header clearfix">    \n  <div class="photo photo-thumbn
 ((__t = ( objectId )) == null ? '' : __t) +
 '">\n      <img src="' +
 ((__t = ( cover )) == null ? '' : __t) +
-'" alt="Profile" class="img-rounded profile-picture">\n    </a>\n    <div class="photo-actions hide">\n      <button id="edit-profile-picture" role="button" class="btn btn-small" title="' +
+'" alt="Profile" class="img-rounded profile-picture">\n    </a>\n    <div class="photo-actions hide">\n      <button role="button" class="btn btn-small edit-profile-picture" title="' +
 ((__t = ( i18nCommon.actions.edit )) == null ? '' : __t) +
 '">\n        <i class="icon-edit"></i>\n      </button>\n    </div>\n  </div>\n  \n  <header class="header photo-float thumbnail-float elastic-float">\n    <h1 id="page-title" class="inline-block profile-inline">\n      <a href="/properties/' +
 ((__t = ( objectId )) == null ? '' : __t) +
@@ -32,7 +32,7 @@ __p += '<div class="page-header clearfix">    \n  <div class="photo photo-thumbn
 ((__t = ( i18nProperty.menu.actions )) == null ? '' : __t) +
 '\n          <b class="caret"></b>\n        </a>\n        ' +
 ((__t = ( JST["src/js/templates/property/menu/actions.jst"]({objectId: objectId, i18nProperty: i18nProperty}) )) == null ? '' : __t) +
-'\n      </li>\n    </ul>\n  </header>\n</div>\n\n<div id="content"></div>\n\n<div id="edit-profile-picture-modal" class="modal form-modal hide fade">\n  <form id="profile-picture-upload-form" method="POST">\n    <div class="modal-header">\n      <button type="button" class="close" data-dismiss="modal" aria-labelledby="edit-profile-picture-modal-label" aria-hidden="true">&times;</button>\n      <h3 id="edit-profile-picture-modal-label">' +
+'\n      </li>\n    </ul>\n  </header>\n</div>\n\n<div class="content"></div>\n\n<div id="edit-profile-picture-modal" class="modal form-modal hide fade">\n  <form id="profile-picture-upload-form" method="POST">\n    <div class="modal-header">\n      <button type="button" class="close" data-dismiss="modal" aria-labelledby="edit-profile-picture-modal-label" aria-hidden="true">&times;</button>\n      <h3 id="edit-profile-picture-modal-label">' +
 ((__t = ( i18nProperty.actions.edit_picture )) == null ? '' : __t) +
 '</h3>\n    </div>\n    <div class="modal-body">\n      <div class="row-fluid">\n        <div id="preview-profile-picture" class="preview template-upload">\n          <img src="' +
 ((__t = ( cover )) == null ? '' : __t) +

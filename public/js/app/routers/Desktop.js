@@ -15,8 +15,6 @@
       DesktopRouter.prototype.routes = {
         "": "index",
         "properties/new": "propertiesNew",
-        "properties/:id": "propertiesShow",
-        "properties/:id/*action": "propertiesShow",
         "*actions": "index"
       };
 
@@ -25,7 +23,7 @@
           pushState: true
         });
         new UserView;
-        return $(document).delegate("a", "click", function(e) {
+        return $(document).on("click", "a", function(e) {
           var href, protocol;
           href = $(this).attr("href");
           if (href === "#" || !(href != null)) {
@@ -52,51 +50,53 @@
         return params;
       };
 
-      DesktopRouter.prototype.index = function() {
-        var _this = this;
-        return require(["views/network/Manage"], function(ManageNetworkView) {
-          return new ManageNetworkView;
-        });
-      };
+      DesktopRouter.prototype.index = function() {};
 
       DesktopRouter.prototype.propertiesNew = function() {
         var _this = this;
-        return require(["views/property/Manage"], function(ManagePropertiesView) {
-          var managePropertiesView;
-          managePropertiesView = new ManagePropertiesView;
-          return managePropertiesView.$el.find('#new-property').click();
-        });
+        if (Parse.User.current()) {
+          return require(["views/property/Manage"], function(ManagePropertiesView) {
+            var managePropertiesView;
+            managePropertiesView = new ManagePropertiesView;
+            return managePropertiesView.$el.find('#new-property').click();
+          });
+        } else {
+          return this.accessDenied();
+        }
       };
 
       DesktopRouter.prototype.propertiesShow = function(id, action) {
         var combo, params,
           _this = this;
-        console.log('propertiesShow');
-        action || (action = 'units');
-        if (action.indexOf("?") > 0) {
-          combo = action.split("?");
-          action = combo[0];
-          params = this.deparam(combo[1]);
-        }
-        return require(["models/Property", "views/property/Show"], function(Property, PropertyView) {
-          return new Parse.Query("Property").get(id, {
-            success: function(model) {
-              var vars;
-              $('#main').html('<div id="property"></div>');
-              vars = {
-                model: model,
-                action: action
-              };
-              if (params) {
-                vars.params = params;
+        if (Parse.User.current()) {
+          action || (action = 'units');
+          if (action.indexOf("?") > 0) {
+            combo = action.split("?");
+            action = combo[0];
+            params = this.deparam(combo[1]);
+          }
+          return require(["models/Property", "views/property/Show"], function(Property, PropertyView) {
+            return new Parse.Query("Property").get(id, {
+              success: function(model) {
+                var vars;
+                $('#main').html('<div id="property"></div>');
+                vars = {
+                  model: model,
+                  action: action
+                };
+                if (params) {
+                  vars.params = params;
+                }
+                return new PropertyView(vars);
+              },
+              error: function(object, error) {
+                return _this.accessDenied();
               }
-              return new PropertyView(vars);
-            },
-            error: function(object, error) {
-              return _this.accessDenied();
-            }
+            });
           });
-        });
+        } else {
+          return this.accessDenied();
+        }
       };
 
       DesktopRouter.prototype.accessDenied = function() {

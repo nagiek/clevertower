@@ -14,9 +14,7 @@
 
       PropertyList.prototype.model = Property;
 
-      PropertyList.prototype.url = function() {
-        return "/";
-      };
+      PropertyList.prototype.query = new Parse.Query("Property").equalTo("user", Parse.User.current());
 
       return PropertyList;
 

@@ -86,7 +86,8 @@
     errors: {
       bad_save: "Something went wrong. Changes were not saved.",
       access_denied: "Access denied",
-      no_permission: "You do not have permission to do that."
+      no_permission: "You do not have permission to do that.",
+      unknown: "An unknown error has occured."
     }
   });
 

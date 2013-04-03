@@ -16,7 +16,7 @@ define [
 
   class PropertyLeasesView extends Parse.View
   
-    el: "#content"
+    el: ".content"
     
     events:
       'click #leases-show a'  : 'switchToShow'
@@ -26,34 +26,33 @@ define [
       'click .save'           : 'save'
     
     initialize: (attrs) ->
+      @editing = false
       
+      @on "view:change", @clear
+      
+      @model.loadUnits()
+      @model.loadLeases()
+      @model.leases.on "add", @addOne
+      @model.leases.on "reset", @addAll
+
+    render: =>
       vars = _.merge(i18nProperty: i18nProperty, i18nCommon: i18nCommon, i18nUnit: i18nUnit, i18nLease: i18nLease)
       @$el.html JST["src/js/templates/property/sub/leases.jst"](vars)
       
-      @editing = false
-      
-      @$messages  = $("#messages")
       @$table     = @$("#leases-table")
       @$list      = @$("#leases-table tbody")
       @$actions   = @$(".form-actions")
       @$undo      = @$actions.find('.undo')
-      
-      @model.loadUnits()
-      @model.loadLeases()
 
-      @model.leases.on "add", @addOne
-      @model.leases.on "reset", @addAll
-      
       # Fetch all the property items for this user
       @model.leases.fetch()
-        # success: (collection, response, options) =>
-        #   @model.leases.add [{property: @model}] if collection.length is 0
-                
-    # Re-render the contents of the property item.
-    render: =>
-      @$list.html ""
-      @$list.html '<p class="empty">' + i18nLease.collection.empty + '</p>' if @model.leases.length is 0
-      
+      @
+
+    
+    clear: (e) =>
+      @undelegateEvents()
+      delete this
+    
     switchToShow: (e) =>
       e.preventDefault()
       return unless @editing
@@ -79,8 +78,8 @@ define [
     # Add all items in the Leases collection at once.
     addAll: (collection, filter) =>
       @$list.html ''
-      @render()
       @model.leases.each @addOne
+      @$list.html '<p class="empty">' + i18nLease.collection.empty + '</p>' if @model.leases.length is 0
 
     # Add a single todo item to the list by creating a view for it, and
     # appending its element to the `<ul>`.

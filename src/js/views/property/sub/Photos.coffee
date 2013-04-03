@@ -19,20 +19,28 @@ define [
   
     # Instead of generating a new element, bind to the existing skeleton of
     # the App already present in the HTML.
-    el: "#content"
+    el: ".content"
     
     initialize : ->
       
       _this = @
-      
-      @$el.append JST["src/js/templates/property/sub/photos.jst"](_.merge(property: @model, i18nProperty: i18nProperty, i18nCommon: i18nCommon))
-
       _.bindAll this, 'save'
-
-      @$list = $("#photo-list")
+      
+      @on "view:change", @clear
       
       @unUploadedPhotos = 0
+          
+      @photos = new PhotoList
+      # Setup the query for the collection to look for properties from the current user
+      @photos.query = new Parse.Query(Photo)
+      @photos.query.equalTo "property", @model
+      # @photos.query.equalTo "unit", ""
+      @photos.bind "add", @addOne
+      @photos.bind "reset", @addAll
+      # @photos.bind "all", @render
 
+      @$el.append JST["src/js/templates/property/sub/photos.jst"](_.merge(property: @model, i18nProperty: i18nProperty, i18nCommon: i18nCommon))
+      @$list = $("#photo-list")
       @$fileForm = $("#fileupload")
 
       # Initiate the file upload.
@@ -81,18 +89,7 @@ define [
             node = $(this)
             that._transition(node).done ->
               node.remove()
-          
-      @photos = new PhotoList
-      # Setup the query for the collection to look for properties from the current user
-      @photos.query = new Parse.Query(Photo)
-      @photos.query.equalTo "property", @model
-      # @photos.query.equalTo "unit", ""
-      @photos.bind "add", @addOne
-      @photos.bind "reset", @addAll
-      # @photos.bind "all", @render
-    
-      # Fetch all the property items for this user
-      @photos.fetch()
+
 
       # @on 'added', (e, data) =>
       #   @unUploadedPhotos++
@@ -102,6 +99,16 @@ define [
       # 
       # @on "photo:remove", (e, data) =>
       #   @unUploadedPhotos--
+
+    render : =>
+      # Fetch all the property items for this user
+      @photos.fetch()
+      @
+
+    clear: (e) =>
+      @undelegateEvents()
+      delete @photos
+      delete this
 
     addOne : (photo) =>
       view = new PhotoView(model: photo)

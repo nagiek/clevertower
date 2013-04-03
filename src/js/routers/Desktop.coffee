@@ -8,9 +8,9 @@ define [
     routes:
       ""                            : "index"
       "properties/new"              : "propertiesNew"
-      "properties/:id"              : "propertiesShow"
+      # "properties/:id"              : "propertiesShow"
       # "properties/:id/add/:model"   : "propertiesAddSub"
-      "properties/:id/*action"      : "propertiesShow"
+      # "properties/:id/*action"      : "propertiesShow"
       "*actions"                    : "index"
 
     initialize: (options) ->
@@ -19,7 +19,7 @@ define [
       new UserView
 
       # Use delegation to avoid initial DOM selection and allow all matching elements to bubble
-      $(document).delegate "a", "click", (e) ->
+      $(document).on "click", "a", (e) ->
 
         # Get the anchor href and protcol
         href = $(this).attr("href")
@@ -50,32 +50,36 @@ define [
       params
         
     index: ->
-      require ["views/network/Manage"], (ManageNetworkView) =>
-        new ManageNetworkView
 
     propertiesNew: ->
-      require ["views/property/Manage"], (ManagePropertiesView) =>
-        managePropertiesView = new ManagePropertiesView
-        managePropertiesView.$el.find('#new-property').click()
+      if Parse.User.current()
+        require ["views/property/Manage"], (ManagePropertiesView) =>
+          managePropertiesView = new ManagePropertiesView
+          managePropertiesView.$el.find('#new-property').click()
+      else
+        @accessDenied()
         
     propertiesShow: (id, action) ->
-      console.log 'propertiesShow'
-      action ||= 'units'
+      if Parse.User.current()
+        action ||= 'units'
 
-      # Split the querystring
-      if action.indexOf("?") > 0
-        combo = action.split("?")
-        action = combo[0]
-        params = @deparam combo[1]
+        # Split the querystring
+        if action.indexOf("?") > 0
+          combo = action.split("?")
+          action = combo[0]
+          params = @deparam combo[1]
         
-      require ["models/Property", "views/property/Show"], (Property, PropertyView) => 
-        new Parse.Query("Property").get id,
-          success: (model) ->
-            $('#main').html '<div id="property"></div>'            
-            vars = model:model, action: action
-            vars.params = params if params
-            new PropertyView(vars)
-          error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
+        require ["models/Property", "views/property/Show"], (Property, PropertyView) => 
+          new Parse.Query("Property").get id,
+            success: (model) ->
+              $('#main').html '<div id="property"></div>'            
+              vars = model:model, action: action
+              vars.params = params if params
+              new PropertyView(vars)
+            error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
+      else
+        @accessDenied()
+      
 
     # propertiesAddSub: (id, node) ->
     #   require ["models/#{node}", "views/property/add/#{node}"], (Property, AddSubPropertyView) => 
