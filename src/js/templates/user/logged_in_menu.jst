@@ -1,16 +1,19 @@
-<% i18nDevise = require("i18n!nls/devise"); %>
-
 <li><a id="profile" href="#"><%= Parse.User.current().get("username") %></a></li>
+<li id="notifications" class="dropdown">
+  <a id="nLabel" data-target="#" data-toggle="dropdown" role="menu" class="dropdown-toggle">
+    <i class="icon icon-flag"></i>
+    <span id="notifications-count" class="badge">0</span>
+  </a>
+  <ul aria-labelledby="nLabel" role="menu" class="dropdown-menu pull-right"></ul>
+</li>
 <li class="dropdown">
   <a id="pLabel" data-target="#" data-toggle="dropdown" role="menu" class="dropdown-toggle">
     <i class="icon icon-cog"></i>
   </a>
-  <ul aria-labelledby="pLabel" role="menu" class="dropdown-menu pull-right"></ul>
+  <ul aria-labelledby="pLabel" role="menu" class="dropdown-menu pull-right">
+    <li><a href="/account/settings"><%= i18nUser.menu.edit_account %></a></li>
+    <li><a href="/account/privacy"><%= i18nUser.menu.edit_privacy %></a></li>
+    <li class="divider">
+    <li><a id="logout" href="#"><%= i18nDevise.actions.logout %></a></li>
+  </ul>
 </li>
-<li class="dropdown">
-  <a id="nLabel" data-target="#" data-toggle="dropdown" role="menu" class="dropdown-toggle">
-    <i class="icon icon-flag"></i>
-  </a>
-  <ul aria-labelledby="nLabel" role="menu" class="dropdown-menu pull-right"></ul>
-</li>
-<li><a id="logout" href="#"><%= i18nDevise.actions.logout %></a></li>

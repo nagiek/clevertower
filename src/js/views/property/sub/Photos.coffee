@@ -39,7 +39,17 @@ define [
       @photos.bind "reset", @addAll
       # @photos.bind "all", @render
 
-      @$el.append JST["src/js/templates/property/sub/photos.jst"](_.merge(property: @model, i18nProperty: i18nProperty, i18nCommon: i18nCommon))
+      # @on 'added', (e, data) =>
+      #   @unUploadedPhotos++
+      # 
+      # @on "photo:upload", (file) =>
+      #   @unUploadedPhotos--
+      # 
+      # @on "photo:remove", (e, data) =>
+      #   @unUploadedPhotos--
+
+    render : =>
+      @$el.html JST["src/js/templates/property/sub/photos.jst"](_.merge(property: @model, i18nProperty: i18nProperty, i18nCommon: i18nCommon))
       @$list = $("#photo-list")
       @$fileForm = $("#fileupload")
 
@@ -89,18 +99,7 @@ define [
             node = $(this)
             that._transition(node).done ->
               node.remove()
-
-
-      # @on 'added', (e, data) =>
-      #   @unUploadedPhotos++
-      # 
-      # @on "photo:upload", (file) =>
-      #   @unUploadedPhotos--
-      # 
-      # @on "photo:remove", (e, data) =>
-      #   @unUploadedPhotos--
-
-    render : =>
+      
       # Fetch all the property items for this user
       @photos.fetch()
       @
@@ -120,4 +119,4 @@ define [
       unless @photos.length is 0
         @photos.each @addOne
       else
-        @$list.before '<p class="empty">' + i18nProperty.collection.empty + '</p>'
+        @$list.before '<p class="empty">' + i18nProperty.collection.empty.photos + '</p>'

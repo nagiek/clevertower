@@ -79,7 +79,7 @@ define [
     addAll: (collection, filter) =>
       @$list.html ''
       @model.leases.each @addOne
-      @$list.html '<p class="empty">' + i18nLease.collection.empty + '</p>' if @model.leases.length is 0
+      @$list.html '<p class="empty">' + i18nLease.collection.empty.leases + '</p>' if @model.leases.length is 0
 
     # Add a single todo item to the list by creating a view for it, and
     # appending its element to the `<ul>`.

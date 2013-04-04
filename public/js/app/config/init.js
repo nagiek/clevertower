@@ -87,8 +87,8 @@
       }
       return loadFiles(config, function() {
         return loadFiles({
-          "dev-css": ["/css/cali.css"],
-          "prod-css": ["/css/cali.min.css"]
+          "dev-css": ["/css/app/cali.css"],
+          "prod-css": ["/css/app/cali.min.css"]
         });
       });
     }), false);

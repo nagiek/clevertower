@@ -1,0 +1,9 @@
+<a href="<%= url %>" class="clearfix <%= read ? '' : 'unread' %>">
+  <div class="photo photo-thumbnail stay-left">
+    <img src="<%= photo_src %>" alt="<%= i18nCommon.notifications.img %>" width="64" height="64">
+  </div>
+  <div class="photo-float thumbnail-float clearfix">
+    <p><%= text %></p>
+    <small><i class="icon icon-<%= icon %>"></i> <%= age %></small>
+  </div>
+</a>

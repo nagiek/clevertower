@@ -49,6 +49,6 @@ define [
         i18nCommon: i18nCommon
       )
       
-      $(@el).html JST["src/js/templates/property/summary.jst"](vars)
+      @$el.html JST["src/js/templates/property/summary.jst"](vars)
       @input = @$(".edit")
       @

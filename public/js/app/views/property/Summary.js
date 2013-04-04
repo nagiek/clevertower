@@ -57,7 +57,7 @@
           i18nProperty: i18nProperty,
           i18nCommon: i18nCommon
         });
-        $(this.el).html(JST["src/js/templates/property/summary.jst"](vars));
+        this.$el.html(JST["src/js/templates/property/summary.jst"](vars));
         this.input = this.$(".edit");
         return this;
       };

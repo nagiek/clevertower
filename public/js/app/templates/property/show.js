@@ -12,7 +12,7 @@ __p += '<div class="page-header clearfix">    \n  <div class="photo photo-thumbn
 ((__t = ( cover )) == null ? '' : __t) +
 '" alt="Profile" class="img-rounded profile-picture">\n    </a>\n    <div class="photo-actions hide">\n      <button role="button" class="btn btn-small edit-profile-picture" title="' +
 ((__t = ( i18nCommon.actions.edit )) == null ? '' : __t) +
-'">\n        <i class="icon-edit"></i>\n      </button>\n    </div>\n  </div>\n  \n  <header class="header photo-float thumbnail-float elastic-float">\n    <h1 id="page-title" class="inline-block profile-inline">\n      <a href="/properties/' +
+'">\n        <i class="icon-edit"></i>\n      </button>\n    </div>\n  </div>\n  \n  <header class="header photo-float thumbnail-float elastic-float">\n    <h1 class="inline-block profile-inline">\n      <a href="/properties/' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '">' +
 ((__t = ( title )) == null ? '' : __t) +

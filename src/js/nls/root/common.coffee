@@ -35,7 +35,9 @@ define
     add_more:             "Add more"
     add_another:          "Add another"
     add_files:            "Add files"
+    add_photos:           "Add photos"
     choose_file:          "Choose file"
+    choose_photo:         "Choose photo"
     add_x_more:           "Add <strong>x</strong> more"
     changes_saved:        "Changes Saved."
   dates:
@@ -43,6 +45,17 @@ define
     datepicker_format:    "mm/dd/yyyy" # Same as above, but for datepicker widget
     per_month:            "Per month"
     date:                 "Date"
+  notifications:
+    img:                  "Notification Image"
+    empty:                "No new notifications"
+    # title:
+    #   lease_invitation:   "Lease Invitation"
+    #   lease_application:  "Lease Application"
+    #   tenant_application: "Tenant Application"
+    text:
+      lease_invitation:   (person) -> "You have been invited to a lease at <strong>#{_.escape(property)}</strong>"
+      lease_application:  (person, property) -> "<strong>#{_.escape(person)}</strong> has applied to join <strong>#{_.escape(property)}</strong>"
+      tenant_application: (person, property) -> "<strong>#{_.escape(person)}</strong> has applied to join <strong>#{_.escape(property)}</strong>"
   status:
     unsaved:              "Unsaved"
     vacant:               "Vacant"

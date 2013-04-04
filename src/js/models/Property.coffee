@@ -81,7 +81,7 @@ define [
 
     cover: (format) ->
       img = @get "image_#{format}"
-      img = "/img/fallback/property-#{format}.png" if img is ''
+      img = "/img/fallback/property-#{format}.png" if img is '' or !img?
       img 
 
     loadUnits: ->

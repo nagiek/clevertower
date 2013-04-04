@@ -7,7 +7,7 @@ obj || (obj = {});
 var __t, __p = '', __e = _.escape;
 with (obj) {
 __p += '<div id="photos">\n  <form id="fileupload" method="POST">\n    <div class="form-actions fileupload-buttonbar">\n      <button type="button" id="file-input" class="btn fileinput-button">\n          <i class="icon-plus"></i>\n          <span>' +
-((__t = ( i18nCommon.actions.add_files )) == null ? '' : __t) +
+((__t = ( i18nCommon.actions.add_photos )) == null ? '' : __t) +
 '</span>\n          <input type="file" name="files[]" accept="photo/*"  multiple>\n      </button>\n      <!-- The fileinput-button span is used to style the file input field as button -->\n      <button type="submit" id="upload" class="start btn btn-primary">\n        <span>' +
 ((__t = ( i18nCommon.actions.upload )) == null ? '' : __t) +
 '</span>\n      </button>\n      <!-- <button type="button" class="btn btn-danger delete" disabled="disabled">\n        <i class="icon-trash icon-white"></i>\n        <span>' +

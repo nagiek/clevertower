@@ -77,7 +77,7 @@
           this.$list.children(':even').children().addClass('views-row-even');
           return this.$list.children(':odd').children().addClass('views-row-odd');
         } else {
-          return this.$list.html('<p class="empty">' + i18nProperty.collection.empty + '</p>');
+          return this.$list.html('<p class="empty">' + i18nProperty.collection.empty.properties + '</p>');
         }
       };
 

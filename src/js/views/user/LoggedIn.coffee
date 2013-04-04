@@ -3,10 +3,12 @@ define [
   "underscore"
   "backbone"
   "pusher"
-  'collections/property/PropertyList',
+  'collections/property/PropertyList'
+  'views/notification/Index'
   "i18n!nls/devise"
+  "i18n!nls/user"
   "templates/user/logged_in_menu"
-], ($, _, Parse, Pusher, PropertyList, i18nDevise) ->
+], ($, _, Parse, Pusher, PropertyList, NotificationsView, i18nDevise, i18nUser) ->
 
   class LoggedInView extends Parse.View
     events:
@@ -15,7 +17,7 @@ define [
     el: "#user-menu"
     initialize: ->
       _.bindAll this, "logOut"
-      @$el.html JST["src/js/templates/user/logged_in_menu.jst"](i18nDevise: i18nDevise)
+      @$el.html JST["src/js/templates/user/logged_in_menu.jst"](i18nUser: i18nUser, i18nDevise: i18nDevise)
       
       Parse.User.current().on "change:type", @render
       
@@ -25,6 +27,7 @@ define [
       @properties = new PropertyList
       @properties.on "add", @subscribeProperty
       
+      @notificationsView = new NotificationsView
       # @leases = new LeaseList
       # @leases.on "add", @subscribeLease
       
@@ -45,6 +48,8 @@ define [
       delete this
 
     render: ->
+      @notificationsView.render()
+      
       if Parse.User.current().get("type") is "manager"
         require ["views/property/Manage"], (ManagePropertiesView) =>
           @subview = new ManagePropertiesView(collection: @properties)

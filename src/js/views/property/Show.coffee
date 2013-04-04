@@ -20,6 +20,7 @@ define [
     
     events:
       'click .edit-profile-picture': 'editProfilePicture'
+      'click h1 a': 'changeSubView'
       'click .nav .dropdown-menu a': 'changeSubView'
       'click .content a': 'changeSubView'
 
@@ -48,25 +49,13 @@ define [
       @
 
     changeSubView: (e) =>
-      subViewName = @subViewName
+      
+      origSubViewName = @subViewName
 
-      url = e.currentTarget.pathname.split('?')
-
-      # Remove the leading "/" and split into urlComponents
-      urlComponents = url[0].substring(1).split("/")
+      # Remove the leading "/" and split into components
+      urlComponents = e.currentTarget.pathname.substring(1).split("/")
       action = if urlComponents.length > 2 then urlComponents.slice(2) else new Array('units')
-      
-      # Get the query string, if it exists.
-      if url.length > 1
-        # # remove any preceding url and split
-        querystring = url[1].split('&')
-        vars.params = {}
-        d = decodeURIComponent
-        # march and parse
-        for combo in querystring
-          pair = combo.split('=')
-          vars.params[d(pair[0])] = d(pair[1])
-      
+            
       if action.length > 1 and action[0] isnt "add"
         # Subnode view
         node = inflection.singularize[action[0]]
@@ -79,7 +68,21 @@ define [
         vars = model: @model
         @subViewName = "views/property/sub/#{action.join("/")}"
       
-      @renderSubView(vars) if @subViewName isnt subViewName
+      return if @subViewName is origSubViewName
+      
+      # Get the query string, if it exists.
+      querystring = e.currentTarget.search
+      if querystring.length > 0
+        # Remove the leading "?" and split into components
+        queryComponents = querystring.substring(1).split('&')
+        vars.params = {}
+        d = decodeURIComponent
+        # march and parse
+        for combo in queryComponents
+          pair = combo.split('=')
+          vars.params[d(pair[0])] = d(pair[1])
+      
+      @renderSubView(vars) 
 
     renderSubView: (vars) =>
       if @subView

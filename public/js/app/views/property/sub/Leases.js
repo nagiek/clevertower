@@ -101,7 +101,7 @@
         this.$list.html('');
         this.model.leases.each(this.addOne);
         if (this.model.leases.length === 0) {
-          return this.$list.html('<p class="empty">' + i18nLease.collection.empty + '</p>');
+          return this.$list.html('<p class="empty">' + i18nLease.collection.empty.leases + '</p>');
         }
       };
 

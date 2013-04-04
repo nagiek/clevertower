@@ -114,7 +114,7 @@ require ["jquery", "backbone", "routers/Desktop", "json2", "bootstrap", "seriali
 
   Parse.User.prototype.cover = (format) ->
     img = @get "image_#{format}"
-    img = "/img/fallback/avatar-#{format}.png" if img is ""
+    img = "/img/fallback/avatar-#{format}.png" if img is '' or !img?
     img
   
   Parse.User.prototype.validate = (attrs, options) ->

@@ -96,6 +96,11 @@ Parse.Cloud.define "AddTenants", (req, res) ->
               notificationACL.setReadAccess(user, true)
             notification.setACL notificationACL
             notification.save
+              text: "You have been invited to join #{title}"
+              channels: [ "leases-#{req.params.leaseId}" ]
+              name: "lease_invitation"
+              user: req.user
+              property: req.object.get("property")
             tenantRoleUsers.add user if tntRole
           , (error) ->
             res.error 'signup_error'
@@ -105,8 +110,11 @@ Parse.Cloud.define "AddTenants", (req, res) ->
           notification.setACL notificationACL
           notification.save
             text: "You have been invited to join #{title}"
-            channels: [ "lease-#{req.params.leaseId}" ]
-            name: "lease-invitation"
+            channels: [ "leases-#{req.params.leaseId}" ]
+            name: "lease_invitation"
+            user: req.user
+            property: req.object.get("property")
+            
             
         tntRole.save() if tntRole
         res.success()
@@ -232,8 +240,6 @@ Parse.Cloud.beforeSave "Lease", (req, res) ->
   if start_date is end_date         then return res.error 'date_missing'
   if start_date > end_date          then return res.error 'dates_incorrect'
   
-  console.log 'validate start'  
-  
   # Check for overlapping dates
   unit_date_query = (new Parse.Query("Lease")).equalTo("unit", req.object.get "unit")
   if req.object.existed() then unit_date_query.notEqualTo "id", req.object.get("unit")
@@ -246,10 +252,7 @@ Parse.Cloud.beforeSave "Lease", (req, res) ->
       ed = obj.get "end_date"
       if start_date <= ed and ed <= end_date then return res.error "#{obj.id}:overlapping_dates"
      
-    console.log 'validate success'
-    console.log req.object.existed()
     return res.success() if req.object.existed()
-    console.log 'new success'
     
     # Change the status depending on who is creating the lease.
     propertyId = req.object.get("property").id
@@ -257,7 +260,6 @@ Parse.Cloud.beforeSave "Lease", (req, res) ->
     success: (property) ->
       
       mgrRole = property.get "mgrRole"
-      console.log 'role success'
       if mgrRole
         
         # Check if the user is in the role.
@@ -265,7 +267,6 @@ Parse.Cloud.beforeSave "Lease", (req, res) ->
         users = mgrRole.getUsers()
         users.query().get req.user.id,
         success: (obj) ->
-          console.log 'users success'
           confirmed = if obj then true else false
           
           # Notify the property.
@@ -276,9 +277,11 @@ Parse.Cloud.beforeSave "Lease", (req, res) ->
             notificationACL.setRoleReadAccess(role, true)
             notification.setACL notificationACL
             notification.save
-              name: "lease-application"
+              name: "lease_application"
               text: "#{name} wants to join your property."
-              channels: [ "property:#{propertyId}" ]
+              channels: [ "properties-#{propertyId}" ]
+              user: req.user
+              property: req.object.get("property")
                                          
           # Set attributes
           req.object.set 
@@ -312,7 +315,10 @@ Parse.Cloud.beforeSave "Lease", (req, res) ->
             role.save().then (savedRole) -> 
               req.object.set "tntRole", savedRole
               res.success()
-              
+            , ->
+              # TODO: Once more roles are available, change this to res.error()
+              res.success()
+                
           else
           
             # Check after each save if tenants should be allowed to edit
@@ -325,9 +331,9 @@ Parse.Cloud.beforeSave "Lease", (req, res) ->
               role.save()
               req.object.setACL leaseACL
               res.success()
-            
-
-            
+            else
+              res.success()
+              
         error: -> res.error "user_missing"
       else res.error "role_missing"
     error: -> res.error "bad_query"
@@ -427,9 +433,11 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
             notificationACL.setReadAccess(req.object.get("user"), true)
             notification.setACL notificationACL
             notification.save
-              name: "lease-invitation"
+              name: "lease_invitation"
               text: "You have been invited to join #{title}"
-              channels: [ "lease-#{lease.id}" ]
+              channels: [ "leases-#{lease.id}" ]
+              user: req.user
+              property: property
             
             # Upgrade the status
             status = if status and status is 'pending' then 'current' else 'invited'
@@ -445,9 +453,11 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
             notificationACL.setRoleReadAccess(role, true)
             notification.setACL notificationACL
             notification.save
-              name: "tenant-application"
+              name: "tenant_application"
               text: "#{name} wants to join your property."
               channels: [ "property-#{propertyId}" ]
+              user: req.user
+              property: property
             
             # Give property managers access to user.
             (new Parse.Query "_User").get user.id,

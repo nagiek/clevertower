@@ -24,6 +24,7 @@
 
       PropertyView.prototype.events = {
         'click .edit-profile-picture': 'editProfilePicture',
+        'click h1 a': 'changeSubView',
         'click .nav .dropdown-menu a': 'changeSubView',
         'click .content a': 'changeSubView'
       };
@@ -51,21 +52,10 @@
       };
 
       PropertyView.prototype.changeSubView = function(e) {
-        var action, combo, d, node, pair, querystring, subViewName, subaction, url, urlComponents, vars, _i, _len;
-        subViewName = this.subViewName;
-        url = e.currentTarget.pathname.split('?');
-        urlComponents = url[0].substring(1).split("/");
+        var action, combo, d, node, origSubViewName, pair, queryComponents, querystring, subaction, urlComponents, vars, _i, _len;
+        origSubViewName = this.subViewName;
+        urlComponents = e.currentTarget.pathname.substring(1).split("/");
         action = urlComponents.length > 2 ? urlComponents.slice(2) : new Array('units');
-        if (url.length > 1) {
-          querystring = url[1].split('&');
-          vars.params = {};
-          d = decodeURIComponent;
-          for (_i = 0, _len = querystring.length; _i < _len; _i++) {
-            combo = querystring[_i];
-            pair = combo.split('=');
-            vars.params[d(pair[0])] = d(pair[1]);
-          }
-        }
         if (action.length > 1 && action[0] !== "add") {
           node = inflection.singularize[action[0]];
           subaction = action[2] ? action[2] : "show";
@@ -83,9 +73,21 @@
           };
           this.subViewName = "views/property/sub/" + (action.join("/"));
         }
-        if (this.subViewName !== subViewName) {
-          return this.renderSubView(vars);
+        if (this.subViewName === origSubViewName) {
+          return;
         }
+        querystring = e.currentTarget.search;
+        if (querystring.length > 0) {
+          queryComponents = querystring.substring(1).split('&');
+          vars.params = {};
+          d = decodeURIComponent;
+          for (_i = 0, _len = queryComponents.length; _i < _len; _i++) {
+            combo = queryComponents[_i];
+            pair = combo.split('=');
+            vars.params[d(pair[0])] = d(pair[1]);
+          }
+        }
+        return this.renderSubView(vars);
       };
 
       PropertyView.prototype.renderSubView = function(vars) {

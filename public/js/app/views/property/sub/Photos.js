@@ -32,15 +32,18 @@
         this.photos.query = new Parse.Query(Photo);
         this.photos.query.equalTo("property", this.model);
         this.photos.bind("add", this.addOne);
-        this.photos.bind("reset", this.addAll);
-        this.$el.append(JST["src/js/templates/property/sub/photos.jst"](_.merge({
+        return this.photos.bind("reset", this.addAll);
+      };
+
+      PropertyPhotosView.prototype.render = function() {
+        this.$el.html(JST["src/js/templates/property/sub/photos.jst"](_.merge({
           property: this.model,
           i18nProperty: i18nProperty,
           i18nCommon: i18nCommon
         })));
         this.$list = $("#photo-list");
         this.$fileForm = $("#fileupload");
-        return this.$fileForm.fileupload({
+        this.$fileForm.fileupload({
           autoUpload: false,
           type: "POST",
           dataType: "json",
@@ -90,9 +93,6 @@
             });
           }
         });
-      };
-
-      PropertyPhotosView.prototype.render = function() {
         this.photos.fetch();
         return this;
       };
@@ -116,7 +116,7 @@
         if (this.photos.length !== 0) {
           return this.photos.each(this.addOne);
         } else {
-          return this.$list.before('<p class="empty">' + i18nProperty.collection.empty + '</p>');
+          return this.$list.before('<p class="empty">' + i18nProperty.collection.empty.photos + '</p>');
         }
       };
 

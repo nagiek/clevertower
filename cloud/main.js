@@ -100,7 +100,13 @@
                     return notificationACL.setReadAccess(user, true);
                   });
                   notification.setACL(notificationACL);
-                  notification.save;
+                  notification.save({
+                    text: "You have been invited to join " + title,
+                    channels: ["leases-" + req.params.leaseId],
+                    name: "lease_invitation",
+                    user: req.user,
+                    property: req.object.get("property")
+                  });
                   if (tntRole) {
                     return tenantRoleUsers.add(user);
                   }
@@ -111,8 +117,10 @@
                 notification.setACL(notificationACL);
                 notification.save({
                   text: "You have been invited to join " + title,
-                  channels: ["lease-" + req.params.leaseId],
-                  name: "lease-invitation"
+                  channels: ["leases-" + req.params.leaseId],
+                  name: "lease_invitation",
+                  user: req.user,
+                  property: req.object.get("property")
                 });
               }
               if (tntRole) {
@@ -236,7 +244,6 @@
     if (start_date > end_date) {
       return res.error('dates_incorrect');
     }
-    console.log('validate start');
     unit_date_query = (new Parse.Query("Lease")).equalTo("unit", req.object.get("unit"));
     if (req.object.existed()) {
       unit_date_query.notEqualTo("id", req.object.get("unit"));
@@ -255,24 +262,19 @@
           return res.error("" + obj.id + ":overlapping_dates");
         }
       });
-      console.log('validate success');
-      console.log(req.object.existed());
       if (req.object.existed()) {
         return res.success();
       }
-      console.log('new success');
       propertyId = req.object.get("property").id;
       return (new Parse.Query("Property")).include('mgrRole').get(propertyId, {
         success: function(property) {
           var mgrRole, users;
           mgrRole = property.get("mgrRole");
-          console.log('role success');
           if (mgrRole) {
             users = mgrRole.getUsers();
             return users.query().get(req.user.id, {
               success: function(obj) {
                 var confirmed, current, existed, leaseACL, name, notification, notificationACL, possible, randomId, role, _i;
-                console.log('users success');
                 confirmed = obj ? true : false;
                 if (!confirmed) {
                   name = user.get("name");
@@ -281,9 +283,11 @@
                   notificationACL.setRoleReadAccess(role, true);
                   notification.setACL(notificationACL);
                   notification.save({
-                    name: "lease-application",
+                    name: "lease_application",
                     text: "" + name + " wants to join your property.",
-                    channels: ["property:" + propertyId]
+                    channels: ["properties-" + propertyId],
+                    user: req.user,
+                    property: req.object.get("property")
                   });
                 }
                 req.object.set({
@@ -309,6 +313,8 @@
                   return role.save().then(function(savedRole) {
                     req.object.set("tntRole", savedRole);
                     return res.success();
+                  }, function() {
+                    return res.success();
                   });
                 } else {
                   if (confirmed === leaseACL.getRoleWriteAccess(current)) {
@@ -316,6 +322,8 @@
                     role.setACL(leaseACL);
                     role.save();
                     req.object.setACL(leaseACL);
+                    return res.success();
+                  } else {
                     return res.success();
                   }
                 }
@@ -435,9 +443,11 @@
                   notificationACL.setReadAccess(req.object.get("user"), true);
                   notification.setACL(notificationACL);
                   notification.save({
-                    name: "lease-invitation",
+                    name: "lease_invitation",
                     text: "You have been invited to join " + title,
-                    channels: ["lease-" + lease.id]
+                    channels: ["leases-" + lease.id],
+                    user: req.user,
+                    property: property
                   });
                   status = status && status === 'pending' ? 'current' : 'invited';
                   req.object.set("status", status);
@@ -449,9 +459,11 @@
                   notificationACL.setRoleReadAccess(role, true);
                   notification.setACL(notificationACL);
                   notification.save({
-                    name: "tenant-application",
+                    name: "tenant_application",
                     text: "" + name + " wants to join your property.",
-                    channels: ["property-" + propertyId]
+                    channels: ["property-" + propertyId],
+                    user: req.user,
+                    property: property
                   });
                   (new Parse.Query("_User")).get(user.id, {
                     success: function(user) {

@@ -68,7 +68,7 @@
     Parse.User.prototype.cover = function(format) {
       var img;
       img = this.get("image_" + format);
-      if (img === "") {
+      if (img === '' || !(img != null)) {
         img = "/img/fallback/avatar-" + format + ".png";
       }
       return img;

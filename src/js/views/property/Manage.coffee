@@ -78,7 +78,7 @@ define [
         @$list.children(':even').children().addClass 'views-row-even'
         @$list.children(':odd').children().addClass  'views-row-odd'
       else
-        @$list.html '<p class="empty">' + i18nProperty.collection.empty + '</p>'
+        @$list.html '<p class="empty">' + i18nProperty.collection.empty.properties + '</p>'
 
     # showProperty : (id) ->
     #   Parse.history.navigate "/properties/#{id}"

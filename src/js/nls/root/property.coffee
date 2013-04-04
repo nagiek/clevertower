@@ -48,8 +48,13 @@ define
     features:           "Features"
     amenities:          "Amenities"
     included:           "Included"
-  collection:             
-    empty:                "You don't have any properties yet."
+  collection:
+    empty:
+      properties:       "You don't have any properties yet."
+      units:            "You don't have any units yet."
+      leases:           "You don't have any leases yet."
+      photos:           "You don't have any photos yet."
+
   fields:
     description         : "Description"
     phone               : "Phone"

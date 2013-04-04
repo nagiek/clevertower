@@ -39,7 +39,9 @@
       add_more: "Add more",
       add_another: "Add another",
       add_files: "Add files",
+      add_photos: "Add photos",
       choose_file: "Choose file",
+      choose_photo: "Choose photo",
       add_x_more: "Add <strong>x</strong> more",
       changes_saved: "Changes Saved."
     },
@@ -48,6 +50,21 @@
       datepicker_format: "mm/dd/yyyy",
       per_month: "Per month",
       date: "Date"
+    },
+    notifications: {
+      img: "Notification Image",
+      empty: "No new notifications",
+      text: {
+        lease_invitation: function(person) {
+          return "You have been invited to a lease at <strong>" + (_.escape(property)) + "</strong>";
+        },
+        lease_application: function(person, property) {
+          return "<strong>" + (_.escape(person)) + "</strong> has applied to join <strong>" + (_.escape(property)) + "</strong>";
+        },
+        tenant_application: function(person, property) {
+          return "<strong>" + (_.escape(person)) + "</strong> has applied to join <strong>" + (_.escape(property)) + "</strong>";
+        }
+      }
     },
     status: {
       unsaved: "Unsaved",
