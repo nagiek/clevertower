@@ -40,7 +40,7 @@
       PropertyUnitsView.prototype.initialize = function(attrs) {
         this.editing = false;
         this.on("view:change", this.clear);
-        this.model.loadUnits();
+        this.model.load('units');
         this.model.units.on("add", this.addOne);
         return this.model.units.on("reset", this.addAll);
       };
@@ -60,7 +60,6 @@
         this.$list = this.$("#units-table tbody");
         this.$actions = this.$(".form-actions");
         this.$undo = this.$actions.find('.undo');
-        this.model.units.fetch();
         return this;
       };
 
@@ -71,6 +70,7 @@
 
       PropertyUnitsView.prototype.switchMode = function(e) {
         e.preventDefault();
+        this.$('#units-edit').toggleClass('active');
         this.$table.find('.view-specific').toggleClass('hide');
         this.$actions.toggleClass('hide');
         return this.editing = this.editing ? false : true;

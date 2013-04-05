@@ -26,22 +26,27 @@
 
       ManagePropertiesView.prototype.initialize = function() {
         var _this = this;
+        _.bindAll(this, 'newProperty');
+        if (!Parse.User.current().properties) {
+          Parse.User.current().properties = new PropertyList;
+        }
+        Parse.User.current().properties.on("add", this.addOne);
+        Parse.User.current().properties.on("reset", this.addAll);
+        Parse.User.current().properties.on("show", function() {
+          return _this.$list.hide();
+        });
+        return Parse.User.current().properties.on("close", function() {
+          return _this.$list.show();
+        });
+      };
+
+      ManagePropertiesView.prototype.render = function() {
         this.$el.html(JST["src/js/templates/property/manage.jst"]({
           i18nCommon: i18nCommon,
           i18nProperty: i18nProperty
         }));
-        _.bindAll(this, 'newProperty');
-        this.$list = this.$("ul#view-id-my_properties");
-        this.collection.on("add", this.addOne);
-        this.collection.on("reset", this.addAll);
-        this.collection.on("all", this.render);
-        this.collection.on("show", function() {
-          return _this.$list.hide();
-        });
-        this.collection.on("close", function() {
-          return _this.$list.show();
-        });
-        return this.collection.fetch({
+        this.delegateEvents();
+        Parse.User.current().properties.fetch({
           success: function(collection, resp, options) {
             var query;
             query = new Parse.Query("Unit");
@@ -55,9 +60,8 @@
             });
           }
         });
+        return this.$list = this.$("ul#view-id-my_properties");
       };
-
-      ManagePropertiesView.prototype.render = function() {};
 
       ManagePropertiesView.prototype.addOne = function(property) {
         var view;
@@ -72,8 +76,8 @@
 
       ManagePropertiesView.prototype.addAll = function(collection, filter) {
         this.$list.html("");
-        if (this.collection.length !== 0) {
-          this.collection.each(this.addOne);
+        if (Parse.User.current().properties.length !== 0) {
+          Parse.User.current().properties.each(this.addOne);
           this.$list.children(':even').children().addClass('views-row-even');
           return this.$list.children(':odd').children().addClass('views-row-odd');
         } else {
@@ -96,7 +100,7 @@
             return _this.$("section").show();
           });
           return propertyWizard.on("property:save", function(property) {
-            _this.collection.add(property);
+            Parse.User.current().properties.add(property);
             _this.$("#new-property").removeProp("disabled");
             return _this.$("section").show();
           });

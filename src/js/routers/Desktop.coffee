@@ -8,16 +8,15 @@ define [
     routes:
       ""                            : "index"
       "properties/new"              : "propertiesNew"
-      # "properties/:id"              : "propertiesShow"
-      # "properties/:id/add/:model"   : "propertiesAddSub"
-      # "properties/:id/*action"      : "propertiesShow"
+      "properties/:id"              : "propertiesShow"
+      "properties/:id/*splat"       : "propertiesShow"
       "*actions"                    : "index"
 
     initialize: (options) ->
       Parse.history.start pushState: true
       
-      new UserView
-
+      new UserView()
+      
       # Use delegation to avoid initial DOM selection and allow all matching elements to bubble
       $(document).on "click", "a", (e) ->
 
@@ -37,10 +36,83 @@ define [
           # triggered.  If this is a problem, change this to navigate on your
           # router.
           Parse.history.navigate href, true
+        
+    index: =>
+      user = Parse.User.current()
+      if user
+        if user.get("type") is "manager"
+          require ["views/property/Manage"], (ManagePropertiesView) =>
+            @view = new ManagePropertiesView if !@view or @view !instanceof ManagePropertiesView
+
+            @view.render()
+        else
+          require ["views/property/Manage"], (ManagePropertiesView) =>
+            @view = new ManagePropertiesView if !@view or @view !instanceof ManagePropertiesView
+            @view.render()
+      else
+        @accessDenied()
+
+    propertiesNew: =>
+      if Parse.User.current()
+        require ["views/property/Manage"], (ManagePropertiesView) =>
+          @view = new ManagePropertiesView if !@view or @view !instanceof ManagePropertiesView
+          @view.$('#new-property').click()
+      else
+        @accessDenied()
+        
+    propertiesShow: (id, splat) =>
+      if Parse.User.current()
+        require ["views/property/Show"], (PropertyView) => 
+          console.log @view
+          if !@view or @view !instanceof PropertyView
+                  
+            require ["models/Property", "collections/property/PropertyList"], (Property, PropertyList) => 
+              if Parse.User.current().properties
+                if model = Parse.User.current().properties.get id
+                  combo = @deparamAction splat
+                  vars = model:model, path: combo.path, params: combo.params
+                
+                  $('#main').html '<div id="property"></div>'
+                  @view = new PropertyView(vars)
+                else
+                  new Parse.Query("Property").get id,
+                  success: (model) =>
+                    Parse.User.current().properties.add model
+                    vars = @deparamAction splat
+                    vars.model = model
+                    $('#main').html '<div id="property"></div>'
+                    @view = new PropertyView(vars)
+                  error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
+                
+              else
+                if !Parse.User.current().properties then Parse.User.current().properties = new PropertyList
+                new Parse.Query("Property").get id,
+                success: (model) =>
+                  Parse.User.current().properties.add model
+                  vars = @deparamAction splat
+                  vars.model = model
+          
+                  $('#main').html '<div id="property"></div>'
+                  @view = new PropertyView(vars)
+                error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
+                
+          else
+            vars = @deparamAction splat
+            @view.changeSubView(vars.path, vars.params)
+            
+      else
+        @accessDenied()
+
+    deparamAction : (splat) ->
+      ary = if splat then splat.split('?') else new Array('')
+      combo = 
+        path: ary[0]
+        params: if ary[1] then @deparam ary[1] else {}
+      
     
     deparam : (querystring) ->
       # remove any preceding url and split
-      querystring = querystring.substring(querystring.indexOf('?')+1).split('&')
+      querystring = querystring.split('&')
       params = {}
       d = decodeURIComponent
       # march and parse
@@ -48,47 +120,6 @@ define [
         pair = combo.split('=')
         params[d(pair[0])] = d(pair[1])
       params
-        
-    index: ->
-
-    propertiesNew: ->
-      if Parse.User.current()
-        require ["views/property/Manage"], (ManagePropertiesView) =>
-          managePropertiesView = new ManagePropertiesView
-          managePropertiesView.$el.find('#new-property').click()
-      else
-        @accessDenied()
-        
-    propertiesShow: (id, action) ->
-      if Parse.User.current()
-        action ||= 'units'
-
-        # Split the querystring
-        if action.indexOf("?") > 0
-          combo = action.split("?")
-          action = combo[0]
-          params = @deparam combo[1]
-        
-        require ["models/Property", "views/property/Show"], (Property, PropertyView) => 
-          new Parse.Query("Property").get id,
-            success: (model) ->
-              $('#main').html '<div id="property"></div>'            
-              vars = model:model, action: action
-              vars.params = params if params
-              new PropertyView(vars)
-            error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
-      else
-        @accessDenied()
-      
-
-    # propertiesAddSub: (id, node) ->
-    #   require ["models/#{node}", "views/property/add/#{node}"], (Property, AddSubPropertyView) => 
-    #     new Parse.Query("Property").get id,
-    #       success: (model) ->
-    #         $('#main').html '<div id="property"></div>'
-    #         new AddSubPropertyView(property:property)
-    #       error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
-
       
     accessDenied: ->
       require ["views/helper/Alert", 'i18n!nls/common'], (Alert, i18nCommon) -> 

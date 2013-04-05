@@ -7,20 +7,15 @@
     <a href="/properties/<%= property.objectId %>/leases/<%= objectId %>/edit" class="btn">
       <%= i18nCommon.actions.edit %>
     </a>
-    <button class="btn add-tenants"
+    <a href="/properties/<%= property.objectId %>/add/tenants?lease=<%= objectId %>" class="btn add-tenants"
             rel="tooltip"
             data-original-title="<%= i18nLease.actions.add_tenants %>">
       <i class="icon-user"></i>
-    </button>
+    </a>
     <button class="btn extend"
             rel="tooltip"
             data-original-title="<%= i18nLease.actions.extend %>">
       <i class="icon-repeat"></i>
-    </button>
-    <button class="btn btn-danger delete"
-            rel="tooltip"
-            data-original-title="<%= i18nCommon.actions.delete %>">
-      <i class="icon-trash icon-white"></i>
     </button>
   </div>
 </header>

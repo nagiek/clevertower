@@ -60,8 +60,7 @@ define [
           else 
             i18nLease.errors[error.message]
         else
-          i18nCommon.errors.unknown
-            
+          i18nCommon.errors.unknown            
                   
         new Alert(event: 'model-save', fade: false, message: msg, type: 'error')
         switch error.message
@@ -77,18 +76,17 @@ define [
         
         # Alert the user and move on
         new Alert(event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success')
+        new ShowLeaseView(model: model)
         Parse.history.navigate "/properties/#{@property.id}/leases/#{model.id}"
-        @remove()
         @undelegateEvents()
         delete this
                 
       @model.on 'destroy', =>
-        @remove()
         @undelegateEvents()
         delete this
       
       if @property
-        @property.loadUnits()
+        @property.load("units")
         @units = @property.units
               
       @current = new Date().setDate(1)

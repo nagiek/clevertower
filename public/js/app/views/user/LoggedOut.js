@@ -22,7 +22,6 @@
 
       LoggedOutView.prototype.initialize = function() {
         _.bindAll(this, "logIn", "signUp", "resetPassword", "showResetPasswordModal");
-        this.render();
         return $('form#reset-password-form').on("submit", this.resetPassword);
       };
 

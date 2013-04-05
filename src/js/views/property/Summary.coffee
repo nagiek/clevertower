@@ -14,21 +14,16 @@ define [
     tagName: "li"
     className: "row"
   
-    events:
-      'click h2 a' : 'show'
-      'click dl dt a' : 'show'
-      'click .btn-toolbar .dropdown-menu a' : 'show'
-  
     initialize: ->
       
-      @model.collection.on 'show', => @undelegateEvents()
-      @model.collection.on 'close', => @delegateEvents()
+      # @model.collection.on 'show', => @undelegateEvents()
+      # @model.collection.on 'close', => @delegateEvents()
       
       @model.on "change", @render
       
-    show: (e) =>
-      $('#main').append new ShowPropertyView(model:@model, e: e).render().el
-      @model.collection.trigger 'show'
+    # show: (e) =>
+    #   $('#main').append new ShowPropertyView(model:@model, e: e).render().el
+    #   @model.collection.trigger 'show'
   
     # Re-render the contents of the property item.
     render: ->
@@ -50,5 +45,4 @@ define [
       )
       
       @$el.html JST["src/js/templates/property/summary.jst"](vars)
-      @input = @$(".edit")
       @

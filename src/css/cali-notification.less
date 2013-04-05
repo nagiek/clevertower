@@ -3,17 +3,15 @@
     width: 330px;    
     > li {
       > a {
+        &.unread,
         &:hover {
-          #gradient > .vertical(@white, @white);
-          background-color:@white;
-        }
-        &.unread {
           #gradient > .vertical(lighten(@blueLight, 5%), @blueLight);
           background-color:@blueLight;
+          color:@black;
         }
         &.unread:hover {
           #gradient > .vertical(@blueLight, darken(@blueLight, 5%));
-          color:@black;
+          background-color:darken(@blueLight, 5%);
         }
       }
     }

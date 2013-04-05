@@ -25,13 +25,15 @@ __p += '<header class="row">\n  <hgroup class="span">\n    <h2>' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '/edit" class="btn">\n      ' +
 ((__t = ( i18nCommon.actions.edit )) == null ? '' : __t) +
-'\n    </a>\n    <button class="btn add-tenants"\n            rel="tooltip"\n            data-original-title="' +
+'\n    </a>\n    <a href="/properties/' +
+((__t = ( property.objectId )) == null ? '' : __t) +
+'/add/tenants?lease=' +
+((__t = ( objectId )) == null ? '' : __t) +
+'" class="btn add-tenants"\n            rel="tooltip"\n            data-original-title="' +
 ((__t = ( i18nLease.actions.add_tenants )) == null ? '' : __t) +
-'">\n      <i class="icon-user"></i>\n    </button>\n    <button class="btn extend"\n            rel="tooltip"\n            data-original-title="' +
+'">\n      <i class="icon-user"></i>\n    </a>\n    <button class="btn extend"\n            rel="tooltip"\n            data-original-title="' +
 ((__t = ( i18nLease.actions.extend )) == null ? '' : __t) +
-'">\n      <i class="icon-repeat"></i>\n    </button>\n    <button class="btn btn-danger delete"\n            rel="tooltip"\n            data-original-title="' +
-((__t = ( i18nCommon.actions.delete )) == null ? '' : __t) +
-'">\n      <i class="icon-trash icon-white"></i>\n    </button>\n  </div>\n</header>\n<div class="row">\n  <div class="span9">\n    <div>\n      <h3>' +
+'">\n      <i class="icon-repeat"></i>\n    </button>\n  </div>\n</header>\n<div class="row">\n  <div class="span9">\n    <div>\n      <h3>' +
 ((__t = ( i18nLease.form.tenants )) == null ? '' : __t) +
 '</h3> \n      <p class="empty">' +
 ((__t = ( i18nLease.tenants.empty )) == null ? '' : __t) +

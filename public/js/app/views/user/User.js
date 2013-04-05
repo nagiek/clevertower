@@ -23,7 +23,7 @@
         viewName = Parse.User.current() ? "views/user/LoggedIn" : "views/user/LoggedOut";
         return require([viewName], function(UserView) {
           var view;
-          view = new UserView();
+          view = new UserView().render();
           return view.on("user:change", _this.render);
         });
       };

@@ -43,8 +43,8 @@
       PropertyLeasesView.prototype.initialize = function(attrs) {
         this.editing = false;
         this.on("view:change", this.clear);
-        this.model.loadUnits();
-        this.model.loadLeases();
+        this.model.load('units');
+        this.model.load('leases');
         this.model.leases.on("add", this.addOne);
         return this.model.leases.on("reset", this.addAll);
       };

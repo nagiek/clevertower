@@ -1,11 +1,11 @@
 (function() {
 
-  define(['underscore', 'backbone', "collections/unit/UnitList", "collections/lease/LeaseList", "models/Unit", "models/Lease"], function(_, Parse, UnitList, LeaseList, Unit, Lease) {
+  define(['underscore', 'backbone', "collections/unit/UnitList", "collections/lease/LeaseList", "models/Unit", "models/Lease", "underscore.inflection"], function(_, Parse, UnitList, LeaseList, Unit, Lease, inflection) {
     var Property;
     return Property = Parse.Object.extend("Property", {
       className: "Property",
       initialize: function() {
-        return _.bindAll(this, "cover", "loadUnits", "loadLeases");
+        return _.bindAll(this, "cover", "load");
       },
       defaults: {
         center: new Parse.GeoPoint,
@@ -64,21 +64,23 @@
         }
         return img;
       },
-      loadUnits: function() {
-        if (!this.units) {
-          this.units = new UnitList({
-            property: this
-          });
+      load: function(collectionName, options) {
+        if (this[collectionName]) {
+          return this[collectionName];
         }
-        return this.units.fetch();
-      },
-      loadLeases: function() {
-        if (!this.leases) {
-          this.leases = new LeaseList({
-            property: this
-          });
+        switch (collectionName) {
+          case "units":
+            this[collectionName] = new UnitList({
+              property: this
+            });
+            break;
+          case "leases":
+            this[collectionName] = new LeaseList({
+              property: this
+            });
         }
-        return this.leases.fetch();
+        this[collectionName].fetch(options);
+        return this[collectionName];
       }
     });
   });

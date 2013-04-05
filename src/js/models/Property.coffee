@@ -5,7 +5,8 @@ define [
   "collections/lease/LeaseList"
   "models/Unit"
   "models/Lease"
-], (_, Parse, UnitList, LeaseList, Unit, Lease) ->
+  "underscore.inflection"
+], (_, Parse, UnitList, LeaseList, Unit, Lease, inflection) ->
 
   Property = Parse.Object.extend "Property"
   # class Property extends Parse.Object
@@ -13,7 +14,7 @@ define [
     className: "Property"
       
     initialize: ->
-      _.bindAll @, "cover", "loadUnits", "loadLeases"
+      _.bindAll @, "cover", "load"
           
     defaults:
       # Location
@@ -84,10 +85,13 @@ define [
       img = "/img/fallback/property-#{format}.png" if img is '' or !img?
       img 
 
-    loadUnits: ->
-      @units = new UnitList property: @ unless @units
-      @units.fetch()
+    load: (collectionName, options) ->
+      return @[collectionName] if @[collectionName]
+      switch collectionName
+        when "units" 
+          @[collectionName] = new UnitList property: @
+        when "leases"
+          @[collectionName] = new LeaseList property: @
       
-    loadLeases: ->
-      @leases = new LeaseList property: @ unless @leases
-      @leases.fetch()
+      @[collectionName].fetch(options)
+      @[collectionName]

@@ -10,8 +10,6 @@
       __extends(LoggedInView, _super);
 
       function LoggedInView() {
-        this.subscribeLease = __bind(this.subscribeLease, this);
-
         this.subscribeProperty = __bind(this.subscribeProperty, this);
         return LoggedInView.__super__.constructor.apply(this, arguments);
       }
@@ -30,18 +28,15 @@
         }));
         Parse.User.current().on("change:type", this.render);
         this.pusher = new Pusher('dee5c4022be4432d7152');
-        this.properties = new PropertyList;
-        this.properties.on("add", this.subscribeProperty);
         this.notificationsView = new NotificationsView;
-        return this.render();
+        if (!Parse.User.current().properties) {
+          Parse.User.current().properties = new PropertyList;
+        }
+        return Parse.User.current().properties.on("add", this.subscribeProperty);
       };
 
-      LoggedInView.prototype.subscribeProperty = function(e) {
+      LoggedInView.prototype.subscribeProperty = function(obj) {
         return this.pusher.subscribe("property-" + obj.id);
-      };
-
-      LoggedInView.prototype.subscribeLease = function(e) {
-        return this.pusher.subscribe("lease-" + obj.id);
       };
 
       LoggedInView.prototype.logOut = function(e) {
@@ -53,23 +48,7 @@
       };
 
       LoggedInView.prototype.render = function() {
-        var _this = this;
         this.notificationsView.render();
-        if (Parse.User.current().get("type") === "manager") {
-          require(["views/property/Manage"], function(ManagePropertiesView) {
-            _this.subview = new ManagePropertiesView({
-              collection: _this.properties
-            });
-            return _this.subview.render();
-          });
-        } else {
-          require(["views/property/Manage"], function(ManagePropertiesView) {
-            _this.subview = new ManagePropertiesView({
-              collection: _this.properties
-            });
-            return _this.subview.render();
-          });
-        }
         return this;
       };
 

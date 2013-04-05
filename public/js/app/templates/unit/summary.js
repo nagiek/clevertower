@@ -137,13 +137,13 @@ __p += '\n</td>\n<td class="view-specific view-edit hide">\n  <div class="contro
 ((__t = ( description )) == null ? '' : __t) +
 '</textarea>\n\t\t</div>\n\t</div>\n</td>\n<td>\n  ';
  if (objectId) { ;
-__p += '\n    <a class="btn btn-mini add-lease"\n       href="/properties/' +
+__p += '\n    <a class="btn btn-mini add-lease view-specific view-show"\n       href="/properties/' +
 ((__t = ( property.objectId )) == null ? '' : __t) +
 '/add/lease?unit=' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '" \n       rel="tooltip" \n       data-original-title="' +
 ((__t = ( i18nUnit.actions.add_lease )) == null ? '' : __t) +
-'">\n      <i class="icon-plus"></i>\n    </a>\n    <a class="btn btn-mini add-task"\n       href="/properties/' +
+'">\n      <i class="icon-plus"></i>\n    </a>\n    <a class="btn btn-mini add-task view-specific view-show"\n       href="/properties/' +
 ((__t = ( property.objectId )) == null ? '' : __t) +
 '/leases/' +
 ((__t = ( objectId )) == null ? '' : __t) +
@@ -151,21 +151,21 @@ __p += '\n    <a class="btn btn-mini add-lease"\n       href="/properties/' +
 ((__t = ( i18nUnit.actions.add_task )) == null ? '' : __t) +
 '">\n      <i class="icon-plus"></i>\n    </a>\n    ';
  if (activeLease) { ;
-__p += '\n      <a class="btn btn-mini add-tenants"\n         href="/properties/' +
+__p += '\n      <a class="btn btn-mini add-tenants view-specific view-show"\n         href="/properties/' +
 ((__t = ( property.objectId )) == null ? '' : __t) +
-'/leases/' +
-((__t = ( activeLease.objectId )) == null ? '' : __t) +
-'/add/tenants" \n         rel="tooltip" \n         data-original-title="' +
+'/add/tenants?lease=' +
+((__t = ( activeLease.id )) == null ? '' : __t) +
+'" \n         rel="tooltip" \n         data-original-title="' +
 ((__t = ( i18nLease.actions.add_tenants )) == null ? '' : __t) +
-'">\n        <i class="icon-user"></i>\n      </a>\n      <a class="btn btn-mini extend"\n         href="/properties/' +
+'">\n        <i class="icon-user"></i>\n      </a>\n      <a class="btn btn-mini extend view-specific view-show"\n         href="/properties/' +
 ((__t = ( property.objectId )) == null ? '' : __t) +
 '/leases/' +
-((__t = ( activeLease.objectId )) == null ? '' : __t) +
+((__t = ( activeLease.id )) == null ? '' : __t) +
 '/extend"\n         rel="tooltip" \n         data-original-title="' +
 ((__t = ( i18nLease.actions.extend )) == null ? '' : __t) +
 '">\n        <i class="icon-repeat"></i>\n      </a>\n    ';
  } ;
-__p += '\n    <button class="btn btn-mini btn-danger delete"\n            rel="tooltip"\n            data-original-title="' +
+__p += '\n    <button class="btn btn-mini btn-danger delete view-specific view-edit hide"\n            rel="tooltip"\n            data-original-title="' +
 ((__t = ( i18nCommon.actions.delete )) == null ? '' : __t) +
 '">\n      <i class="icon-trash icon-white"></i>\n    </button>\n  ';
  } else { ;

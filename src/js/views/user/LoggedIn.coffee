@@ -20,24 +20,21 @@ define [
       @$el.html JST["src/js/templates/user/logged_in_menu.jst"](i18nUser: i18nUser, i18nDevise: i18nDevise)
       
       Parse.User.current().on "change:type", @render
-      
       @pusher = new Pusher 'dee5c4022be4432d7152'
-      
-      # Create our collection of Properties
-      @properties = new PropertyList
-      @properties.on "add", @subscribeProperty
+
+      # subscribeLease: (e) =>
+      #   @pusher.subscribe "lease-#{obj.id}"
       
       @notificationsView = new NotificationsView
       # @leases = new LeaseList
       # @leases.on "add", @subscribeLease
       
-      @render()
+      # Create our collection of Properties
+      if !Parse.User.current().properties then Parse.User.current().properties = new PropertyList
+      Parse.User.current().properties.on "add", @subscribeProperty
 
-    subscribeProperty: (e) =>
+    subscribeProperty: (obj) =>
       @pusher.subscribe "property-#{obj.id}"
-
-    subscribeLease: (e) =>
-      @pusher.subscribe "lease-#{obj.id}"
 
     # Logs out the user and shows the login view
     logOut: (e) ->
@@ -49,14 +46,4 @@ define [
 
     render: ->
       @notificationsView.render()
-      
-      if Parse.User.current().get("type") is "manager"
-        require ["views/property/Manage"], (ManagePropertiesView) =>
-          @subview = new ManagePropertiesView(collection: @properties)
-          @subview.render()
-      else
-        require ["views/property/Manage"], (ManagePropertiesView) =>
-          @subview = new ManagePropertiesView(collection: @properties)
-          @subview.render()
-      
       @

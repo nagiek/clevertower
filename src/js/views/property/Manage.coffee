@@ -25,23 +25,25 @@ define [
       'click #new-property' : "newProperty"
     
     initialize : ->
-      @$el.html JST["src/js/templates/property/manage.jst"](i18nCommon: i18nCommon, i18nProperty: i18nProperty)
       
       _.bindAll this, 'newProperty'
       
-      @$list = @$("ul#view-id-my_properties")
+      if !Parse.User.current().properties then Parse.User.current().properties = new PropertyList
       
       # Setup the query for the collection to look for properties from the current user
-      @collection.on "add", @addOne
-      @collection.on "reset", @addAll
-      @collection.on "all", @render
+      Parse.User.current().properties.on "add", @addOne
+      Parse.User.current().properties.on "reset", @addAll
       
       # custom listeners for seeing properties.
-      @collection.on "show", => @$list.hide()
-      @collection.on "close", => @$list.show()
-    
+      Parse.User.current().properties.on "show", => @$list.hide()
+      Parse.User.current().properties.on "close", => @$list.show()
+
+    render: =>
+      @$el.html JST["src/js/templates/property/manage.jst"](i18nCommon: i18nCommon, i18nProperty: i18nProperty)
+      @delegateEvents()
+      
       # Fetch all the property items for this user
-      @collection.fetch
+      Parse.User.current().properties.fetch
         success: (collection, resp, options) ->          
           query = new Parse.Query("Unit");
           query.containedIn "property", collection.models
@@ -51,30 +53,22 @@ define [
             success: (number) ->
               collection.each (property) -> 
                 property.unitsLength = number
+      
+      @$list = @$("ul#view-id-my_properties")
 
-    render: =>
-      # done = @collection.done().length
-      # remaining = @collection.remaining().length
-      # @$("#property-stats").html @statsTemplate(
-      #   total: @collection.length
-      #   done: done
-      #   remaining: remaining
-      # )
-      # @delegateEvents()
-      # @allCheckbox.checked = not remaining
     
     # Add a single property item to the list by creating a view for it, and
     # appending its element to the `<ul>`.
     addOne: (property) =>
       @$('p.empty').remove() if @$('p.empty') # Clear "empty" text
-      view = new SummaryPropertyView(model: property)
+      view = new SummaryPropertyView model: property
       @$list.append view.render().el
 
     # Add all items in the Properties collection at once.
     addAll: (collection, filter) =>
       @$list.html ""
-      unless @collection.length is 0
-        @collection.each @addOne
+      unless Parse.User.current().properties.length is 0
+        Parse.User.current().properties.each @addOne
         @$list.children(':even').children().addClass 'views-row-even'
         @$list.children(':odd').children().addClass  'views-row-odd'
       else
@@ -103,7 +97,7 @@ define [
         propertyWizard.on "property:save", (property) =>
           
           # Add new property to collection
-          @collection.add property
+          Parse.User.current().properties.add property
           
           # Reset form
           @$("#new-property").removeProp "disabled"

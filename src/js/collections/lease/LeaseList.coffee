@@ -7,11 +7,10 @@ define [
 
   class LeaseList extends Parse.Collection
 
-    # Reference to this collection's model.
     model: Lease
-    
+    query: new Parse.Query("Lease").include("unit")
+      
     initialize: (attrs) ->
-      @query = new Parse.Query(Lease)
       if attrs.property
         @property = attrs.property
         @query.equalTo "property", @property
@@ -21,6 +20,15 @@ define [
 
     url:  ->
       "/properties/#{@property.get "id"}/leases"
+
+    # Filter down the list of all active leases
+    active: ->
+      @filter (lease) ->
+        lease.isActive()
+
+    # Filter down the list of all inactive leases
+    inactive: ->
+      @without.apply this, @active()
 
     # query: ->
     #   query = new Parse.Query(Lease)

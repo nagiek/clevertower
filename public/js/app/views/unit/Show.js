@@ -16,30 +16,17 @@
         return ShowUnitView.__super__.constructor.apply(this, arguments);
       }
 
-      ShowUnitView.prototype.el = "#content";
+      ShowUnitView.prototype.el = ".content";
 
       ShowUnitView.prototype.initialize = function(attrs) {
-        var _this = this;
+        console.log(this.model);
         this.property = attrs.property;
-        this.property.loadUnits();
-        Parse.Promise.when([
-          new Parse.Query("Unit").get(attrs.subId, {
-            success: function(model) {
-              _this.model = model;
-              _this.leases = new LeaseList({
-                unit: _this.model
-              });
-              _this.leases.on("reset", _this.addAll);
-              return _this.leases.on("add", _this.addOne);
-            }
-          })
-        ]).then(function() {
-          _this.render();
-          _this.$list = _this.$('#leases-table tbody');
-          return _this.leases.fetch();
+        this.property.load('units');
+        this.leases = new LeaseList({
+          unit: this.model
         });
-        this.model = _this.model;
-        return this.$list = _this.$list;
+        this.leases.on("reset", this.addAll);
+        return this.leases.on("add", this.addOne);
       };
 
       ShowUnitView.prototype.render = function() {
@@ -52,6 +39,8 @@
           i18nCommon: i18nCommon
         });
         $(this.el).html(JST["src/js/templates/unit/show.jst"](vars));
+        this.$list = this.$('#leases-table tbody');
+        this.leases.fetch();
         return this;
       };
 

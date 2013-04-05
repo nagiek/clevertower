@@ -82,18 +82,19 @@
             message: i18nCommon.actions.changes_saved,
             type: 'success'
           });
+          new ShowLeaseView({
+            model: model
+          });
           Parse.history.navigate("/properties/" + _this.property.id + "/leases/" + model.id);
-          _this.remove();
           _this.undelegateEvents();
           return delete _this;
         });
         this.model.on('destroy', function() {
-          _this.remove();
           _this.undelegateEvents();
           return delete _this;
         });
         if (this.property) {
-          this.property.loadUnits();
+          this.property.load("units");
           this.units = this.property.units;
         }
         this.current = new Date().setDate(1);

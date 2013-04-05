@@ -30,8 +30,8 @@ define [
       
       @on "view:change", @clear
       
-      @model.loadUnits()
-      @model.loadLeases()
+      @model.load('units')
+      @model.load('leases')
       @model.leases.on "add", @addOne
       @model.leases.on "reset", @addAll
 

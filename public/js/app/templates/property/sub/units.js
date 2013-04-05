@@ -12,7 +12,7 @@ __p += '<form id="units" method="post">\n  <header>\n    <h2 class="pull-left">'
 ((__t = ( i18nCommon.dates.date )) == null ? '' : __t) +
 '</div>\n          <div class="controls">\n            <input id="date" type="text" class="input-small" value="' +
 ((__t = ( today )) == null ? '' : __t) +
-'">\n          </div>\n        </div>\n      </div> -->\n  \n      <div class="well form-actions form-inline form-condensed pull-right">\n        <button id="units-edit" class="btn" data-toggle="button">' +
+'">\n          </div>\n        </div>\n      </div> -->\n  \n      <div class="well form-actions form-inline form-condensed pull-right">\n        <button id="units-edit" class="btn">' +
 ((__t = ( i18nUnit.actions.edit_units )) == null ? '' : __t) +
 '</button>\n      \t<div class="control-group">\n      \t\t<div class="control-label">' +
 ((__t = ( i18nUnit.actions.add_x_units )) == null ? '' : __t) +

@@ -16,25 +16,18 @@ define [
 
   class ShowLeaseView extends Parse.View
   
-    el: "#content"
+    el: ".content"
     
-    initialize: (attrs) ->
+    initialize: (attrs) =>
       @property = attrs.property
-      @property.loadUnits()
+      @property.load("units")
+      
+      @tenants = new TenantList([], lease: @model)
+      
+      @tenants.on "add",   @addOne
+      @tenants.on "reset", @addAll
 
-      new Parse.Query("Lease").include("unit").get attrs.subId, 
-      success: (model) => 
-        @model = model
-        @render()
-
-        @$list = @$('ul.tenants')
-
-        @tenants = new TenantList([], lease: @model)
-        
-        @tenants.on "add",   @addOne
-        @tenants.on "reset", @addAll
-
-        @tenants.fetch()
+      @tenants.fetch()
                 
 
         # @rel_tenants_current = @model.relation("tenants_current")
@@ -67,6 +60,8 @@ define [
       
       vars = _.merge(modelVars, i18nUnit: i18nUnit, i18nLease: i18nLease, i18nCommon: i18nCommon)
       $(@el).html JST["src/js/templates/lease/show.jst"](vars)
+      
+      @$list = @$('ul.tenants')
       @
       
       

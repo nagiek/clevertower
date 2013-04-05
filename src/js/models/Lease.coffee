@@ -26,6 +26,16 @@ define [
       # tenants_invited: new Parse.Relation()
       # tenants_current: new Parse.Relation()
     
+    initialize: ->
+      _.bindAll this, 'isActive'
+    
+    isActive: ->
+      sd = @get "start_date"
+      ed = @get "end_date"
+      return false unless sd and ed
+      today = new Date
+      return sd < today and today < ed
+    
     validate: (attrs = {}, options = {}) ->
       # Check all attribute existence, as validate is called on set
       # and save, and may not have the attributes in question.

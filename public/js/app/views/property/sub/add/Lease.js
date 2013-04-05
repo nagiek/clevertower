@@ -21,7 +21,7 @@
           property: this.model
         };
         if (attrs.params && attrs.params.unit) {
-          this.model.loadUnits();
+          this.model.load('units');
           vars.unit = {
             __type: "Pointer",
             className: "Unit",

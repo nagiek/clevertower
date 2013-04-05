@@ -30,7 +30,8 @@ define [
       
       @on "view:change", @clear
       
-      @model.loadUnits()
+      # Fetch all the property items for this user
+      @model.load('units')
 
       @model.units.on "add", @addOne
       @model.units.on "reset", @addAll
@@ -49,9 +50,7 @@ define [
       @$list      = @$("#units-table tbody")
       @$actions   = @$(".form-actions")
       @$undo      = @$actions.find('.undo')
-      
-      # Fetch all the property items for this user
-      @model.units.fetch()
+
       @
     
     clear: (e) =>
@@ -60,6 +59,7 @@ define [
     
     switchMode: (e) =>
       e.preventDefault()
+      @$('#units-edit').toggleClass('active')
       @$table.find('.view-specific').toggleClass('hide')
       @$actions.toggleClass('hide')
       @editing = if @editing then false else true

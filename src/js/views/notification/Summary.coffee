@@ -17,7 +17,6 @@ define [
       'click' : 'markAsRead'
         
     initialize: ->
-      console.log @model
       @model.on "change", @render
         
     markAsRead: (e) =>
@@ -36,18 +35,18 @@ define [
       url = "/properties/#{property.id}" + url unless channels[0].indexOf('properties') is 0
       
       switch channels[0].split("-")[0]
-        when 'property'
+        when 'properties'
           icon = 'person'
           photo_src = property.cover("thumb")
-        when 'lease' or 'tenant'
+        when 'leases' or 'tenant'
           icon = 'plus'
           photo_src = user.cover("thumb")
         else 
           icon = 'calendar'
           photo_src = user.cover("thumb")
-            
+      
       vars = _.merge(
-        age: moment(@model.get("createdAt")).fromNow()
+        age: moment(@model.createdAt).fromNow()
         text: i18nCommon.notifications.text[event](name, property.get("thoroughfare"))
         url: url
         read: @model.get "read"

@@ -86,33 +86,33 @@
 </td>
 <td>
   <% if (objectId) { %>
-    <a class="btn btn-mini add-lease"
+    <a class="btn btn-mini add-lease view-specific view-show"
        href="/properties/<%= property.objectId %>/add/lease?unit=<%= objectId %>" 
        rel="tooltip" 
        data-original-title="<%= i18nUnit.actions.add_lease %>">
       <i class="icon-plus"></i>
     </a>
-    <a class="btn btn-mini add-task"
+    <a class="btn btn-mini add-task view-specific view-show"
        href="/properties/<%= property.objectId %>/leases/<%= objectId %>/add/task" 
        rel="tooltip" 
        data-original-title="<%= i18nUnit.actions.add_task %>">
       <i class="icon-plus"></i>
     </a>
     <% if (activeLease) { %>
-      <a class="btn btn-mini add-tenants"
-         href="/properties/<%= property.objectId %>/leases/<%= activeLease.objectId %>/add/tenants" 
+      <a class="btn btn-mini add-tenants view-specific view-show"
+         href="/properties/<%= property.objectId %>/add/tenants?lease=<%= activeLease.id %>" 
          rel="tooltip" 
          data-original-title="<%= i18nLease.actions.add_tenants %>">
         <i class="icon-user"></i>
       </a>
-      <a class="btn btn-mini extend"
-         href="/properties/<%= property.objectId %>/leases/<%= activeLease.objectId %>/extend"
+      <a class="btn btn-mini extend view-specific view-show"
+         href="/properties/<%= property.objectId %>/leases/<%= activeLease.id %>/extend"
          rel="tooltip" 
          data-original-title="<%= i18nLease.actions.extend %>">
         <i class="icon-repeat"></i>
       </a>
     <% } %>
-    <button class="btn btn-mini btn-danger delete"
+    <button class="btn btn-mini btn-danger delete view-specific view-edit hide"
             rel="tooltip"
             data-original-title="<%= i18nCommon.actions.delete %>">
       <i class="icon-trash icon-white"></i>

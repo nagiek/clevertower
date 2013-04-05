@@ -6,6 +6,7 @@
     },
     actions: {
       add_tenants: "add tenants to lease",
+      add_new_lease: "Add a new lease",
       extend: "extend lease",
       "new": "new lease"
     },
@@ -18,7 +19,9 @@
     dates: {
       starting_this_month: "Starting This Month",
       starting_next_month: "Starting Next Month",
-      july_to_june: "July 1st to June 30th"
+      july_to_june: "July 1st to June 30th",
+      active: "active",
+      inactive: "inactive"
     },
     rent: {
       first_month_paid: "First Month Paid",

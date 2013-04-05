@@ -18,15 +18,10 @@
         return PropertyView.__super__.constructor.apply(this, arguments);
       }
 
-      PropertyView.prototype.tagName = "div";
-
-      PropertyView.prototype.id = "property";
+      PropertyView.prototype.el = '#property';
 
       PropertyView.prototype.events = {
-        'click .edit-profile-picture': 'editProfilePicture',
-        'click h1 a': 'changeSubView',
-        'click .nav .dropdown-menu a': 'changeSubView',
-        'click .content a': 'changeSubView'
+        'click .edit-profile-picture': 'editProfilePicture'
       };
 
       PropertyView.prototype.initialize = function(attrs) {
@@ -37,7 +32,8 @@
           return _this.refresh;
         });
         this.model.on('destroy', this.clear);
-        return this.changeSubView(attrs.e);
+        this.render();
+        return this.changeSubView(attrs.path, attrs.params);
       };
 
       PropertyView.prototype.render = function() {
@@ -51,54 +47,51 @@
         return this;
       };
 
-      PropertyView.prototype.changeSubView = function(e) {
-        var action, combo, d, node, origSubViewName, pair, queryComponents, querystring, subaction, urlComponents, vars, _i, _len;
-        origSubViewName = this.subViewName;
-        urlComponents = e.currentTarget.pathname.substring(1).split("/");
-        action = urlComponents.length > 2 ? urlComponents.slice(2) : new Array('units');
-        if (action.length > 1 && action[0] !== "add") {
-          node = inflection.singularize[action[0]];
-          subaction = action[2] ? action[2] : "show";
-          vars = {
-            property: this.model,
-            subId: action[1]
-          };
-          this.subViewName = "views/" + node + "/" + subaction;
+      PropertyView.prototype.changeSubView = function(path, params) {
+        var action, name, node, propertyCentric, subaction, subid,
+          _this = this;
+        console.log(path);
+        action = path ? path.split("/") : Array('units');
+        if (action.length === 1 || action[0] === "add") {
+          name = "views/property/sub/" + (action.join("/"));
+          return this.renderSubView(name, {
+            model: this.model,
+            params: params
+          });
         } else {
-          if (action[0] === "add") {
-            this.model.loadUnits();
+          propertyCentric = false;
+          node = action[0][0].toUpperCase() + inflection.singularize[action[0]].substring(1);
+          subid = action[1];
+          subaction = action[2] ? action[2] : "show";
+          name = "views/" + node + "/" + subaction;
+          if (this.model[action[0]]) {
+            return this.renderSubView(name, {
+              property: this.model,
+              model: this.model[action[0]].get(subid)
+            });
+          } else {
+            return (new Parse.Query(node)).get(subid, {
+              success: function(submodel) {
+                return _this.renderSubView(name, {
+                  property: _this.model,
+                  model: submodel
+                });
+              }
+            });
           }
-          vars = {
-            model: this.model
-          };
-          this.subViewName = "views/property/sub/" + (action.join("/"));
         }
-        if (this.subViewName === origSubViewName) {
-          return;
-        }
-        querystring = e.currentTarget.search;
-        if (querystring.length > 0) {
-          queryComponents = querystring.substring(1).split('&');
-          vars.params = {};
-          d = decodeURIComponent;
-          for (_i = 0, _len = queryComponents.length; _i < _len; _i++) {
-            combo = queryComponents[_i];
-            pair = combo.split('=');
-            vars.params[d(pair[0])] = d(pair[1]);
-          }
-        }
-        return this.renderSubView(vars);
       };
 
-      PropertyView.prototype.renderSubView = function(vars) {
+      PropertyView.prototype.renderSubView = function(name, vars) {
         var _this = this;
         if (this.subView) {
           this.subView.trigger("view:change");
         }
-        return require([this.subViewName], function(PropertySubView) {
-          _this.subView = new PropertySubView(vars);
-          _this.subView.render();
-          return _this.delegateEvents();
+        this.$('.content').removeClass('in');
+        return require([name], function(PropertySubView) {
+          _this.subView = new PropertySubView(vars).render();
+          _this.delegateEvents();
+          return _this.$('.content').addClass('in');
         });
       };
 
@@ -107,7 +100,7 @@
       };
 
       PropertyView.prototype.clear = function() {
-        this.model.collection.trigger("close");
+        Parse.User.current().properties.trigger("close");
         this.undelegateEvents();
         this.remove();
         return delete this;

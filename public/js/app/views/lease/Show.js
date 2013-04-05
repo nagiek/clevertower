@@ -13,28 +13,22 @@
         this.addAll = __bind(this.addAll, this);
 
         this.addOne = __bind(this.addOne, this);
+
+        this.initialize = __bind(this.initialize, this);
         return ShowLeaseView.__super__.constructor.apply(this, arguments);
       }
 
-      ShowLeaseView.prototype.el = "#content";
+      ShowLeaseView.prototype.el = ".content";
 
       ShowLeaseView.prototype.initialize = function(attrs) {
-        var _this = this;
         this.property = attrs.property;
-        this.property.loadUnits();
-        return new Parse.Query("Lease").include("unit").get(attrs.subId, {
-          success: function(model) {
-            _this.model = model;
-            _this.render();
-            _this.$list = _this.$('ul.tenants');
-            _this.tenants = new TenantList([], {
-              lease: _this.model
-            });
-            _this.tenants.on("add", _this.addOne);
-            _this.tenants.on("reset", _this.addAll);
-            return _this.tenants.fetch();
-          }
+        this.property.load("units");
+        this.tenants = new TenantList([], {
+          lease: this.model
         });
+        this.tenants.on("add", this.addOne);
+        this.tenants.on("reset", this.addAll);
+        return this.tenants.fetch();
       };
 
       ShowLeaseView.prototype.render = function() {
@@ -53,6 +47,7 @@
           i18nCommon: i18nCommon
         });
         $(this.el).html(JST["src/js/templates/lease/show.jst"](vars));
+        this.$list = this.$('ul.tenants');
         return this;
       };
 

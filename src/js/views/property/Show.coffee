@@ -14,15 +14,13 @@ define [
 ], ($, _, Parse, Property, i18nProperty, i18nCommon, inflection) ->
 
   class PropertyView extends Parse.View
-  
-    tagName: "div"
-    id: "property"
+
+    el: '#property'
+    # tagName: "div"
+    # id: "property"
     
     events:
       'click .edit-profile-picture': 'editProfilePicture'
-      'click h1 a': 'changeSubView'
-      'click .nav .dropdown-menu a': 'changeSubView'
-      'click .content a': 'changeSubView'
 
     initialize: (attrs) ->
       
@@ -34,7 +32,9 @@ define [
       @model.on 'change:image_profile', (model, name) => @refresh
       @model.on 'destroy',  @clear
       
-      @changeSubView attrs.e
+      # Render immediately, as we will display a subview
+      @render()
+      @changeSubView attrs.path, attrs.params
 
     # Re-render the contents of the property item.
     render: ->
@@ -48,57 +48,60 @@ define [
       @$el.html JST["src/js/templates/property/show.jst"](vars)
       @
 
-    changeSubView: (e) =>
+    changeSubView: (path, params) =>
       
-      origSubViewName = @subViewName
-
       # Remove the leading "/" and split into components
-      urlComponents = e.currentTarget.pathname.substring(1).split("/")
-      action = if urlComponents.length > 2 then urlComponents.slice(2) else new Array('units')
-            
-      if action.length > 1 and action[0] isnt "add"
+      # urlComponents = e.currentTarget.pathname.substring(1).split("/")
+      
+      console.log path
+      action = if path then path.split("/") else Array('units')
+      
+      if action.length is 1 or action[0] is "add"
+        # vars = model: @model, params: params
+        # 
+        # # Get the query string, if it exists.
+        # querystring = e.currentTarget.search
+        # if querystring.length > 0
+        #   # Remove the leading "?" and split into components
+        #   queryComponents = querystring.substring(1).split('&')
+        #   vars.params = {}
+        #   d = decodeURIComponent
+        #   # march and parse
+        #   for combo in queryComponents
+        #     pair = combo.split('=')
+        #     vars.params[d(pair[0])] = d(pair[1])
+        
+        name = "views/property/sub/#{action.join("/")}"
+        @renderSubView name, model: @model, params: params 
+        
+      else
         # Subnode view
-        node = inflection.singularize[action[0]]
+        propertyCentric = false
+        node = action[0][0].toUpperCase() + inflection.singularize[action[0]].substring(1) # units => Unit
+        subid = action[1]
         subaction = if action[2] then action[2] else "show"
-        vars = property: @model, subId: action[1]
-        @subViewName = "views/#{node}/#{subaction}"
-      else      
-        # Property view
-        @model.loadUnits() if action[0] is "add"
-        vars = model: @model
-        @subViewName = "views/property/sub/#{action.join("/")}"
-      
-      return if @subViewName is origSubViewName
-      
-      # Get the query string, if it exists.
-      querystring = e.currentTarget.search
-      if querystring.length > 0
-        # Remove the leading "?" and split into components
-        queryComponents = querystring.substring(1).split('&')
-        vars.params = {}
-        d = decodeURIComponent
-        # march and parse
-        for combo in queryComponents
-          pair = combo.split('=')
-          vars.params[d(pair[0])] = d(pair[1])
-      
-      @renderSubView(vars) 
+        name = "views/#{node}/#{subaction}"    
 
-    renderSubView: (vars) =>
-      if @subView
-        @subView.trigger "view:change" 
-      
-      require [@subViewName], (PropertySubView) =>
-        @subView = new PropertySubView(vars)
-        @subView.render()
+        # Load the model if it exists.
+        if @model[action[0]] then @renderSubView name, property: @model, model: @model[action[0]].get subid
+        # Else get it from the server.
+        else (new Parse.Query(node)).get subid, success: (submodel) => @renderSubView name, property: @model, model: submodel
+
+
+    renderSubView: (name, vars) =>
+      @subView.trigger "view:change" if @subView
+      @$('.content').removeClass 'in'
+      require [name], (PropertySubView) =>
+        @subView = new PropertySubView(vars).render()
         @delegateEvents()
+        @$('.content').addClass 'in'
   
     # Re-render the contents of the property item.
     refresh: ->
       $('#preview-profile-picture img').prop('src', @model.cover('profile'))
     
     clear: =>
-      @model.collection.trigger "close"
+      Parse.User.current().properties.trigger "close"
       @undelegateEvents()
       @remove()
       delete this

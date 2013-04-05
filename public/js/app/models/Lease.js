@@ -14,6 +14,19 @@
         last_month_paid: false,
         checks_received: false
       },
+      initialize: function() {
+        return _.bindAll(this, 'isActive');
+      },
+      isActive: function() {
+        var ed, sd, today;
+        sd = this.get("start_date");
+        ed = this.get("end_date");
+        if (!(sd && ed)) {
+          return false;
+        }
+        today = new Date;
+        return sd < today && today < ed;
+      },
       validate: function(attrs, options) {
         var error;
         if (attrs == null) {

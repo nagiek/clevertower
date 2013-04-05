@@ -21,12 +21,9 @@ define [
 
     initialize: ->
       _.bindAll this, "logIn", "signUp", "resetPassword", "showResetPasswordModal"
-      @render()
 
-      # Bind this here, as it is outside the view.
+      # Bind this here instead of events, as it is outside the view.
       $('form#reset-password-form').on "submit", @resetPassword
-      
-
 
     render: ->
       require ["views/todo/Manage"], (ManageTodosView) =>
