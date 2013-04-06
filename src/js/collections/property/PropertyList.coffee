@@ -10,4 +10,6 @@ define [
     # Reference to this collection's model.
     model: Property
 
-    query: new Parse.Query("Property").equalTo("user", Parse.User.current())
+    initialize: ->
+      # We load PropertyList before Parse is initialized, so we cannot pre-load the query.
+      @query = new Parse.Query("Property").equalTo("user", Parse.User.current())

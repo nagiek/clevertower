@@ -1,4 +1,6 @@
 define
+  menu:
+    account_settings:               "Account settings"
   actions:
     signin:                         "Sign in"
     signup:                         "Sign up"
@@ -18,6 +20,7 @@ define
     password:                       "Password"
     edit_resource:                  "Edit %{resource}"
     password_change_hint:           "Leave blank if you don't want to change it"
+    password_required:              "We need your current password to change either your email or your password."
     password_current_hint:          "We need your current password to confirm your changes"
     cancel_account:                 "Cancel my account"
     cancel_account_instructions:    "Unhappy? %{href}"
@@ -26,13 +29,18 @@ define
     send_instructions:              "Send instructions"
     instructions_to_email:          "Instructions to change your password will be emailed to you."
   messages:
-    password_reset:                 "Password has been successfully reset. We have send further instructions to your email"
+    password_reset:                 "We have sent a link to reset your password to your email"
   errors:
     username_doesnt_exist:          "We don't have that email in our system. Why not sign up?"
     username_taken:                 "That email is in use. Have you forgotten your password?"
     fields_missing:                 "You must enter a username and password."
     invalid_login:                  "Invalid email or password. Please try again."
+    invalid_email:                  "Please enter a valid email address."
     invalid_email_format:           "Please enter a valid email address."
+    missing_password:               "You must enter your password to make changes."
+    "invalid login parameters":     "You have entered an incorrect email or password."
+    missing_passwords:              "You must confirm your password to change it."
+    unmatching_passwords:           "The passwords you entered do not match."
   mailer:
     general:
       greeting:                     "Hello %{name}"

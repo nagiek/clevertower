@@ -2,7 +2,7 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", 'views/helper/Alert', "i18n!nls/common", "i18n!nls/devise", "i18n!nls/user", 'templates/user/logged_out_menu', 'templates/user/reset_password'], function($, _, Parse, Alert, i18nCommon, i18nDevise, i18nUser) {
+  define(["jquery", "underscore", "backbone", 'models/Profile', 'views/helper/Alert', "i18n!nls/common", "i18n!nls/devise", "i18n!nls/user", 'templates/user/logged_out_menu', 'templates/user/reset_password'], function($, _, Parse, Profile, Alert, i18nCommon, i18nDevise, i18nUser) {
     var LoggedOutView;
     return LoggedOutView = (function(_super) {
 
@@ -21,15 +21,17 @@
       };
 
       LoggedOutView.prototype.initialize = function() {
+        var _this = this;
         _.bindAll(this, "logIn", "signUp", "resetPassword", "showResetPasswordModal");
-        return $('form#reset-password-form').on("submit", this.resetPassword);
+        this.on("user:login", function() {
+          $('#reset-password-modal').remove();
+          _this.undelegateEvents();
+          return delete _this;
+        });
+        return this.render();
       };
 
       LoggedOutView.prototype.render = function() {
-        var _this = this;
-        require(["views/todo/Manage"], function(ManageTodosView) {
-          return new ManageTodosView;
-        });
         this.$el.html(JST["src/js/templates/user/logged_out_menu.jst"]({
           i18nDevise: i18nDevise,
           i18nUser: i18nUser
@@ -38,6 +40,7 @@
           i18nCommon: i18nCommon,
           i18nDevise: i18nDevise
         }));
+        $('form#reset-password-form').on("submit", this.resetPassword);
         return this;
       };
 
@@ -89,11 +92,8 @@
         password = this.$("#login-password").val();
         return Parse.User.logIn(email, password, {
           success: function(user) {
-            _this.trigger("user:change");
-            $('#reset-password-modal').remove();
-            Parse.history.navigate("/");
-            _this.undelegateEvents();
-            return delete _this;
+            _this.trigger("user:login");
+            return _this.trigger("user:change");
           },
           error: function(user, error) {
             var msg;
@@ -125,11 +125,8 @@
           ACL: new Parse.ACL()
         }, {
           success: function(user) {
-            _this.trigger("user:change");
-            $('#reset-password-modal').remove();
-            Parse.history.navigate("/");
-            _this.undelegateEvents();
-            return delete _this;
+            _this.trigger("user:login");
+            return _this.trigger("user:change");
           },
           error: function(user, error) {
             var msg;

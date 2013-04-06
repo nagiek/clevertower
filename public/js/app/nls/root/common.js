@@ -49,7 +49,13 @@
       moment_format: "MM/DD/YYYY",
       datepicker_format: "mm/dd/yyyy",
       per_month: "Per month",
-      date: "Date"
+      date: "Date",
+      day: "Day",
+      month: "Month",
+      year: "Year",
+      months: {
+        short: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+      }
     },
     notifications: {
       img: "Notification Image",
@@ -82,9 +88,15 @@
     nouns: {
       link: "link"
     },
+    order: {
+      first: "First",
+      last: "Last"
+    },
     adjectives: {
       unsaved: "Unsaved",
-      all: "All"
+      all: "All",
+      "private": "Private",
+      landlord_only: "Landlord Only"
     },
     form: {
       title: "Title",

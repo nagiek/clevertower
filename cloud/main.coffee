@@ -34,34 +34,41 @@ Parse.Cloud.define "AddTenants", (req, res) ->
       
       tntRole = property.get "tntRole"
       if tntRole and mgrRole
-        tenantRoleUsers = tntRole.getUsers() 
+        tntRoleUsers = tntRole.getUsers() 
       
         # tenantACL
         tenantACL = new Parse.ACL
         tenantACL.setRoleReadAccess tntRole, true
         tenantACL.setRoleReadAccess mgrRole, true
         tenantACL.setRoleWriteAccess mgrRole, true
+        
+        # new profileACL
+        # Set to be totally open: will close when the user registers
+        profileACL = new Parse.ACL
+        profileACL.setPublicReadAccess true
+        profileACL.setPublicWriteAccess true
       
       # Create the tenants.
-      (new Parse.Query "_User").containedIn("username", emails).find()
-      .then (users) ->
+      # Query for the profile and include the user to add too roles
+      (new Parse.Query "Profile").include("_User").containedIn("username", emails).find()
+      .then (profiles) ->
         newUsersSignUps = []
         _.each emails, (email) ->
           found_user = false
-          found_user = _.find users, (user) -> return user if email is user.get "email"
+          found_user = _.find profiles, (profile) -> return profile.get("user") if email is profile.get "email"
           
           if found_user
             # User exists
             tenant = new Parse.Object("Tenant")
-            tenant.save(lease: lease, status: status, user: found_user, accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb", ACL: tenantACL)
+            tenant.save lease: lease, status: status, profile: found_user.get("profile"), accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb", ACL: tenantACL
             notificationACL.setReadAccess(found_user, true)
-            tenantRoleUsers.add found_user if tntRole
+            tntRoleUsers.add found_user if tntRole
             
           else
             # Notify the user
             Mandrill.sendEmail
               message:
-                subject: "Using Cloud Code and Mandrill is great!"
+                subject: "You have been invited to try CleverTower"
                 text: "Hello World!"
                 from_email: "parse@cloudcode.com"
                 from_name: "Cloud Code"
@@ -70,30 +77,22 @@ Parse.Cloud.define "AddTenants", (req, res) ->
             ,
               success: (httpres) ->
               error: (httpres) ->
-                
-            # Generate random password.
-            password = ""
-            possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-            for [1...8]
-              password += possible.charAt Math.floor(Math.random() * possible.length)
               
-            newUser = new Parse.User
-              username: email
-              password: password
+            newProfile = new Parse.Object "Profile",
               email: email
-              ACL: new Parse.ACL()
+              ACL: profileACL
               
             # Add the SignUp promise to the list of things to do.
-            newUsersSignUps.push newUser.signUp()
+            newUsersSignUps.push newProfile.save()
             
         # Sign up new user.
         if newUsersSignUps.length > 0
           Parse.Promise.when(newUsersSignUps)
           .then ->
-            _.each arguments, (user) ->
+            _.each arguments, (profile) ->
               tenant = new Parse.Object("Tenant")
-              tenant.save(lease: lease, status: status, user: user, accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb", ACL: tenantACL)
-              notificationACL.setReadAccess(user, true)
+              tenant.save(lease: lease, status: status, profile: profile, accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb", ACL: tenantACL)
+
             notification.setACL notificationACL
             notification.save
               text: "You have been invited to join #{title}"
@@ -101,7 +100,7 @@ Parse.Cloud.define "AddTenants", (req, res) ->
               name: "lease_invitation"
               user: req.user
               property: req.object.get("property")
-            tenantRoleUsers.add user if tntRole
+              
           , (error) ->
             res.error 'signup_error'
             
@@ -149,12 +148,61 @@ Parse.Cloud.define "CheckForUniqueProperty", (req, res) ->
 
 
 # User validation
-Parse.Cloud.beforeSave "_User", (req, res) ->
-  req.object.set "createdBy", req.user
-  email = req.object.get "email"
-  return res.error 'missing_username' if email is ''
-  return res.error 'invalid_email' unless /^([a-zA-Z0-9_.-])+@([a-zA-Z0-9_.-])+\.([a-zA-Z])+([a-zA-Z])+/.test email
+Parse.Cloud.beforeSave "Profile", (req, res) ->
+
+  # email = req.object.get "email"
+  # return res.error 'missing_username' if email is ''
+  # return res.error 'invalid_email_format' unless /^([a-zA-Z0-9_.-])+@([a-zA-Z0-9_.-])+\.([a-zA-Z])+([a-zA-Z])+/.test email
+  
+  req.object.set "createdBy", req.user unless req.object.existed()
+  
   res.success()
+
+# User after save
+Parse.Cloud.afterSave "_User", (req, res) ->
+  
+  return if req.object.existed()
+  
+  email = req.object.get "email"
+  
+  # Map the user to the profile, if any.
+  (new Parse.Query "Profile").equalTo('email', email).first()
+  .then (profile) ->
+
+    # Create a new ACL, as the existing one is set to public/public.
+    # We will add to the ACL later.
+    profileACL = new Parse.ACL()
+    profileACL.setPublicReadAccess true
+    profileACL.setWriteAccess req.object, true
+
+    unless profile
+      profile = new Parse.Object("Profile")
+      profile.setACL profileACL
+      profile.save user: req.object
+
+    else
+    
+      _ = require "underscore"
+    
+      # Include the user into any properties they have been invited to.
+      (new Parse.Query "Managers").include('property.role').equalTo('profile', profile).find()
+      .then (objs) ->
+        _.each objs, (obj) ->
+          role = obj.get("property").get("role")
+          if role
+            role.getUsers().add req.obj
+            role.save()
+        (new Parse.Query "Tenants").include('lease.role').equalTo('profile', profile).find()
+        .then (objs) ->
+          _.each objs, (obj) ->
+            role = obj.get("lease").get("role")
+            if role
+              role.getUsers().add req.obj
+              role.save()
+            
+            # No more steps. Save.
+            profile.setACL profileACL
+            profile.save(user: req.object)
 
 
 # Property validation
@@ -395,9 +443,10 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
   (new Parse.Query "Lease").include('tntRole').get req.object.get("lease").id,
   success: (lease) ->
     propertyId = lease.get("property").id
-    user = req.object.get("User")
+    profile = req.object.get "profile"
+    user = profile.get "user"
     status = req.object.get "status"
-    tntRole = property.get "tntRole"
+    tntRole = lease.get "tntRole"
     
     # Change the status depending on who is creating the link.
     (new Parse.Query "Property").include('mgrRole').get propertyId,
@@ -413,17 +462,17 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
         req.object.setACL tenantACL
       
       if mgrRole
-        # Check if the user is in the role.
+        # Check if the REQUEST user is in the role.
         # Users are in a Parse.Relation, which requires a second query.
         users = mgrRole.getUsers()
-        users.query().equalTo("user", user).first()
+        users.query().equalTo("user", req.user).first()
         .then (obj) ->
           if obj
-              
+            
             # Add the user to the tenant ACL list. Currently, there is only 
             # one list, but this may have to be divided in the future.
             tenantRole = lease.get "tntRole"
-            tenantRole.getUsers().add req.object.get("user")
+            tenantRole.getUsers().add user
             tenantRole.save()
             
             # Notify the user.
@@ -478,6 +527,9 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
 # Notification tasks
 Parse.Cloud.afterSave "Notification", (req) ->
   
+  Mandrill = require 'mandrill'
+  Mandrill.initialize 'rE7-kYdcFOw7SxRfCfkVzQ'
+  
   # Executed in afterSave to avoid holding up any waiting.
   # Could place it beforeSave if there are consistent problems.
   return if req.object.get "error"
@@ -514,7 +566,7 @@ Parse.Cloud.afterSave "Notification", (req) ->
   
   signature = C.CryptoJS.HmacSHA256(string_to_sign, secret).toString(C.CryptoJS.enc.Hex)
   
-  Parse.Cloud.httpreq
+  Parse.Cloud.httpRequest
     method: method,
     url: serverUrl + addedUrl,
     headers: 
@@ -529,7 +581,22 @@ Parse.Cloud.afterSave "Notification", (req) ->
     success: (httpres) ->
     error: (error) ->
       req.object.set "error", error.text
-      req.object.save()  
+      req.object.save()
+      
+  # This will only work if we can get the users.
+  # 
+  # # Sena an email
+  # Mandrill.sendEmail
+  #   message:
+  #     subject: name
+  #     text: text
+  #     from_email: "parse@cloudcode.com"
+  #     from_name: "Cloud Code"
+  #     to: [{email: email, name: email}]
+  #   async: true
+  # ,
+  #   success: (httpres) ->
+  #   error: (httpres) ->
   
   # Send a push notification
   Parse.Push.send 

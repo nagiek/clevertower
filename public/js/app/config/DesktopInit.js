@@ -56,23 +56,9 @@
     return window.google.maps;
   });
 
-  require(["jquery", "backbone", "routers/Desktop", "json2", "bootstrap", "serializeObject"], function($, Parse, AppRouter) {
+  require(["jquery", "backbone", "collections/property/PropertyList", "models/Profile", "routers/Desktop", "json2", "bootstrap", "serializeObject"], function($, Parse, PropertyList, Profile, AppRouter) {
+    var _this = this;
     Parse.initialize("z00OPdGYL7X4uW9soymp8n5JGBSE6k26ILN1j3Hu", "NifB9pRHfmsTDQSDA9DKxMuux03S4w2WGVdcxPHm");
-    Parse.User.prototype.defaults = {
-      first_name: "",
-      last_name: "",
-      image_thumb: "",
-      image_profile: "",
-      image_full: ""
-    };
-    Parse.User.prototype.cover = function(format) {
-      var img;
-      img = this.get("image_" + format);
-      if (img === '' || !(img != null)) {
-        img = "/img/fallback/avatar-" + format + ".png";
-      }
-      return img;
-    };
     Parse.User.prototype.validate = function(attrs, options) {
       if (_.has(attrs, "ACL") && !(attrs.ACL instanceof Parse.ACL)) {
         return new Parse.Error(Parse.Error.OTHER_CAUSE, "ACL must be a Parse.ACL.");
@@ -86,26 +72,15 @@
       }
       return false;
     };
-    Parse.User.prototype.validate = function(attrs, options) {
-      if (attrs == null) {
-        attrs = {};
-      }
-      if (options == null) {
-        options = {};
-      }
-      if (_.has(attrs, "ACL") && !(attrs.ACL instanceof Parse.ACL)) {
-        return new Parse.Error(Parse.Error.OTHER_CAUSE, "ACL must be a Parse.ACL.");
-      }
-      if (attrs.email && attrs.email !== "") {
-        if (!/^([a-zA-Z0-9_.-])+@([a-zA-Z0-9_.-])+\.([a-zA-Z])+([a-zA-Z])+/.test(attrs.email)) {
-          return {
-            message: "invalid_email"
-          };
-        }
-      }
-      return false;
-    };
-    return new AppRouter();
+    if (Parse.User.current()) {
+      Parse.User.current().properties = new PropertyList;
+      return (new Parse.Query(Profile)).equalTo("user", Parse.User.current()).first().then(function(profile) {
+        Parse.User.current().profile = profile;
+        return new AppRouter();
+      });
+    } else {
+      return new AppRouter();
+    }
   });
 
 }).call(this);

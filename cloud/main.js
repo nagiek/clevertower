@@ -19,24 +19,27 @@
         notificationACL = new Parse.ACL;
         return (new Parse.Query("Lease")).include('tntRole').get(req.params.leaseId, {
           success: function(lease) {
-            var tenantACL, tenantRoleUsers, tntRole;
+            var profileACL, tenantACL, tntRole, tntRoleUsers;
             tntRole = property.get("tntRole");
             if (tntRole && mgrRole) {
-              tenantRoleUsers = tntRole.getUsers();
+              tntRoleUsers = tntRole.getUsers();
               tenantACL = new Parse.ACL;
               tenantACL.setRoleReadAccess(tntRole, true);
               tenantACL.setRoleReadAccess(mgrRole, true);
               tenantACL.setRoleWriteAccess(mgrRole, true);
+              profileACL = new Parse.ACL;
+              profileACL.setPublicReadAccess(true);
+              profileACL.setPublicWriteAccess(true);
             }
-            return (new Parse.Query("_User")).containedIn("username", emails).find().then(function(users) {
+            return (new Parse.Query("Profile")).include("_User").containedIn("username", emails).find().then(function(profiles) {
               var newUsersSignUps;
               newUsersSignUps = [];
               _.each(emails, function(email) {
-                var found_user, newUser, password, possible, tenant, _i;
+                var found_user, newProfile, tenant;
                 found_user = false;
-                found_user = _.find(users, function(user) {
-                  if (email === user.get("email")) {
-                    return user;
+                found_user = _.find(profiles, function(profile) {
+                  if (email === profile.get("email")) {
+                    return profile.get("user");
                   }
                 });
                 if (found_user) {
@@ -44,18 +47,18 @@
                   tenant.save({
                     lease: lease,
                     status: status,
-                    user: found_user,
+                    profile: found_user.get("profile"),
                     accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb",
                     ACL: tenantACL
                   });
                   notificationACL.setReadAccess(found_user, true);
                   if (tntRole) {
-                    return tenantRoleUsers.add(found_user);
+                    return tntRoleUsers.add(found_user);
                   }
                 } else {
                   Mandrill.sendEmail({
                     message: {
-                      subject: "Using Cloud Code and Mandrill is great!",
+                      subject: "You have been invited to try CleverTower",
                       text: "Hello World!",
                       from_email: "parse@cloudcode.com",
                       from_name: "Cloud Code",
@@ -71,45 +74,34 @@
                     success: function(httpres) {},
                     error: function(httpres) {}
                   });
-                  password = "";
-                  possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-                  for (_i = 1; _i < 8; _i++) {
-                    password += possible.charAt(Math.floor(Math.random() * possible.length));
-                  }
-                  newUser = new Parse.User({
-                    username: email,
-                    password: password,
+                  newProfile = new Parse.Object("Profile", {
                     email: email,
-                    ACL: new Parse.ACL()
+                    ACL: profileACL
                   });
-                  return newUsersSignUps.push(newUser.signUp());
+                  return newUsersSignUps.push(newProfile.save());
                 }
               });
               if (newUsersSignUps.length > 0) {
                 Parse.Promise.when(newUsersSignUps).then(function() {
-                  _.each(arguments, function(user) {
+                  _.each(arguments, function(profile) {
                     var tenant;
                     tenant = new Parse.Object("Tenant");
-                    tenant.save({
+                    return tenant.save({
                       lease: lease,
                       status: status,
-                      user: user,
+                      profile: profile,
                       accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb",
                       ACL: tenantACL
                     });
-                    return notificationACL.setReadAccess(user, true);
                   });
                   notification.setACL(notificationACL);
-                  notification.save({
+                  return notification.save({
                     text: "You have been invited to join " + title,
                     channels: ["leases-" + req.params.leaseId],
                     name: "lease_invitation",
                     user: req.user,
                     property: req.object.get("property")
                   });
-                  if (tntRole) {
-                    return tenantRoleUsers.add(user);
-                  }
                 }, function(error) {
                   return res.error('signup_error');
                 });
@@ -151,17 +143,58 @@
     });
   });
 
-  Parse.Cloud.beforeSave("_User", function(req, res) {
-    var email;
-    req.object.set("createdBy", req.user);
-    email = req.object.get("email");
-    if (email === '') {
-      return res.error('missing_username');
-    }
-    if (!/^([a-zA-Z0-9_.-])+@([a-zA-Z0-9_.-])+\.([a-zA-Z])+([a-zA-Z])+/.test(email)) {
-      return res.error('invalid_email');
+  Parse.Cloud.beforeSave("Profile", function(req, res) {
+    if (!req.object.existed()) {
+      req.object.set("createdBy", req.user);
     }
     return res.success();
+  });
+
+  Parse.Cloud.afterSave("_User", function(req, res) {
+    var email;
+    if (req.object.existed()) {
+      return;
+    }
+    email = req.object.get("email");
+    return (new Parse.Query("Profile")).equalTo('email', email).first().then(function(profile) {
+      var profileACL, _;
+      profileACL = new Parse.ACL();
+      profileACL.setPublicReadAccess(true);
+      profileACL.setWriteAccess(req.object, true);
+      if (!profile) {
+        profile = new Parse.Object("Profile");
+        profile.setACL(profileACL);
+        return profile.save({
+          user: req.object
+        });
+      } else {
+        _ = require("underscore");
+        return (new Parse.Query("Managers")).include('property.role').equalTo('profile', profile).find().then(function(objs) {
+          _.each(objs, function(obj) {
+            var role;
+            role = obj.get("property").get("role");
+            if (role) {
+              role.getUsers().add(req.obj);
+              return role.save();
+            }
+          });
+          return (new Parse.Query("Tenants")).include('lease.role').equalTo('profile', profile).find().then(function(objs) {
+            return _.each(objs, function(obj) {
+              var role;
+              role = obj.get("lease").get("role");
+              if (role) {
+                role.getUsers().add(req.obj);
+                role.save();
+              }
+              profile.setACL(profileACL);
+              return profile.save({
+                user: req.object
+              });
+            });
+          });
+        });
+      }
+    });
   });
 
   Parse.Cloud.beforeSave("Property", function(req, res) {
@@ -407,11 +440,12 @@
     }
     return (new Parse.Query("Lease")).include('tntRole').get(req.object.get("lease").id, {
       success: function(lease) {
-        var propertyId, status, tntRole, user;
+        var profile, propertyId, status, tntRole, user;
         propertyId = lease.get("property").id;
-        user = req.object.get("User");
+        profile = req.object.get("profile");
+        user = profile.get("user");
         status = req.object.get("status");
-        tntRole = property.get("tntRole");
+        tntRole = lease.get("tntRole");
         return (new Parse.Query("Property")).include('mgrRole').get(propertyId, {
           success: function(property) {
             var mgrRole, tenantACL, users;
@@ -431,11 +465,11 @@
             }
             if (mgrRole) {
               users = mgrRole.getUsers();
-              return users.query().equalTo("user", user).first().then(function(obj) {
+              return users.query().equalTo("user", req.user).first().then(function(obj) {
                 var name, notification, notificationACL, tenantRole, title;
                 if (obj) {
                   tenantRole = lease.get("tntRole");
-                  tenantRole.getUsers().add(req.object.get("user"));
+                  tenantRole.getUsers().add(user);
                   tenantRole.save();
                   title = property.get("thoroughfare");
                   notification = new Parse.Object("Notification");
@@ -496,7 +530,9 @@
   });
 
   Parse.Cloud.afterSave("Notification", function(req) {
-    var C, addedUrl, body, body_md5, channels, key, method, secret, serverUrl, signature, string_to_sign, text, timestamp, version;
+    var C, Mandrill, addedUrl, body, body_md5, channels, key, method, secret, serverUrl, signature, string_to_sign, text, timestamp, version;
+    Mandrill = require('mandrill');
+    Mandrill.initialize('rE7-kYdcFOw7SxRfCfkVzQ');
     if (req.object.get("error")) {
       return;
     }
@@ -525,7 +561,7 @@
     body_md5 = C.CryptoJS.MD5(body).toString(C.CryptoJS.enc.Hex);
     string_to_sign = method + "\n" + addedUrl + "\n" + ("auth_key=" + key) + ("&auth_timestamp=" + timestamp) + ("&auth_version=" + version) + ("&body_md5=" + body_md5);
     signature = C.CryptoJS.HmacSHA256(string_to_sign, secret).toString(C.CryptoJS.enc.Hex);
-    Parse.Cloud.httpreq({
+    Parse.Cloud.httpRequest({
       method: method,
       url: serverUrl + addedUrl,
       headers: {

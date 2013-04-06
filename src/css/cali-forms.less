@@ -11,6 +11,17 @@
   }
 }
 
+.form-horizontal {
+  // Multiple controls and labels within the same group
+  .controls + .control-label {
+    margin-top:5px;
+    & + .controls {
+      margin-top:5px;
+    }
+  }
+}
+
+
 legend {
   margin-bottom:9px;
 }

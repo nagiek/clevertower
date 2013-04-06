@@ -2,13 +2,14 @@ define [
   "jquery"
   "underscore"
   "backbone"
+  'models/Profile'
   'views/helper/Alert'
   "i18n!nls/common"
   "i18n!nls/devise"
   "i18n!nls/user"
   'templates/user/logged_out_menu'
   'templates/user/reset_password'
-], ($, _, Parse, Alert, i18nCommon, i18nDevise, i18nUser) ->
+], ($, _, Parse, Profile, Alert, i18nCommon, i18nDevise, i18nUser) ->
 
   class LoggedOutView extends Parse.View
 
@@ -22,15 +23,20 @@ define [
     initialize: ->
       _.bindAll this, "logIn", "signUp", "resetPassword", "showResetPasswordModal"
 
-      # Bind this here instead of events, as it is outside the view.
-      $('form#reset-password-form').on "submit", @resetPassword
+      @on "user:login", =>
+        $('#reset-password-modal').remove()
+        @undelegateEvents();
+        delete this
+        
+      @render()
 
     render: ->
-      require ["views/todo/Manage"], (ManageTodosView) =>
-        new ManageTodosView
-        
       @$el.html JST["src/js/templates/user/logged_out_menu.jst"](i18nDevise: i18nDevise, i18nUser: i18nUser)
       $('body').append JST["src/js/templates/user/reset_password.jst"](i18nCommon: i18nCommon, i18nDevise: i18nDevise)
+      
+      # Bind this here instead of events, as it is outside the view.
+      $('form#reset-password-form').on "submit", @resetPassword
+      
       @
 
     showResetPasswordModal: (e) ->
@@ -59,12 +65,9 @@ define [
       email = @$("#login-username").val()
       password = @$("#login-password").val()
       Parse.User.logIn email, password,
-        success: (user) =>
+        success: (user) =>  
+          @trigger "user:login"
           @trigger "user:change"
-          $('#reset-password-modal').remove()
-          Parse.history.navigate "/"
-          @undelegateEvents();
-          delete this
 
         error: (user, error) =>
           @$('.login-form .username-group').addClass('error')
@@ -84,11 +87,8 @@ define [
       password = @$("#signup-password").val()
       Parse.User.signUp email, password, { email: email, ACL: new Parse.ACL() },
         success: (user) =>
+          @trigger "user:login"
           @trigger "user:change"
-          $('#reset-password-modal').remove()
-          Parse.history.navigate "/"
-          @undelegateEvents();
-          delete this
 
         error: (user, error) =>
           @$(".signup-form .error").removeClass('error')

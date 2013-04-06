@@ -80,7 +80,7 @@
         this.$list.html('');
         this.model.units.each(this.addOne);
         if (this.model.units.length === 0) {
-          return this.$list.html('<p class="empty">' + i18nUnit.collection.empty.units + '</p>');
+          return this.$list.html('<p class="empty">' + i18nProperty.collection.empty.units + '</p>');
         }
       };
 

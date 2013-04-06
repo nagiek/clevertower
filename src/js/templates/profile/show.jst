@@ -1,0 +1,30 @@
+<section class="offset1 span10">
+  <a href="/user/1" class="photo photo-medium stay-left">
+    <img src="<%= cover %>" alt="<%= name %>" width="180" height="180" />
+  </a>
+
+  <div class="photo-float medium-float">
+    <h1><%= name %></h1>
+
+    <% if (current) { %>
+      <div class="btn-group">
+        <a href="/account/edit" class="btn"><%= i18nUser.menu.edit_my_profile %></a>
+        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+          <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+          <li><a href="/account/settings"><%= i18nUser.menu.account %></a></li>
+          <li><a href="/account/privacy"><%= i18nUser.menu.privacy %></a></li>
+        </ul>
+      </div>
+    <% } %>
+
+    <% if (bio) { %>
+      <div><%= bio %></div>
+    <% } %>
+    
+    <% if (website) { %>
+      <div><%= website %></div>
+    <% } %>
+  </div><!--/.info-->
+</section>

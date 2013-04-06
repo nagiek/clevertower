@@ -46,10 +46,10 @@ define [
         @$('.emails-group').addClass('error') 
         new Alert(event: 'model-save', fade: false, message: error.message, type: 'error')
           
-      @on 'submit:success', (leaseId) ->
+      @on 'submit:success', (lease) ->
         @$('button.save').removeProp "disabled"
         new Alert(event: 'model-save', message: i18nCommon.actions.changes_saved, type: 'success')
-        Parse.history.navigate "/properties/#{@property.id}/leases/#{leaseId}"
+        Parse.history.navigate "/properties/#{@property.id}/leases/#{lease.id}"
       
 
       
@@ -112,7 +112,7 @@ define [
         @trigger "submit:error", {message: 'tenants_incorrect'}
       else
         Parse.Cloud.run "AddTenants", attrs,
-        success: (model) => @trigger "submit:success", data.lease
+        success: (model) => @trigger "submit:success", model
         error: (model, error) => @trigger "submit:error", {message: 'tenants_incorrect'}
 
     render: ->

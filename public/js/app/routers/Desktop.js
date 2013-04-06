@@ -3,7 +3,7 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "backbone", "views/user/User"], function($, Parse, UserView) {
+  define(["jquery", "backbone", "views/user/UserMenu"], function($, Parse, UserMenuView) {
     var DesktopRouter;
     return DesktopRouter = (function(_super) {
 
@@ -23,6 +23,9 @@
         "properties/new": "propertiesNew",
         "properties/:id": "propertiesShow",
         "properties/:id/*splat": "propertiesShow",
+        "users/:id": "profileShow",
+        "users/:id/edit": "profileEdit",
+        "account/:category": "accountSettings",
         "*actions": "index"
       };
 
@@ -30,7 +33,7 @@
         Parse.history.start({
           pushState: true
         });
-        new UserView();
+        new UserMenuView();
         return $(document).on("click", "a", function(e) {
           var href, protocol;
           href = $(this).attr("href");
@@ -66,7 +69,7 @@
             });
           }
         } else {
-          return this.accessDenied();
+          return $('#main').html('<h1>Cover page goes here</h1>');
         }
       };
 
@@ -77,10 +80,10 @@
             if (!_this.view || !(_this.view instanceof ManagePropertiesView)) {
               _this.view = new ManagePropertiesView;
             }
-            return _this.view.$('#new-property').click();
+            return _this.view.render().$('#new-property').click();
           });
         } else {
-          return this.accessDenied();
+          return this.signupOrLogin();
         }
       };
 
@@ -89,7 +92,6 @@
         if (Parse.User.current()) {
           return require(["views/property/Show"], function(PropertyView) {
             var vars;
-            console.log(_this.view);
             if (!_this.view || !(_this.view instanceof PropertyView)) {
               return require(["models/Property", "collections/property/PropertyList"], function(Property, PropertyList) {
                 var combo, model, vars;
@@ -141,7 +143,75 @@
             }
           });
         } else {
-          return this.accessDenied();
+          return this.signupOrLogin();
+        }
+      };
+
+      DesktopRouter.prototype.profileShow = function(id) {
+        var _this = this;
+        return require(["models/Profile", "views/profile/Show"], function(Profile, ShowProfileView) {
+          if (Parse.User.current().profile && id === Parse.User.current().profile.id) {
+            _this.view = new ShowProfileView({
+              model: Parse.User.current().profile,
+              current: true
+            });
+            return _this.view.render();
+          } else {
+            return (new Parse.Query(Profile)).get(id, {
+              success: function(obj) {
+                _this.view = new ShowProfileView({
+                  model: obj,
+                  current: false
+                });
+                return _this.view.render();
+              }
+            });
+          }
+        });
+      };
+
+      DesktopRouter.prototype.profileEdit = function(id) {
+        var _this = this;
+        return require(["models/Profile", "views/profile/Edit"], function(Profile, EditProfileView) {
+          if (Parse.User.current().profile && id === Parse.User.current().profile.id) {
+            _this.view = new EditProfileView({
+              model: Parse.User.current().profile,
+              current: true
+            });
+            return _this.view.render();
+          } else {
+            return (new Parse.Query(Profile)).get(id, {
+              success: function(obj) {
+                _this.view = new EditProfileView({
+                  model: obj,
+                  current: false
+                });
+                return _this.view.render();
+              }
+            });
+          }
+        });
+      };
+
+      DesktopRouter.prototype.accountSettings = function(category) {
+        var _this = this;
+        if (Parse.User.current().authenticated()) {
+          if (category === 'edit') {
+            return require(["views/profile/edit"], function(UserSettingsView) {
+              return _this.view = new UserSettingsView({
+                model: Parse.User.current().profile,
+                current: true
+              }).render();
+            });
+          } else {
+            return require(["views/user/" + category], function(UserSettingsView) {
+              return _this.view = new UserSettingsView({
+                model: Parse.User.current()
+              }).render();
+            });
+          }
+        } else {
+          return this.signupOrLogin();
         }
       };
 
@@ -168,6 +238,19 @@
       };
 
       DesktopRouter.prototype.accessDenied = function() {
+        return require(["views/helper/Alert", 'i18n!nls/common'], function(Alert, i18nCommon) {
+          new Alert({
+            event: 'access-denied',
+            type: 'error',
+            fade: true,
+            heading: i18nCommon.errors.access_denied,
+            message: i18nCommon.errors.no_permission
+          });
+          return Parse.history.navigate("/");
+        });
+      };
+
+      DesktopRouter.prototype.signupOrLogin = function() {
         return require(["views/helper/Alert", 'i18n!nls/common'], function(Alert, i18nCommon) {
           new Alert({
             event: 'access-denied',

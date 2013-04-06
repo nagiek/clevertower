@@ -45,6 +45,12 @@ define
     datepicker_format:    "mm/dd/yyyy" # Same as above, but for datepicker widget
     per_month:            "Per month"
     date:                 "Date"
+    day:                  "Day"
+    month:                "Month"
+    year:                 "Year"
+    months:
+      short:               ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+      
   notifications:
     img:                  "Notification Image"
     empty:                "No new notifications"
@@ -68,9 +74,14 @@ define
     loading:              "Loading"
   nouns:             
     link:                 "link"
-  adjectives:             
+  order:
+    first:                "First"
+    last:                 "Last"
+  adjectives:
     unsaved:              "Unsaved"
     all:                  "All"
+    private:              "Private"
+    landlord_only:        "Landlord Only"
   form:                   
     title:                "Title"
     info:                 "Info"

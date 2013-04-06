@@ -14,7 +14,9 @@
 
       PropertyList.prototype.model = Property;
 
-      PropertyList.prototype.query = new Parse.Query("Property").equalTo("user", Parse.User.current());
+      PropertyList.prototype.initialize = function() {
+        return this.query = new Parse.Query("Property").equalTo("user", Parse.User.current());
+      };
 
       return PropertyList;
 

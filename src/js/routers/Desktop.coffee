@@ -1,8 +1,8 @@
 define [
   "jquery", 
   "backbone",
-  "views/user/User"
-], ($, Parse, UserView) ->
+  "views/user/UserMenu"
+], ($, Parse, UserMenuView) ->
 
   class DesktopRouter extends Parse.Router
     routes:
@@ -10,12 +10,15 @@ define [
       "properties/new"              : "propertiesNew"
       "properties/:id"              : "propertiesShow"
       "properties/:id/*splat"       : "propertiesShow"
+      "users/:id"                   : "profileShow"
+      "users/:id/edit"              : "profileEdit"
+      "account/:category"           : "accountSettings"
       "*actions"                    : "index"
 
     initialize: (options) ->
       Parse.history.start pushState: true
       
-      new UserView()
+      new UserMenuView()
       
       # Use delegation to avoid initial DOM selection and allow all matching elements to bubble
       $(document).on "click", "a", (e) ->
@@ -50,20 +53,19 @@ define [
             @view = new ManagePropertiesView if !@view or @view !instanceof ManagePropertiesView
             @view.render()
       else
-        @accessDenied()
+        $('#main').html '<h1>Cover page goes here</h1>'
 
     propertiesNew: =>
       if Parse.User.current()
         require ["views/property/Manage"], (ManagePropertiesView) =>
           @view = new ManagePropertiesView if !@view or @view !instanceof ManagePropertiesView
-          @view.$('#new-property').click()
+          @view.render().$('#new-property').click()
       else
-        @accessDenied()
+        @signupOrLogin()
         
     propertiesShow: (id, splat) =>
       if Parse.User.current()
         require ["views/property/Show"], (PropertyView) => 
-          console.log @view
           if !@view or @view !instanceof PropertyView
                   
             require ["models/Property", "collections/property/PropertyList"], (Property, PropertyList) => 
@@ -101,8 +103,41 @@ define [
             @view.changeSubView(vars.path, vars.params)
             
       else
-        @accessDenied()
+        @signupOrLogin()
 
+    profileShow : (id) ->
+      require ["models/Profile", "views/profile/Show"], (Profile, ShowProfileView) =>
+        if Parse.User.current().profile and id is Parse.User.current().profile.id
+          @view = new ShowProfileView model: Parse.User.current().profile, current: true
+          @view.render()
+        else
+          (new Parse.Query(Profile)).get id,
+          success: (obj) => 
+            @view = new ShowProfileView model: obj, current: false
+            @view.render()
+
+    profileEdit : (id) ->
+      require ["models/Profile", "views/profile/Edit"], (Profile, EditProfileView) =>
+        if Parse.User.current().profile and id is Parse.User.current().profile.id
+          @view = new EditProfileView model: Parse.User.current().profile, current: true
+          @view.render()
+        else
+          (new Parse.Query(Profile)).get id,
+          success: (obj) => 
+            @view = new EditProfileView model: obj, current: false
+            @view.render()
+            
+    accountSettings : (category) ->
+      if Parse.User.current().authenticated()
+        if category is 'edit'
+          require ["views/profile/edit"], (UserSettingsView) =>
+            @view = new UserSettingsView(model: Parse.User.current().profile, current: true).render()
+        else
+          require ["views/user/#{category}"], (UserSettingsView) =>
+            @view = new UserSettingsView(model: Parse.User.current()).render()
+      else
+        @signupOrLogin()
+  
     deparamAction : (splat) ->
       ary = if splat then splat.split('?') else new Array('')
       combo = 
@@ -122,6 +157,16 @@ define [
       params
       
     accessDenied: ->
+      require ["views/helper/Alert", 'i18n!nls/common'], (Alert, i18nCommon) -> 
+        new Alert
+          event:    'access-denied'
+          type:     'error'
+          fade:     true
+          heading:  i18nCommon.errors.access_denied
+          message:  i18nCommon.errors.no_permission
+        Parse.history.navigate "/"
+        
+    signupOrLogin: ->
       require ["views/helper/Alert", 'i18n!nls/common'], (Alert, i18nCommon) -> 
         new Alert
           event:    'access-denied'
