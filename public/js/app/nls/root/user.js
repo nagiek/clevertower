@@ -13,9 +13,13 @@
       edit_my_profile: "Edit my profile",
       account: "Account",
       privacy: "Privacy",
+      apps: "Apps",
       account_settings: "Account settings",
       privacy_settings: "Privacy settings",
       profile_menu: "Profile menu"
+    },
+    app_descriptions: {
+      facebook: "Connect with friends and the world around you on Facebook."
     },
     show: {
       portrait: "%{user}'s portrait"

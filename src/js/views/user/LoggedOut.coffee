@@ -17,6 +17,7 @@ define [
 
     events:
       "submit form.login-form"  : "logIn"
+      "click .btn-facebook": "logInWithFacebook"
       "submit form.signup-form" : "signUp"
       "click .reset-password-modal" : "showResetPasswordModal"
 
@@ -38,6 +39,15 @@ define [
       $('form#reset-password-form').on "submit", @resetPassword
       
       @
+      
+    logInWithFacebook : (e) ->  
+      e.preventDefault()
+      Parse.FacebookUtils.logIn "user_likes,email",
+        success: (user) ->
+          @trigger "user:login"
+          @trigger "user:change"
+        error: (user, error) ->
+
 
     showResetPasswordModal: (e) ->
       $('#reset-password-modal').modal()

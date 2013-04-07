@@ -19,6 +19,8 @@ define [
     initialize : (attrs) ->
       
       _.bindAll this, 'save', 'resetPassword'
+
+      @model.on 'change', @render
                   
       @model.on 'invalid', (error) =>
         @$('.error').removeClass('error')

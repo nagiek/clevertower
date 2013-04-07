@@ -13,7 +13,12 @@
       forgot_your_password: "Forgot your password?",
       missing_confirmation: "Didn't receive confirmation instructions?",
       missing_unlock: "Didn't receive unlock instructions?",
-      sign_in_with: "Sign in with %{provider}",
+      sign_in_with: function(provider) {
+        return "Sign in with " + (_.escape(provider));
+      },
+      sign_up_with: function(provider) {
+        return "Sign up with " + (_.escape(provider));
+      },
       change_password: "Change my password",
       confirm_account: "Confirm my account",
       resend_unlock_instructions: "Resend unlock instructions",

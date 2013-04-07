@@ -16,6 +16,7 @@
 
       LoggedOutView.prototype.events = {
         "submit form.login-form": "logIn",
+        "click .btn-facebook": "logInWithFacebook",
         "submit form.signup-form": "signUp",
         "click .reset-password-modal": "showResetPasswordModal"
       };
@@ -42,6 +43,17 @@
         }));
         $('form#reset-password-form').on("submit", this.resetPassword);
         return this;
+      };
+
+      LoggedOutView.prototype.logInWithFacebook = function(e) {
+        e.preventDefault();
+        return Parse.FacebookUtils.logIn("user_likes,email", {
+          success: function(user) {
+            this.trigger("user:login");
+            return this.trigger("user:change");
+          },
+          error: function(user, error) {}
+        });
       };
 
       LoggedOutView.prototype.showResetPasswordModal = function(e) {

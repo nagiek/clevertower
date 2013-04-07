@@ -59,6 +59,13 @@
   require(["jquery", "backbone", "collections/property/PropertyList", "models/Profile", "routers/Desktop", "json2", "bootstrap", "serializeObject"], function($, Parse, PropertyList, Profile, AppRouter) {
     var _this = this;
     Parse.initialize("z00OPdGYL7X4uW9soymp8n5JGBSE6k26ILN1j3Hu", "NifB9pRHfmsTDQSDA9DKxMuux03S4w2WGVdcxPHm");
+    Parse.FacebookUtils.init({
+      appId: '387187337995318',
+      channelUrl: '//localhost:3000/fb-channel',
+      status: true,
+      cookie: true,
+      xfbml: true
+    });
     Parse.User.prototype.defaults = {
       privacy_visible: false,
       privacy_unit: false

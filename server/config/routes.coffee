@@ -4,6 +4,14 @@ module.exports = (app) ->
   # admin   = require('./admin_rest')(app)
   # helpers  = require('./helpers')(app)
 
+  app.get('/fb-channel', (req, res) ->
+    var body = '<script type="text/javascript" src="//connect.facebook.net/en_US/all.js"></script>';
+    res.setHeader 'Content-Type', 'text/html'
+    res.setHeader 'Content-Length', body.length
+    res.setHeader 'Expires', new Date(2015,01,01).toString()
+    res.end(body);
+  });
+
   app.get '/', (req, res) ->
     res.render 'index'
   app.get '/*', (req, res) ->

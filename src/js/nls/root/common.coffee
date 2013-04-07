@@ -31,6 +31,8 @@ define
     back:                 "Back"
     edit:                 "Edit"
     undo:                 "Undo"
+    link:                 "Link"
+    revoke_access:        "Revoke access"
     confirm:              "Are you sure?"
     add_more:             "Add more"
     add_another:          "Add another"
@@ -79,6 +81,7 @@ define
     last:                 "Last"
   adjectives:
     unsaved:              "Unsaved"
+    linked:               "Linked"
     all:                  "All"
     private:              "Private"
     landlord_only:        "Landlord Only"

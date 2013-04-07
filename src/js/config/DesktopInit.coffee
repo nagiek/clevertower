@@ -101,6 +101,17 @@ require ["jquery", "backbone", "collections/property/PropertyList", "models/Prof
   
   Parse.initialize "z00OPdGYL7X4uW9soymp8n5JGBSE6k26ILN1j3Hu", "NifB9pRHfmsTDQSDA9DKxMuux03S4w2WGVdcxPHm" # JS Key  
 
+  # init the FB JS SDK
+  Parse.FacebookUtils.init
+    appId      : '387187337995318'                # Facebook App ID
+    channelUrl : '//localhost:3000/fb-channel'      # Channel File (must be absolute path)
+    status     : true                             # check login status
+    cookie     : true                             # enable cookies to allow Parse to access the session
+    xfbml      : true                             # parse XFBML
+
+
+    # Additional initialization code such as adding Event Listeners goes here
+
   # Setup
   # Extend Parse User
   Parse.User::defaults = 

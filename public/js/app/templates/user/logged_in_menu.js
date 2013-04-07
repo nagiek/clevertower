@@ -14,6 +14,8 @@ __p += '<li><a id="profile-link" href="/users/' +
 ((__t = ( i18nUser.menu.account_settings )) == null ? '' : __t) +
 '</a></li>\n    <li><a href="/account/privacy"><i class="icon icon-lock"></i> ' +
 ((__t = ( i18nUser.menu.privacy_settings )) == null ? '' : __t) +
+'</a></li>\n    <li><a href="/account/apps"><i class="icon icon-th"></i> ' +
+((__t = ( i18nUser.menu.apps )) == null ? '' : __t) +
 '</a></li>\n    <li class="divider">\n    <li><a id="logout" href="#">' +
 ((__t = ( i18nDevise.actions.logout )) == null ? '' : __t) +
 '</a></li>\n  </ul>\n</li>';

@@ -33,18 +33,23 @@ td.btn-group > .btn {
 }
 
 .btn-facebook,
-.btn-facebook:hover {
+.btn-facebook:hover,
+.btn-facebook:active,
+.btn-facebook.active {
+  background-image: url("@{imagesFolder}/vendor/facebook/fb-sprites.png"); // url(https://static.ak.fbcdn.net/rsrc.php/v2/yL/r/FGFbc80dUKj.png);
+  background-repeat: no-repeat;
+  background-position: -1px -138px;
   color: @white;
   text-shadow: 0 -1px 0 rgba(0,0,0,.25);
 }
 
-@fbBlue:              #627aad;
-@fbBlueDark:          #3b5998;
-
 .btn-facebook {
   padding-left: 35px !important;
+  min-height: 26px;
   background-color: #5B74A8;
   border-color: #879AC0 #29447E #1A356E;
+  border-width: 1px;
+  border-style: solid;
   //#gradient > .vertical-three-colors(#ffffff, #ffffff, 25%, darken(#ffffff, 10%)); // Don't use .gradientbar() here since it does a three-color gradient
   //.buttonBackground(@fbBlue, @fbBlueDark);
   display: inline-block;
@@ -67,7 +72,9 @@ td.btn-group > .btn {
   &.active {
     color: rgba(255,255,255,.75);
   }
-  &:hover {
+  &:hover,
+  &:active,
+  &.active {
     background-color: @fbBlue;
   }
 }
@@ -83,12 +90,4 @@ td.btn-group > .btn {
   .btn .text {
     display:none;
   }
-}
-
-.btn-facebook,
-.btn-facebook:hover {
-  background-image: url("@{imagesFolder}/fb-icon.png");
-  // background-image: url(https://static.ak.fbcdn.net/rsrc.php/v2/yL/r/FGFbc80dUKj.png);
-  background-repeat: no-repeat;
-  background-position: -1px -138px;
 }
