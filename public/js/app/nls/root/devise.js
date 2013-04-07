@@ -7,7 +7,7 @@
     actions: {
       signin: "Sign in",
       signup: "Sign up",
-      logout: "Logout",
+      logout: "Log out",
       login: "Login",
       reset_password: "Reset password",
       forgot_your_password: "Forgot your password?",
@@ -22,7 +22,8 @@
       change_password: "Change my password",
       confirm_account: "Confirm my account",
       resend_unlock_instructions: "Resend unlock instructions",
-      unlock_account: "Unlock my account"
+      unlock_account: "Unlock my account",
+      back_to_profile: "Back to profile"
     },
     form: {
       email: "Email",

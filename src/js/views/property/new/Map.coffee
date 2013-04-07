@@ -3,10 +3,11 @@ define [
   "underscore"
   "backbone"
   'models/Map'
+  "i18n!nls/common"
   "i18n!nls/property"
   "templates/property/new/map"
   "gmaps"
-], ($, _, Parse, Map, i18nProperty) ->
+], ($, _, Parse, Map, i18nCommon, i18nProperty) ->
 
   # GMapView
   # anytime the points change or the center changes
@@ -24,22 +25,15 @@ define [
       
       _.bindAll this, 'checkForSubmit', 'geocode', 'geolocate'
       
-      divId = "mapCanvas"
+      @mapId = "mapCanvas"
       
       @wizard = attrs.wizard
       @marker = attrs.marker
       
-      @model = new Map divId: divId, marker: @marker
-      
-      @$searchInput = @$('#geolocation-search').focus()
+      @model = new Map divId: @mapId, marker: @marker
 
       # Geolocation
       @browserGeoSupport = if navigator.geolocation or google.loader.ClientLocation then true else false
-
-      # Don't give the option if browser doesn't support it.
-      @$('.geolocate').show() unless @browserGeoSupport is false
-
-      @gmap = new google.maps.Map document.getElementById(divId), @model.get "opts"
 
       # object.listenTo(other, event, callback)   # Parse doesn't yet support this function
       @wizard.on "wizard:cancel", =>
@@ -64,6 +58,14 @@ define [
         # map the model remove to a Marker remove
         @gmarker.setMap null
         delete @marker
+
+    render : ->
+      @$el.html JST["src/js/templates/property/new/map.jst"](i18nProperty: i18nProperty, i18nCommon: i18nCommon)
+      @$searchInput = @$('#geolocation-search').focus()
+      # Don't give the option if browser doesn't support it.
+      @$('.geolocate').show() unless @browserGeoSupport is false
+      @gmap = new google.maps.Map document.getElementById(@mapId), @model.get "opts"
+      @
 
     checkForSubmit : (e) ->
       return unless e.keyCode is 13

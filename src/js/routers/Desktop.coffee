@@ -59,7 +59,8 @@ define [
       if Parse.User.current()
         require ["views/property/Manage"], (ManagePropertiesView) =>
           @view = new ManagePropertiesView if !@view or @view !instanceof ManagePropertiesView
-          @view.render().$('#new-property').click()
+          @view.render()
+          @view.newProperty()
       else
         @signupOrLogin()
         

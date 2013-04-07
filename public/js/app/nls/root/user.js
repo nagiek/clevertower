@@ -1,6 +1,9 @@
 (function() {
 
   define({
+    actions: {
+      back_to_profile: "Back to profile"
+    },
     manager_menu: {
       properties: "Properties",
       tenants: "Tenants",

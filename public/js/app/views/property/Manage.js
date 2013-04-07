@@ -93,7 +93,7 @@
             disabled: "disabled"
           });
           _this.$("section").hide();
-          propertyWizard = new PropertyWizard;
+          propertyWizard = (new PropertyWizard).render();
           Parse.history.navigate("/properties/new");
           propertyWizard.on("wizard:cancel", function() {
             _this.$("#new-property").removeProp("disabled");

@@ -3,7 +3,7 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", 'models/Map', "i18n!nls/property", "templates/property/new/map", "gmaps"], function($, _, Parse, Map, i18nProperty) {
+  define(["jquery", "underscore", "backbone", 'models/Map', "i18n!nls/common", "i18n!nls/property", "templates/property/new/map", "gmaps"], function($, _, Parse, Map, i18nCommon, i18nProperty) {
     var GMapView;
     return GMapView = (function(_super) {
 
@@ -23,22 +23,16 @@
       };
 
       GMapView.prototype.initialize = function(attrs) {
-        var divId,
-          _this = this;
+        var _this = this;
         _.bindAll(this, 'checkForSubmit', 'geocode', 'geolocate');
-        divId = "mapCanvas";
+        this.mapId = "mapCanvas";
         this.wizard = attrs.wizard;
         this.marker = attrs.marker;
         this.model = new Map({
-          divId: divId,
+          divId: this.mapId,
           marker: this.marker
         });
-        this.$searchInput = this.$('#geolocation-search').focus();
         this.browserGeoSupport = navigator.geolocation || google.loader.ClientLocation ? true : false;
-        if (this.browserGeoSupport !== false) {
-          this.$('.geolocate').show();
-        }
-        this.gmap = new google.maps.Map(document.getElementById(divId), this.model.get("opts"));
         this.wizard.on("wizard:cancel", function() {
           _this.undelegateEvents();
           _this.remove();
@@ -68,6 +62,19 @@
           this.gmarker.setMap(null);
           return delete this.marker;
         });
+      };
+
+      GMapView.prototype.render = function() {
+        this.$el.html(JST["src/js/templates/property/new/map.jst"]({
+          i18nProperty: i18nProperty,
+          i18nCommon: i18nCommon
+        }));
+        this.$searchInput = this.$('#geolocation-search').focus();
+        if (this.browserGeoSupport !== false) {
+          this.$('.geolocate').show();
+        }
+        this.gmap = new google.maps.Map(document.getElementById(this.mapId), this.model.get("opts"));
+        return this;
       };
 
       GMapView.prototype.checkForSubmit = function(e) {

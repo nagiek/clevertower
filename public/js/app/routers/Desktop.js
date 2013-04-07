@@ -80,7 +80,8 @@
             if (!_this.view || !(_this.view instanceof ManagePropertiesView)) {
               _this.view = new ManagePropertiesView;
             }
-            return _this.view.render().$('#new-property').click();
+            _this.view.render();
+            return _this.view.newProperty();
           });
         } else {
           return this.signupOrLogin();
