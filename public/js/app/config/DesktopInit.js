@@ -59,6 +59,10 @@
   require(["jquery", "backbone", "collections/property/PropertyList", "models/Profile", "routers/Desktop", "json2", "bootstrap", "serializeObject"], function($, Parse, PropertyList, Profile, AppRouter) {
     var _this = this;
     Parse.initialize("z00OPdGYL7X4uW9soymp8n5JGBSE6k26ILN1j3Hu", "NifB9pRHfmsTDQSDA9DKxMuux03S4w2WGVdcxPHm");
+    Parse.User.prototype.defaults = {
+      privacy_visible: false,
+      privacy_unit: false
+    };
     Parse.User.prototype.validate = function(attrs, options) {
       if (_.has(attrs, "ACL") && !(attrs.ACL instanceof Parse.ACL)) {
         return new Parse.Error(Parse.Error.OTHER_CAUSE, "ACL must be a Parse.ACL.");

@@ -26,13 +26,14 @@ define [
         
       @$list = @$('ul')
       @$count = @$('#notifications-count')
+
         # success: (collection, response, options) =>
         #   @notifications.add [{property: @model}] if collection.length is 0
                 
     # Re-rendering the App just means refreshing the statistics -- the rest
     # of the app doesn't change.
     render: =>
-      size =  @notifications.unread().length
+      size = @notifications.unread().length
       @$count.html size
       if size > 0 then @$count.addClass("badge-important") else @$count.removeClass("badge-important")
       @
@@ -45,11 +46,11 @@ define [
     addAll: (collection, filter) =>
       @$list.html ''
       @notifications.each @addOne
-      if @notifications.length is 0 then @$list.html '<p class="empty">' + i18nCommon.notifications.empty + '</p>'
+      if @notifications.length is 0 then @$list.html '<li class="empty">' + i18nCommon.notifications.empty + '</li>'
 
     # Add a single todo item to the list by creating a view for it, and
     # appending its element to the `<ul>`.
     addOne: (notification) =>
-      @$('p.empty').hide()
+      @$('li.empty').hide()
       view = new NotificationView(model: notification)
       @$list.append view.render().el

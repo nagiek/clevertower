@@ -1,0 +1,30 @@
+<h1><%= i18nUser.menu.privacy_settings %></h1>
+<form class="form-horizontal" method="post" id="privacy-form">
+  <fieldset>
+    <legend><%= i18nUser.privacy.context %></legend>
+    <div class="control-group">
+      <div class="controls">
+        <label for="user[privacy_visible]" class="checkbox">
+          <input type="checkbox" name="user[privacy_visible]" <%= privacy_visible ? checked="checked" : '' %>>
+          <%= i18nUser.privacy.visible.label %>
+        </label>
+        <p class="help-block"><%= i18nUser.privacy.visible.description %></p>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <div class="controls">
+        <label for="user[privacy_unit]" class="checkbox">
+          <input type="checkbox" name="user[privacy_unit]" <%= privacy_unit ? checked="checked" : '' %>>
+          <%= i18nUser.privacy.unit.label %>
+        </label>
+        <p class="help-block"><%= i18nUser.privacy.unit.description %></p>
+      </div>
+    </div>
+  </fieldset>
+
+  <div class="form-actions">
+    <button class="save btn btn-primary"><%= i18nCommon.actions.save %></button>
+    <a href="<%= cancel_path %>" class="back btn"><%= i18nCommon.actions.back %></a>
+  </div>
+</form>

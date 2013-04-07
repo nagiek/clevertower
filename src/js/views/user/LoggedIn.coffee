@@ -24,7 +24,6 @@ define [
       # subscribeLease: (e) =>
       #   @pusher.subscribe "lease-#{obj.id}"
       
-      @notificationsView = new NotificationsView
       # Parse.User.current().leases.on "add", @subscribeLease
 
       # Load the properties if the user has just logged in.
@@ -63,6 +62,7 @@ define [
       )
       @$el.html JST["src/js/templates/user/logged_in_menu.jst"](vars)
       @changeName Parse.User.current().profile
+      @notificationsView = new NotificationsView
       @notificationsView.render()
       @
       

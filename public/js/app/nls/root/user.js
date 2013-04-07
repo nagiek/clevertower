@@ -13,8 +13,8 @@
       edit_my_profile: "Edit my profile",
       account: "Account",
       privacy: "Privacy",
-      edit_account: "Edit account",
-      edit_privacy: "Edit privacy",
+      account_settings: "Account settings",
+      privacy_settings: "Privacy settings",
       profile_menu: "Profile menu"
     },
     show: {
@@ -34,6 +34,17 @@
       },
       birthday: "Birthday",
       avatar: "Picture"
+    },
+    privacy: {
+      context: "Tenants in my building...",
+      visible: {
+        label: "...Can see I live here",
+        description: "Other tenants will be able to see your public profile."
+      },
+      unit: {
+        label: "...Can see my unit",
+        description: "Other tenants will be able to see which unit you live in."
+      }
     },
     form: {
       bulk_edit: "Edit users",

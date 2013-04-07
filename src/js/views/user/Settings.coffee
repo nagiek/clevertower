@@ -8,7 +8,7 @@ define [
   "templates/user/settings"
 ], ($, _, Parse, Alert, i18nCommon, i18nDevise) ->
 
-  class EditProfileView extends Parse.View
+  class EditAccountView extends Parse.View
     
     el: '#main'
     
@@ -54,8 +54,6 @@ define [
       data = @$('form').serializeObject()
       return @model.trigger "invalid", {message: "missing_password"} unless data.user.password
       
-      console.log @model.getUsername()
-      
       Parse.User.logIn @model.getUsername(), data.user.password, 
       success: =>
         # Email security
@@ -70,16 +68,12 @@ define [
           else return @model.trigger "invalid", {message: "missing_passwords"}
         else
           delete data.user.password
-                
-        delete data.user.new_password
-        delete data.user.new_password_confirm
 
         @model.save data.user,
         success: (model) =>
           @model.trigger "sync", model # This is triggered automatically in Backbone, but not Parse.
           @trigger "save:success", model, this
         error: (model, error) => 
-          console.log error
           @model.trigger "invalid", error
           
       error: (model, error) =>

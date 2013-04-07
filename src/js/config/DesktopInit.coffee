@@ -100,6 +100,12 @@ define "gmaps", ["async!//maps.googleapis.com/maps/api/js?v=3&sensor=false&key=A
 require ["jquery", "backbone", "collections/property/PropertyList", "models/Profile", "routers/Desktop", "json2", "bootstrap", "serializeObject"], ($, Parse, PropertyList, Profile, AppRouter) ->
   
   Parse.initialize "z00OPdGYL7X4uW9soymp8n5JGBSE6k26ILN1j3Hu", "NifB9pRHfmsTDQSDA9DKxMuux03S4w2WGVdcxPHm" # JS Key  
+
+  # Setup
+  # Extend Parse User
+  Parse.User::defaults = 
+    privacy_visible:  false
+    privacy_unit:     false
   
   # Setup
   # Extend Parse User

@@ -24,7 +24,6 @@
         var _this = this;
         _.bindAll(this, "render", "changeName", "logOut");
         this.pusher = new Pusher('dee5c4022be4432d7152');
-        this.notificationsView = new NotificationsView;
         if (!Parse.User.current().properties) {
           Parse.User.current().properties = new PropertyList;
         }
@@ -63,6 +62,7 @@
         });
         this.$el.html(JST["src/js/templates/user/logged_in_menu.jst"](vars));
         this.changeName(Parse.User.current().profile);
+        this.notificationsView = new NotificationsView;
         this.notificationsView.render();
         return this;
       };
