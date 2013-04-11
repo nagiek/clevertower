@@ -42,6 +42,14 @@
       view_public: "See Public View",
       view_tenant: "See Tenant View"
     },
+    network: {
+      edit: "Edit network",
+      setup: "Set up network",
+      claim_domain: "Claim your domain name.",
+      must_be_done: "Before you can begin adding properties to CleverTower, you must create your network.\nOnly people who you invite to your network can edit properties.\nYou can change these settings at any time.",
+      give_network_a_title: "Give your network a title.",
+      can_be_anything: "Can be anything you like."
+    },
     structure: {
       vacancies: "Vacancies",
       units_control: "Units Control"
@@ -94,7 +102,7 @@
       park: "Park",
       pool: "Pool",
       sauna: "Sauna",
-      wheelchair: "wheelchair",
+      wheelchair: "Wheelchair access",
       electricity: "Electricity",
       furniture: "Furniture",
       gas: "Gas",
@@ -102,6 +110,14 @@
       hot_water: "Hot water"
     },
     errors: {
+      name_reserved: "That name is reserved by CleverTower. Please choose another.",
+      name_invalid: "You did not enter a valid name. Make sure there are only lowercase letters.",
+      name_too_short: "The name must be at least four letters long",
+      name_too_short: "The name cannot be longer than 31 characters.",
+      name_missing: "You must enter a name.",
+      name_taken: function(id) {
+        return "<p>This name has been taken by an existing network.</p>\n<p>\n  <a href=\"/network/" + id + "\" class=\"btn btn-warning\">View network</a>\n  <a class=\"btn close\">Close</a>\n</p>";
+      },
       invalid_address: "You must add an address.",
       insufficient_data: "We were unable to determine your address.",
       no_geolocaiton: "Your browser doesn't support geolocation.",

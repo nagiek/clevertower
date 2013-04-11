@@ -50,6 +50,17 @@
             <input type="password" name="password" id="signup-password" class="span" size="28" placeholder="<%= i18nDevise.form.password %>">
           </div>
         </div>
+        <div class="control-group type-group">
+          <label for="type" class="control-label"><%= i18nDevise.form.type.label %>:</label>
+          <div class="controls">
+            <div class="toggle">
+	          <label class="toggle-radio" for="toggleOption1"><%= i18nDevise.form.type.tenant %></label>
+	          <input type="radio" name="type" id="toggleOption1" value="tenant" checked="checked">
+	          <input type="radio" name="type" id="toggleOption2" value="manager">
+	          <label class="toggle-radio" for="toggleOption2"><%= i18nDevise.form.type.manager %></label>
+	        </div>
+          </div>
+        </div>
         <button class="btn btn-block"><%= i18nDevise.actions.signup %></button>
       </fieldset>
     </form>

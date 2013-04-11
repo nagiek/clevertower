@@ -53,7 +53,6 @@ define [
       # Remove the leading "/" and split into components
       # urlComponents = e.currentTarget.pathname.substring(1).split("/")
       
-      console.log path
       action = if path then path.split("/") else Array('units')
       
       if action.length is 1 or action[0] is "add"

@@ -3,6 +3,7 @@ define [
   "underscore"
   "backbone"
   'collections/property/PropertyList',
+  "models/Network"
   "models/Property"
   "views/property/summary"
   "i18n!nls/property"
@@ -13,7 +14,7 @@ define [
   "templates/property/menu/reports"
   "templates/property/menu/building"
   "templates/property/menu/actions"
-], ($, _, Parse, PropertyList, Property, SummaryPropertyView, i18nProperty, i18nCommon) ->
+], ($, _, Parse, PropertyList, Network, Property, SummaryPropertyView, i18nProperty, i18nCommon) ->
 
   class ManagePropertiesView extends Parse.View
   
@@ -35,26 +36,36 @@ define [
       Parse.User.current().properties.on "reset", @addAll
       
       # custom listeners for seeing properties.
-      Parse.User.current().properties.on "show", => @$list.hide()
-      Parse.User.current().properties.on "close", => @$list.show()
+      Parse.User.current().properties.on "show", => @$propertyList.hide()
+      Parse.User.current().properties.on "close", => @$propertyList.show()
 
     render: =>
-      @$el.html JST["src/js/templates/property/manage.jst"](i18nCommon: i18nCommon, i18nProperty: i18nProperty)
-      @delegateEvents()
+      network = Parse.User.current().get("network")
+      _.defaults network.attributes, Network::defaults
+      vars = _.merge network.toJSON(),
+        i18nCommon: i18nCommon
+        i18nProperty: i18nProperty
+      # vars.title = network.get("name") unless vars.title
+      @$el.html JST["src/js/templates/property/manage.jst"](vars)
       
-      # Fetch all the property items for this user
-      Parse.User.current().properties.fetch
-        success: (collection, resp, options) ->          
-          query = new Parse.Query("Unit");
-          query.containedIn "property", collection.models
-          # TODO: groupBy not supported yet.
-          # query.groupBy "property"
-          query.count
-            success: (number) ->
-              collection.each (property) -> 
-                property.unitsLength = number
       
-      @$list = @$("ul#view-id-my_properties")
+      @$propertyList = @$("#network-properties")
+      @$managerList = @$("#network-managers")
+      
+      # Fetch all the property items for the network
+      if Parse.User.current().properties.length is 0
+        Parse.User.current().properties.fetch
+          success: (collection, resp, options) ->          
+            query = new Parse.Query("Unit");
+            query.containedIn "property", collection.models
+            # TODO: groupBy not supported yet.
+            # query.groupBy "property"
+            query.count
+              success: (number) ->
+                collection.each (property) -> 
+                  property.unitsLength = number
+      else
+        @addAll()
 
     
     # Add a single property item to the list by creating a view for it, and
@@ -62,17 +73,17 @@ define [
     addOne: (property) =>
       @$('p.empty').remove() if @$('p.empty') # Clear "empty" text
       view = new SummaryPropertyView model: property
-      @$list.append view.render().el
+      @$propertyList.append view.render().el
 
     # Add all items in the Properties collection at once.
     addAll: (collection, filter) =>
-      @$list.html ""
+      @$propertyList.html ""
       unless Parse.User.current().properties.length is 0
         Parse.User.current().properties.each @addOne
-        @$list.children(':even').children().addClass 'views-row-even'
-        @$list.children(':odd').children().addClass  'views-row-odd'
+        @$propertyList.children(':even').children().addClass 'views-row-even'
+        @$propertyList.children(':odd').children().addClass  'views-row-odd'
       else
-        @$list.html '<p class="empty">' + i18nProperty.collection.empty.properties + '</p>'
+        @$propertyList.html '<p class="empty">' + i18nProperty.collection.empty.properties + '</p>'
 
     # showProperty : (id) ->
     #   Parse.history.navigate "/properties/#{id}"

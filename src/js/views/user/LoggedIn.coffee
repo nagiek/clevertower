@@ -16,19 +16,16 @@ define [
       "click #logout": "logOut"
 
     el: "#user-menu"
-    initialize: ->
+    initialize: (attrs) ->
       _.bindAll this, "render", "changeName", "logOut"
-            
+      
+      @onNetwork = attrs.onNetwork
+      
       @pusher = new Pusher 'dee5c4022be4432d7152'
 
-      # subscribeLease: (e) =>
-      #   @pusher.subscribe "lease-#{obj.id}"
-      
       # Parse.User.current().leases.on "add", @subscribeLease
-
-      # Load the properties if the user has just logged in.
-      Parse.User.current().properties = new PropertyList unless Parse.User.current().properties
-      Parse.User.current().properties.on "add", @subscribeProperty
+      
+      if @onNetwork then @registerUser()
       
       # Load the profile if the user has just logged in.
       if Parse.User.current().profile
@@ -40,10 +37,17 @@ define [
           Parse.User.current().profile = profile
           Parse.User.current().profile.on "sync", @changeName
           @render()
+          
+    registerUser : =>
+      # Load the properties if the user has just logged in.
+      Parse.User.current().properties = new PropertyList unless Parse.User.current().properties
+      Parse.User.current().properties.on "add", @subscribeProperty
       
-
     subscribeProperty: (obj) =>
       @pusher.subscribe "property-#{obj.id}"
+      
+    # subscribeLease: (e) =>
+    #   @pusher.subscribe "lease-#{obj.id}"
 
     # Logs out the user and shows the login view
     logOut: (e) ->

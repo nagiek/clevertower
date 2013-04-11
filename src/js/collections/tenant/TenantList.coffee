@@ -10,7 +10,7 @@ define [
     # Reference to this collection's model.
     model: Tenant
 
-    initialize: (attrs) ->
+    initialize: (models, attrs) ->
       @createQuery(attrs.lease) if attrs and attrs.lease and attrs.lease.id
       
     createQuery: (lease) ->
@@ -18,4 +18,4 @@ define [
       if @lease and @lease.id      
         @query = new Parse.Query(Tenant)
         .equalTo("lease", @lease)
-        .include("user")
+        .include("profile")

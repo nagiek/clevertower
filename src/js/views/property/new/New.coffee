@@ -13,7 +13,8 @@ define [
   # we update the model two way <-->
   class NewPropertyView extends Parse.View
 
-    el : ".property-form"
+    tagName : "form"
+    className: "property-form span12"
 
     initialize: (attrs) ->
       
@@ -34,5 +35,9 @@ define [
         delete this
         
     render : ->
-      @$el.html JST["src/js/templates/property/_form.jst"](property: @model, i18nProperty: i18nProperty, i18nCommon: i18nCommon)
+      vars = 
+        property: _.defaults(@model.attributes, Property::defaults)
+        i18nProperty: i18nProperty
+        i18nCommon: i18nCommon
+      @$el.html JST["src/js/templates/property/_form.jst"](vars)
       @

@@ -44,7 +44,10 @@ html(lang="en")
                 span.icon-bar              
               a.brand(href="/", title="Home")
                 img(src="/img/logos/logo.png", alt="logo")
-              a.btn.btn-home.home.pull-left(href="/") Network
+              ul.nav#domain-menu
+                li#home-nav
+                  a(href="/") Home
+                li#network-nav
               .nav-collapse.in.collapse
                 ul.nav#search-menu
                   li
@@ -61,17 +64,9 @@ html(lang="en")
           // Messages
           #messages.container
 
-          // Facebook root. (en_US)
+          // Facebook root.
           #fb-root
-          script(type="text/javascript")
-            // Load the SDK asynchronously
-            (function(d, s, id){
-               var js, fjs = d.getElementsByTagName(s)[0];
-               if (d.getElementById(id)) {return;}
-               js = d.createElement(s); js.id = id;
-               js.src = "//connect.facebook.net/en_US/all.js";
-               fjs.parentNode.insertBefore(js, fjs);
-             }(document, 'script', 'facebook-jssdk'));
+
 
           // Main
           #main.span12

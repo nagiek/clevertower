@@ -21,7 +21,7 @@
       NewLeaseView.prototype.el = '.content';
 
       NewLeaseView.prototype.events = {
-        'submit .lease-form': 'save',
+        'submit form': 'save',
         'click .starting-this-month': 'setThisMonth',
         'click .starting-next-month': 'setNextMonth',
         'click .july-to-june': 'setJulyJune',
@@ -31,31 +31,27 @@
       NewLeaseView.prototype.initialize = function(attrs) {
         var _this = this;
         _.bindAll(this, 'addOne', 'addAll', 'save', 'setThisMonth', 'setNextMonth', 'setJulyJune');
+        this.property = attrs.property;
         if (!this.model) {
           this.model = new Lease;
         }
-        if (!this.model.tenants) {
-          this.model.tenants = new TenantList;
-        }
-        this.property = attrs.property;
+        this.model.prep('tenants');
         this.model.on('invalid', function(error) {
           var args, fn, msg;
           _this.$('.error').removeClass('error');
           _this.$('button.save').removeProp("disabled");
           msg = (function() {
-            if (error.message) {
-              if (error.message.indexOf(":") > 0) {
-                args = error.message.split(":");
-                fn = args.pop();
-                switch (fn) {
-                  case "overlapping_dates":
-                    return i18nLease.errors[fn]("/properties/" + this.property.id + "/leases/" + args[0]);
-                  default:
-                    return i18nLease.errors[fn](args[0]);
-                }
-              } else {
-                return i18nLease.errors[error.message];
+            if (error.message.indexOf(":") > 0) {
+              args = error.message.split(":");
+              fn = args.pop();
+              switch (fn) {
+                case "overlapping_dates":
+                  return i18nLease.errors[fn]("/properties/" + this.property.id + "/leases/" + args[0]);
+                default:
+                  return i18nLease.errors[fn](args[0]);
               }
+            } else if (i18nLease.errors[error.message]) {
+              return i18nLease.errors[error.message];
             } else {
               return i18nCommon.errors.unknown;
             }
@@ -74,48 +70,45 @@
           }
         });
         this.on("save:success", function(model) {
+          _this.model.id = model.id;
           _this.model.tenants.createQuery(model);
           _this.model.tenants.fetch();
-          new Alert({
-            event: 'model-save',
-            fade: true,
-            message: i18nCommon.actions.changes_saved,
-            type: 'success'
+          return require(["views/lease/Show"], function(ShowLeaseView) {
+            new Alert({
+              event: 'model-save',
+              fade: true,
+              message: i18nCommon.actions.changes_saved,
+              type: 'success'
+            });
+            new ShowLeaseView({
+              model: _this.model,
+              property: _this.property
+            }).render();
+            Parse.history.navigate("/properties/" + _this.property.id + "/leases/" + model.id);
+            _this.undelegateEvents();
+            return delete _this;
           });
-          new ShowLeaseView({
-            model: model
-          });
-          Parse.history.navigate("/properties/" + _this.property.id + "/leases/" + model.id);
-          _this.undelegateEvents();
-          return delete _this;
         });
         this.model.on('destroy', function() {
           _this.undelegateEvents();
           return delete _this;
         });
         if (this.property) {
-          this.property.load("units");
-          this.units = this.property.units;
+          this.units = this.property.prep("units");
         }
+        this.units.bind("add", this.addOne);
+        this.units.bind("reset", this.addAll);
         this.current = new Date().setDate(1);
-        this.dates = {
+        return this.dates = {
           start: this.model.get("start_date") ? moment(this.model.get("start_date")).format("L") : moment(this.current).format("L"),
           end: this.model.get("end_date") ? moment(this.model.get("end_date")).format("L") : moment(this.current).add(1, 'year').subtract(1, 'day').format("L")
         };
-        this.render();
-        this.$unitSelect = this.$('.unit-select');
-        this.$startDate = this.$('.start-date');
-        this.$endDate = this.$('.end-date');
-        $('.datepicker').datepicker();
-        this.units.bind("add", this.addOne);
-        this.units.bind("reset", this.addAll);
-        return this.units.fetch();
       };
 
       NewLeaseView.prototype.addOne = function(u) {
         var HTML;
         HTML = ("<option value='" + u.id + "'") + (this.model.get("unit") && this.model.get("unit").id === u.id ? "selected='selected'" : "") + (">" + (u.get('title')) + "</option>");
-        return this.$unitSelect.children(':first').after(HTML);
+        return this.$unitSelect.append(HTML);
       };
 
       NewLeaseView.prototype.addAll = function() {
@@ -133,7 +126,7 @@
         data = this.$('form').serializeObject();
         this.$('.error').removeClass('error');
         _.each(['rent', 'keys', 'garage_remotes', 'security_deposit', 'parking_fee'], function(attr) {
-          if (data.lease[attr] === '') {
+          if (data.lease[attr] === '' || data.lease[attr] === '0') {
             data.lease[attr] = 0;
           }
           if (data.lease[attr] && isNaN(data.lease[attr])) {
@@ -165,13 +158,11 @@
         if (data.emails && data.emails !== '') {
           attrs.emails = [];
           _.each(data.emails.split(","), function(email) {
-            var account;
             email = $.trim(email);
-            account = new Parse.User({
-              username: email,
+            userValid = !Parse.User.prototype.validate({
               email: email
-            });
-            if (userValid = account.isValid()) {
+            }) ? true : false;
+            if (userValid) {
               return attrs.emails.push(email);
             }
           });
@@ -218,17 +209,26 @@
 
       NewLeaseView.prototype.render = function() {
         var vars;
-        vars = _.merge({
-          lease: this.model,
+        vars = {
+          lease: _.defaults(this.model.attributes, Lease.prototype.defaults),
+          unit: this.model.get("unit") ? this.model.get("unit") : false,
           dates: this.dates,
           cancel_path: ("/properties/" + this.property.id) + (!this.model.isNew() ? "/leases/" + this.model.id : ""),
           moment: moment,
           i18nCommon: i18nCommon,
           i18nUnit: i18nUnit,
           i18nLease: i18nLease
-        });
-        vars.unit = this.model.get("unit") ? this.model.get("unit") : false;
-        return this.$el.html(JST["src/js/templates/lease/" + (this.model.isNew() ? 'new' : 'edit') + ".jst"](vars));
+        };
+        this.$el.html(JST["src/js/templates/lease/" + (this.model.isNew() ? 'new' : 'edit') + ".jst"](vars));
+        this.$unitSelect = this.$('.unit-select');
+        this.$startDate = this.$('.start-date');
+        this.$endDate = this.$('.end-date');
+        $('.datepicker').datepicker();
+        if (this.units.length === 0) {
+          return this.units.fetch();
+        } else {
+          return this.addAll();
+        }
       };
 
       return NewLeaseView;

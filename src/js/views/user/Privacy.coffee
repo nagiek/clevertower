@@ -24,8 +24,6 @@ define [
         @$('button.save').removeProp "disabled"
         new Alert(event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success')
     
-    # Save is broken into two saves: User and profile.
-    # Profile is always available, but user may be hidden.
     save : (e) ->
       e.preventDefault()
       

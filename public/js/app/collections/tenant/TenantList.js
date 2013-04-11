@@ -14,7 +14,7 @@
 
       TenantList.prototype.model = Tenant;
 
-      TenantList.prototype.initialize = function(attrs) {
+      TenantList.prototype.initialize = function(models, attrs) {
         if (attrs && attrs.lease && attrs.lease.id) {
           return this.createQuery(attrs.lease);
         }
@@ -25,7 +25,7 @@
           this.lease = lease;
         }
         if (this.lease && this.lease.id) {
-          return this.query = new Parse.Query(Tenant).equalTo("lease", this.lease).include("user");
+          return this.query = new Parse.Query(Tenant).equalTo("lease", this.lease).include("profile");
         }
       };
 

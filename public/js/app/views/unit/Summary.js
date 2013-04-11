@@ -1,5 +1,6 @@
 (function() {
-  var __hasProp = {}.hasOwnProperty,
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(["jquery", "underscore", "backbone", "moment", 'models/Unit', 'models/Lease', 'views/helper/Alert', "i18n!nls/lease", "i18n!nls/unit", "i18n!nls/common", 'templates/unit/summary'], function($, _, Parse, moment, Unit, Lease, Alert, i18nLease, i18nUnit, i18nCommon) {
@@ -9,6 +10,7 @@
       __extends(UnitSummaryView, _super);
 
       function UnitSummaryView() {
+        this.newOnEnter = __bind(this.newOnEnter, this);
         return UnitSummaryView.__super__.constructor.apply(this, arguments);
       }
 
@@ -18,8 +20,9 @@
         'blur input': 'update',
         'blur textarea': 'update',
         'blur select': 'updateS',
-        'click .remove': 'remove',
-        'click .delete': 'kill'
+        'click .remove': 'clear',
+        'click .delete': 'delete',
+        "keypress .title": "newOnEnter"
       };
 
       UnitSummaryView.prototype.initialize = function() {
@@ -30,7 +33,7 @@
         this.model.on("save:success", function() {
           return _this.render();
         });
-        this.model.on("remove", function() {
+        this.model.on("destroy", function() {
           _this.remove();
           _this.undelegateEvents();
           return delete _this;
@@ -89,17 +92,27 @@
         return e;
       };
 
-      UnitSummaryView.prototype.kill = function(e) {
+      UnitSummaryView.prototype.clear = function(e) {
+        e.preventDefault();
+        return this.model.destroy();
+      };
+
+      UnitSummaryView.prototype["delete"] = function(e) {
         var id;
         e.preventDefault();
         if (confirm(i18nCommon.actions.confirm + " " + i18nCommon.warnings.no_undo)) {
           id = this.model.get("property").id;
           this.model.destroy();
-          this.remove();
-          this.undelegateEvents();
-          delete this;
           return Parse.history.navigate("/properties/" + id);
         }
+      };
+
+      UnitSummaryView.prototype.newOnEnter = function(e) {
+        if (e.keyCode !== 13) {
+          return;
+        }
+        this.update(e);
+        return this.model.collection.prepopulate();
       };
 
       return UnitSummaryView;

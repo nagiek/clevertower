@@ -19,9 +19,7 @@
       ShowUnitView.prototype.el = ".content";
 
       ShowUnitView.prototype.initialize = function(attrs) {
-        console.log(this.model);
         this.property = attrs.property;
-        this.property.load('units');
         this.leases = new LeaseList({
           unit: this.model
         });

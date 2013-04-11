@@ -12,7 +12,9 @@
         return NewPropertyView.__super__.constructor.apply(this, arguments);
       }
 
-      NewPropertyView.prototype.el = ".property-form";
+      NewPropertyView.prototype.tagName = "form";
+
+      NewPropertyView.prototype.className = "property-form span12";
 
       NewPropertyView.prototype.initialize = function(attrs) {
         var _this = this;
@@ -32,11 +34,13 @@
       };
 
       NewPropertyView.prototype.render = function() {
-        this.$el.html(JST["src/js/templates/property/_form.jst"]({
-          property: this.model,
+        var vars;
+        vars = {
+          property: _.defaults(this.model.attributes, Property.prototype.defaults),
           i18nProperty: i18nProperty,
           i18nCommon: i18nCommon
-        }));
+        };
+        this.$el.html(JST["src/js/templates/property/_form.jst"](vars));
         return this;
       };
 

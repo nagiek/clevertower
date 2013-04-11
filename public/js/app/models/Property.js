@@ -5,7 +5,7 @@
     return Property = Parse.Object.extend("Property", {
       className: "Property",
       initialize: function() {
-        return _.bindAll(this, "cover", "load");
+        return _.bindAll(this, "cover", "prep");
       },
       defaults: {
         center: new Parse.GeoPoint,
@@ -64,22 +64,21 @@
         }
         return img;
       },
-      load: function(collectionName, options) {
+      prep: function(collectionName, options) {
         if (this[collectionName]) {
           return this[collectionName];
         }
         switch (collectionName) {
           case "units":
-            this[collectionName] = new UnitList({
+            this[collectionName] = new UnitList([], {
               property: this
             });
             break;
           case "leases":
-            this[collectionName] = new LeaseList({
+            this[collectionName] = new LeaseList([], {
               property: this
             });
         }
-        this[collectionName].fetch(options);
         return this[collectionName];
       }
     });

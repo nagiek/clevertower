@@ -21,7 +21,10 @@
           property: this.model
         };
         if (attrs.params && attrs.params.unit) {
-          this.model.load('units');
+          this.model.prep('units');
+          if (this.model.units.length === 0) {
+            this.model.units.fetch();
+          }
           vars.unit = {
             __type: "Pointer",
             className: "Unit",
@@ -35,7 +38,7 @@
         return this.form = new NewLeaseView({
           model: this.lease,
           property: this.model
-        });
+        }).render();
       };
 
       AddLeaseToPropertyView.prototype.clear = function() {

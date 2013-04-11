@@ -20,28 +20,11 @@ define [
     
     initialize: (attrs) =>
       @property = attrs.property
-      @property.load("units")
       
-      @tenants = new TenantList([], lease: @model)
+      @model.prep('tenants')
       
-      @tenants.on "add",   @addOne
-      @tenants.on "reset", @addAll
-
-      @tenants.fetch()
-                
-
-        # @rel_tenants_current = @model.relation("tenants_current")
-        # @rel_tenants_current.on "add",   @addOneCurrent
-        # @rel_tenants_current.on "reset", @addAllCurrent
-        # @rel_tenants_current.query().find success: (list) => @tenants_current = list
-        
-        # new Parse.Query("Lease").relation.query().get attrs.subId, success: (model) => @model = model
-        # new Parse.Query("Income").where("lease", attrs.subId)
-        # new Parse.Query("Expense").where("lease", attrs.subId)
-
-        # @tenants_pending = _this.tenants_pending
-        # @tenants_invited = _this.tenants_invited
-        # @tenants_current = _this.tenants_current
+      @model.tenants.on "add",   @addOne
+      @model.tenants.on "reset", @addAll
       
     # Re-render the contents of the Unit item.
     render: ->
@@ -51,7 +34,7 @@ define [
       unitId = @model.get("unit").id
       modelVars.propertyId = @property.id
       modelVars.unitId = unitId
-      modelVars.title = @model.get("unit").get("title") # @property.units.get(unitId).get("title")
+      modelVars.title = @model.get("unit").get("title")
       modelVars.tenants = false
       
       # Parse turns dates into an object, which we must override.
@@ -62,12 +45,14 @@ define [
       $(@el).html JST["src/js/templates/lease/show.jst"](vars)
       
       @$list = @$('ul.tenants')
+      
+      @model.tenants.fetch() if @model.tenants.length is 0 else @addAll()
       @
       
       
     addOne : (t) =>
       @$("p.empty").text ''
-      @$list.append (new TenantView(model: t)).render()
+      @$list.append (new TenantView(model: t)).render().el
 
     addAll : =>
       @tenants.each @addOne

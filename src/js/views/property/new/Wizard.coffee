@@ -29,7 +29,7 @@ define [
 
       _.bindAll this, 'next', 'back', 'cancel', 'render'
 
-      @model = new Property user: Parse.User.current()
+      @model = new Property
 
       @model.on "invalid", (error) =>
         @state = 'address'
@@ -41,14 +41,14 @@ define [
           i18nProperty.errors[error.message]
 
         switch error.message
-          when 'title_missing' then @$('#property-title-group').addClass('error') # Add class to Control Group
-          else @$('#address-search-group').addClass('error') # Add class to Control Group
+          when 'title_missing' then @$('#property-title-group').addClass('error')
+          else @$('#address-search-group').addClass('error')
         
         new Alert event: 'model-save', fade: false, message: msg, type: 'error'
 
       @on "address:validated", =>
         @state = 'property'
-        require ["views/property/new/New", "templates/property/new/new"], (NewPropertyView) =>
+        require ["views/property/new/New", "templates/property/_form"], (NewPropertyView) =>
 
           @form = new NewPropertyView(wizard: this, model: @model)
           @map.$el.after @form.render().el
@@ -96,12 +96,12 @@ define [
       return if @state is 'address'
       @state = 'address'
       @map.$el.animate left: "0%", 500
-      @form.$el.animate left: "150%", 500, 'swing', ->
-        @remove()
-        delete this
+      @form.$el.animate left: "150%", 500, 'swing', =>
+        @form.remove()
+        @form.undelegateEvents()
+        delete @form
       @$('.back').prop disabled: 'disabled'
       @$('.next').html(i18nCommon.actions.next)
-      delete @form
 
     cancel : (e) ->
       @trigger "wizard:cancel", this

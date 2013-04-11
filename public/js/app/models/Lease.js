@@ -1,6 +1,6 @@
 (function() {
 
-  define(['underscore', 'backbone', "models/Property", "models/Unit", "moment"], function(_, Parse, Property, Unit, moment) {
+  define(['underscore', 'backbone', "collections/tenant/TenantList", "models/Property", "models/Unit", "moment"], function(_, Parse, Property, Unit, moment) {
     var Lease;
     return Lease = Parse.Object.extend("Lease", {
       className: "Lease",
@@ -9,6 +9,7 @@
         keys: 0,
         garage_remotes: 0,
         parking_fee: 0,
+        security_deposit: 0,
         parking_space: "",
         first_month_paid: false,
         last_month_paid: false,
@@ -59,6 +60,18 @@
           }
         }
         return false;
+      },
+      prep: function(collectionName, options) {
+        if (this[collectionName]) {
+          return this[collectionName];
+        }
+        switch (collectionName) {
+          case "tenants":
+            this[collectionName] = new TenantList([], {
+              lease: this
+            });
+        }
+        return this[collectionName];
       }
     });
   });

@@ -28,3 +28,9 @@ define [
       img = @get "image_#{format}"
       img = "/img/fallback/avatar-#{format}.png" if img is '' or !img?
       img
+      
+    validate: (attrs, options) ->
+      if attrs.email and attrs.email isnt ""
+        return {message: "invalid_email"} unless /^([a-zA-Z0-9_.-])+@([a-zA-Z0-9_.-])+\.([a-zA-Z])+([a-zA-Z])+/.test attrs.email
+      false  
+    

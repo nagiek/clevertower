@@ -19,13 +19,14 @@ define [
       
       vars = property: @model
       if attrs.params and attrs.params.unit
-        @model.load('units')
+        @model.prep('units')
+        @model.units.fetch() if @model.units.length is 0
         # vars.unit = @model.units.get attrs.params.unit # Won't complete in time
         vars.unit = __type: "Pointer", className: "Unit", objectId: attrs.params.unit
       @lease = new Lease(vars)
       
     render : ->
-      @form = new NewLeaseView model: @lease, property: @model
+      @form = new NewLeaseView(model: @lease, property: @model).render()
     
     clear : ->
       delete @form.undelegateEvents()

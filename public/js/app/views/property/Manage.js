@@ -3,7 +3,7 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", 'collections/property/PropertyList', "models/Property", "views/property/summary", "i18n!nls/property", "i18n!nls/common", "templates/property/manage", "templates/property/menu", "templates/property/menu/show", "templates/property/menu/reports", "templates/property/menu/building", "templates/property/menu/actions"], function($, _, Parse, PropertyList, Property, SummaryPropertyView, i18nProperty, i18nCommon) {
+  define(["jquery", "underscore", "backbone", 'collections/property/PropertyList', "models/Network", "models/Property", "views/property/summary", "i18n!nls/property", "i18n!nls/common", "templates/property/manage", "templates/property/menu", "templates/property/menu/show", "templates/property/menu/reports", "templates/property/menu/building", "templates/property/menu/actions"], function($, _, Parse, PropertyList, Network, Property, SummaryPropertyView, i18nProperty, i18nCommon) {
     var ManagePropertiesView;
     return ManagePropertiesView = (function(_super) {
 
@@ -33,34 +33,42 @@
         Parse.User.current().properties.on("add", this.addOne);
         Parse.User.current().properties.on("reset", this.addAll);
         Parse.User.current().properties.on("show", function() {
-          return _this.$list.hide();
+          return _this.$propertyList.hide();
         });
         return Parse.User.current().properties.on("close", function() {
-          return _this.$list.show();
+          return _this.$propertyList.show();
         });
       };
 
       ManagePropertiesView.prototype.render = function() {
-        this.$el.html(JST["src/js/templates/property/manage.jst"]({
+        var network, vars;
+        network = Parse.User.current().get("network");
+        _.defaults(network.attributes, Network.prototype.defaults);
+        vars = _.merge(network.toJSON(), {
           i18nCommon: i18nCommon,
           i18nProperty: i18nProperty
-        }));
-        this.delegateEvents();
-        Parse.User.current().properties.fetch({
-          success: function(collection, resp, options) {
-            var query;
-            query = new Parse.Query("Unit");
-            query.containedIn("property", collection.models);
-            return query.count({
-              success: function(number) {
-                return collection.each(function(property) {
-                  return property.unitsLength = number;
-                });
-              }
-            });
-          }
         });
-        return this.$list = this.$("ul#view-id-my_properties");
+        this.$el.html(JST["src/js/templates/property/manage.jst"](vars));
+        this.$propertyList = this.$("#network-properties");
+        this.$managerList = this.$("#network-managers");
+        if (Parse.User.current().properties.length === 0) {
+          return Parse.User.current().properties.fetch({
+            success: function(collection, resp, options) {
+              var query;
+              query = new Parse.Query("Unit");
+              query.containedIn("property", collection.models);
+              return query.count({
+                success: function(number) {
+                  return collection.each(function(property) {
+                    return property.unitsLength = number;
+                  });
+                }
+              });
+            }
+          });
+        } else {
+          return this.addAll();
+        }
       };
 
       ManagePropertiesView.prototype.addOne = function(property) {
@@ -71,17 +79,17 @@
         view = new SummaryPropertyView({
           model: property
         });
-        return this.$list.append(view.render().el);
+        return this.$propertyList.append(view.render().el);
       };
 
       ManagePropertiesView.prototype.addAll = function(collection, filter) {
-        this.$list.html("");
+        this.$propertyList.html("");
         if (Parse.User.current().properties.length !== 0) {
           Parse.User.current().properties.each(this.addOne);
-          this.$list.children(':even').children().addClass('views-row-even');
-          return this.$list.children(':odd').children().addClass('views-row-odd');
+          this.$propertyList.children(':even').children().addClass('views-row-even');
+          return this.$propertyList.children(':odd').children().addClass('views-row-odd');
         } else {
-          return this.$list.html('<p class="empty">' + i18nProperty.collection.empty.properties + '</p>');
+          return this.$propertyList.html('<p class="empty">' + i18nProperty.collection.empty.properties + '</p>');
         }
       };
 

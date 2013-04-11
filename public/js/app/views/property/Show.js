@@ -50,7 +50,6 @@
       PropertyView.prototype.changeSubView = function(path, params) {
         var action, name, node, propertyCentric, subaction, subid,
           _this = this;
-        console.log(path);
         action = path ? path.split("/") : Array('units');
         if (action.length === 1 || action[0] === "add") {
           name = "views/property/sub/" + (action.join("/"));

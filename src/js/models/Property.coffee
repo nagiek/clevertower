@@ -14,7 +14,7 @@ define [
     className: "Property"
       
     initialize: ->
-      _.bindAll @, "cover", "load"
+      _.bindAll @, "cover", "prep"
           
     defaults:
       # Location
@@ -85,13 +85,12 @@ define [
       img = "/img/fallback/property-#{format}.png" if img is '' or !img?
       img 
 
-    load: (collectionName, options) ->
+    prep: (collectionName, options) ->
       return @[collectionName] if @[collectionName]
       switch collectionName
         when "units" 
-          @[collectionName] = new UnitList property: @
+          @[collectionName] = new UnitList [], property: @
         when "leases"
-          @[collectionName] = new LeaseList property: @
-      
-      @[collectionName].fetch(options)
+          @[collectionName] = new LeaseList [], property: @
+
       @[collectionName]

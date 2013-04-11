@@ -36,11 +36,13 @@
       };
 
       PropertyEditView.prototype.render = function() {
-        this.$el.html(JST["src/js/templates/property/sub/edit.jst"](_.merge({
-          property: this.model,
+        var vars;
+        vars = {
+          property: _.defaults(this.model.attributes, Property.prototype.defaults),
           i18nProperty: i18nProperty,
           i18nCommon: i18nCommon
-        })));
+        };
+        this.$el.html(JST["src/js/templates/property/sub/edit.jst"](vars));
         return this;
       };
 

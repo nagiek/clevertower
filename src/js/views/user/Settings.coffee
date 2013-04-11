@@ -5,6 +5,7 @@ define [
   "views/helper/Alert"
   "i18n!nls/common"
   "i18n!nls/devise"
+  "plugins/toggler"
   "templates/user/settings"
 ], ($, _, Parse, Alert, i18nCommon, i18nDevise) ->
 
@@ -52,26 +53,37 @@ define [
     # Profile is always available, but user may be hidden.
     save : (e) ->
       e.preventDefault()
-      
+      @$('button.save').prop "disabled", disabled
       data = @$('form').serializeObject()
-      return @model.trigger "invalid", {message: "missing_password"} unless data.user.password
       
-      Parse.User.logIn @model.getUsername(), data.user.password, 
-      success: =>
-        # Email security
-        data.user.username = data.user.email if data.user.email
+      # Extra security for username/password
+      if data.user.new_password or data.user.new_password_confirm or data.user.email isnt Parse.User.current().getEmail()
+        return @model.trigger "invalid", {message: "missing_password"} unless data.user.password      
+        Parse.User.logIn @model.getUsername(), data.user.password, 
+        success: =>
+          # Email security
+          data.user.username = data.user.email if data.user.email
       
-        # Password security
-        if data.user.new_password or data.user.new_password_confirm
-          if data.user.new_password and data.user.new_password_confirm
-            if data.user.new_password is data.user.new_password_confirm 
-              data.user.password = data.user.new_password
-            else return @model.trigger "invalid", {message: "unmatching_passwords"}
-          else return @model.trigger "invalid", {message: "missing_passwords"}
-        else
-          delete data.user.password
+          # Password security
+          if data.user.new_password or data.user.new_password_confirm
+            if data.user.new_password and data.user.new_password_confirm
+              if data.user.new_password is data.user.new_password_confirm 
+                data.user.password = data.user.new_password
+              else return @model.trigger "invalid", {message: "unmatching_passwords"}
+            else return @model.trigger "invalid", {message: "missing_passwords"}
+          else
+            delete data.user.password
 
-        @model.save data.user,
+          @model.save data.user,
+          success: (model) =>
+            @model.trigger "sync", model # This is triggered automatically in Backbone, but not Parse.
+            @trigger "save:success", model, this
+          error: (model, error) => 
+            @model.trigger "invalid", error
+            
+      # We are saving just the type.
+      else
+        @model.save data.user.type,
         success: (model) =>
           @model.trigger "sync", model # This is triggered automatically in Backbone, but not Parse.
           @trigger "save:success", model, this
@@ -90,3 +102,5 @@ define [
         i18nDevise: i18nDevise
       
       @$el.html JST["src/js/templates/user/settings.jst"](vars)
+      
+      @$('.toggle').toggler()

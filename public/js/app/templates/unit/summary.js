@@ -31,7 +31,7 @@ __p += '\n  </div>\n  ';
  if (objectId) { ;
 __p += '<div class="view-specific view-edit hide">';
  } ;
-__p += '\n    <div class="control-group">\n  \t\t<div class="controls">\n  \t\t\t<input type="text" maxlength="8" name="title" class="span1" value="' +
+__p += '\n    <div class="control-group">\n  \t\t<div class="controls">\n  \t\t\t<input type="text" maxlength="8" name="title" class="span1 title" value="' +
 ((__t = ( title )) == null ? '' : __t) +
 '">\n  \t\t</div>\n  \t</div>\n  ';
  if (objectId) { ;
@@ -143,13 +143,13 @@ __p += '\n    <a class="btn btn-mini add-lease view-specific view-show"\n       
 ((__t = ( objectId )) == null ? '' : __t) +
 '" \n       rel="tooltip" \n       data-original-title="' +
 ((__t = ( i18nUnit.actions.add_lease )) == null ? '' : __t) +
-'">\n      <i class="icon-plus"></i>\n    </a>\n    <a class="btn btn-mini add-task view-specific view-show"\n       href="/properties/' +
+'">\n      <i class="icon-plus"></i>\n    </a>\n    <!-- <a class="btn btn-mini add-task view-specific view-show"\n       href="/properties/' +
 ((__t = ( property.objectId )) == null ? '' : __t) +
-'/leases/' +
+'/add/task?unit=' +
 ((__t = ( objectId )) == null ? '' : __t) +
-'/add/task" \n       rel="tooltip" \n       data-original-title="' +
+'"\n       rel="tooltip" \n       data-original-title="' +
 ((__t = ( i18nUnit.actions.add_task )) == null ? '' : __t) +
-'">\n      <i class="icon-plus"></i>\n    </a>\n    ';
+'">\n      <i class="icon-plus"></i>\n    </a> -->\n    ';
  if (activeLease) { ;
 __p += '\n      <a class="btn btn-mini add-tenants view-specific view-show"\n         href="/properties/' +
 ((__t = ( property.objectId )) == null ? '' : __t) +

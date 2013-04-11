@@ -1,6 +1,7 @@
 define [
   'underscore'
   'backbone'
+  "collections/tenant/TenantList"
   "models/Property"
   "models/Unit"
   "moment"
@@ -15,6 +16,7 @@ define [
       keys: 0
       garage_remotes: 0
       parking_fee: 0
+      security_deposit: 0
       parking_space: ""
       first_month_paid: false
       last_month_paid: false
@@ -51,3 +53,11 @@ define [
           # Validate associated  attrs.unit.attributes
           return error if error = attrs.unit.validationError
       false
+
+    prep: (collectionName, options) ->
+      return @[collectionName] if @[collectionName]
+      switch collectionName
+        when "tenants" 
+          @[collectionName] = new TenantList [], lease: @
+
+      @[collectionName]

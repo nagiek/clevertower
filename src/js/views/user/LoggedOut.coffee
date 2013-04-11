@@ -7,6 +7,7 @@ define [
   "i18n!nls/common"
   "i18n!nls/devise"
   "i18n!nls/user"
+  'plugins/toggler'
   'templates/user/logged_out_menu'
   'templates/user/reset_password'
 ], ($, _, Parse, Profile, Alert, i18nCommon, i18nDevise, i18nUser) ->
@@ -16,18 +17,33 @@ define [
     el: "#user-menu"
 
     events:
-      "submit form.login-form"  : "logIn"
-      "click .btn-facebook": "logInWithFacebook"
-      "submit form.signup-form" : "signUp"
+      "submit form.login-form"      : "logIn"
+      "click .btn-facebook"         : "logInWithFacebook"
+      "submit form.signup-form"     : "signUp"
       "click .reset-password-modal" : "showResetPasswordModal"
+      # "click .toggle"               : "toggle"
 
     initialize: ->
       _.bindAll this, "logIn", "signUp", "resetPassword", "showResetPasswordModal"
 
-      @on "user:login", =>
+      @on "user:login", (user) =>
         $('#reset-password-modal').remove()
-        @undelegateEvents();
-        delete this
+        if user.get("type") is "manager"
+          network = user.get("network")
+          if network and network.get("name")
+            # Set the link to the network subdomain.
+            domain = "#{location.protocol}://#{network.get("name")}.#{document.domain}" + if location.port then ":#{location.port}"
+            $("#network-nav a").prop "href", domain
+            @undelegateEvents()
+            delete this
+          else
+            require ["views/network/Set"], (SetNetworkView) =>              
+              Parse.history.navigate "/network/set"
+              @view = new SetNetworkView(model: Parse.User.current().get("network")) if !@view or @view !instanceof NetworkFormView
+              @view.render()
+        else
+          @undelegateEvents()
+          delete this
         
       @render()
 
@@ -37,15 +53,16 @@ define [
       
       # Bind this here instead of events, as it is outside the view.
       $('form#reset-password-form').on "submit", @resetPassword
-      
+      # Make toggles
+      @$('.toggle').toggler()
       @
       
     logInWithFacebook : (e) ->  
       e.preventDefault()
       Parse.FacebookUtils.logIn "user_likes,email",
         success: (user) ->
-          @trigger "user:login"
-          @trigger "user:change"
+          @trigger "user:login", user
+          @trigger "user:change", user
         error: (user, error) ->
 
 
@@ -76,8 +93,8 @@ define [
       password = @$("#login-password").val()
       Parse.User.logIn email, password,
         success: (user) =>  
-          @trigger "user:login"
-          @trigger "user:change"
+          @trigger "user:login", user
+          @trigger "user:change", user
 
         error: (user, error) =>
           @$('.login-form .username-group').addClass('error')
@@ -97,8 +114,8 @@ define [
       password = @$("#signup-password").val()
       Parse.User.signUp email, password, { email: email, ACL: new Parse.ACL() },
         success: (user) =>
-          @trigger "user:login"
-          @trigger "user:change"
+          @trigger "user:login", user
+          @trigger "user:change", user
 
         error: (user, error) =>
           @$(".signup-form .error").removeClass('error')

@@ -25,9 +25,7 @@
       PropertyWizardView.prototype.initialize = function() {
         var _this = this;
         _.bindAll(this, 'next', 'back', 'cancel', 'render');
-        this.model = new Property({
-          user: Parse.User.current()
-        });
+        this.model = new Property;
         this.model.on("invalid", function(error) {
           var args, fn, msg;
           _this.state = 'address';
@@ -48,7 +46,7 @@
         });
         this.on("address:validated", function() {
           _this.state = 'property';
-          return require(["views/property/new/New", "templates/property/new/new"], function(NewPropertyView) {
+          return require(["views/property/new/New", "templates/property/_form"], function(NewPropertyView) {
             _this.form = new NewPropertyView({
               wizard: _this,
               model: _this.model
@@ -127,6 +125,7 @@
       };
 
       PropertyWizardView.prototype.back = function(e) {
+        var _this = this;
         if (this.state === 'address') {
           return;
         }
@@ -137,14 +136,14 @@
         this.form.$el.animate({
           left: "150%"
         }, 500, 'swing', function() {
-          this.remove();
-          return delete this;
+          _this.form.remove();
+          _this.form.undelegateEvents();
+          return delete _this.form;
         });
         this.$('.back').prop({
           disabled: 'disabled'
         });
-        this.$('.next').html(i18nCommon.actions.next);
-        return delete this.form;
+        return this.$('.next').html(i18nCommon.actions.next);
       };
 
       PropertyWizardView.prototype.cancel = function(e) {

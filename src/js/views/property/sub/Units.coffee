@@ -26,18 +26,15 @@ define [
       'click .save'       : 'save'
     
     initialize: (attrs) ->
-      @editing = false
       
       @on "view:change", @clear
       
       # Fetch all the property items for this user
-      @model.load('units')
-
+      @model.prep('units')
       @model.units.on "add", @addOne
       @model.units.on "reset", @addAll
       
-        # success: (collection, response, options) =>
-        #   @model.units.add [{property: @model}] if collection.length is 0
+      @editing = false
                 
     # Re-render the contents of the property item.
     render: =>
@@ -47,10 +44,12 @@ define [
       @$el.html JST["src/js/templates/property/sub/units.jst"](vars)      
       
       @$table     = @$("#units-table")
-      @$list      = @$("#units-table tbody")
       @$actions   = @$(".form-actions")
       @$undo      = @$actions.find('.undo')
 
+      @model.units.fetch()
+      
+      if @model.units.length is 0 then @switchToEdit()
       @
     
     clear: (e) =>
@@ -64,15 +63,16 @@ define [
       @$actions.toggleClass('hide')
       @editing = if @editing then false else true
 
-    # switchToShow: (e) =>      
-    # switchToEdit: (e) =>
-
+    switchToShow: (e) => @switchMode if @editing  
+    switchToEdit: (e) => @switchMode unless @editing
 
     # Add all items in the Units collection at once.
     addAll: (collection, filter) =>
+      # Define @$list here, as we may 
+      @$list = @$("#units-table tbody")
       @$list.html ''
-      @model.units.each @addOne
-      if @model.units.length is 0 then @$list.html '<p class="empty">' + i18nProperty.collection.empty.units + '</p>'
+      if @model.units.length > 0 then @model.units.each @addOne
+      else @$list.html '<p class="empty">' + i18nProperty.collection.empty.units + '</p>'
 
     # Add a single todo item to the list by creating a view for it, and
     # appending its element to the `<ul>`.
@@ -81,32 +81,19 @@ define [
       view = new UnitView(model: unit)
       @$list.append view.render().el
       view.$('.view-specific').toggleClass('hide') if @editing
-      
+      @$list.last().find('.title').focus()
+
     addX: (e) =>
       e.preventDefault()
       x = Number $('#x').val()
       x = 1 unless x?
-            
+
       until x <= 0
-        if @model.units.length is 0
-          unit = new Unit property: @model
-        else
-          unit = @model.units.at(@model.units.length - 1).clone()
-
-          unit.set "has_lease", false
-          unit.unset "activeLease"
-
-          title = unit.get 'title'
-          newTitle = title.substr 0, title.length-1
-          char = title.charAt title.length - 1
-          # Convert to string for Parse DB
-          newChar = if isNaN(char) then String.fromCharCode char.charCodeAt() + 1 else String Number(char) + 1
-          unit.set 'title', newTitle + newChar
-        @model.units.add unit
+        @model.units.prepopulate()
         x--
 
       @$undo.removeProp 'disabled'
-      @$list.last().find('.title-group input').focus()
+      @$list.last().find('.title').focus()
       
     undo: (e) =>
       e.preventDefault()

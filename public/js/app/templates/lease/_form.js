@@ -45,7 +45,9 @@ __p += '\n\n<div class="row">\n  <fieldset class="span4">\n    <legend>' +
 ((__t = ( i18nLease.form.rent )) == null ? '' : __t) +
 '</legend>\n    <div class="row">\n      <div class="control-group span">\n        <label for="lease-rent" class="control-label">' +
 ((__t = ( i18nLease.fields.rent )) == null ? '' : __t) +
-'</label>\n        <div class="controls">\n          <div class="input-prepend">\n            <span class="field-prefix add-on">$</span>\n            <input type="number" class="span1" name="lease[rent]" id="lease-rent" maxlength="12" />\n          </div>\n        </div>\n      </div>\n      <div class="span2">\n        <label for="lease-first_month_paid" class="checkbox">\n          <input type="checkbox" name="lease[first_month_paid]" id="lease-first_month_paid" value="1" ' +
+'</label>\n        <div class="controls">\n          <div class="input-prepend">\n            <span class="field-prefix add-on">$</span>\n            <input type="number" class="span1" name="lease[rent]" id="lease-rent" maxlength="12" value="' +
+((__t = ( lease.rent )) == null ? '' : __t) +
+'" />\n          </div>\n        </div>\n      </div>\n      <div class="span2">\n        <label for="lease-first_month_paid" class="checkbox">\n          <input type="checkbox" name="lease[first_month_paid]" id="lease-first_month_paid" value="1" ' +
 ((__t = ( lease.first_month_paid ? checked="checked" : '' )) == null ? '' : __t) +
 '>' +
 ((__t = ( i18nLease.rent.first_month_paid )) == null ? '' : __t) +
@@ -61,17 +63,27 @@ __p += '\n\n<div class="row">\n  <fieldset class="span4">\n    <legend>' +
 ((__t = ( i18nLease.form.deposit )) == null ? '' : __t) +
 '</legend>\n    <div class="row">\n      <div class="control-group span">\n        <label for="lease-security_deposit" class="control-label">' +
 ((__t = ( i18nLease.fields.security_deposit )) == null ? '' : __t) +
-'</label>\n        <div class="controls">\n          <div class="input-prepend">\n            <span class="field-prefix add-on">$</span>\n            <input type="number" class="span1" name="lease[security_deposit]" id="lease-security_deposit" maxlength="12" />\n          </div>\n        </div>\n      </div>\n      <div class="control-group span1">\n        <label for="lease-keys" class="control-label">' +
+'</label>\n        <div class="controls">\n          <div class="input-prepend">\n            <span class="field-prefix add-on">$</span>\n            <input type="number" class="span1" name="lease[security_deposit]" id="lease-security_deposit" maxlength="12" value="' +
+((__t = ( lease.security_deposit )) == null ? '' : __t) +
+'" />\n          </div>\n        </div>\n      </div>\n      <div class="control-group span1">\n        <label for="lease-keys" class="control-label">' +
 ((__t = ( i18nLease.fields.keys )) == null ? '' : __t) +
-'</label>\n        <div class="controls">\n          <input type="number" class="span1" name="lease[keys]" id="lease-keys" maxlength="12" />\n        </div>\n      </div>\n    </div>\n  </fieldset>\n\n  <fieldset class="span5">\n    <legend>' +
+'</label>\n        <div class="controls">\n          <input type="number" class="span1" name="lease[keys]" id="lease-keys" maxlength="12" value="' +
+((__t = ( lease.keys )) == null ? '' : __t) +
+'" />\n        </div>\n      </div>\n    </div>\n  </fieldset>\n\n  <fieldset class="span5">\n    <legend>' +
 ((__t = ( i18nLease.form.parking )) == null ? '' : __t) +
 '</legend>\n    <div class="row">\n      <div class="control-group span">\n        <label for="lease-parking_fee" class="control-label">' +
 ((__t = ( i18nLease.fields.parking_fee )) == null ? '' : __t) +
-'</label>\n        <div class="controls">\n          <div class="input-prepend">\n            <span class="field-prefix add-on">$</span>\n            <input type="number" class="span1" name="lease[parking_fee]" id="lease-parking_fee" maxlength="12" />\n          </div>\n        </div>\n      </div>\n      <div class="control-group span1">\n        <label for="lease-parking_space" class="control-label">' +
+'</label>\n        <div class="controls">\n          <div class="input-prepend">\n            <span class="field-prefix add-on">$</span>\n            <input type="number" class="span1" name="lease[parking_fee]" id="lease-parking_fee" maxlength="12" value="' +
+((__t = ( lease.parking_fee )) == null ? '' : __t) +
+'" />\n          </div>\n        </div>\n      </div>\n      <div class="control-group span1">\n        <label for="lease-parking_space" class="control-label">' +
 ((__t = ( i18nLease.fields.parking_space )) == null ? '' : __t) +
-'</label>\n        <div class="controls">\n          <input type="text" class="span1" name="lease[parking_space]" id="lease-parking_space" maxlength="12" />\n        </div>\n      </div>\n      <div class="control-group span1">\n        <label for="lease-garage_remotes" class="control-label">' +
+'</label>\n        <div class="controls">\n          <input type="text" class="span1" name="lease[parking_space]" id="lease-parking_space" maxlength="12" value="' +
+((__t = ( lease.parking_space )) == null ? '' : __t) +
+'" />\n        </div>\n      </div>\n      <div class="control-group span1">\n        <label for="lease-garage_remotes" class="control-label">' +
 ((__t = ( i18nLease.fields.garage_remotes )) == null ? '' : __t) +
-'</label>\n        <div class="controls">\n          <input type="number" class="span1" name="lease[garage_remotes]" id="lease-garage_remotes" maxlength="12" />\n        </div>\n      </div>\n    </div>\n  </fieldset>\n</div>';
+'</label>\n        <div class="controls">\n          <input type="number" class="span1" name="lease[garage_remotes]" id="lease-garage_remotes" maxlength="12" value="' +
+((__t = ( lease.garage_remotes )) == null ? '' : __t) +
+'"/>\n        </div>\n      </div>\n    </div>\n  </fieldset>\n</div>';
 
 }
 return __p

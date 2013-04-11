@@ -20,12 +20,13 @@ define [
       @vars = property: @model, lease: undefined
       
       if attrs.params and attrs.params.lease
-        @model.load('leases')
+        @model.prep('leases')
+        @model.leases.fetch() if @model.leases.length is 0
         @vars.leaseId = attrs.params.lease
       
       
     render : ->
-      @form = new NewTenantsView @vars
+      @form = new NewTenantsView(@vars).render()
     
     clear : ->
       delete @form.undelegateEvents()

@@ -1,0 +1,41 @@
+<div class="row">
+  <fieldset class="form-xlarge offset1 span">
+    <div class="title-group control-group">
+      <label for="network-title" class="control-label "><%= i18nProperty.network.give_network_a_title %> <span class="required">*</span></label>
+      <div class="controls">
+        <input type="text" class="span5" name="network[title]" maxlength="127" value="<%= network.title %>" required="required" />
+        <p class="help-block"><%= i18nProperty.network.can_be_anything %></p>
+      </div>
+    </div>
+    <div class="name-group control-group">
+      <label for="network-name" class="control-label"><%= i18nProperty.network.claim_domain %> <span class="required">*</span></label>
+      <div class="controls">
+        <div class="input-append">
+          <input type="text" class="input-block input-large text-right" name="network[name]" maxlength="32" value="<%= network.name %>" required="required" />
+          <span class="add-on">.clevertower.com</span>
+        </div>
+        <p class="help-block"><%= i18nCommon.form.lowercase_only %></p>
+      </div>
+    </div>
+  </fieldset>
+  <fieldset class="offset1 span form-large">
+    <div class="control-group">
+      <label for="network-phone" class="control-label"><%= i18nProperty.fields.phone %></label>
+      <div class="controls">
+        <input type="text" class="span3" name="network[phone]" maxlength="127" value="<%= network.phone %>" />
+      </div>
+    </div>
+    <div class="control-group">
+      <label for="network-email" class="control-label"><%= i18nProperty.fields.email %></label>
+      <div class="controls">
+        <input type="text" class="span3"  name="network[email]" maxlength="127" value="<%= network.email %>" />
+      </div>
+    </div>
+    <div class="control-group">
+      <label for="network-website" class="control-label"><%= i18nProperty.fields.website %></label>
+      <div class="controls">
+        <input type="text" class="span3"  name="network[website]" maxlength="127" value="<%= network.website %>" />
+      </div>
+    </div>
+  </fieldset>
+</div>

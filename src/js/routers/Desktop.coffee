@@ -1,15 +1,15 @@
 define [
   "jquery", 
   "backbone",
-  "views/user/UserMenu"
-], ($, Parse, UserMenuView) ->
+  "views/user/Menu"
+  "views/network/Menu"
+], ($, Parse, UserMenuView, NetworkMenuView) ->
 
   class DesktopRouter extends Parse.Router
     routes:
       ""                            : "index"
-      "properties/new"              : "propertiesNew"
-      "properties/:id"              : "propertiesShow"
-      "properties/:id/*splat"       : "propertiesShow"
+      "network/set"                 : "networkSet"
+      "network/:name"               : "networkShow"
       "users/:id"                   : "profileShow"
       "users/:id/edit"              : "profileEdit"
       "account/:category"           : "accountSettings"
@@ -18,7 +18,12 @@ define [
     initialize: (options) ->
       Parse.history.start pushState: true
       
-      new UserMenuView()
+      new UserMenuView(onNetwork: false).render()
+      new NetworkMenuView()
+      
+      @on "route", => 
+        @view.undelegateEvents()
+        delete @view
       
       # Use delegation to avoid initial DOM selection and allow all matching elements to bubble
       $(document).on "click", "a", (e) ->
@@ -28,11 +33,14 @@ define [
         
         return if href is "#" or not href?
         
-        protocol = @protocol + "//"
+        # protocol = location.protocol + "//"
 
         # Ensure the protocol is not part of URL, meaning its relative.
         # Stop the event bubbling to ensure the link will not cause a page refresh.
-        if href.slice(protocol.length) isnt protocol
+        # if href.slice(protocol.length) isnt protocol
+        
+        # If this is a relative link.
+        if href.substring(0,1) is '/'
           e.preventDefault()
 
           # Note by using Backbone.history.navigate, router events will not be
@@ -43,68 +51,33 @@ define [
     index: =>
       user = Parse.User.current()
       if user
-        if user.get("type") is "manager"
-          require ["views/property/Manage"], (ManagePropertiesView) =>
-            @view = new ManagePropertiesView if !@view or @view !instanceof ManagePropertiesView
+        $('#main').html """
+                        <h1>News Feed</h1>
+                        <div class="row">
+                          <div class="span8">
 
-            @view.render()
-        else
-          require ["views/property/Manage"], (ManagePropertiesView) =>
-            @view = new ManagePropertiesView if !@view or @view !instanceof ManagePropertiesView
-            @view.render()
+                          </div>
+                          <div class="span4">
+                            <!-- if user.get('type') is 'manager' then  -->
+                            <ul class="nav nav-list"><li><a href="/network/set">Set up network</a></li></ul>
+                          </div>
+                        </div>
+                        """
       else
-        $('#main').html '<h1>Cover page goes here</h1>'
+        $('#main').html '<h1>Splash page</h1>'
 
-    propertiesNew: =>
+
+    # User
+    # --------------
+    
+    networkSet : ->
       if Parse.User.current()
-        require ["views/property/Manage"], (ManagePropertiesView) =>
-          @view = new ManagePropertiesView if !@view or @view !instanceof ManagePropertiesView
+        require ["views/network/New"], (NewNetworkView) =>              
+          @view = new NewNetworkView(model: Parse.User.current().get("network")) # if !@view or @view !instanceof NewNetworkView
           @view.render()
-          @view.newProperty()
       else
         @signupOrLogin()
-        
-    propertiesShow: (id, splat) =>
-      if Parse.User.current()
-        require ["views/property/Show"], (PropertyView) => 
-          if !@view or @view !instanceof PropertyView
-                  
-            require ["models/Property", "collections/property/PropertyList"], (Property, PropertyList) => 
-              if Parse.User.current().properties
-                if model = Parse.User.current().properties.get id
-                  combo = @deparamAction splat
-                  vars = model:model, path: combo.path, params: combo.params
-                
-                  $('#main').html '<div id="property"></div>'
-                  @view = new PropertyView(vars)
-                else
-                  new Parse.Query("Property").get id,
-                  success: (model) =>
-                    Parse.User.current().properties.add model
-                    vars = @deparamAction splat
-                    vars.model = model
-                    $('#main').html '<div id="property"></div>'
-                    @view = new PropertyView(vars)
-                  error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
-                
-              else
-                if !Parse.User.current().properties then Parse.User.current().properties = new PropertyList
-                new Parse.Query("Property").get id,
-                success: (model) =>
-                  Parse.User.current().properties.add model
-                  vars = @deparamAction splat
-                  vars.model = model
-          
-                  $('#main').html '<div id="property"></div>'
-                  @view = new PropertyView(vars)
-                error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
-                
-          else
-            vars = @deparamAction splat
-            @view.changeSubView(vars.path, vars.params)
-            
-      else
-        @signupOrLogin()
+    
 
     profileShow : (id) ->
       require ["models/Profile", "views/profile/Show"], (Profile, ShowProfileView) =>
@@ -138,6 +111,12 @@ define [
             @view = new UserSettingsView(model: Parse.User.current()).render()
       else
         @signupOrLogin()
+  
+  
+  
+
+    # Utilities
+    # --------------
   
     deparamAction : (splat) ->
       ary = if splat then splat.split('?') else new Array('')

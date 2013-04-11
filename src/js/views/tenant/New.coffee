@@ -6,6 +6,7 @@ define [
   "models/Property"
   "models/Lease"
   "models/Tenant"
+  "models/Profile"
   "views/helper/Alert"
   "i18n!nls/common"
   "i18n!nls/lease"
@@ -13,7 +14,7 @@ define [
   "templates/helper/field/property"
   "templates/helper/field/tenant"
   "datepicker"
-], ($, _, Parse, TenantList, Property, Lease, Tenant, Alert, i18nCommon, i18nLease) ->
+], ($, _, Parse, TenantList, Property, Lease, Tenant, Profile, Alert, i18nCommon, i18nLease) ->
   
   class NewTenantsView extends Parse.View
     
@@ -29,34 +30,26 @@ define [
       @property = attrs.property
       @leaseId = attrs.leaseId
       
-      @render()
-      
-      if @property
-        @property.load('leases')
-        @leases = @property.leases
-      else 
-        @leases = new LeaseList
-        @leases.fetch()
-      
+      @leases = if @property then @property.prep('leases') else new LeaseList      
       @leases.bind "add", @addOne
       @leases.bind "reset", @addAll
       
+      @on 'submit:return', ->
+        @$('button.save').removeProp "disabled"
+      
       @on 'submit:error', (error) ->
-        @$('button.save').removeProp "disabled"
         @$('.emails-group').addClass('error') 
-        new Alert(event: 'model-save', fade: false, message: error.message, type: 'error')
+        new Alert(event: 'model-save', fade: false, message: i18nLease.errors[error.message], type: 'error')
           
-      @on 'submit:success', (lease) ->
-        @$('button.save').removeProp "disabled"
-        new Alert(event: 'model-save', message: i18nCommon.actions.changes_saved, type: 'success')
-        Parse.history.navigate "/properties/#{@property.id}/leases/#{lease.id}"
       
-
-      
-      # @el = "form.lease-form"
-      # @$el = $("#content form.lease-form")
-          
-
+      @on "submit:success", (model) =>
+        require ["views/lease/Show"], (ShowLeaseView) =>
+          # Alert the user and move on
+          new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
+          new ShowLeaseView(model: model, property: @property).render()
+          Parse.history.navigate "/properties/#{@property.id}/leases/#{model.id}"
+          @undelegateEvents()
+          delete this
 
     addOne : (l) =>
       if l.isActive() then @addActive(l) else @addInactive(l) 
@@ -103,17 +96,22 @@ define [
         attrs.emails = []
         _.each data.emails.split(","), (email) =>
           email = $.trim(email)
-          # account will not be saved directly. We create one only for validation.
-          account = new Parse.User(username: email, email: email)
-          attrs.emails.push email if userValid = account.isValid()
+          # validate is a backwards function.
+          userValid = unless Parse.User::validate(email: email) then true else false
+          attrs.emails.push email if userValid
 
       
       unless userValid
+        @trigger "submit:return"
         @trigger "submit:error", {message: 'tenants_incorrect'}
       else
         Parse.Cloud.run "AddTenants", attrs,
-        success: (model) => @trigger "submit:success", model
-        error: (model, error) => @trigger "submit:error", {message: 'tenants_incorrect'}
+        success: (model) =>
+          @trigger "submit:return"
+          @trigger "submit:success", model
+        error: (model, error) =>
+          @trigger "submit:return"
+          @trigger "submit:error", message: 'tenants_incorrect'
 
     render: ->
       vars = _.merge(
@@ -125,3 +123,5 @@ define [
       @$el.html JST["src/js/templates/tenant/new.jst"](vars)
       
       @$leaseSelect = @$('.lease-select')
+      
+      @leases.fetch() if @leases.length is 0

@@ -24,13 +24,12 @@
 
       LeaseSummaryView.prototype.initialize = function(attrs) {
         var _this = this;
-        this.title = attrs.title;
         this.onUnit = attrs.onUnit ? true : false;
         this.link_text = this.onUnit ? i18nCommon.nouns.link : i18nCommon.classes.lease;
         this.model.on("save:success", function() {
           return _this.render();
         });
-        this.model.on("remove", function() {
+        this.model.on("destroy", function() {
           _this.remove();
           _this.undelegateEvents();
           return delete _this;
@@ -62,7 +61,7 @@
           onUnit: this.onUnit,
           propertyId: this.model.get("property").id,
           unitId: this.model.get("unit").id,
-          title: this.title,
+          title: this.model.get("unit").get("title"),
           moment: moment,
           propertyId: this.model.get("property").id,
           objectId: this.model.get("objectId"),
@@ -96,11 +95,7 @@
         e.preventDefault();
         if (confirm(i18nCommon.actions.confirm + " " + i18nCommon.warnings.no_undo)) {
           id = this.model.get("property").id;
-          this.model.destroy();
-          this.remove();
-          this.undelegateEvents();
-          delete this;
-          return Parse.history.navigate("/properties/" + id);
+          return this.model.destroy();
         }
       };
 

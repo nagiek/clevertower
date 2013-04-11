@@ -26,14 +26,13 @@ define [
       
     initialize: (attrs) ->
       
-      @title = attrs.title
       @onUnit = if attrs.onUnit then true else false
       @link_text = if @onUnit then i18nCommon.nouns.link else i18nCommon.classes.lease
           
       @model.on "save:success", =>
         @render()
         
-      @model.on "remove", =>
+      @model.on "destroy", =>
         @remove()
         @undelegateEvents()
         delete this
@@ -62,7 +61,7 @@ define [
         onUnit: @onUnit
         propertyId: @model.get("property").id
         unitId: @model.get("unit").id
-        title: @title
+        title: @model.get("unit").get("title")
         moment: moment
         propertyId: @model.get("property").id
         objectId: @model.get "objectId"
@@ -91,7 +90,3 @@ define [
       if confirm(i18nCommon.actions.confirm + " " + i18nCommon.warnings.no_undo)
         id = @model.get("property").id
         @model.destroy()
-        @remove()
-        @undelegateEvents()
-        delete this
-        Parse.history.navigate "/properties/#{id}"

@@ -21,9 +21,14 @@
       };
 
       PhotoView.prototype.initialize = function() {
+        var _this = this;
         _.bindAll(this, "render", "close", "remove");
-        this.model.bind("change", this.render);
-        return this.model.bind("destroy", this.remove);
+        this.model.on("change", this.render);
+        return this.model.on("destroy", function() {
+          _this.remove();
+          _this.undeletegateEvents();
+          return delete _this;
+        });
       };
 
       PhotoView.prototype.render = function() {

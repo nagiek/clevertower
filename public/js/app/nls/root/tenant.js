@@ -16,7 +16,7 @@
       update: 'Lease was successfully updated with new tenants.'
     },
     fields: {
-      state: {
+      status: {
         active: "Active",
         invited: "Invited",
         pending: "Pending"

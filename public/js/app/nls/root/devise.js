@@ -37,7 +37,12 @@
       new_password: "New password",
       new_password_confirm: "Confirm new password",
       send_instructions: "Send instructions",
-      instructions_to_email: "Instructions to change your password will be emailed to you."
+      instructions_to_email: "Instructions to change your password will be emailed to you.",
+      type: {
+        label: "I am a",
+        manager: "Manager",
+        tenant: "Tenant"
+      }
     },
     messages: {
       password_reset: "We have sent a link to reset your password to your email"

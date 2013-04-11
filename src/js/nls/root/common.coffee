@@ -1,8 +1,10 @@
 define
-  headers:
+  menu:
     home:                 "Home"
     search:               "Search"
-    operations:           "Operations"
+  fields:
+    title:                "Title"
+    name:                 "Name"
   classes:                
     lease:                "lease"
     Lease:                "Lease"
@@ -13,6 +15,8 @@ define
     unit:                 "unit"
     units:                "units"
     Units:                "Units"
+    Properties:           "Properties"
+    Managers:             "Managers"
     tasks:                "tasks"
     finances:             "finances"
   actions:                
@@ -86,14 +90,15 @@ define
     private:              "Private"
     landlord_only:        "Landlord Only"
   form:                   
-    title:                "Title"
+    operations:           "Operations"
     info:                 "Info"
     required:             "Required"
+    lowercase_only:       "Lowercase letters (a-z) only. No spaces."
     comma_separated:      "Enter a comma-separated list of email addresses."
     select:               
       select_value:       "- Select a value -"
       numeric:            "Numeric (1 ➡ 2)"
-      alphabetical:       "Alpha (A ➡ B)"
+      alphabetical:       "Alphabetical (A ➡ B)"
   warnings:               
     no_undo:              "This action cannot be undone."
   errors:                 

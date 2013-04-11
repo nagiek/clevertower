@@ -1,4 +1,5 @@
 (function() {
+  var onNetwork, router;
 
   require.config({
     baseUrl: "/js",
@@ -6,11 +7,13 @@
       jquery: "//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min",
       underscore: "//cdnjs.cloudflare.com/ajax/libs/lodash.js/1.0.1/lodash.min",
       backbone: "//www.parsecdn.com/js/parse-1.2.2",
+      facebook: "//connect.facebook.net/en_US/all",
       jqueryuiwidget: "libs/jqueryui/jquery.ui.widget.min",
       jquerymobile: "//cdnjs.cloudflare.com/ajax/libs/jquery-mobile/1.2.0/jquery.mobile.min",
       datepicker: "libs/bootstrap/bootstrap-datepicker.min",
       serializeObject: "app/plugins/serialize_object",
       filePicker: "app/plugins/file_picker",
+      toggler: "app/plugins/toggler",
       "jquery.fileupload-pr": "app/plugins/jquery-fileupload-pr",
       "jquery.fileupload-ui": "app/plugins/jquery-fileupload-ui",
       "jquery.fileupload-fp": "app/plugins/jquery-fileupload-fp",
@@ -30,6 +33,7 @@
       collections: "app/collections",
       models: "app/models",
       nls: "app/nls",
+      plugins: "app/plugins",
       routers: "app/routers",
       templates: "app/templates",
       views: "app/views"
@@ -56,8 +60,13 @@
     return window.google.maps;
   });
 
-  require(["jquery", "backbone", "collections/property/PropertyList", "models/Profile", "routers/Desktop", "json2", "bootstrap", "serializeObject"], function($, Parse, PropertyList, Profile, AppRouter) {
-    var _this = this;
+  onNetwork = window.location.host.split(".").length > 2;
+
+  router = onNetwork ? "routers/Network" : "routers/Desktop";
+
+  require(["jquery", "backbone", "facebook", "collections/property/PropertyList", "models/Profile", router, "json2", "bootstrap", "serializeObject"], function($, Parse, FB, PropertyList, Profile, AppRouter) {
+    var networkPromise, profilePromise,
+      _this = this;
     Parse.initialize("z00OPdGYL7X4uW9soymp8n5JGBSE6k26ILN1j3Hu", "NifB9pRHfmsTDQSDA9DKxMuux03S4w2WGVdcxPHm");
     Parse.FacebookUtils.init({
       appId: '387187337995318',
@@ -68,7 +77,8 @@
     });
     Parse.User.prototype.defaults = {
       privacy_visible: false,
-      privacy_unit: false
+      privacy_unit: false,
+      type: "tenant"
     };
     Parse.User.prototype.validate = function(attrs, options) {
       if (_.has(attrs, "ACL") && !(attrs.ACL instanceof Parse.ACL)) {
@@ -84,9 +94,16 @@
       return false;
     };
     if (Parse.User.current()) {
-      Parse.User.current().properties = new PropertyList;
-      return (new Parse.Query(Profile)).equalTo("user", Parse.User.current()).first().then(function(profile) {
+      profilePromise = (new Parse.Query(Profile)).equalTo("user", Parse.User.current()).first();
+      networkPromise = (new Parse.Query("_User")).include('network.role').equalTo("objectId", Parse.User.current().id).first();
+      return Parse.Promise.when(profilePromise, networkPromise).then(function(profile, user) {
+        var network;
         Parse.User.current().profile = profile;
+        if (onNetwork) {
+          Parse.User.current().properties = new PropertyList;
+        }
+        network = user.get("network");
+        Parse.User.current().set("network", network);
         return new AppRouter();
       });
     } else {

@@ -43,13 +43,6 @@ legend {
   }
 }
 
-.button_to {
-  display:inline;
-  > div {
-    display:inline;
-  }
-}
-
 /**
  * jQuery File Upload UI Plugin CSS 6.10
  * https://github.com/blueimp/jQuery-File-Upload
@@ -202,18 +195,115 @@ legend {
   }
 }
 
-input[type="text"],
-input[type="number"],
-input[type="date"],
-input[type="url"],
-input[type="email"] {
-  &.input-tall {
-    font-size: 18px;
-    height: 44px;
-    line-height: 24px;
-    padding: 8px 16px;
+// Large controls
+@media (min-width: 480px) {
+  .form-xlarge {
+    .control-label {
+      font-size: 18px;
+      line-height: 24px;
+    }
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    input[type="url"],
+    input[type="email"] {
+      font-size: 18px;
+      height: 44px;
+      line-height: 24px;
+      padding: 8px 16px;
+    }
+    .help-inline,
+    .help-block {
+      font-size: 16px;
+      line-height: 18px;
+      margin-bottom: 16px;
+    }
+    .add-on {    
+      font-size: 18px;
+      line-height: 24px;
+      height: 24px;
+      padding: 18px 16px;
+    }
+    .input-append {
+      .add-on {
+        padding-left: 8px;
+      }
+    }
+    .input-prepend {
+      .add-on {
+        padding-right: 8px;
+      }
+    }
+    &.form-horizontal {
+      .control-label {
+        padding-top: 16px;
+      }
+    }
+  }
+  .form-large {
+    .control-label {
+      font-size: 14px;
+      line-height: 24px;
+    }
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    input[type="url"],
+    input[type="email"] {
+      font-size: 14px;
+      height: 24px;
+      line-height: 18px;
+      padding: 6px 12px;
+    }
+    .help-inline,
+    .help-block {
+      font-size: 13px;
+      line-height: 16px;
+    }
+    .add-on {    
+      font-size: 14px;
+      line-height: 24px;
+      height: 24px;
+      padding: 12px 9px;
+    }
+    .input-append {
+      .add-on {
+        padding-left: 6px;
+      }
+    }
+    .input-prepend {
+      .add-on {
+        padding-right: 6px;
+      }
+    }
+    &.form-horizontal {
+      .control-label {
+        padding-top: 16px;
+      }
+    }
   }
 }
+
+
+
+
+@media (min-width: 480px) and (max-width: 767px) { 
+  .form-xlarge {
+    .add-on {    
+      height: 24px;
+      padding: 9px 16px;
+    }
+  }
+  .form-large {
+    .add-on {    
+      height: 18px;
+      padding: 6px 112px;
+    }
+  }
+}
+
+
+
 
 .input-xsmall {
   width: 60px;

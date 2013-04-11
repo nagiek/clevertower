@@ -3,26 +3,21 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "backbone", "views/user/UserMenu"], function($, Parse, UserMenuView) {
+  define(["jquery", "backbone", "views/user/Menu", "views/network/Menu"], function($, Parse, UserMenuView, NetworkMenuView) {
     var DesktopRouter;
     return DesktopRouter = (function(_super) {
 
       __extends(DesktopRouter, _super);
 
       function DesktopRouter() {
-        this.propertiesShow = __bind(this.propertiesShow, this);
-
-        this.propertiesNew = __bind(this.propertiesNew, this);
-
         this.index = __bind(this.index, this);
         return DesktopRouter.__super__.constructor.apply(this, arguments);
       }
 
       DesktopRouter.prototype.routes = {
         "": "index",
-        "properties/new": "propertiesNew",
-        "properties/:id": "propertiesShow",
-        "properties/:id/*splat": "propertiesShow",
+        "network/set": "networkSet",
+        "network/:name": "networkShow",
         "users/:id": "profileShow",
         "users/:id/edit": "profileEdit",
         "account/:category": "accountSettings",
@@ -30,18 +25,25 @@
       };
 
       DesktopRouter.prototype.initialize = function(options) {
+        var _this = this;
         Parse.history.start({
           pushState: true
         });
-        new UserMenuView();
+        new UserMenuView({
+          onNetwork: false
+        }).render();
+        new NetworkMenuView();
+        this.on("route", function() {
+          _this.view.undelegateEvents();
+          return delete _this.view;
+        });
         return $(document).on("click", "a", function(e) {
-          var href, protocol;
+          var href;
           href = $(this).attr("href");
           if (href === "#" || !(href != null)) {
             return;
           }
-          protocol = this.protocol + "//";
-          if (href.slice(protocol.length) !== protocol) {
+          if (href.substring(0, 1) === '/') {
             e.preventDefault();
             return Parse.history.navigate(href, true);
           }
@@ -49,99 +51,23 @@
       };
 
       DesktopRouter.prototype.index = function() {
-        var user,
-          _this = this;
+        var user;
         user = Parse.User.current();
         if (user) {
-          if (user.get("type") === "manager") {
-            return require(["views/property/Manage"], function(ManagePropertiesView) {
-              if (!_this.view || !(_this.view instanceof ManagePropertiesView)) {
-                _this.view = new ManagePropertiesView;
-              }
-              return _this.view.render();
-            });
-          } else {
-            return require(["views/property/Manage"], function(ManagePropertiesView) {
-              if (!_this.view || !(_this.view instanceof ManagePropertiesView)) {
-                _this.view = new ManagePropertiesView;
-              }
-              return _this.view.render();
-            });
-          }
+          return $('#main').html("<h1>News Feed</h1>\n<div class=\"row\">\n  <div class=\"span8\">\n\n  </div>\n  <div class=\"span4\">\n    <!-- if user.get('type') is 'manager' then  -->\n    <ul class=\"nav nav-list\"><li><a href=\"/network/set\">Set up network</a></li></ul>\n  </div>\n</div>");
         } else {
-          return $('#main').html('<h1>Cover page goes here</h1>');
+          return $('#main').html('<h1>Splash page</h1>');
         }
       };
 
-      DesktopRouter.prototype.propertiesNew = function() {
+      DesktopRouter.prototype.networkSet = function() {
         var _this = this;
         if (Parse.User.current()) {
-          return require(["views/property/Manage"], function(ManagePropertiesView) {
-            if (!_this.view || !(_this.view instanceof ManagePropertiesView)) {
-              _this.view = new ManagePropertiesView;
-            }
-            _this.view.render();
-            return _this.view.newProperty();
-          });
-        } else {
-          return this.signupOrLogin();
-        }
-      };
-
-      DesktopRouter.prototype.propertiesShow = function(id, splat) {
-        var _this = this;
-        if (Parse.User.current()) {
-          return require(["views/property/Show"], function(PropertyView) {
-            var vars;
-            if (!_this.view || !(_this.view instanceof PropertyView)) {
-              return require(["models/Property", "collections/property/PropertyList"], function(Property, PropertyList) {
-                var combo, model, vars;
-                if (Parse.User.current().properties) {
-                  if (model = Parse.User.current().properties.get(id)) {
-                    combo = _this.deparamAction(splat);
-                    vars = {
-                      model: model,
-                      path: combo.path,
-                      params: combo.params
-                    };
-                    $('#main').html('<div id="property"></div>');
-                    return _this.view = new PropertyView(vars);
-                  } else {
-                    return new Parse.Query("Property").get(id, {
-                      success: function(model) {
-                        Parse.User.current().properties.add(model);
-                        vars = _this.deparamAction(splat);
-                        vars.model = model;
-                        $('#main').html('<div id="property"></div>');
-                        return _this.view = new PropertyView(vars);
-                      },
-                      error: function(object, error) {
-                        return _this.accessDenied();
-                      }
-                    });
-                  }
-                } else {
-                  if (!Parse.User.current().properties) {
-                    Parse.User.current().properties = new PropertyList;
-                  }
-                  return new Parse.Query("Property").get(id, {
-                    success: function(model) {
-                      Parse.User.current().properties.add(model);
-                      vars = _this.deparamAction(splat);
-                      vars.model = model;
-                      $('#main').html('<div id="property"></div>');
-                      return _this.view = new PropertyView(vars);
-                    },
-                    error: function(object, error) {
-                      return _this.accessDenied();
-                    }
-                  });
-                }
-              });
-            } else {
-              vars = _this.deparamAction(splat);
-              return _this.view.changeSubView(vars.path, vars.params);
-            }
+          return require(["views/network/New"], function(NewNetworkView) {
+            _this.view = new NewNetworkView({
+              model: Parse.User.current().get("network")
+            });
+            return _this.view.render();
           });
         } else {
           return this.signupOrLogin();

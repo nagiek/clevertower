@@ -20,6 +20,10 @@
 
         this.addAll = __bind(this.addAll, this);
 
+        this.switchToEdit = __bind(this.switchToEdit, this);
+
+        this.switchToShow = __bind(this.switchToShow, this);
+
         this.switchMode = __bind(this.switchMode, this);
 
         this.clear = __bind(this.clear, this);
@@ -38,11 +42,11 @@
       };
 
       PropertyUnitsView.prototype.initialize = function(attrs) {
-        this.editing = false;
         this.on("view:change", this.clear);
-        this.model.load('units');
+        this.model.prep('units');
         this.model.units.on("add", this.addOne);
-        return this.model.units.on("reset", this.addAll);
+        this.model.units.on("reset", this.addAll);
+        return this.editing = false;
       };
 
       PropertyUnitsView.prototype.render = function() {
@@ -57,9 +61,12 @@
         });
         this.$el.html(JST["src/js/templates/property/sub/units.jst"](vars));
         this.$table = this.$("#units-table");
-        this.$list = this.$("#units-table tbody");
         this.$actions = this.$(".form-actions");
         this.$undo = this.$actions.find('.undo');
+        this.model.units.fetch();
+        if (this.model.units.length === 0) {
+          this.switchToEdit();
+        }
         return this;
       };
 
@@ -76,10 +83,24 @@
         return this.editing = this.editing ? false : true;
       };
 
+      PropertyUnitsView.prototype.switchToShow = function(e) {
+        if (this.editing) {
+          return this.switchMode;
+        }
+      };
+
+      PropertyUnitsView.prototype.switchToEdit = function(e) {
+        if (!this.editing) {
+          return this.switchMode;
+        }
+      };
+
       PropertyUnitsView.prototype.addAll = function(collection, filter) {
+        this.$list = this.$("#units-table tbody");
         this.$list.html('');
-        this.model.units.each(this.addOne);
-        if (this.model.units.length === 0) {
+        if (this.model.units.length > 0) {
+          return this.model.units.each(this.addOne);
+        } else {
           return this.$list.html('<p class="empty">' + i18nProperty.collection.empty.units + '</p>');
         }
       };
@@ -92,37 +113,24 @@
         });
         this.$list.append(view.render().el);
         if (this.editing) {
-          return view.$('.view-specific').toggleClass('hide');
+          view.$('.view-specific').toggleClass('hide');
         }
+        return this.$list.last().find('.title').focus();
       };
 
       PropertyUnitsView.prototype.addX = function(e) {
-        var char, newChar, newTitle, title, unit, x;
+        var x;
         e.preventDefault();
         x = Number($('#x').val());
         if (x == null) {
           x = 1;
         }
         while (!(x <= 0)) {
-          if (this.model.units.length === 0) {
-            unit = new Unit({
-              property: this.model
-            });
-          } else {
-            unit = this.model.units.at(this.model.units.length - 1).clone();
-            unit.set("has_lease", false);
-            unit.unset("activeLease");
-            title = unit.get('title');
-            newTitle = title.substr(0, title.length - 1);
-            char = title.charAt(title.length - 1);
-            newChar = isNaN(char) ? String.fromCharCode(char.charCodeAt() + 1) : String(Number(char) + 1);
-            unit.set('title', newTitle + newChar);
-          }
-          this.model.units.add(unit);
+          this.model.units.prepopulate();
           x--;
         }
         this.$undo.removeProp('disabled');
-        return this.$list.last().find('.title-group input').focus();
+        return this.$list.last().find('.title').focus();
       };
 
       PropertyUnitsView.prototype.undo = function(e) {

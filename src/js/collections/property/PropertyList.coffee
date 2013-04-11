@@ -12,4 +12,4 @@ define [
 
     initialize: ->
       # We load PropertyList before Parse is initialized, so we cannot pre-load the query.
-      @query = new Parse.Query("Property").equalTo("user", Parse.User.current())
+      @query = new Parse.Query("Property").equalTo("network", Parse.User.current().get("network"))

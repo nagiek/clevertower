@@ -32,7 +32,11 @@ define [
       delete this
       
     render : =>
-      @$el.html JST["src/js/templates/property/sub/edit.jst"](_.merge(property: @model, i18nProperty: i18nProperty, i18nCommon: i18nCommon))
+      vars = 
+        property: _.defaults(@model.attributes, Property::defaults)
+        i18nProperty: i18nProperty
+        i18nCommon: i18nCommon
+      @$el.html JST["src/js/templates/property/sub/edit.jst"](vars)
       @
         
     save : (e) ->

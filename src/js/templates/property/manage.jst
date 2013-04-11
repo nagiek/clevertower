@@ -1,18 +1,25 @@
 <section class="section">
-  <header>
-    <ul id="actions" class="unstyled inline">
-      <li>
-        <button id="new-property" class="btn btn-success">
-          <!-- <i class="icon icon-white icon-plus"></i> -->
+  <div class="row">
+    <div class="span8">
+      <header>
+        <h2 class="inline-block"><%= i18nCommon.classes.Properties %></h2>
+        <ul class="unstyled inline inline-block">
+        <li><button id="new-property" class="btn btn-success">
+          <i class="icon icon-white icon-plus"></i>
           <%= i18nProperty.actions.new_property %>
-        </button>
-      </li>
-    </ul>
-  </header>
-
-  <ul id="view-id-my_properties" class="property-list unstyled">
-    <img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" />
-  </ul>
+        </button></li>
+        </ul>
+      </header>
+      <ul id="network-properties" class="property-list unstyled">
+        <img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" />
+      </ul>
+    </div>
+    <div class="span4">
+      <ul class="nav nav-list well">
+        <li><a href="clevertower.dev/networks/<%= title %>"><%= title %></a><a class="btn pull-right" href="/network/edit" rel="tooltip" data-original-title="<%= i18nCommon.actions.edit %>"><i class="icon icon-edit"></i></a></li>
+        <li><a href="/network/managers"><%= i18nCommon.classes.Managers %></a></li>
+      </ul>
+    </div>
+  </div>
 </section>
-
-<div id="form" class="row wizard"></div>
+<div class="row wizard"></div>

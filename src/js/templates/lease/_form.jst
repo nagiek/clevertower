@@ -40,7 +40,7 @@
         <div class="controls">
           <div class="input-prepend">
             <span class="field-prefix add-on">$</span>
-            <input type="number" class="span1" name="lease[rent]" id="lease-rent" maxlength="12" />
+            <input type="number" class="span1" name="lease[rent]" id="lease-rent" maxlength="12" value="<%= lease.rent %>" />
           </div>
         </div>
       </div>
@@ -66,14 +66,14 @@
         <div class="controls">
           <div class="input-prepend">
             <span class="field-prefix add-on">$</span>
-            <input type="number" class="span1" name="lease[security_deposit]" id="lease-security_deposit" maxlength="12" />
+            <input type="number" class="span1" name="lease[security_deposit]" id="lease-security_deposit" maxlength="12" value="<%= lease.security_deposit %>" />
           </div>
         </div>
       </div>
       <div class="control-group span1">
         <label for="lease-keys" class="control-label"><%= i18nLease.fields.keys %></label>
         <div class="controls">
-          <input type="number" class="span1" name="lease[keys]" id="lease-keys" maxlength="12" />
+          <input type="number" class="span1" name="lease[keys]" id="lease-keys" maxlength="12" value="<%= lease.keys %>" />
         </div>
       </div>
     </div>
@@ -87,20 +87,20 @@
         <div class="controls">
           <div class="input-prepend">
             <span class="field-prefix add-on">$</span>
-            <input type="number" class="span1" name="lease[parking_fee]" id="lease-parking_fee" maxlength="12" />
+            <input type="number" class="span1" name="lease[parking_fee]" id="lease-parking_fee" maxlength="12" value="<%= lease.parking_fee %>" />
           </div>
         </div>
       </div>
       <div class="control-group span1">
         <label for="lease-parking_space" class="control-label"><%= i18nLease.fields.parking_space %></label>
         <div class="controls">
-          <input type="text" class="span1" name="lease[parking_space]" id="lease-parking_space" maxlength="12" />
+          <input type="text" class="span1" name="lease[parking_space]" id="lease-parking_space" maxlength="12" value="<%= lease.parking_space %>" />
         </div>
       </div>
       <div class="control-group span1">
         <label for="lease-garage_remotes" class="control-label"><%= i18nLease.fields.garage_remotes %></label>
         <div class="controls">
-          <input type="number" class="span1" name="lease[garage_remotes]" id="lease-garage_remotes" maxlength="12" />
+          <input type="number" class="span1" name="lease[garage_remotes]" id="lease-garage_remotes" maxlength="12" value="<%= lease.garage_remotes %>"/>
         </div>
       </div>
     </div>

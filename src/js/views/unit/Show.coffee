@@ -18,9 +18,8 @@ define [
     el: ".content"
     
     initialize: (attrs) ->
-      console.log @model
+
       @property = attrs.property
-      @property.load('units')
       
       @leases = new LeaseList(unit: @model)
       @leases.on "reset", @addAll

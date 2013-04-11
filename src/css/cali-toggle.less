@@ -1,0 +1,118 @@
+/** 
+ * From the code found here:
+ * http://designmodo.github.io/Flat-UI/
+ */
+.toggle {
+  // @see .clearfix
+  *zoom: 1;
+  &:before,
+  &:after {
+    display: table;
+    content: "";
+    // Fixes Opera/contenteditable bug:
+    // http://nicolasgallagher.com/micro-clearfix-hack/#comment-36952
+    line-height: 0;
+  }
+  &:after {
+    clear: both;
+  }
+
+  background-color: #34495e;
+  border-radius: 60px;
+  color: white;
+  height: 29px;
+  margin: 0 12px 12px 0;
+  overflow: hidden;
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+  .transition(0.25s);
+  -webkit-backface-visibility: hidden;
+  .toggle-radio:first-child {
+    margin-bottom: -29px;
+    left: 0;
+  }
+  .toggle-radio {
+    background: url("@{imagesFolder}/vendor/flat-ui/toggle/icon-on.png") right top no-repeat;
+    color: #1abc9c;
+    display: block;
+    font-weight: 700;
+    height: 21px;
+    left: 120%;
+    margin-left: -13px;
+    padding: 5px 32px 3px;
+    position: relative;
+    text-align: center;
+    z-index: 2;
+    .transition(0.25s);
+    -webkit-backface-visibility: hidden;
+  }
+  &.toggle-icon {
+    border-radius: 6px 7px 7px 6px;
+    .toggle-radio:first-child {
+      text-align: left;
+    }
+    .toggle-radio {
+      background-image: url("@{imagesFolder}/vendor/flat-ui/toggle/block-on.png");
+      background-position: 62px 0;
+      border-radius: 6px;
+      min-width: 27px;
+      text-align: right;
+    }
+  }
+  input {
+    display: none;
+    position: absolute;
+    outline: none !important;
+    display: block\9;
+    opacity: 0.01;
+    filter: alpha(opacity=1);
+    zoom: 1;
+  }
+  &.toggle-off {
+    background-color: #cbd2d8;
+    .toggle-radio:first-child {
+      left: -120%;
+    }
+    .toggle-radio {
+      background-image: url("@{imagesFolder}/vendor/flat-ui/toggle/icon-off.png");
+      background-position: 0 0;
+      color: white;
+      left: 0;
+      margin-left: 0.5px;
+      margin-right: -13px;
+      z-index: 1;
+    }
+  }
+  &.toggle-icon.toggle-off {
+    border-radius: 7px 6px 6px 7px;
+    .toggle-radio {
+      background-image: url("@{imagesFolder}/vendor/flat-ui/toggle/block-off.png");
+      background-position: 0 0;
+    }
+  }
+}
+
+
+
+/*
+@media  only screen and (-webkit-min-device-pixel-ratio: 2)
+      , only screen and (-webkit-min-device-pixel-ratio: 1.5)
+      , only screen and (-moz-min-device-pixel-ratio: 2)
+      , only screen and (-o-min-device-pixel-ratio: 3 / 2)
+      , only screen and (-o-min-device-pixel-ratio: 2 / 1)
+      , only screen and (min--moz-device-pixel-ratio: 1.5)
+      , only screen and (min-device-pixel-ratio: 1.5)
+      , only screen and (min-device-pixel-ratio: 2) {
+  .toggle {
+    &.toggle-off .toggle-radio {
+      background-image: url("../images/toggle/icon-off-2x.png");
+      background-size: 30px 29px;
+    }
+    .toggle-radio {
+      background-image: url("../images/toggle/icon-on-2x.png");
+      background-size: 30px 29px;
+    }
+  }
+}
+*/    

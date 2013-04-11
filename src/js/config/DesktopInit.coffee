@@ -19,8 +19,8 @@ require.config
                               
     # Async Libraries         
     # ---------------         
-    # See below               
-    # gmaps:                    "//maps.googleapis.com/maps/api/js?v=3&sensor=false&key=AIzaSyD_xrni-sLyPudfQ--6gn7yAhaW6nTuqkg"
+    # gmaps: (See below)      "//maps.googleapis.com/maps/api/js?v=3&sensor=false&key=AIzaSyD_xrni-sLyPudfQ--6gn7yAhaW6nTuqkg"
+    facebook:                 "//connect.facebook.net/en_US/all"
                               
     # jQuery Libraries        
     # ---------------
@@ -31,6 +31,7 @@ require.config
     # datepickermobile:         "libs/jqueryui/jquery.ui.datepicker.mobile.min"
     serializeObject:          "app/plugins/serialize_object"
     filePicker:               "app/plugins/file_picker"
+    toggler:                  "app/plugins/toggler"
     "jquery.fileupload-pr":   "app/plugins/jquery-fileupload-pr" # Profile  (single)
     "jquery.fileupload-ui":   "app/plugins/jquery-fileupload-ui" # UI       (multiple)
     "jquery.fileupload-fp":   "app/plugins/jquery-fileupload-fp" # File Processing
@@ -62,6 +63,7 @@ require.config
     collections:              "app/collections"
     models:                   "app/models"
     nls:                      "app/nls"
+    plugins:                  "app/plugins"
     routers:                  "app/routers"
     templates:                "app/templates"
     views:                    "app/views"
@@ -95,10 +97,12 @@ define "gmaps", ["async!//maps.googleapis.com/maps/api/js?v=3&sensor=false&key=A
   window.google.maps
 
 
+# Alter the router depending on if we are on a subdomain or not, judging by the amount of "." chars.
+# This will bug out on "www" subdomain.
+onNetwork = window.location.host.split(".").length > 2
+router = if onNetwork then "routers/Network" else "routers/Desktop"
+require ["jquery", "backbone", "facebook", "collections/property/PropertyList", "models/Profile", router, "json2", "bootstrap", "serializeObject"], ($, Parse, FB, PropertyList, Profile, AppRouter) ->
 
-# Includes Desktop Specific JavaScript files here (or inside of your Desktop router)
-require ["jquery", "backbone", "collections/property/PropertyList", "models/Profile", "routers/Desktop", "json2", "bootstrap", "serializeObject"], ($, Parse, PropertyList, Profile, AppRouter) ->
-  
   Parse.initialize "z00OPdGYL7X4uW9soymp8n5JGBSE6k26ILN1j3Hu", "NifB9pRHfmsTDQSDA9DKxMuux03S4w2WGVdcxPHm" # JS Key  
 
   # init the FB JS SDK
@@ -110,16 +114,13 @@ require ["jquery", "backbone", "collections/property/PropertyList", "models/Prof
     xfbml      : true                             # parse XFBML
 
 
-    # Additional initialization code such as adding Event Listeners goes here
 
-  # Setup
   # Extend Parse User
   Parse.User::defaults = 
     privacy_visible:  false
     privacy_unit:     false
+    type:             "tenant"
   
-  # Setup
-  # Extend Parse User
   Parse.User::validate = (attrs, options) ->
 
     # Original function
@@ -131,16 +132,26 @@ require ["jquery", "backbone", "collections/property/PropertyList", "models/Prof
       return {message: "invalid_email"} unless /^([a-zA-Z0-9_.-])+@([a-zA-Z0-9_.-])+\.([a-zA-Z])+([a-zA-Z])+/.test attrs.email
     false  
 
+
   # Load the user's profile before loading the app.
   # @see LoggedOutView::login
   if Parse.User.current()
     
-    # Create our collection of Properties
-    Parse.User.current().properties = new PropertyList
-    
-    (new Parse.Query(Profile)).equalTo("user", Parse.User.current()).first()
-    .then (profile) => 
+    profilePromise = (new Parse.Query(Profile)).equalTo("user", Parse.User.current()).first()
+    networkPromise = (new Parse.Query("_User")).include('network.role').equalTo("objectId", Parse.User.current().id).first()
+    Parse.Promise.when(profilePromise, networkPromise).then (profile, user) => 
+
       Parse.User.current().profile = profile
+      
+      # Create our collection of Properties
+      if onNetwork then Parse.User.current().properties = new PropertyList
+      
+      # Load the network regardless if we are on a subdomain or not, as we need the link.
+      # Should query for network when loading user... this is weird.
+      # Set network on current user from loaded user.
+      network = user.get "network"
+      Parse.User.current().set "network", network
+      
       new AppRouter()
   else
     new AppRouter()

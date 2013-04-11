@@ -2,7 +2,7 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", 'models/Profile', 'views/helper/Alert', "i18n!nls/common", "i18n!nls/devise", "i18n!nls/user", 'templates/user/logged_out_menu', 'templates/user/reset_password'], function($, _, Parse, Profile, Alert, i18nCommon, i18nDevise, i18nUser) {
+  define(["jquery", "underscore", "backbone", 'models/Profile', 'views/helper/Alert', "i18n!nls/common", "i18n!nls/devise", "i18n!nls/user", 'plugins/toggler', 'templates/user/logged_out_menu', 'templates/user/reset_password'], function($, _, Parse, Profile, Alert, i18nCommon, i18nDevise, i18nUser) {
     var LoggedOutView;
     return LoggedOutView = (function(_super) {
 
@@ -24,10 +24,31 @@
       LoggedOutView.prototype.initialize = function() {
         var _this = this;
         _.bindAll(this, "logIn", "signUp", "resetPassword", "showResetPasswordModal");
-        this.on("user:login", function() {
+        this.on("user:login", function(user) {
+          var domain, network;
           $('#reset-password-modal').remove();
-          _this.undelegateEvents();
-          return delete _this;
+          if (user.get("type") === "manager") {
+            network = user.get("network");
+            if (network && network.get("name")) {
+              domain = ("" + location.protocol + "://" + (network.get("name")) + "." + document.domain) + (location.port ? ":" + location.port : void 0);
+              $("#network-nav a").prop("href", domain);
+              _this.undelegateEvents();
+              return delete _this;
+            } else {
+              return require(["views/network/Set"], function(SetNetworkView) {
+                Parse.history.navigate("/network/set");
+                if (!_this.view || !(_this.view instanceof NetworkFormView)) {
+                  _this.view = new SetNetworkView({
+                    model: Parse.User.current().get("network")
+                  });
+                }
+                return _this.view.render();
+              });
+            }
+          } else {
+            _this.undelegateEvents();
+            return delete _this;
+          }
         });
         return this.render();
       };
@@ -42,6 +63,7 @@
           i18nDevise: i18nDevise
         }));
         $('form#reset-password-form').on("submit", this.resetPassword);
+        this.$('.toggle').toggler();
         return this;
       };
 
@@ -49,8 +71,8 @@
         e.preventDefault();
         return Parse.FacebookUtils.logIn("user_likes,email", {
           success: function(user) {
-            this.trigger("user:login");
-            return this.trigger("user:change");
+            this.trigger("user:login", user);
+            return this.trigger("user:change", user);
           },
           error: function(user, error) {}
         });
@@ -104,8 +126,8 @@
         password = this.$("#login-password").val();
         return Parse.User.logIn(email, password, {
           success: function(user) {
-            _this.trigger("user:login");
-            return _this.trigger("user:change");
+            _this.trigger("user:login", user);
+            return _this.trigger("user:change", user);
           },
           error: function(user, error) {
             var msg;
@@ -137,8 +159,8 @@
           ACL: new Parse.ACL()
         }, {
           success: function(user) {
-            _this.trigger("user:login");
-            return _this.trigger("user:change");
+            _this.trigger("user:login", user);
+            return _this.trigger("user:change", user);
           },
           error: function(user, error) {
             var msg;

@@ -22,13 +22,9 @@
 
       ShowLeaseView.prototype.initialize = function(attrs) {
         this.property = attrs.property;
-        this.property.load("units");
-        this.tenants = new TenantList([], {
-          lease: this.model
-        });
-        this.tenants.on("add", this.addOne);
-        this.tenants.on("reset", this.addAll);
-        return this.tenants.fetch();
+        this.model.prep('tenants');
+        this.model.tenants.on("add", this.addOne);
+        return this.model.tenants.on("reset", this.addAll);
       };
 
       ShowLeaseView.prototype.render = function() {
@@ -48,6 +44,7 @@
         });
         $(this.el).html(JST["src/js/templates/lease/show.jst"](vars));
         this.$list = this.$('ul.tenants');
+        this.model.tenants.fetch()(this.model.tenants.length === 0 ? void 0 : this.addAll());
         return this;
       };
 
@@ -55,7 +52,7 @@
         this.$("p.empty").text('');
         return this.$list.append((new TenantView({
           model: t
-        })).render());
+        })).render().el);
       };
 
       ShowLeaseView.prototype.addAll = function() {

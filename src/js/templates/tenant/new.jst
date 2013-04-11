@@ -8,14 +8,14 @@
         <div class="controls">
           <input type="hidden" name="lease[__type]" value="Pointer">
           <input type="hidden" name="lease[className]" value="Lease">
-          <select name="lease[id]" class="span lease-select" required="true">
+          <select name="lease[id]" class="lease-select pull-left" required="true">
             <option value=''><%= i18nCommon.form.select.select_value %></option>
             <optgroup class="group-active" label="<%= i18nLease.dates.active %>"></optgroup>
             <optgroup class="group-inactive" label="<%= i18nLease.dates.inactive %>"></optgroup>
           </select>
+          <a class="span inline-block" href="<%= property_path %>/add/lease"><%= i18nLease.actions.add_new_lease %></a>
         </div>
       </div>
-      <a class="span" href="<%= property_path %>/add/lease"><%= i18nLease.actions.add_new_lease %></a>
     </div>
   </fieldset>
   <fieldset>

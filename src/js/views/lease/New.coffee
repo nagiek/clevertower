@@ -26,7 +26,7 @@ define [
     el: '.content'
     
     events:
-      'submit .lease-form'          : 'save'
+      'submit form'                 : 'save'
 
       'click .starting-this-month'  : 'setThisMonth'
       'click .starting-next-month'  : 'setNextMonth'
@@ -39,17 +39,16 @@ define [
       
       _.bindAll this, 'addOne', 'addAll', 'save', 'setThisMonth', 'setNextMonth', 'setJulyJune'
       
-      @model = new Lease unless @model
-      @model.tenants = new TenantList unless @model.tenants
-      
       @property = attrs.property
+      
+      @model = new Lease unless @model
+      @model.prep('tenants')
             
       @model.on 'invalid', (error) =>
         @$('.error').removeClass('error')
         @$('button.save').removeProp "disabled"
 
-        msg = if error.message
-          if error.message.indexOf(":") > 0
+        msg = if error.message.indexOf(":") > 0
             args = error.message.split ":"
             fn = args.pop()
             switch fn
@@ -57,10 +56,10 @@ define [
                 i18nLease.errors[fn]("/properties/#{@property.id}/leases/#{args[0]}")
               else
                 i18nLease.errors[fn](args[0])
-          else 
+          else if i18nLease.errors[error.message]
             i18nLease.errors[error.message]
-        else
-          i18nCommon.errors.unknown            
+          else
+            i18nCommon.errors.unknown
                   
         new Alert(event: 'model-save', fade: false, message: msg, type: 'error')
         switch error.message
@@ -71,46 +70,36 @@ define [
       
       @on "save:success", (model) =>
         # Save the tenants, now that we have an ID
+        @model.id = model.id
         @model.tenants.createQuery(model)
         @model.tenants.fetch()
         
-        # Alert the user and move on
-        new Alert(event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success')
-        new ShowLeaseView(model: model)
-        Parse.history.navigate "/properties/#{@property.id}/leases/#{model.id}"
-        @undelegateEvents()
-        delete this
+        require ["views/lease/Show"], (ShowLeaseView) =>
+          # Alert the user and move on
+          new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
+          new ShowLeaseView(model: @model, property: @property).render()
+          Parse.history.navigate "/properties/#{@property.id}/leases/#{model.id}"
+          @undelegateEvents()
+          delete this
                 
       @model.on 'destroy', =>
         @undelegateEvents()
         delete this
       
-      if @property
-        @property.load("units")
-        @units = @property.units
+      @units = @property.prep("units") if @property
+
+      @units.bind "add", @addOne
+      @units.bind "reset", @addAll
               
       @current = new Date().setDate(1)
       @dates =
         start:  if @model.get "start_date"  then moment(@model.get("start_date")).format("L")  else moment(@current).format("L")
         end:    if @model.get "end_date"    then moment(@model.get("end_date")).format("L")    else moment(@current).add(1, 'year').subtract(1, 'day').format("L")
       
-      @render()
-      
-      # @el = "form.lease-form"
-      # @$el = $("#content form.lease-form")
-      @$unitSelect = @$('.unit-select')
-          
-      @$startDate = @$('.start-date')
-      @$endDate = @$('.end-date')
-      $('.datepicker').datepicker()
-          
-      @units.bind "add", @addOne
-      @units.bind "reset", @addAll
-      @units.fetch()
 
     addOne : (u) =>
       HTML = "<option value='#{u.id}'" + (if @model.get("unit") and @model.get("unit").id == u.id then "selected='selected'" else "") + ">#{u.get('title')}</option>"
-      @$unitSelect.children(':first').after HTML
+      @$unitSelect.append HTML
       # @$unitSelect.children(':last').before HTML
 
     addAll : =>
@@ -130,7 +119,7 @@ define [
       
       # Massage the Only-String data from serializeObject()
       _.each ['rent', 'keys', 'garage_remotes', 'security_deposit', 'parking_fee'], (attr) ->
-        data.lease[attr] = 0 if data.lease[attr] is ''
+        data.lease[attr] = 0 if data.lease[attr] is '' or data.lease[attr] is '0'
         data.lease[attr] = Number data.lease[attr] if data.lease[attr] and isNaN data.lease[attr]
 
       _.each ['start_date', 'end_date'], (attr) ->
@@ -158,9 +147,9 @@ define [
         attrs.emails = []
         _.each data.emails.split(","), (email) =>
           email = $.trim(email)
-          # account will not be saved directly. We create one only for validation.
-          account = new Parse.User(username: email, email: email)
-          attrs.emails.push email if userValid = account.isValid()
+          # validate is a backwards function.
+          userValid = unless Parse.User::validate(email: email) then true else false
+          attrs.emails.push email if userValid
       
       unless userValid
         @$('.emails-group').addClass('error')
@@ -196,9 +185,9 @@ define [
       @$endDate.val moment(@current).month(6).add(1, 'year').subtract(1, 'day').format("L")
 
     render: ->
-      
-      vars = _.merge(
-        lease: @model
+      vars =
+        lease: _.defaults(@model.attributes, Lease::defaults)
+        unit: if @model.get "unit" then @model.get "unit" else false
         dates: @dates
         cancel_path: "/properties/#{@property.id}" + unless @model.isNew() then "/leases/#{@model.id}" else ""
         # units: @units
@@ -206,6 +195,15 @@ define [
         i18nCommon: i18nCommon
         i18nUnit: i18nUnit
         i18nLease: i18nLease
-      )
-      vars.unit = if @model.get "unit" then @model.get "unit" else false
+
       @$el.html JST["src/js/templates/lease/#{if @model.isNew() then 'new' else 'edit'}.jst"](vars)
+      
+      # @el = "form.lease-form"
+      # @$el = $("#content form.lease-form")
+      @$unitSelect = @$('.unit-select')
+          
+      @$startDate = @$('.start-date')
+      @$endDate = @$('.end-date')
+      $('.datepicker').datepicker()
+      
+      if @units.length is 0 then @units.fetch() else @addAll()

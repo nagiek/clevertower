@@ -11,6 +11,8 @@
 
       function LoggedInView() {
         this.subscribeProperty = __bind(this.subscribeProperty, this);
+
+        this.registerUser = __bind(this.registerUser, this);
         return LoggedInView.__super__.constructor.apply(this, arguments);
       }
 
@@ -20,14 +22,14 @@
 
       LoggedInView.prototype.el = "#user-menu";
 
-      LoggedInView.prototype.initialize = function() {
+      LoggedInView.prototype.initialize = function(attrs) {
         var _this = this;
         _.bindAll(this, "render", "changeName", "logOut");
+        this.onNetwork = attrs.onNetwork;
         this.pusher = new Pusher('dee5c4022be4432d7152');
-        if (!Parse.User.current().properties) {
-          Parse.User.current().properties = new PropertyList;
+        if (this.onNetwork) {
+          this.registerUser();
         }
-        Parse.User.current().properties.on("add", this.subscribeProperty);
         if (Parse.User.current().profile) {
           Parse.User.current().profile.on("sync", this.changeName);
           return this.render();
@@ -38,6 +40,13 @@
             return _this.render();
           });
         }
+      };
+
+      LoggedInView.prototype.registerUser = function() {
+        if (!Parse.User.current().properties) {
+          Parse.User.current().properties = new PropertyList;
+        }
+        return Parse.User.current().properties.on("add", this.subscribeProperty);
       };
 
       LoggedInView.prototype.subscribeProperty = function(obj) {

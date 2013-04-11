@@ -10,16 +10,13 @@ define [
     model: Lease
     query: new Parse.Query("Lease").include("unit")
       
-    initialize: (attrs) ->
+    initialize: (models, attrs) ->
       if attrs.property
         @property = attrs.property
         @query.equalTo "property", @property
       else if attrs.unit
         @unit = attrs.unit
         @query.equalTo "unit", @unit
-
-    url:  ->
-      "/properties/#{@property.get "id"}/leases"
 
     # Filter down the list of all active leases
     active: ->

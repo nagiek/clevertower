@@ -1,0 +1,14 @@
+<header class="row">
+  <h1 class="offset1 span6"><%= i18nProperty.network.setup %></h1>
+  <p class="help-block offset3 span6"><%= i18nProperty.network.must_be_done %></p>
+</header>
+<form class="form-large">
+  <%= JST["src/js/templates/network/_form.jst"]({network: network, i18nCommon: i18nCommon, i18nProperty: i18nProperty}) %>
+  <div class="form-actions">
+    <div class="row">
+      <div class="offset1 span">
+        <button class="save btn btn-primary"><%= i18nCommon.actions.save %></button>
+      </div>
+    </div>
+  </div>
+</form>

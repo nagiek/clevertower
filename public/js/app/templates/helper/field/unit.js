@@ -14,7 +14,7 @@ __p += '<input type="hidden" name="unit[__type]" value="Pointer">\n<input type="
 '</option>\n  <option value="-1">' +
 ((__t = ( i18nUnit.constants.new_unit )) == null ? '' : __t) +
 '</option>\n</select>\n\n<input type="text" class="new-unit span1 hide" name="unit[attributes][title]" placeholder="' +
-((__t = ( i18nCommon.form.title )) == null ? '' : __t) +
+((__t = ( i18nCommon.fields.title )) == null ? '' : __t) +
 '" />\n';
  if (!property) { ;
 __p += '\n  \n  units.each(function(u) {\n    <option value="' +

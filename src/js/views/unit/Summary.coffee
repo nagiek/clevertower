@@ -21,8 +21,9 @@ define [
       'blur input'        : 'update'
       'blur textarea'     : 'update'
       'blur select'       : 'updateS'
-      'click .remove'     : 'remove'
-      'click .delete'     : 'kill'
+      'click .remove'     : 'clear'
+      'click .delete'     : 'delete'
+      "keypress .title"   : "newOnEnter"
       
     initialize: () ->
       @model.on "change:title", =>
@@ -31,7 +32,7 @@ define [
       @model.on "save:success", =>
         @render()
         
-      @model.on "remove", =>
+      @model.on "destroy", =>
         @remove()
         @undelegateEvents()
         delete this
@@ -79,13 +80,19 @@ define [
       @model.set name, value
       e
 
-    kill : (e) ->
+    clear : (e) ->
+      e.preventDefault() 
+      @model.destroy()
+
+    delete : (e) ->
       e.preventDefault()
       if confirm(i18nCommon.actions.confirm + " " + i18nCommon.warnings.no_undo)
         id = @model.get("property").id
         @model.destroy()
-        @remove()
-        @undelegateEvents()
-        delete this
         Parse.history.navigate "/properties/#{id}"
     
+    # If you hit return in the main input field, save and create new
+    newOnEnter: (e) =>
+      return  unless e.keyCode is 13
+      @update(e)
+      @model.collection.prepopulate()

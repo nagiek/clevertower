@@ -38,7 +38,13 @@ __p += '<li id="login-nav" class="auth-nav dropdown">\n  <a id="lLabel" data-tog
 ((__t = ( i18nDevise.form.password )) == null ? '' : __t) +
 ':</label>\n          <div class="controls">\n            <input type="password" name="password" id="signup-password" class="span" size="28" placeholder="' +
 ((__t = ( i18nDevise.form.password )) == null ? '' : __t) +
-'">\n          </div>\n        </div>\n        <button class="btn btn-block">' +
+'">\n          </div>\n        </div>\n        <div class="control-group type-group">\n          <label for="type" class="control-label">' +
+((__t = ( i18nDevise.form.type.label )) == null ? '' : __t) +
+':</label>\n          <div class="controls">\n            <div class="toggle">\n\t          <label class="toggle-radio" for="toggleOption1">' +
+((__t = ( i18nDevise.form.type.tenant )) == null ? '' : __t) +
+'</label>\n\t          <input type="radio" name="type" id="toggleOption1" value="tenant" checked="checked">\n\t          <input type="radio" name="type" id="toggleOption2" value="manager">\n\t          <label class="toggle-radio" for="toggleOption2">' +
+((__t = ( i18nDevise.form.type.manager )) == null ? '' : __t) +
+'</label>\n\t        </div>\n          </div>\n        </div>\n        <button class="btn btn-block">' +
 ((__t = ( i18nDevise.actions.signup )) == null ? '' : __t) +
 '</button>\n      </fieldset>\n    </form>\n  </div>\n</li>';
 

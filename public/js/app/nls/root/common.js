@@ -1,10 +1,13 @@
 (function() {
 
   define({
-    headers: {
+    menu: {
       home: "Home",
-      search: "Search",
-      operations: "Operations"
+      search: "Search"
+    },
+    fields: {
+      title: "Title",
+      name: "Name"
     },
     classes: {
       lease: "lease",
@@ -16,6 +19,8 @@
       unit: "unit",
       units: "units",
       Units: "Units",
+      Properties: "Properties",
+      Managers: "Managers",
       tasks: "tasks",
       finances: "finances"
     },
@@ -102,14 +107,15 @@
       landlord_only: "Landlord Only"
     },
     form: {
-      title: "Title",
+      operations: "Operations",
       info: "Info",
       required: "Required",
+      lowercase_only: "Lowercase letters (a-z) only. No spaces.",
       comma_separated: "Enter a comma-separated list of email addresses.",
       select: {
         select_value: "- Select a value -",
         numeric: "Numeric (1 ➡ 2)",
-        alphabetical: "Alpha (A ➡ B)"
+        alphabetical: "Alphabetical (A ➡ B)"
       }
     },
     warnings: {

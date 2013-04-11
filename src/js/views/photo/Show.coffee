@@ -22,8 +22,11 @@ define [
     # app, we set a direct reference on the model for convenience.
     initialize: ->
       _.bindAll this, "render", "close", "remove"
-      @model.bind "change", @render
-      @model.bind "destroy", @remove
+      @model.on "change", @render
+      @model.on "destroy", =>
+        @remove()
+        @undeletegateEvents()
+        delete this
 
   
     # Re-render the contents of the photo item.

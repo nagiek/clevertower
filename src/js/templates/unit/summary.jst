@@ -10,7 +10,7 @@
   <% if (objectId) { %><div class="view-specific view-edit hide"><% } %>
     <div class="control-group">
   		<div class="controls">
-  			<input type="text" maxlength="8" name="title" class="span1" value="<%= title %>">
+  			<input type="text" maxlength="8" name="title" class="span1 title" value="<%= title %>">
   		</div>
   	</div>
   <% if (objectId) { %></div><% } %>
@@ -92,12 +92,12 @@
        data-original-title="<%= i18nUnit.actions.add_lease %>">
       <i class="icon-plus"></i>
     </a>
-    <a class="btn btn-mini add-task view-specific view-show"
-       href="/properties/<%= property.objectId %>/leases/<%= objectId %>/add/task" 
+    <!-- <a class="btn btn-mini add-task view-specific view-show"
+       href="/properties/<%= property.objectId %>/add/task?unit=<%= objectId %>"
        rel="tooltip" 
        data-original-title="<%= i18nUnit.actions.add_task %>">
       <i class="icon-plus"></i>
-    </a>
+    </a> -->
     <% if (activeLease) { %>
       <a class="btn btn-mini add-tenants view-specific view-show"
          href="/properties/<%= property.objectId %>/add/tenants?lease=<%= activeLease.id %>" 
