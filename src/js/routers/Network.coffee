@@ -19,11 +19,28 @@ define [
     initialize: (options) ->
       Parse.history.start pushState: true
       
-      new UserMenuView(onNetwork: true).render()
-      new NetworkMenuView()
+      @userView = new UserMenuView().render()
+      @networkView = new NetworkMenuView().render()
       
-      @on "route", (route) => 
-        
+      Parse.Dispatcher.on "user:login", (user) =>
+        Parse.User.current().setup().then =>
+          @userView.render()
+          @networkView.render()
+          
+          # Remove the Signup or Login callback
+          @off "route", @signupOrLogin
+          
+          # Go to the dashboard.
+          @index()
+          Parse.history.navigate "/"
+      
+      Parse.Dispatcher.on "user:change", => 
+        # Reload the current path.
+        # The views themselves are responsbile for reloading or not.
+        @navigate location.pathname, trigger: true
+      
+      # Clean up after views
+      Parse.history.on "route", (route) =>        
         unless route is "propertiesShow"
           @view.undelegateEvents()
           delete @view
@@ -32,12 +49,8 @@ define [
             if @view !instanceof PropertyView
               @view.undelegateEvents()
               delete @view
-
-      Parse.Dispatcher.on "user:login", (route) => 
-        # Remove the Signup or Login callback
-        @off "route", @signupOrLogin
         
-      Parse.Dispatcher.on "network:set", (route) => 
+      Parse.Dispatcher.on "network:set", => 
         # Remove the Access Denied callback
         @off "route", @accessDenied
         

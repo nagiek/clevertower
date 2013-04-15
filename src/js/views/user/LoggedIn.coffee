@@ -21,29 +21,15 @@ define [
     initialize: (attrs) ->
       _.bindAll this, "render", "changeName", "logOut"
       
-      @onNetwork = attrs.onNetwork
-      
       @pusher = new Pusher 'dee5c4022be4432d7152'
 
-      # Parse.User.current().leases.on "add", @subscribeLease
-      
-      if @onNetwork then @registerUser()      
-
-      if Parse.User.current().profile
-        Parse.User.current().profile.on "sync", @changeName
-        @render()
-      else
-        # The user has just logged in. Load the profile.
-        (new Parse.Query(Profile)).equalTo("user", Parse.User.current()).first()
-        .then (profile) => 
-          Parse.User.current().profile = profile
-          Parse.User.current().profile.on "sync", @changeName
-          @render()
+      if Parse.onNetwork then @registerUser()      
+      Parse.User.current().profile.on "sync", @changeName
+      @render()
           
     registerUser : =>
       # Load the properties if the user has just logged in.
-      Parse.User.current().properties = new PropertyList unless Parse.User.current().properties
-      Parse.User.current().properties.on "add", @subscribeProperty
+      Parse.User.current().get("network").properties.on "add", @subscribeProperty
       
     subscribeProperty: (obj) =>
       @pusher.subscribe "property-#{obj.id}"
@@ -56,7 +42,7 @@ define [
       Parse.User.logOut()
       Parse.Dispatcher.trigger "user:change"
       Parse.Dispatcher.trigger "user:logout"
-      @undelegateEvents();
+      @undelegateEvents()
       delete this
 
     render: ->

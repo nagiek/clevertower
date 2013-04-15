@@ -119,6 +119,7 @@
       name_taken: function(id) {
         return "<p>This name has been taken by an existing network.</p>\n<p>\n  <a href=\"/network/" + id + "\" class=\"btn btn-warning\">View network</a>\n  <a class=\"btn close\">Close</a>\n</p>";
       },
+      network_not_set: "You have not joined a network yet.",
       invalid_address: "You must add an address.",
       insufficient_data: "We were unable to determine your address.",
       no_geolocaiton: "Your browser doesn't support geolocation.",

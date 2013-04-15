@@ -1,6 +1,5 @@
 (function() {
-  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-    __hasProp = {}.hasOwnProperty,
+  var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(["jquery", "backbone", "views/user/Menu", "views/network/Menu"], function($, Parse, UserMenuView, NetworkMenuView) {
@@ -10,7 +9,6 @@
       __extends(DesktopRouter, _super);
 
       function DesktopRouter() {
-        this.index = __bind(this.index, this);
         return DesktopRouter.__super__.constructor.apply(this, arguments);
       }
 
@@ -29,20 +27,43 @@
         Parse.history.start({
           pushState: true
         });
-        new UserMenuView({
-          onNetwork: false
-        }).render();
-        new NetworkMenuView();
+        this.userView = new UserMenuView().render();
+        this.networkView = new NetworkMenuView().render();
+        Parse.Dispatcher.on("user:login", function(user) {
+          return Parse.User.current().setup().then(function() {
+            _this.userView.render();
+            _this.networkView.render();
+            if (Parse.User.current().get("type") === "manager" && !Parse.User.current().get("network")) {
+              return require(["views/helper/Alert", 'i18n!nls/property', "views/network/New"], function(Alert, i18nProperty, NewNetworkView) {
+                new Alert({
+                  event: 'no_network',
+                  type: 'warning',
+                  fade: true,
+                  heading: i18nProperty.errors.network_not_set
+                });
+                Parse.history.navigate("/network/set");
+                if (!_this.view || !(_this.view instanceof NetworkFormView)) {
+                  _this.view = new NewNetworkView({
+                    model: Parse.User.current().get("network")
+                  });
+                }
+                return _this.view.render();
+              });
+            } else {
+              return Parse.history.loadUrl(location.pathname);
+            }
+          });
+        });
+        Parse.Dispatcher.on("user:logout", function() {
+          _this.userView.render();
+          _this.networkView.render();
+          return Parse.history.loadUrl(location.pathname);
+        });
         Parse.history.on("route", function() {
           if (_this.view) {
             _this.view.undelegateEvents();
             return delete _this.view;
           }
-        });
-        Parse.Dispatcher.on("user:logout", function(route) {
-          var domain;
-          domain = "" + location.protocol + "//" + (location.host.split(".").slice(1, 3).join("."));
-          return setTimeout(window.location.replace(domain, 1000));
         });
         return $(document).on("click", "a", function(e) {
           var href;
@@ -58,9 +79,7 @@
       };
 
       DesktopRouter.prototype.index = function() {
-        var user;
-        user = Parse.User.current();
-        if (user) {
+        if (Parse.User.current()) {
           return $('#main').html("<h1>News Feed</h1>\n<div class=\"row\">\n  <div class=\"span8\">\n\n  </div>\n  <div class=\"span4\">\n    <!-- if user.get('type') is 'manager' then  -->\n    <ul class=\"nav nav-list\"><li><a href=\"/network/set\">Set up network</a></li></ul>\n  </div>\n</div>");
         } else {
           return $('#main').html('<h1>Splash page</h1>');
@@ -180,19 +199,19 @@
             heading: i18nCommon.errors.access_denied,
             message: i18nCommon.errors.no_permission
           });
-          Parse.history.navigate("/");
-          return {
-            signupOrLogin: function() {
-              return require(["views/helper/Alert", 'i18n!nls/common'], function(Alert, i18nCommon) {
-                return new Alert({
-                  event: 'routing-canceled',
-                  type: 'warning',
-                  fade: true,
-                  heading: i18nCommon.errors.not_logged_in
-                });
-              });
-            }
-          };
+          return Parse.history.navigate("/", true);
+        });
+      };
+
+      DesktopRouter.prototype.signupOrLogin = function() {
+        return require(["views/helper/Alert", 'i18n!nls/common'], function(Alert, i18nCommon) {
+          new Alert({
+            event: 'routing-canceled',
+            type: 'warning',
+            fade: true,
+            heading: i18nCommon.errors.not_logged_in
+          });
+          return Parse.history.navigate("/", true);
         });
       };
 

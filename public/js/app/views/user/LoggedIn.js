@@ -23,30 +23,17 @@
       };
 
       LoggedInView.prototype.initialize = function(attrs) {
-        var _this = this;
         _.bindAll(this, "render", "changeName", "logOut");
-        this.onNetwork = attrs.onNetwork;
         this.pusher = new Pusher('dee5c4022be4432d7152');
-        if (this.onNetwork) {
+        if (Parse.onNetwork) {
           this.registerUser();
         }
-        if (Parse.User.current().profile) {
-          Parse.User.current().profile.on("sync", this.changeName);
-          return this.render();
-        } else {
-          return (new Parse.Query(Profile)).equalTo("user", Parse.User.current()).first().then(function(profile) {
-            Parse.User.current().profile = profile;
-            Parse.User.current().profile.on("sync", _this.changeName);
-            return _this.render();
-          });
-        }
+        Parse.User.current().profile.on("sync", this.changeName);
+        return this.render();
       };
 
       LoggedInView.prototype.registerUser = function() {
-        if (!Parse.User.current().properties) {
-          Parse.User.current().properties = new PropertyList;
-        }
-        return Parse.User.current().properties.on("add", this.subscribeProperty);
+        return Parse.User.current().get("network").properties.on("add", this.subscribeProperty);
       };
 
       LoggedInView.prototype.subscribeProperty = function(obj) {

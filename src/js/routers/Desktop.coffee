@@ -18,18 +18,42 @@ define [
     initialize: (options) ->
       Parse.history.start pushState: true
       
-      new UserMenuView(onNetwork: false).render()
-      new NetworkMenuView()
+      @userView = new UserMenuView().render()
+      @networkView = new NetworkMenuView().render()
+            
+      Parse.Dispatcher.on "user:login", (user) =>
+        Parse.User.current().setup().then =>
+          @userView.render()
+          @networkView.render()
+          if Parse.User.current().get("type") is "manager" and !Parse.User.current().get("network")
+            require ["views/helper/Alert", 'i18n!nls/property', "views/network/New"], (Alert, i18nProperty, NewNetworkView) =>
+              new Alert
+                event:    'no_network'
+                type:     'warning'
+                fade:     true
+                heading:  i18nProperty.errors.network_not_set
+              Parse.history.navigate "/network/set"
+              @view = new NewNetworkView(model: Parse.User.current().get("network")) if !@view or @view !instanceof NetworkFormView
+              @view.render()
+          else
+            # Reload the current path. Don't use navigate, as it will fail.
+            # The route functions themselves are responsible for altering content.
+            Parse.history.loadUrl location.pathname
+          
+      Parse.Dispatcher.on "user:logout", =>
+        @userView.render()
+        @networkView.render()
+        # Reload the current path. Don't use navigate, as it will fail.
+        # The route functions themselves are responsible for altering content.
+        Parse.history.loadUrl location.pathname
       
+      
+      # Clean up after views
       Parse.history.on "route", =>
         if @view
           @view.undelegateEvents()
           delete @view
-      
-      Parse.Dispatcher.on "user:logout", (route) => 
-        # Navigate after a second.
-        domain = "#{location.protocol}//#{location.host.split(".").slice(1,3).join(".")}"
-        setTimeout window.location.replace domain, 1000
+  
       
       # Use delegation to avoid initial DOM selection and allow all matching elements to bubble
       $(document).on "click", "a", (e) ->
@@ -40,10 +64,13 @@ define [
         if href.substring(0,1) is '/' and href.substring(0,2) isnt '//'
           e.preventDefault()
           Parse.history.navigate href, true
-        
-    index: =>
-      user = Parse.User.current()
-      if user
+          
+          
+    # Routes
+    # --------------
+          
+    index: ->
+      if Parse.User.current()
         $('#main').html """
                         <h1>News Feed</h1>
                         <div class="row">
@@ -137,12 +164,13 @@ define [
           fade:     true
           heading:  i18nCommon.errors.access_denied
           message:  i18nCommon.errors.no_permission
-        Parse.history.navigate "/"
+        Parse.history.navigate "/", true
         
-        signupOrLogin: ->
-          require ["views/helper/Alert", 'i18n!nls/common'], (Alert, i18nCommon) -> 
-            new Alert
-              event:    'routing-canceled'
-              type:     'warning'
-              fade:     true
-              heading:  i18nCommon.errors.not_logged_in
+    signupOrLogin: ->
+      require ["views/helper/Alert", 'i18n!nls/common'], (Alert, i18nCommon) -> 
+        new Alert
+          event:    'routing-canceled'
+          type:     'warning'
+          fade:     true
+          heading:  i18nCommon.errors.not_logged_in
+        Parse.history.navigate "/", true

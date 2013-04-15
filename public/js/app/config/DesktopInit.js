@@ -65,9 +65,8 @@
   router = onNetwork ? "routers/Network" : "routers/Desktop";
 
   require(["jquery", "backbone", "facebook", "collections/property/PropertyList", "models/Profile", router, "json2", "bootstrap", "serializeObject"], function($, Parse, FB, PropertyList, Profile, AppRouter) {
-    var networkPromise, profilePromise,
-      _this = this;
     Parse.initialize("z00OPdGYL7X4uW9soymp8n5JGBSE6k26ILN1j3Hu", "NifB9pRHfmsTDQSDA9DKxMuux03S4w2WGVdcxPHm");
+    Parse.onNetwork = onNetwork;
     Parse.FacebookUtils.init({
       appId: '387187337995318',
       channelUrl: '//localhost:3000/fb-channel',
@@ -93,20 +92,26 @@
       }
       return false;
     };
-    Parse.Dispatcher = {};
-    _.extend(Parse.Dispatcher, Parse.Events);
-    if (Parse.User.current()) {
+    Parse.User.prototype.setup = function() {
+      var networkPromise, profilePromise,
+        _this = this;
       profilePromise = (new Parse.Query(Profile)).equalTo("user", Parse.User.current()).first();
       networkPromise = (new Parse.Query("_User")).include('network.role').equalTo("objectId", Parse.User.current().id).first();
       return Parse.Promise.when(profilePromise, networkPromise).then(function(profile, user) {
         var network;
         Parse.User.current().profile = profile;
         network = user.get("network");
-        if (onNetwork) {
+        if (Parse.onNetwork) {
           network.prep("properties");
           network.prep("managers");
         }
-        Parse.User.current().set("network", network);
+        return Parse.User.current().set("network", network);
+      });
+    };
+    Parse.Dispatcher = {};
+    _.extend(Parse.Dispatcher, Parse.Events);
+    if (Parse.User.current()) {
+      return Parse.User.current().setup().then(function() {
         return new AppRouter();
       });
     } else {

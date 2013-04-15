@@ -9,7 +9,6 @@ define [
     initialize: (attrs) ->
       _.bindAll this, 'render'
       @attrs = attrs
-      Parse.Dispatcher.on "user:change", @render
       
     render: ->
       viewName = if Parse.User.current() then "views/user/LoggedIn" else "views/user/LoggedOut"

@@ -118,6 +118,7 @@ define
                                         <a class="btn close">Close</a>
                                       </p>
                                       """
+    network_not_set:                  "You have not joined a network yet."
     invalid_address:                  "You must add an address."
     insufficient_data:                "We were unable to determine your address."
     no_geolocaiton:                   "Your browser doesn't support geolocation."

@@ -28,22 +28,8 @@ define [
 
       Parse.Dispatcher.on "user:login", (user) =>
         $('#reset-password-modal').remove()
-        if user.get("type") is "manager"
-          network = user.get("network")
-          if network and network.get("name")
-            # Set the link to the network subdomain.
-            domain = "#{location.protocol}://#{network.get("name")}.#{document.domain}" + if location.port then ":#{location.port}"
-            $("#network-nav a").prop "href", domain
-            @undelegateEvents()
-            delete this
-          else
-            require ["views/network/New"], (NewNetworkView) =>
-              Parse.history.navigate "/network/set"
-              @view = new NewNetworkView(model: Parse.User.current().get("network")) if !@view or @view !instanceof NetworkFormView
-              @view.render()
-        else
-          @undelegateEvents()
-          delete this
+        @undelegateEvents()
+        delete this
         
       @render()
 

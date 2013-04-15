@@ -12,36 +12,18 @@ define [
     
     initialize: ->
       _.bindAll this, "render"
-      
-      if Parse.User.current()
-      
-        Parse.Dispatcher.on "user:login", ->
-          @networkQuery()  
-      
-        Parse.Dispatcher.on "user:logout", ->
-          delete @model
 
-        if Parse.User.current().get("network")
-          @initModel(Parse.User.current())
-        else
-          @networkQuery()
-      else
-        @render()
-              
-    networkQuery : ->
-      (new Parse.Query("_User")).equalTo("objectId", Parse.User.current().id).include('network.role').first()
-      .then (user) =>
-        if user and user.get("network")
-          @initModel(user) 
-        else
-          @render()
+      Parse.Dispatcher.on "user:logout", ->
+        delete @model
     
-    initModel : (user) ->
-      @model = user.get "network"
+    initModel :->
+      @model = Parse.User.current().get("network")
       @model.on "change", @render
-      @render()
       
     render: ->  
+      if Parse.User.current() and Parse.User.current().get("network")
+        @initModel()
+        
       hostArray = location.host.split(".")
       if hostArray.length > 2
         # On a subdomain

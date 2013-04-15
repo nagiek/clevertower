@@ -25,30 +25,9 @@
         var _this = this;
         _.bindAll(this, "logIn", "signUp", "resetPassword", "showResetPasswordModal");
         Parse.Dispatcher.on("user:login", function(user) {
-          var domain, network;
           $('#reset-password-modal').remove();
-          if (user.get("type") === "manager") {
-            network = user.get("network");
-            if (network && network.get("name")) {
-              domain = ("" + location.protocol + "://" + (network.get("name")) + "." + document.domain) + (location.port ? ":" + location.port : void 0);
-              $("#network-nav a").prop("href", domain);
-              _this.undelegateEvents();
-              return delete _this;
-            } else {
-              return require(["views/network/New"], function(NewNetworkView) {
-                Parse.history.navigate("/network/set");
-                if (!_this.view || !(_this.view instanceof NetworkFormView)) {
-                  _this.view = new NewNetworkView({
-                    model: Parse.User.current().get("network")
-                  });
-                }
-                return _this.view.render();
-              });
-            }
-          } else {
-            _this.undelegateEvents();
-            return delete _this;
-          }
+          _this.undelegateEvents();
+          return delete _this;
         });
         return this.render();
       };
