@@ -1,0 +1,17 @@
+<td>
+  <div class="photo">
+    <a href="/users/<%= objectId %>">
+      <img src="<%=url%>" class="img-rounded photo-profile" width="100">
+    </a>
+  </div>
+  <a href="/users/<%= objectId %>"><strong><%= name %></strong></a>
+</td>
+<td>
+  <span class="label label-<%= status == 'confirmed' ? 'success' : 'warning' %>"><%= status %></span>
+</td>
+<td>
+  <button class="delete btn btn-mini">
+    <%= i18nCommon.actions.delete %>
+  </button>
+</td>
+

@@ -21,31 +21,24 @@ define [
       new UserMenuView(onNetwork: false).render()
       new NetworkMenuView()
       
-      @on "route", => 
-        @view.undelegateEvents()
-        delete @view
+      Parse.history.on "route", =>
+        if @view
+          @view.undelegateEvents()
+          delete @view
+      
+      Parse.Dispatcher.on "user:logout", (route) => 
+        # Navigate after a second.
+        domain = "#{location.protocol}//#{location.host.split(".").slice(1,3).join(".")}"
+        setTimeout window.location.replace domain, 1000
       
       # Use delegation to avoid initial DOM selection and allow all matching elements to bubble
       $(document).on "click", "a", (e) ->
-
-        # Get the anchor href and protcol
+        # Get the anchor href
         href = $(this).attr("href")
-        
-        return if href is "#" or not href?
-        
-        # protocol = location.protocol + "//"
-
-        # Ensure the protocol is not part of URL, meaning its relative.
-        # Stop the event bubbling to ensure the link will not cause a page refresh.
-        # if href.slice(protocol.length) isnt protocol
-        
-        # If this is a relative link.
-        if href.substring(0,1) is '/'
+        return if href is "#" or not href?        
+        # If this is a relative link on this domain.
+        if href.substring(0,1) is '/' and href.substring(0,2) isnt '//'
           e.preventDefault()
-
-          # Note by using Backbone.history.navigate, router events will not be
-          # triggered.  If this is a problem, change this to navigate on your
-          # router.
           Parse.history.navigate href, true
         
     index: =>
@@ -146,12 +139,10 @@ define [
           message:  i18nCommon.errors.no_permission
         Parse.history.navigate "/"
         
-    signupOrLogin: ->
-      require ["views/helper/Alert", 'i18n!nls/common'], (Alert, i18nCommon) -> 
-        new Alert
-          event:    'access-denied'
-          type:     'error'
-          fade:     true
-          heading:  i18nCommon.errors.access_denied
-          message:  i18nCommon.errors.no_permission
-        Parse.history.navigate "/"
+        signupOrLogin: ->
+          require ["views/helper/Alert", 'i18n!nls/common'], (Alert, i18nCommon) -> 
+            new Alert
+              event:    'routing-canceled'
+              type:     'warning'
+              fade:     true
+              heading:  i18nCommon.errors.not_logged_in

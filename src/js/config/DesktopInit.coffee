@@ -114,7 +114,6 @@ require ["jquery", "backbone", "facebook", "collections/property/PropertyList", 
     xfbml      : true                             # parse XFBML
 
 
-
   # Extend Parse User
   Parse.User::defaults = 
     privacy_visible:  false
@@ -132,6 +131,9 @@ require ["jquery", "backbone", "facebook", "collections/property/PropertyList", 
       return {message: "invalid_email"} unless /^([a-zA-Z0-9_.-])+@([a-zA-Z0-9_.-])+\.([a-zA-Z])+([a-zA-Z])+/.test attrs.email
     false  
 
+  # Set up Dispatcher for global events
+  Parse.Dispatcher = {}
+  _.extend(Parse.Dispatcher, Parse.Events)
 
   # Load the user's profile before loading the app.
   # @see LoggedOutView::login
@@ -140,16 +142,19 @@ require ["jquery", "backbone", "facebook", "collections/property/PropertyList", 
     profilePromise = (new Parse.Query(Profile)).equalTo("user", Parse.User.current()).first()
     networkPromise = (new Parse.Query("_User")).include('network.role').equalTo("objectId", Parse.User.current().id).first()
     Parse.Promise.when(profilePromise, networkPromise).then (profile, user) => 
-
+    
       Parse.User.current().profile = profile
-      
-      # Create our collection of Properties
-      if onNetwork then Parse.User.current().properties = new PropertyList
       
       # Load the network regardless if we are on a subdomain or not, as we need the link.
       # Should query for network when loading user... this is weird.
       # Set network on current user from loaded user.
       network = user.get "network"
+      
+      if onNetwork 
+        # Create our collections
+        network.prep("properties")
+        network.prep("managers")
+      
       Parse.User.current().set "network", network
       
       new AppRouter()

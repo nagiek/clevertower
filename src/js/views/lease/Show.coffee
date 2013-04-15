@@ -42,9 +42,9 @@ define [
       modelVars.end_date = moment(@model.get "end_date").format("LL")
       
       vars = _.merge(modelVars, i18nUnit: i18nUnit, i18nLease: i18nLease, i18nCommon: i18nCommon)
-      $(@el).html JST["src/js/templates/lease/show.jst"](vars)
+      @$el.html JST["src/js/templates/lease/show.jst"](vars)
       
-      @$list = @$('ul.tenants')
+      @$list = @$('ul#tenants')
       
       @model.tenants.fetch() if @model.tenants.length is 0 else @addAll()
       @
@@ -55,4 +55,4 @@ define [
       @$list.append (new TenantView(model: t)).render().el
 
     addAll : =>
-      @tenants.each @addOne
+      @model.tenants.each @addOne

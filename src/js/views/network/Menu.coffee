@@ -15,10 +15,10 @@ define [
       
       if Parse.User.current()
       
-        Parse.User.current().on "user:login", ->
+        Parse.Dispatcher.on "user:login", ->
           @networkQuery()  
       
-        Parse.User.current().on "user:logout", ->
+        Parse.Dispatcher.on "user:logout", ->
           delete @model
 
         if Parse.User.current().get("network")

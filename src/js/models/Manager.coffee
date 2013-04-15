@@ -3,9 +3,9 @@ define [
   'backbone'
 ], (_, Parse) ->
 
-  Tenant = Parse.Object.extend "Tenant",
+  Manager = Parse.Object.extend "Manager",
   
-    className: "Tenant"
+    className: "Manager"
   
     defaults:
       status: "invited"

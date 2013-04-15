@@ -53,11 +53,11 @@ define [
     # Profile is always available, but user may be hidden.
     save : (e) ->
       e.preventDefault()
-      @$('button.save').prop "disabled", disabled
+      @$('button.save').prop "disabled", "disabled"
       data = @$('form').serializeObject()
       
       # Extra security for username/password
-      if data.user.new_password or data.user.new_password_confirm or data.user.email isnt Parse.User.current().getEmail()
+      if data.user.new_password or data.user.new_password_confirm or (data.user.email and data.user.email isnt Parse.User.current().getEmail())
         return @model.trigger "invalid", {message: "missing_password"} unless data.user.password      
         Parse.User.logIn @model.getUsername(), data.user.password, 
         success: =>
@@ -95,12 +95,14 @@ define [
         
     render: ->
       
-      vars = _.merge @model.toJSON(),        
+      vars = _.merge @model.toJSON(),
         email: @model.getEmail()
         cancel_path: "/users/#{Parse.User.current().profile.id}"
         i18nCommon: i18nCommon
         i18nDevise: i18nDevise
+      vars.type = 'tenant' unless vars.type
       
       @$el.html JST["src/js/templates/user/settings.jst"](vars)
       
       @$('.toggle').toggler()
+      @

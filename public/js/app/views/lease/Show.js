@@ -42,8 +42,8 @@
           i18nLease: i18nLease,
           i18nCommon: i18nCommon
         });
-        $(this.el).html(JST["src/js/templates/lease/show.jst"](vars));
-        this.$list = this.$('ul.tenants');
+        this.$el.html(JST["src/js/templates/lease/show.jst"](vars));
+        this.$list = this.$('ul#tenants');
         this.model.tenants.fetch()(this.model.tenants.length === 0 ? void 0 : this.addAll());
         return this;
       };
@@ -56,7 +56,7 @@
       };
 
       ShowLeaseView.prototype.addAll = function() {
-        return this.tenants.each(this.addOne);
+        return this.model.tenants.each(this.addOne);
       };
 
       return ShowLeaseView;

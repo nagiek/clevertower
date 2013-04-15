@@ -72,7 +72,6 @@ define [
         # Save the tenants, now that we have an ID
         @model.id = model.id
         @model.tenants.createQuery(model)
-        @model.tenants.fetch()
         
         require ["views/lease/Show"], (ShowLeaseView) =>
           # Alert the user and move on

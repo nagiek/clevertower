@@ -5,6 +5,7 @@ define
     new_property:                     "New Property"
     setup_property:                   "Setup Property"
     edit_picture:                     "Change Picture"
+    go_to_network:                    "Go to network"
   menu:                                 
     dashboard:                        "Dashboard"
     day_to_day:                       "Day to Day"

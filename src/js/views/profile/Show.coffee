@@ -24,6 +24,7 @@ define [
       )
       _.defaults vars, Profile::defaults
       vars.name = @model.get "email" unless vars.name?
+      console.log vars.name 
       @$el.html JST["src/js/templates/profile/show.jst"](vars)
       @
       

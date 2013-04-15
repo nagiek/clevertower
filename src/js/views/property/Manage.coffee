@@ -29,15 +29,13 @@ define [
       
       _.bindAll this, 'newProperty'
       
-      if !Parse.User.current().properties then Parse.User.current().properties = new PropertyList
-      
       # Setup the query for the collection to look for properties from the current user
-      Parse.User.current().properties.on "add", @addOne
-      Parse.User.current().properties.on "reset", @addAll
+      Parse.User.current().get("network").properties.on "add", @addOne
+      Parse.User.current().get("network").properties.on "reset", @addAll
       
       # custom listeners for seeing properties.
-      Parse.User.current().properties.on "show", => @$propertyList.hide()
-      Parse.User.current().properties.on "close", => @$propertyList.show()
+      Parse.User.current().get("network").properties.on "show", => @$propertyList.hide()
+      Parse.User.current().get("network").properties.on "close", => @$propertyList.show()
 
     render: =>
       network = Parse.User.current().get("network")
@@ -53,8 +51,8 @@ define [
       @$managerList = @$("#network-managers")
       
       # Fetch all the property items for the network
-      if Parse.User.current().properties.length is 0
-        Parse.User.current().properties.fetch
+      if Parse.User.current().get("network").properties.length is 0
+        Parse.User.current().get("network").properties.fetch
           success: (collection, resp, options) ->          
             query = new Parse.Query("Unit");
             query.containedIn "property", collection.models
@@ -78,8 +76,8 @@ define [
     # Add all items in the Properties collection at once.
     addAll: (collection, filter) =>
       @$propertyList.html ""
-      unless Parse.User.current().properties.length is 0
-        Parse.User.current().properties.each @addOne
+      unless Parse.User.current().get("network").properties.length is 0
+        Parse.User.current().get("network").properties.each @addOne
         @$propertyList.children(':even').children().addClass 'views-row-even'
         @$propertyList.children(':odd').children().addClass  'views-row-odd'
       else
@@ -103,12 +101,11 @@ define [
           # Reset form
           @$("#new-property").removeProp "disabled"
           @$("section").show()
-
         
         propertyWizard.on "property:save", (property) =>
           
           # Add new property to collection
-          Parse.User.current().properties.add property
+          Parse.User.current().get("network").properties.add property
           
           # Reset form
           @$("#new-property").removeProp "disabled"

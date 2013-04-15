@@ -67,6 +67,7 @@ define [
       success: (model) =>
         @model.trigger "sync", model # This is triggered automatically in Backbone, but not Parse.
         @trigger "save:success", model, this
+        Parse.Dispatcher.trigger "network:set"
       error: (model, error) =>
         @model.trigger "sync", model # This is triggered automatically in Backbone, but not Parse.
         @model.trigger "invalid", error

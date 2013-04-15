@@ -42,3 +42,4 @@ define [
       
       _.defaults vars, Parse.User::defaults
       @$el.html JST["src/js/templates/user/privacy.jst"](vars)
+      @

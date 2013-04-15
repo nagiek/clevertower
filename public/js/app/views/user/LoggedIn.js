@@ -16,11 +16,11 @@
         return LoggedInView.__super__.constructor.apply(this, arguments);
       }
 
+      LoggedInView.prototype.el = "#user-menu";
+
       LoggedInView.prototype.events = {
         "click #logout": "logOut"
       };
-
-      LoggedInView.prototype.el = "#user-menu";
 
       LoggedInView.prototype.initialize = function(attrs) {
         var _this = this;
@@ -55,20 +55,20 @@
 
       LoggedInView.prototype.logOut = function(e) {
         Parse.User.logOut();
-        Parse.history.navigate("/");
-        this.trigger("user:change");
-        this.trigger("user:logout");
+        Parse.Dispatcher.trigger("user:change");
+        Parse.Dispatcher.trigger("user:logout");
         this.undelegateEvents();
         return delete this;
       };
 
       LoggedInView.prototype.render = function() {
         var vars;
-        vars = _.merge({
+        vars = {
+          name: Parse.User.current().profile.name,
           objectId: Parse.User.current().profile.id,
           i18nUser: i18nUser,
           i18nDevise: i18nDevise
-        });
+        };
         this.$el.html(JST["src/js/templates/user/logged_in_menu.jst"](vars));
         this.changeName(Parse.User.current().profile);
         this.notificationsView = new NotificationsView;
@@ -82,7 +82,7 @@
           name = model.get("name");
         }
         if (name == null) {
-          name = Parse.User.current().getUsername();
+          name = Parse.User.current().getEmail();
         }
         return this.$('#profile-link').html(name);
       };

@@ -20,7 +20,8 @@ Parse.Cloud.define "AddTenants", (req, res) ->
   (new Parse.Query "Property").include('network.role').get req.params.propertyId,
   success: (property) ->
     
-    mgrRole = property.get("network").get("role")
+    network = property.get("network")
+    mgrRole = network.get("role")
     title = property.get "thoroughfare"
     
     # Lease Role
@@ -57,8 +58,15 @@ Parse.Cloud.define "AddTenants", (req, res) ->
           if found_profile
             # User exists
             tenant = new Parse.Object("Tenant")
-            tenant.save lease: lease, status: status, profile: found_profile, accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb", ACL: tenantACL
-            notificationACL.setReadAccess found_user, true
+            tenant.save
+              lease: lease
+              property: property
+              network: network
+              status: status
+              profile: found_profile
+              accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb"
+              ACL: tenantACL
+            notificationACL.setReadAccess found_profile.get("user"), true
             tntRoleUsers.add found_profile.get("user") if tntRole
             
           else
@@ -88,15 +96,23 @@ Parse.Cloud.define "AddTenants", (req, res) ->
           .then ->
             _.each arguments, (profile) ->
               tenant = new Parse.Object("Tenant")
-              tenant.save(lease: lease, status: status, profile: profile, accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb", ACL: tenantACL)
+              tenant.save
+                lease: lease
+                property: property
+                network: network
+                status: status
+                profile: profile
+                accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb"
+                ACL: tenantACL
               
             notification.setACL notificationACL
             notification.save
               text: "You have been invited to join #{title}"
-              channels: [ "leases-#{req.params.leaseId}" ]
+              channels: [ "leases-#{lease.id}" ]
               name: "lease_invitation"
               user: req.user
               property: property
+              network: network
               
             tntRole.save() if tntRole
             res.success lease
@@ -110,10 +126,11 @@ Parse.Cloud.define "AddTenants", (req, res) ->
           notification.setACL notificationACL
           notification.save
             text: "You have been invited to join #{title}"
-            channels: [ "leases-#{req.params.leaseId}" ]
+            channels: [ "leases-#{lease.id}" ]
             name: "lease_invitation"
             user: req.user
             property: property
+            network: network
                         
           tntRole.save() if tntRole
           res.success lease
@@ -178,8 +195,10 @@ Parse.Cloud.afterSave "_User", (req, res) ->
     
     unless profile
       profile = new Parse.Object("Profile")
-      profile.setACL profileACL
-      profile.save user: req.object
+      profile.save 
+        email: email
+        ACL: profileACL
+        user: req.object
       
     else
     
@@ -202,10 +221,10 @@ Parse.Cloud.afterSave "_User", (req, res) ->
               role.save()
             
             # No more steps. Save.
-            profile.setACL profileACL
             profile.save
               email: req.object.get("email")
-              user: req.object        
+              user: req.object
+              ACL profileACL
 
 
 # Tenant validation
@@ -330,14 +349,38 @@ Parse.Cloud.beforeSave "Network", (req, res) ->
     role.save().then (savedRole) -> 
       req.object.set "role", savedRole
       res.success()
+    , ->
+      res.error "role_error"
       
   , ->
     res.error "bad_query"
 
 
-# Network validation
+# Network after save
 Parse.Cloud.afterSave "Network", (req, res) ->
-  req.user.save network: req.object unless req.object.existed()
+  unless req.object.existed()
+    # Save a convenient reference to the network.
+    req.user.save network: req.object 
+    
+    # Save the user as a manager
+    (new Parse.Query "Profile").equalTo('user', req.user).first()
+    .then (profile) ->
+      # Query for the role, as we need the role's name to adjust the ACL.
+      (new Parse.Query "_Role").get req.object.get("role"),
+      success: (role) ->
+      
+        manager = new Parse.Object("Manager")
+        managerACL = new Parse.ACL
+        managerACL.setRoleReadAccess role, true
+        managerACL.setRoleWriteAccess role, true
+      
+        manager.save
+          network: network
+          status: 'accepted'
+          admin: true
+          profile: profile
+          accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb"
+          ACL: managerACL
 
 
 # Property validation
@@ -574,7 +617,8 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
     # Change the status depending on who is creating the link.
     (new Parse.Query "Property").include('network.role').get propertyId,
     success: (property) ->
-      mgrRole = property.get("network").get("role")
+      network = property.get("network")
+      mgrRole = network.get("role")
       
       # Set ACL
       unless req.object.existed()
@@ -582,7 +626,9 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
         tenantACL.setRoleReadAccess tntRole, true if tntRole
         tenantACL.setRoleReadAccess mgrRole, true if mgrRole
         tenantACL.setRoleWriteAccess mgrRole, true if mgrRole
-        req.object.setACL tenantACL
+        req.object.set 
+          network: network
+          ACL: tenantACL
       
       if mgrRole
         # Check if the REQUEST user is in the role.
@@ -610,6 +656,7 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
               channels: [ "leases-#{lease.id}" ]
               user: req.user
               property: property
+              network: network
             
             # Upgrade the status
             status = if status and status is 'pending' then 'current' else 'invited'
@@ -630,6 +677,7 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
               channels: [ "property-#{propertyId}" ]
               user: req.user
               property: property
+              network: network
             
             # Give property managers access to user.
             (new Parse.Query "_User").get user.id,

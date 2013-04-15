@@ -2,7 +2,7 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", 'models/Lease', 'models/Profile', "i18n!nls/common", "i18n!nls/tenant", 'templates/profile/summary'], function($, _, Parse, Lease, Profile, i18nCommon, i18nTenant) {
+  define(["jquery", "underscore", "backbone", 'models/Lease', 'models/Profile', "i18n!nls/common", "i18n!nls/group", 'templates/profile/summary'], function($, _, Parse, Lease, Profile, i18nCommon, i18nGroup) {
     var TenantSummaryView;
     return TenantSummaryView = (function(_super) {
 
@@ -35,10 +35,11 @@
         var status, vars;
         status = this.model.get('status');
         vars = _.merge(this.profile.toJSON(), {
-          i_status: i18nTenant.fields.status[status],
+          i_status: i18nGroup.fields.status[status],
           status: status,
           url: this.profile.cover('thumb'),
-          i18nCommon: i18nCommon
+          i18nCommon: i18nCommon,
+          i18nGroup: i18nGroup
         });
         if (!vars.name) {
           vars.name = this.profile.get("email");

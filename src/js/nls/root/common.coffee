@@ -21,6 +21,7 @@ define
     finances:             "finances"
   actions:                
     go:                   "Go"
+    go_to:                "Go to"
     show:                 "Show"
     destroy:              "Destroy"
     upload:               "Upload"
@@ -80,6 +81,7 @@ define
     loading:              "Loading"
   nouns:             
     link:                 "link"
+    sample_email:         "keigan@example.com"
   order:
     first:                "First"
     last:                 "Last"
@@ -106,4 +108,4 @@ define
     access_denied:        "Access denied"
     no_permission:        "You do not have permission to do that."
     unknown:              "An unknown error has occured."
-      
+    not_logged_in:        "You are not logged in."

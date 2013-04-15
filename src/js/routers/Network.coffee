@@ -32,15 +32,27 @@ define [
             if @view !instanceof PropertyView
               @view.undelegateEvents()
               delete @view
+
+      Parse.Dispatcher.on "user:login", (route) => 
+        # Remove the Signup or Login callback
+        @off "route", @signupOrLogin
         
+      Parse.Dispatcher.on "network:set", (route) => 
+        # Remove the Access Denied callback
+        @off "route", @accessDenied
+        
+      Parse.Dispatcher.on "user:logout", (route) => 
+        # Navigate after a second to the top level domain.
+        domain = "#{location.protocol}//#{location.host.split(".").slice(1,3).join(".")}"
+        setTimeout window.location.replace domain, 1000
       
       # Use delegation to avoid initial DOM selection and allow all matching elements to bubble
       $(document).on "click", "a", (e) ->
         # Get the anchor href
         href = $(this).attr("href")
         return if href is "#" or not href?        
-        # If this is a relative link.
-        if href.substring(0,1) is '/'
+        # If this is a relative link on this domain.
+        if href.substring(0,1) is '/' and href.substring(0,2) isnt '//'
           e.preventDefault()
           Parse.history.navigate href, true
           
@@ -187,9 +199,9 @@ define [
     accessDenied: ->
       require ["views/helper/Alert", 'i18n!nls/common'], (Alert, i18nCommon) -> 
         new Alert
-          event:    'access-denied'
+          event:    'routing-canceled'
           type:     'error'
-          fade:     false
+          fade:     true
           heading:  i18nCommon.errors.access_denied
           message:  i18nCommon.errors.no_permission
         Parse.history.navigate "/"
@@ -197,9 +209,7 @@ define [
     signupOrLogin: ->
       require ["views/helper/Alert", 'i18n!nls/common'], (Alert, i18nCommon) -> 
         new Alert
-          event:    'access-denied'
-          type:     'error'
+          event:    'routing-canceled'
+          type:     'warning'
           fade:     true
-          heading:  i18nCommon.errors.access_denied
-          message:  i18nCommon.errors.no_permission
-        Parse.history.navigate "/"
+          heading:  i18nCommon.errors.not_logged_in

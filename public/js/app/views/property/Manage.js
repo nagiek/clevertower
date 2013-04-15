@@ -27,15 +27,12 @@
       ManagePropertiesView.prototype.initialize = function() {
         var _this = this;
         _.bindAll(this, 'newProperty');
-        if (!Parse.User.current().properties) {
-          Parse.User.current().properties = new PropertyList;
-        }
-        Parse.User.current().properties.on("add", this.addOne);
-        Parse.User.current().properties.on("reset", this.addAll);
-        Parse.User.current().properties.on("show", function() {
+        Parse.User.current().get("network").properties.on("add", this.addOne);
+        Parse.User.current().get("network").properties.on("reset", this.addAll);
+        Parse.User.current().get("network").properties.on("show", function() {
           return _this.$propertyList.hide();
         });
-        return Parse.User.current().properties.on("close", function() {
+        return Parse.User.current().get("network").properties.on("close", function() {
           return _this.$propertyList.show();
         });
       };
@@ -51,8 +48,8 @@
         this.$el.html(JST["src/js/templates/property/manage.jst"](vars));
         this.$propertyList = this.$("#network-properties");
         this.$managerList = this.$("#network-managers");
-        if (Parse.User.current().properties.length === 0) {
-          return Parse.User.current().properties.fetch({
+        if (Parse.User.current().get("network").properties.length === 0) {
+          return Parse.User.current().get("network").properties.fetch({
             success: function(collection, resp, options) {
               var query;
               query = new Parse.Query("Unit");
@@ -84,8 +81,8 @@
 
       ManagePropertiesView.prototype.addAll = function(collection, filter) {
         this.$propertyList.html("");
-        if (Parse.User.current().properties.length !== 0) {
-          Parse.User.current().properties.each(this.addOne);
+        if (Parse.User.current().get("network").properties.length !== 0) {
+          Parse.User.current().get("network").properties.each(this.addOne);
           this.$propertyList.children(':even').children().addClass('views-row-even');
           return this.$propertyList.children(':odd').children().addClass('views-row-odd');
         } else {
@@ -108,7 +105,7 @@
             return _this.$("section").show();
           });
           return propertyWizard.on("property:save", function(property) {
-            Parse.User.current().properties.add(property);
+            Parse.User.current().get("network").properties.add(property);
             _this.$("#new-property").removeProp("disabled");
             return _this.$("section").show();
           });

@@ -33,9 +33,16 @@
           onNetwork: false
         }).render();
         new NetworkMenuView();
-        this.on("route", function() {
-          _this.view.undelegateEvents();
-          return delete _this.view;
+        Parse.history.on("route", function() {
+          if (_this.view) {
+            _this.view.undelegateEvents();
+            return delete _this.view;
+          }
+        });
+        Parse.Dispatcher.on("user:logout", function(route) {
+          var domain;
+          domain = "" + location.protocol + "//" + (location.host.split(".").slice(1, 3).join("."));
+          return setTimeout(window.location.replace(domain, 1000));
         });
         return $(document).on("click", "a", function(e) {
           var href;
@@ -43,7 +50,7 @@
           if (href === "#" || !(href != null)) {
             return;
           }
-          if (href.substring(0, 1) === '/') {
+          if (href.substring(0, 1) === '/' && href.substring(0, 2) !== '//') {
             e.preventDefault();
             return Parse.history.navigate(href, true);
           }
@@ -173,20 +180,19 @@
             heading: i18nCommon.errors.access_denied,
             message: i18nCommon.errors.no_permission
           });
-          return Parse.history.navigate("/");
-        });
-      };
-
-      DesktopRouter.prototype.signupOrLogin = function() {
-        return require(["views/helper/Alert", 'i18n!nls/common'], function(Alert, i18nCommon) {
-          new Alert({
-            event: 'access-denied',
-            type: 'error',
-            fade: true,
-            heading: i18nCommon.errors.access_denied,
-            message: i18nCommon.errors.no_permission
-          });
-          return Parse.history.navigate("/");
+          Parse.history.navigate("/");
+          return {
+            signupOrLogin: function() {
+              return require(["views/helper/Alert", 'i18n!nls/common'], function(Alert, i18nCommon) {
+                return new Alert({
+                  event: 'routing-canceled',
+                  type: 'warning',
+                  fade: true,
+                  heading: i18nCommon.errors.not_logged_in
+                });
+              });
+            }
+          };
         });
       };
 

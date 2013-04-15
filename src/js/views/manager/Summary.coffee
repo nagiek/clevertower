@@ -5,14 +5,13 @@ define [
   'models/Lease'
   'models/Profile'
   "i18n!nls/common"
-  "i18n!nls/group"
-  'templates/profile/summary'
+  "i18n!nls/tenant"
+  'templates/profile/tablerow'
 ], ($, _, Parse, Lease, Profile, i18nCommon, i18nGroup) ->
 
   class TenantSummaryView extends Parse.View
   
-    tagName: "li"
-    className: "span"
+    tagName: "tr"
     
     events:
       'click .delete' : 'kill'
@@ -34,10 +33,9 @@ define [
         status: status
         url: @profile.cover 'thumb'
         i18nCommon: i18nCommon
-        i18nGroup: i18nGroup
         
       vars.name = @profile.get("email") unless vars.name
-      @$el.html JST["src/js/templates/profile/summary.jst"](vars)
+      @$el.html JST["src/js/templates/profile/tablerow.jst"](vars)
       @
     
     kill: ->

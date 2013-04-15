@@ -23,9 +23,7 @@
       }
     },
     errors: {
-      messages: {
-        unique_tenant: "This user has already been added."
-      }
+      unique_tenant: "This user has already been added."
     }
   });
 

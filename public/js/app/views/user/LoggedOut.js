@@ -24,7 +24,7 @@
       LoggedOutView.prototype.initialize = function() {
         var _this = this;
         _.bindAll(this, "logIn", "signUp", "resetPassword", "showResetPasswordModal");
-        this.on("user:login", function(user) {
+        Parse.Dispatcher.on("user:login", function(user) {
           var domain, network;
           $('#reset-password-modal').remove();
           if (user.get("type") === "manager") {
@@ -35,10 +35,10 @@
               _this.undelegateEvents();
               return delete _this;
             } else {
-              return require(["views/network/Set"], function(SetNetworkView) {
+              return require(["views/network/New"], function(NewNetworkView) {
                 Parse.history.navigate("/network/set");
                 if (!_this.view || !(_this.view instanceof NetworkFormView)) {
-                  _this.view = new SetNetworkView({
+                  _this.view = new NewNetworkView({
                     model: Parse.User.current().get("network")
                   });
                 }
@@ -65,17 +65,6 @@
         $('form#reset-password-form').on("submit", this.resetPassword);
         this.$('.toggle').toggler();
         return this;
-      };
-
-      LoggedOutView.prototype.logInWithFacebook = function(e) {
-        e.preventDefault();
-        return Parse.FacebookUtils.logIn("user_likes,email", {
-          success: function(user) {
-            this.trigger("user:login", user);
-            return this.trigger("user:change", user);
-          },
-          error: function(user, error) {}
-        });
       };
 
       LoggedOutView.prototype.showResetPasswordModal = function(e) {
@@ -126,8 +115,8 @@
         password = this.$("#login-password").val();
         return Parse.User.logIn(email, password, {
           success: function(user) {
-            _this.trigger("user:login", user);
-            return _this.trigger("user:change", user);
+            Parse.Dispatcher.trigger("user:login", user);
+            return Parse.Dispatcher.trigger("user:change", user);
           },
           error: function(user, error) {
             var msg;
@@ -147,6 +136,17 @@
         });
       };
 
+      LoggedOutView.prototype.logInWithFacebook = function(e) {
+        e.preventDefault();
+        return Parse.FacebookUtils.logIn("user_likes,email", {
+          success: function(user) {
+            Parse.Dispatcher.trigger("user:login", user);
+            return Parse.Dispatcher.trigger("user:change", user);
+          },
+          error: function(user, error) {}
+        });
+      };
+
       LoggedOutView.prototype.signUp = function(e) {
         var email, password,
           _this = this;
@@ -159,8 +159,8 @@
           ACL: new Parse.ACL()
         }, {
           success: function(user) {
-            _this.trigger("user:login", user);
-            return _this.trigger("user:change", user);
+            Parse.Dispatcher.trigger("user:login", user);
+            return Parse.Dispatcher.trigger("user:change", user);
           },
           error: function(user, error) {
             var msg;

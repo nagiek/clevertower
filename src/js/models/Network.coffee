@@ -1,7 +1,9 @@
 define [
   'underscore'
   'backbone'
-], (_, Parse) ->
+  'collections/property/PropertyList'
+  'collections/manager/ManagerList'
+], (_, Parse, PropertyList, ManagerList) ->
 
   Network = Parse.Object.extend "Network"
   # class Property extends Parse.Object
@@ -25,4 +27,13 @@ define [
         return message: 'name_too_long'   if name.length > 31
         return message: 'name_invalid'    unless /^[a-z]+$/.test name
       false
-    
+      
+    prep: (collectionName, options) ->
+      return @[collectionName] if @[collectionName]
+      switch collectionName
+        when "properties"
+          @[collectionName] = new PropertyList [], network: @
+        when "managers"
+          @[collectionName] = new ManagerList [], network: @
+
+      @[collectionName]

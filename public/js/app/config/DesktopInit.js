@@ -93,16 +93,19 @@
       }
       return false;
     };
+    Parse.Dispatcher = {};
+    _.extend(Parse.Dispatcher, Parse.Events);
     if (Parse.User.current()) {
       profilePromise = (new Parse.Query(Profile)).equalTo("user", Parse.User.current()).first();
       networkPromise = (new Parse.Query("_User")).include('network.role').equalTo("objectId", Parse.User.current().id).first();
       return Parse.Promise.when(profilePromise, networkPromise).then(function(profile, user) {
         var network;
         Parse.User.current().profile = profile;
-        if (onNetwork) {
-          Parse.User.current().properties = new PropertyList;
-        }
         network = user.get("network");
+        if (onNetwork) {
+          network.prep("properties");
+          network.prep("managers");
+        }
         Parse.User.current().set("network", network);
         return new AppRouter();
       });

@@ -12,8 +12,9 @@
     status = 'invited';
     return (new Parse.Query("Property")).include('network.role').get(req.params.propertyId, {
       success: function(property) {
-        var mgrRole, title;
-        mgrRole = property.get("network").get("role");
+        var mgrRole, network, title;
+        network = property.get("network");
+        mgrRole = network.get("role");
         title = property.get("thoroughfare");
         return (new Parse.Query("Lease")).include('role').get(req.params.leaseId, {
           success: function(lease) {
@@ -48,12 +49,14 @@
                   tenant = new Parse.Object("Tenant");
                   tenant.save({
                     lease: lease,
+                    property: property,
+                    network: network,
                     status: status,
                     profile: found_profile,
                     accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb",
                     ACL: tenantACL
                   });
-                  notificationACL.setReadAccess(found_user, true);
+                  notificationACL.setReadAccess(found_profile.get("user"), true);
                   if (tntRole) {
                     return tntRoleUsers.add(found_profile.get("user"));
                   }
@@ -90,6 +93,8 @@
                     tenant = new Parse.Object("Tenant");
                     return tenant.save({
                       lease: lease,
+                      property: property,
+                      network: network,
                       status: status,
                       profile: profile,
                       accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb",
@@ -99,10 +104,11 @@
                   notification.setACL(notificationACL);
                   notification.save({
                     text: "You have been invited to join " + title,
-                    channels: ["leases-" + req.params.leaseId],
+                    channels: ["leases-" + lease.id],
                     name: "lease_invitation",
                     user: req.user,
-                    property: property
+                    property: property,
+                    network: network
                   });
                   if (tntRole) {
                     tntRole.save();
@@ -115,10 +121,11 @@
                 notification.setACL(notificationACL);
                 notification.save({
                   text: "You have been invited to join " + title,
-                  channels: ["leases-" + req.params.leaseId],
+                  channels: ["leases-" + lease.id],
                   name: "lease_invitation",
                   user: req.user,
-                  property: property
+                  property: property,
+                  network: network
                 });
                 if (tntRole) {
                   tntRole.save();
@@ -178,8 +185,9 @@
       profileACL.setWriteAccess(req.object, true);
       if (!profile) {
         profile = new Parse.Object("Profile");
-        profile.setACL(profileACL);
         return profile.save({
+          email: email,
+          ACL: profileACL,
           user: req.object
         });
       } else {
@@ -201,11 +209,10 @@
                 role.getUsers().add(req.obj);
                 role.save();
               }
-              profile.setACL(profileACL);
               return profile.save({
                 email: req.object.get("email"),
                 user: req.object
-              });
+              }, ACL(profileACL));
             });
           });
         });
@@ -345,6 +352,8 @@
       return role.save().then(function(savedRole) {
         req.object.set("role", savedRole);
         return res.success();
+      }, function() {
+        return res.error("role_error");
       });
     }, function() {
       return res.error("bad_query");
@@ -353,8 +362,27 @@
 
   Parse.Cloud.afterSave("Network", function(req, res) {
     if (!req.object.existed()) {
-      return req.user.save({
+      req.user.save({
         network: req.object
+      });
+      return (new Parse.Query("Profile")).equalTo('user', req.user).first().then(function(profile) {
+        return (new Parse.Query("_Role")).get(req.object.get("role"), {
+          success: function(role) {
+            var manager, managerACL;
+            manager = new Parse.Object("Manager");
+            managerACL = new Parse.ACL;
+            managerACL.setRoleReadAccess(role, true);
+            managerACL.setRoleWriteAccess(role, true);
+            return manager.save({
+              network: network,
+              status: 'accepted',
+              admin: true,
+              profile: profile,
+              accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb",
+              ACL: managerACL
+            });
+          }
+        });
       });
     }
   });
@@ -610,8 +638,9 @@
         tntRole = lease.get("role");
         return (new Parse.Query("Property")).include('network.role').get(propertyId, {
           success: function(property) {
-            var mgrRole, tenantACL, users;
-            mgrRole = property.get("network").get("role");
+            var mgrRole, network, tenantACL, users;
+            network = property.get("network");
+            mgrRole = network.get("role");
             if (!req.object.existed()) {
               tenantACL = new Parse.ACL;
               if (tntRole) {
@@ -623,7 +652,10 @@
               if (mgrRole) {
                 tenantACL.setRoleWriteAccess(mgrRole, true);
               }
-              req.object.setACL(tenantACL);
+              req.object.set({
+                network: network,
+                ACL: tenantACL
+              });
             }
             if (mgrRole) {
               users = mgrRole.getUsers();
@@ -644,7 +676,8 @@
                       text: "You have been invited to join " + title,
                       channels: ["leases-" + lease.id],
                       user: req.user,
-                      property: property
+                      property: property,
+                      network: network
                     });
                     status = status && status === 'pending' ? 'current' : 'invited';
                     req.object.set("status", status);
@@ -660,7 +693,8 @@
                       text: "" + name + " wants to join your property.",
                       channels: ["property-" + propertyId],
                       user: req.user,
-                      property: property
+                      property: property,
+                      network: network
                     });
                     (new Parse.Query("_User")).get(user.id, {
                       success: function(user) {

@@ -16,7 +16,14 @@
     </div>
     <div class="span4">
       <ul class="nav nav-list well">
-        <li><a href="clevertower.dev/networks/<%= title %>"><%= title %></a><a class="btn pull-right" href="/network/edit" rel="tooltip" data-original-title="<%= i18nCommon.actions.edit %>"><i class="icon icon-edit"></i></a></li>
+        <li>
+          <a class="pull-right text-right" href="/network/edit" rel="tooltip" data-original-title="<%= i18nCommon.actions.edit %>"><i class="icon icon-edit"></i></a>
+          
+          <a href="//clevertower.dev/networks/<%= name %>">
+            <h4><%= title %></h4>
+            <small><%= i18nCommon.actions.go_to %> clevertower.com/networks/<%= name %></small>
+          </a>
+        </li>
         <li><a href="/network/managers"><%= i18nCommon.classes.Managers %></a></li>
       </ul>
     </div>

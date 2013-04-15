@@ -72,7 +72,6 @@
         this.on("save:success", function(model) {
           _this.model.id = model.id;
           _this.model.tenants.createQuery(model);
-          _this.model.tenants.fetch();
           return require(["views/lease/Show"], function(ShowLeaseView) {
             new Alert({
               event: 'model-save',

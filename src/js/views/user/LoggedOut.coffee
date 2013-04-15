@@ -26,7 +26,7 @@ define [
     initialize: ->
       _.bindAll this, "logIn", "signUp", "resetPassword", "showResetPasswordModal"
 
-      @on "user:login", (user) =>
+      Parse.Dispatcher.on "user:login", (user) =>
         $('#reset-password-modal').remove()
         if user.get("type") is "manager"
           network = user.get("network")
@@ -37,9 +37,9 @@ define [
             @undelegateEvents()
             delete this
           else
-            require ["views/network/Set"], (SetNetworkView) =>              
+            require ["views/network/New"], (NewNetworkView) =>
               Parse.history.navigate "/network/set"
-              @view = new SetNetworkView(model: Parse.User.current().get("network")) if !@view or @view !instanceof NetworkFormView
+              @view = new NewNetworkView(model: Parse.User.current().get("network")) if !@view or @view !instanceof NetworkFormView
               @view.render()
         else
           @undelegateEvents()
@@ -56,15 +56,6 @@ define [
       # Make toggles
       @$('.toggle').toggler()
       @
-      
-    logInWithFacebook : (e) ->  
-      e.preventDefault()
-      Parse.FacebookUtils.logIn "user_likes,email",
-        success: (user) ->
-          @trigger "user:login", user
-          @trigger "user:change", user
-        error: (user, error) ->
-
 
     showResetPasswordModal: (e) ->
       $('#reset-password-modal').modal()
@@ -92,9 +83,9 @@ define [
       email = @$("#login-username").val()
       password = @$("#login-password").val()
       Parse.User.logIn email, password,
-        success: (user) =>  
-          @trigger "user:login", user
-          @trigger "user:change", user
+        success: (user) =>
+          Parse.Dispatcher.trigger "user:login", user
+          Parse.Dispatcher.trigger "user:change", user
 
         error: (user, error) =>
           @$('.login-form .username-group').addClass('error')
@@ -107,6 +98,14 @@ define [
           @$(".login-form .alert-error").html(msg).show()
           @$(".login-form button").removeAttr "disabled"
 
+    logInWithFacebook : (e) ->  
+      e.preventDefault()
+      Parse.FacebookUtils.logIn "user_likes,email",
+        success: (user) ->
+          Parse.Dispatcher.trigger "user:login", user
+          Parse.Dispatcher.trigger "user:change", user
+        error: (user, error) ->
+            
     signUp: (e) ->
       e.preventDefault()
       @$(".signup-form button").attr "disabled", "disabled"
@@ -114,8 +113,8 @@ define [
       password = @$("#signup-password").val()
       Parse.User.signUp email, password, { email: email, ACL: new Parse.ACL() },
         success: (user) =>
-          @trigger "user:login", user
-          @trigger "user:change", user
+          Parse.Dispatcher.trigger "user:login", user
+          Parse.Dispatcher.trigger "user:change", user
 
         error: (user, error) =>
           @$(".signup-form .error").removeClass('error')

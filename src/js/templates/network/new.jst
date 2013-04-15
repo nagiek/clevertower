@@ -1,8 +1,8 @@
 <header class="row">
   <h1 class="offset1 span6"><%= i18nProperty.network.setup %></h1>
-  <p class="help-block offset3 span6"><%= i18nProperty.network.must_be_done %></p>
+  <p class="help-block offset1 span6"><%= i18nProperty.network.must_be_done %></p>
 </header>
-<form class="form-large">
+<form>
   <%= JST["src/js/templates/network/_form.jst"]({network: network, i18nCommon: i18nCommon, i18nProperty: i18nProperty}) %>
   <div class="form-actions">
     <div class="row">

@@ -12,13 +12,17 @@ __p += '<section class="section">\n  <div class="row">\n    <div class="span8">\
 ((__t = ( i18nProperty.actions.new_property )) == null ? '' : __t) +
 '\n        </button></li>\n        </ul>\n      </header>\n      <ul id="network-properties" class="property-list unstyled">\n        <img src=\'/img/misc/spinner.gif\' class=\'spinner\' alt="' +
 ((__t = ( i18nCommon.verbs.loading )) == null ? '' : __t) +
-'" />\n      </ul>\n    </div>\n    <div class="span4">\n      <ul class="nav nav-list well">\n        <li><a href="clevertower.dev/networks/' +
-((__t = ( title )) == null ? '' : __t) +
-'">' +
-((__t = ( title )) == null ? '' : __t) +
-'</a><a class="btn pull-right" href="/network/edit" rel="tooltip" data-original-title="' +
+'" />\n      </ul>\n    </div>\n    <div class="span4">\n      <ul class="nav nav-list well">\n        <li>\n          <a class="pull-right text-right" href="/network/edit" rel="tooltip" data-original-title="' +
 ((__t = ( i18nCommon.actions.edit )) == null ? '' : __t) +
-'"><i class="icon icon-edit"></i></a></li>\n        <li><a href="/network/managers">' +
+'"><i class="icon icon-edit"></i></a>\n          \n          <a href="//clevertower.dev/networks/' +
+((__t = ( name )) == null ? '' : __t) +
+'">\n            <h4>' +
+((__t = ( title )) == null ? '' : __t) +
+'</h4>\n            <small>' +
+((__t = ( i18nCommon.actions.go_to )) == null ? '' : __t) +
+' clevertower.com/networks/' +
+((__t = ( name )) == null ? '' : __t) +
+'</small>\n          </a>\n        </li>\n        <li><a href="/network/managers">' +
 ((__t = ( i18nCommon.classes.Managers )) == null ? '' : __t) +
 '</a></li>\n      </ul>\n    </div>\n  </div>\n</section>\n<div class="row wizard"></div>';
 

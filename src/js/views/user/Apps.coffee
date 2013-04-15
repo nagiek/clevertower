@@ -47,3 +47,4 @@ define [
         i18nUser:     i18nUser
       
       @$el.html JST["src/js/templates/user/apps.jst"](vars)
+      @
