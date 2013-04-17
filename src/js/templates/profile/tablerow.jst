@@ -1,17 +1,19 @@
 <td>
-  <div class="photo">
+  <div class="photo inline-block inline-block-middle">
     <a href="/users/<%= objectId %>">
-      <img src="<%=url%>" class="img-rounded photo-profile" width="100">
+      <img src="<%=url%>" class="img-rounded" width="64" height="64">
     </a>
   </div>
-  <a href="/users/<%= objectId %>"><strong><%= name %></strong></a>
+  <a href="/users/<%= objectId %>" class="inline-block inline-block-middle"><strong><%= name %></strong></a>
+  <% if (current_user) { %><strong><small>(<%= i18nCommon.nouns.you %>)</small></strong><% } %>
 </td>
 <td>
-  <span class="label label-<%= status == 'confirmed' ? 'success' : 'warning' %>"><%= status %></span>
+  <span class="label label-large label-<%= status == 'accepted' ? 'success' : 'warning' %>"><%= status %></span>
+  <% if (admin) { %><small>(<%= i18nCommon.adjectives.admin %>)</small><% } %>
 </td>
 <td>
-  <button class="delete btn btn-mini">
-    <%= i18nCommon.actions.delete %>
+  <button class="delete btn">
+    <% if (current_user) { %> <%= current_user_leave %> <% } else { %> <%= i18nCommon.actions.remove %> <% } %>
   </button>
 </td>
 

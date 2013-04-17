@@ -56,7 +56,5 @@ define [
     addOne: (lease) =>
       @$('p.empty').hide()
       view = new LeaseView(model: lease)
-      console.log lease
-      console.log view
       @$list.append view.render().el
       view.$el.find('.view-specific').toggleClass('hide') if @editing

@@ -62,6 +62,7 @@ define [
     save : (e) ->
       e.preventDefault()
       data = @$('form').serializeObject()
+      @$('button.save').prop "disabled", "disabled"
 
       @model.save data.network,
       success: (model) =>

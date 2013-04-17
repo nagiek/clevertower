@@ -23,21 +23,22 @@
       };
 
       LoggedInView.prototype.initialize = function(attrs) {
+        var network;
         _.bindAll(this, "render", "changeName", "logOut");
         this.pusher = new Pusher('dee5c4022be4432d7152');
-        if (Parse.onNetwork) {
-          this.registerUser();
+        network = Parse.User.current().get("network");
+        if (network) {
+          this.pusher.subscribe("networks-" + network.id);
         }
+        network.properties.on("add", this.subscribeProperty);
         Parse.User.current().profile.on("sync", this.changeName);
         return this.render();
       };
 
-      LoggedInView.prototype.registerUser = function() {
-        return Parse.User.current().get("network").properties.on("add", this.subscribeProperty);
-      };
+      LoggedInView.prototype.registerUser = function() {};
 
       LoggedInView.prototype.subscribeProperty = function(obj) {
-        return this.pusher.subscribe("property-" + obj.id);
+        return this.pusher.subscribe("properties-" + obj.id);
       };
 
       LoggedInView.prototype.logOut = function(e) {

@@ -23,16 +23,19 @@ define [
       
       @pusher = new Pusher 'dee5c4022be4432d7152'
 
-      if Parse.onNetwork then @registerUser()      
+      network = Parse.User.current().get("network")
+      @pusher.subscribe "networks-#{network.id}" if network
+      network.properties.on "add", @subscribeProperty
+
       Parse.User.current().profile.on "sync", @changeName
       @render()
           
     registerUser : =>
       # Load the properties if the user has just logged in.
-      Parse.User.current().get("network").properties.on "add", @subscribeProperty
+
       
     subscribeProperty: (obj) =>
-      @pusher.subscribe "property-#{obj.id}"
+      @pusher.subscribe "properties-#{obj.id}"
       
     # subscribeLease: (e) =>
     #   @pusher.subscribe "lease-#{obj.id}"

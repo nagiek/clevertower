@@ -15,7 +15,7 @@ define [
     initialize: (attrs) ->
       @editing = false
       
-      @on "user:logOut", @clear
+      Parse.Dispatcher.on "user:logout", @clear
 
       @notifications = new NotificationList
       @notifications.on "add", @addOne

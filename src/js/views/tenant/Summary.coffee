@@ -23,7 +23,7 @@ define [
       
       @model.on "destroy", =>
         @remove()
-        @undeletegateEvents()
+        @undelegateEvents()
         delete this
   
     # Re-render the contents of the property item.

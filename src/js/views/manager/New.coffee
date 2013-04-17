@@ -16,7 +16,7 @@ define [
   "datepicker"
 ], ($, _, Parse, TenantList, Property, Lease, Tenant, Profile, Alert, i18nCommon, i18nLease) ->
   
-  class NewTenantsView extends Parse.View
+  class NewManagersView extends Parse.View
     
     el: '.content'
     

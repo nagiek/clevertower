@@ -42,6 +42,7 @@
       edit: "Edit",
       undo: "Undo",
       link: "Link",
+      leave: "Leave",
       revoke_access: "Revoke access",
       confirm: "Are you sure?",
       add_more: "Add more",
@@ -95,6 +96,7 @@
     },
     nouns: {
       link: "link",
+      you: "You",
       sample_email: "keigan@example.com"
     },
     order: {
@@ -106,7 +108,8 @@
       linked: "Linked",
       all: "All",
       "private": "Private",
-      landlord_only: "Landlord Only"
+      landlord_only: "Landlord Only",
+      admin: "admin"
     },
     form: {
       operations: "Operations",

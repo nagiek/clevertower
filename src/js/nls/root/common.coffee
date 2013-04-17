@@ -37,6 +37,7 @@ define
     edit:                 "Edit"
     undo:                 "Undo"
     link:                 "Link"
+    leave:                "Leave"
     revoke_access:        "Revoke access"
     confirm:              "Are you sure?"
     add_more:             "Add more"
@@ -81,6 +82,7 @@ define
     loading:              "Loading"
   nouns:             
     link:                 "link"
+    you:                  "You"
     sample_email:         "keigan@example.com"
   order:
     first:                "First"
@@ -91,6 +93,7 @@ define
     all:                  "All"
     private:              "Private"
     landlord_only:        "Landlord Only"
+    admin:                "admin"
   form:                   
     operations:           "Operations"
     info:                 "Info"

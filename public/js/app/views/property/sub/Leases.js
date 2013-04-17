@@ -71,8 +71,6 @@
         view = new LeaseView({
           model: lease
         });
-        console.log(lease);
-        console.log(view);
         this.$list.append(view.render().el);
         if (this.editing) {
           return view.$el.find('.view-specific').toggleClass('hide');

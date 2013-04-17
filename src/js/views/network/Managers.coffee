@@ -5,15 +5,16 @@ define [
   'collections/manager/ManagerList'
   'models/Manager'
   'models/Profile'
+  'views/helper/Alert'
   'views/manager/Summary'
   "i18n!nls/group"
   "i18n!nls/common"
   'templates/network/managers'
-], ($, _, Parse, ManagerList, Manager, Profile, ManagerView, i18nGroup, i18nCommon) ->
+], ($, _, Parse, ManagerList, Manager, Profile, Alert, ManagerView, i18nGroup, i18nCommon) ->
 
   class NetworkManagersView extends Parse.View
   
-    el: ".content"
+    el: "#main"
     
     events:
       'submit form' : 'save'
@@ -21,6 +22,17 @@ define [
     initialize: (attrs) ->
       
       _.bindAll this, 'addOne', 'addAll', 'render'
+      
+      @on "submit:success", (models) -> 
+        @model.managers.add models
+        new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
+        @$('.emails-group input').val('')
+      
+      @on "submit:return", -> @$('button.save').removeProp "disabled"
+
+      @on "submit:fail", (error) ->
+        @$('.emails-group').addClass('error')
+        new Alert event: 'model-save', fade: false, message: i18nCommon.errors[error.message], type: 'error'
       
       @model.prep('managers')
       
@@ -33,17 +45,12 @@ define [
       vars = _.merge(i18nGroup: i18nGroup, i18nCommon: i18nCommon)
       @$el.html JST["src/js/templates/network/managers.jst"](vars)
       
-      @$list = @$('ul#managers')
+      @$list = @$('table#managers tbody')
 
-      if @model.managers.length is 0 
-        @model.managers.fetch
-          success: (collection, response, options) =>
-            if collection.length is 0 then @$("td.empty").text(i18nGroup.manager.empty).show()
-      else @addAll()
+      if @model.managers.length is 0 then @model.managers.fetch() else @addAll()
       @
       
     addOne : (manager) ->
-      @$("td.empty").hide()
       @$list.append (new ManagerView(model: manager)).render().el
 
     addAll : ->
@@ -57,16 +64,22 @@ define [
       
       data = @$('form').serializeObject()
 
-
       # Validate tenants (assignment done in Cloud)
       userValid = unless Parse.User::validate(email: data.manager.email) then true else false
 
       unless userValid
         @$('.emails-group').addClass('error')
-        @model.trigger "invalid", {message: 'email_incorrect'}
+        @trigger "submit:return"
+        @trigger "submit:fail", {message: 'email_incorrect'}
       else
-        @model.save attrs,
-        success: (model) => 
-          @trigger "save:success", model, this
-        error: (model, error) => 
-          @model.trigger "invalid", error
+        attrs =
+          emails: [ data.manager.email ]
+          networkId: @model.id
+        Parse.Cloud.run "AddManagers", attrs,
+        success: (modelObject) => 
+          models = _.toArray modelObject
+          @trigger "submit:return"
+          @trigger "submit:success", models
+        error: (error) => 
+          @trigger "submit:return"
+          @trigger "submit:fail", error

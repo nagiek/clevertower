@@ -34,21 +34,17 @@ define [
           @index()
           Parse.history.navigate "/"
       
-      Parse.Dispatcher.on "user:change", => 
-        # Reload the current path.
-        # The views themselves are responsbile for reloading or not.
-        @navigate location.pathname, trigger: true
-      
       # Clean up after views
       Parse.history.on "route", (route) =>        
-        unless route is "propertiesShow"
-          @view.undelegateEvents()
-          delete @view
-        else
-          require ["views/property/Show"], (PropertyView) => 
-            if @view !instanceof PropertyView
-              @view.undelegateEvents()
-              delete @view
+        if @view
+          unless route is "propertiesShow"
+            @view.undelegateEvents()
+            delete @view
+          else
+            require ["views/property/Show"], (PropertyView) => 
+              if @view !instanceof PropertyView
+                @view.undelegateEvents()
+                delete @view
         
       Parse.Dispatcher.on "network:set", => 
         # Remove the Access Denied callback

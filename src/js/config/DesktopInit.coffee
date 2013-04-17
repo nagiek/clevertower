@@ -135,11 +135,11 @@ require ["jquery", "backbone", "facebook", "collections/property/PropertyList", 
 
   # Load all the stuff
   Parse.User::setup = ->
-    profilePromise = (new Parse.Query(Profile)).equalTo("user", Parse.User.current()).first()
-    networkPromise = (new Parse.Query("_User")).include('network.role').equalTo("objectId", Parse.User.current().id).first()
+    profilePromise = (new Parse.Query(Profile)).equalTo("user", @).first()
+    networkPromise = (new Parse.Query("_User")).include('network.role').equalTo("objectId", @id).first()
     Parse.Promise.when(profilePromise, networkPromise).then (profile, user) => 
 
-      Parse.User.current().profile = profile
+      @profile = profile
 
       # Load the network regardless if we are on a subdomain or not, as we need the link.
       # Should query for network when loading user... this is weird.
@@ -151,7 +151,7 @@ require ["jquery", "backbone", "facebook", "collections/property/PropertyList", 
         network.prep("properties")
         network.prep("managers")
 
-      Parse.User.current().set "network", network
+      @set "network", network
 
 
   # Set up Dispatcher for global events
@@ -161,7 +161,6 @@ require ["jquery", "backbone", "facebook", "collections/property/PropertyList", 
   # Load the user's profile before loading the app.
   # @see LoggedOutView::login
   if Parse.User.current()
-    Parse.User.current().setup().then ->
-      new AppRouter()
+    Parse.User.current().setup().then -> new AppRouter()
   else
     new AppRouter()

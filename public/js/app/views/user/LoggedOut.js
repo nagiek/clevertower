@@ -127,13 +127,15 @@
       };
 
       LoggedOutView.prototype.signUp = function(e) {
-        var email, password,
+        var email, password, type,
           _this = this;
         e.preventDefault();
         this.$(".signup-form button").attr("disabled", "disabled");
         email = this.$("#signup-username").val();
         password = this.$("#signup-password").val();
+        type = this.$(".type-group :selected").id() === 'signup-tenant' ? 'tenant' : 'manager';
         return Parse.User.signUp(email, password, {
+          type: type,
           email: email,
           ACL: new Parse.ACL()
         }, {

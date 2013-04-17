@@ -15,8 +15,8 @@ define
                   New members will be allowed to post. They will not be able to make
                   any changes to this blog's settings, unless you promote them to an admin.
                   """
-      
-    empty: "There are no managers in your network."
+    deleted_if_empty: "This blog will be automatically deleted if all of its members leave."
+    delete_network: "Delete network"
     notices:
       update: 'New managers were successfully added.'
   fields:

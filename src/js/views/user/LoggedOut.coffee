@@ -97,7 +97,8 @@ define [
       @$(".signup-form button").attr "disabled", "disabled"
       email = @$("#signup-username").val()
       password = @$("#signup-password").val()
-      Parse.User.signUp email, password, { email: email, ACL: new Parse.ACL() },
+      type = if @$(".type-group :selected").id() is 'signup-tenant' then 'tenant' else 'manager'
+      Parse.User.signUp email, password, { type: type, email: email, ACL: new Parse.ACL() },
         success: (user) =>
           Parse.Dispatcher.trigger "user:login", user
           Parse.Dispatcher.trigger "user:change", user

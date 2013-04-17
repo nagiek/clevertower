@@ -50,6 +50,7 @@ define [
       
       # Clean up after views
       Parse.history.on "route", =>
+        console.log @view
         if @view
           @view.undelegateEvents()
           delete @view
@@ -122,7 +123,7 @@ define [
             @view.render()
             
     accountSettings : (category) ->
-      if Parse.User.current().authenticated()
+      if Parse.User.current()
         if category is 'edit'
           require ["views/profile/edit"], (UserSettingsView) =>
             @view = new UserSettingsView(model: Parse.User.current().profile, current: true).render()

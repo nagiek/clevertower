@@ -5,11 +5,11 @@ define [
   'models/Lease'
   'models/Profile'
   "i18n!nls/common"
-  "i18n!nls/tenant"
+  "i18n!nls/group"
   'templates/profile/tablerow'
 ], ($, _, Parse, Lease, Profile, i18nCommon, i18nGroup) ->
 
-  class TenantSummaryView extends Parse.View
+  class ManagerSummaryView extends Parse.View
   
     tagName: "tr"
     
@@ -18,23 +18,26 @@ define [
     
     initialize : (attrs) ->
       _.bindAll 'this', 'render'
-      @profile = @model.get("profile")
       
       @model.on "destroy", =>
         @remove()
-        @undeletegateEvents()
+        @undelegateEvents()
         delete this
   
     # Re-render the contents of the property item.
     render: ->
       status = @model.get 'status'
-      vars = _.merge @profile.toJSON(),
+      current_user = @model.get("profile").id is Parse.User.current().profile.id
+      vars = _.merge @model.get("profile").toJSON(),
         i_status: i18nGroup.fields.status[status]
         status: status
-        url: @profile.cover 'thumb'
+        admin: @model.get 'admin'
+        current_user: current_user
+        current_user_leave: if @model.collection.length > 1 then i18nCommon.actions.leave else i18nGroup.manager.delete_network
+        url: @model.get("profile").cover('thumb')
         i18nCommon: i18nCommon
         
-      vars.name = @profile.get("email") unless vars.name
+      vars.name = @model.get("profile").get("email") unless vars.name
       @$el.html JST["src/js/templates/profile/tablerow.jst"](vars)
       @
     

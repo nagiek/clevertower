@@ -26,13 +26,18 @@ define [
     # Re-render the contents of the property item.
     render: =>
       channels = @model.get "channels"
+      network = @model.get "network"
       property = @model.get "property"
       user = @model.get "user"
       event = @model.get "name" 
       name = if user.get("name") then user.get("name") else user.get "email"
       
-      url = "/" + channels[0].replace("-", "/")
-      url = "/properties/#{property.id}" + url unless channels[0].indexOf('properties') is 0
+      if @model.get "forMgr"
+        url = "//#{network.get("name")}.#{location.host}"
+        url += "/properties/#{property.id}" if property
+        url += channels[0].replace("-", "/") unless channels[0].indexOf('properties') or channels[0].indexOf('profiles')
+      else
+        url = "/" + channels[0].replace("-", "/")
       
       switch channels[0].split("-")[0]
         when 'properties'

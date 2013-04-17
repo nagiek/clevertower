@@ -60,6 +60,7 @@
           return Parse.history.loadUrl(location.pathname);
         });
         Parse.history.on("route", function() {
+          console.log(_this.view);
           if (_this.view) {
             _this.view.undelegateEvents();
             return delete _this.view;
@@ -148,7 +149,7 @@
 
       DesktopRouter.prototype.accountSettings = function(category) {
         var _this = this;
-        if (Parse.User.current().authenticated()) {
+        if (Parse.User.current()) {
           if (category === 'edit') {
             return require(["views/profile/edit"], function(UserSettingsView) {
               return _this.view = new UserSettingsView({
