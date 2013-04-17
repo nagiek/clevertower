@@ -6,13 +6,13 @@ define [
   "views/helper/Alert"
   "i18n!nls/common"
   "i18n!nls/property"
-  "templates/network/edit"
+  "templates/network/sub/edit"
   "templates/network/_form"
 ], ($, _, Parse, Network, Alert, i18nCommon, i18nProperty) ->
 
   class EditNetworkView extends Parse.View
       
-    el: '#main'
+    el: '.content'
     
     events:
       'submit form'        : 'save'
@@ -48,6 +48,8 @@ define [
         #   @view = new ManagePropertiesView if !@view or @view !instanceof ManagePropertiesView
         #   @view.render()
         #   delete this
+        
+      @render()
     
     save : (e) ->
       e.preventDefault()
@@ -67,4 +69,4 @@ define [
         i18nCommon: i18nCommon
         i18nProperty: i18nProperty
       
-      @$el.html JST["src/js/templates/network/edit.jst"](vars)
+      @$el.html JST["src/js/templates/network/sub/edit.jst"](vars)

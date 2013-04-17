@@ -89,6 +89,7 @@
     },
     prepositions: {
       of: "of",
+      at: "at",
       eg: "E.g., "
     },
     verbs: {

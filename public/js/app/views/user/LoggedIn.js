@@ -24,14 +24,16 @@
 
       LoggedInView.prototype.initialize = function(attrs) {
         var network;
-        _.bindAll(this, "render", "changeName", "logOut");
+        _.bindAll(this, "render", "updateNav", "logOut");
         this.pusher = new Pusher('dee5c4022be4432d7152');
         network = Parse.User.current().get("network");
         if (network) {
           this.pusher.subscribe("networks-" + network.id);
         }
-        network.properties.on("add", this.subscribeProperty);
-        Parse.User.current().profile.on("sync", this.changeName);
+        if (Parse.onNetwork) {
+          network.properties.on("add", this.subscribeProperty);
+        }
+        Parse.User.current().profile.on("sync", this.updateNav);
         return this.render();
       };
 
@@ -50,29 +52,25 @@
       };
 
       LoggedInView.prototype.render = function() {
-        var vars;
+        var name, vars;
+        name = Parse.User.current().profile.name();
         vars = {
-          name: Parse.User.current().profile.name,
+          src: Parse.User.current().profile.cover('micro'),
+          photo_alt: i18nUser.show.photo(name),
+          name: name,
           objectId: Parse.User.current().profile.id,
           i18nUser: i18nUser,
           i18nDevise: i18nDevise
         };
         this.$el.html(JST["src/js/templates/user/logged_in_menu.jst"](vars));
-        this.changeName(Parse.User.current().profile);
         this.notificationsView = new NotificationsView;
         this.notificationsView.render();
         return this;
       };
 
-      LoggedInView.prototype.changeName = function(model) {
-        var name;
-        if (model) {
-          name = model.get("name");
-        }
-        if (name == null) {
-          name = Parse.User.current().getEmail();
-        }
-        return this.$('#profile-link').html(name);
+      LoggedInView.prototype.updateNav = function() {
+        this.$('#profile-link img').prop("src", Parse.User.current().profile.cover("micro"));
+        return this.$('#profile-link span').html(Parse.User.current().profile.name());
       };
 
       return LoggedInView;

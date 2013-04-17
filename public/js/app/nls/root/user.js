@@ -25,7 +25,9 @@
       facebook: "Connect with friends and the world around you on Facebook."
     },
     show: {
-      portrait: "%{user}'s portrait"
+      photo: function(name) {
+        return "" + (_.escape(name)) + "'s photo";
+      }
     },
     fields: {
       name: "Name",

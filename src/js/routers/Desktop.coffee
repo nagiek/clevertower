@@ -50,7 +50,6 @@ define [
       
       # Clean up after views
       Parse.history.on "route", =>
-        console.log @view
         if @view
           @view.undelegateEvents()
           delete @view
@@ -80,7 +79,7 @@ define [
                           </div>
                           <div class="span4">
                             <!-- if user.get('type') is 'manager' then  -->
-                            <ul class="nav nav-list"><li><a href="/network/set">Set up network</a></li></ul>
+                            <ul class="nav nav-list well"><li><a href="/network/set">Set up network</a></li></ul>
                           </div>
                         </div>
                         """

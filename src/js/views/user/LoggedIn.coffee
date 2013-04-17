@@ -19,15 +19,16 @@ define [
       "click #logout": "logOut"
 
     initialize: (attrs) ->
-      _.bindAll this, "render", "changeName", "logOut"
+      _.bindAll this, "render", "updateNav", "logOut"
       
       @pusher = new Pusher 'dee5c4022be4432d7152'
 
       network = Parse.User.current().get("network")
       @pusher.subscribe "networks-#{network.id}" if network
-      network.properties.on "add", @subscribeProperty
+      
+      network.properties.on "add", @subscribeProperty if Parse.onNetwork
 
-      Parse.User.current().profile.on "sync", @changeName
+      Parse.User.current().profile.on "sync", @updateNav
       @render()
           
     registerUser : =>
@@ -49,19 +50,21 @@ define [
       delete this
 
     render: ->
+      name = Parse.User.current().profile.name()
       vars = 
-        name: Parse.User.current().profile.name
+        src: Parse.User.current().profile.cover('micro')
+        photo_alt: i18nUser.show.photo(name)
+        name: name
         objectId: Parse.User.current().profile.id
         i18nUser: i18nUser
         i18nDevise: i18nDevise
 
       @$el.html JST["src/js/templates/user/logged_in_menu.jst"](vars)
-      @changeName Parse.User.current().profile
       @notificationsView = new NotificationsView
       @notificationsView.render()
       @
-      
-    changeName: (model) ->      
-      name = model.get "name" if model
-      name = Parse.User.current().getEmail() unless name?
-      @$('#profile-link').html name
+
+
+    updateNav: ->
+      @$('#profile-link img').prop "src", Parse.User.current().profile.cover("micro")
+      @$('#profile-link span').html Parse.User.current().profile.name()

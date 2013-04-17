@@ -48,9 +48,10 @@ define [
 
       @on "address:validated", =>
         @state = 'property'
+        @model.set 'title', @model.get('thoroughfare')
         require ["views/property/new/New", "templates/property/_form"], (NewPropertyView) =>
 
-          @form = new NewPropertyView(wizard: this, model: @model)
+          @form = new NewPropertyView(wizard: @, model: @model)
           @map.$el.after @form.render().el
           
           # Animate

@@ -1,4 +1,9 @@
-<li><a id="profile-link" href="/users/<%= objectId %>"><%= name %></a></li>
+<li>
+  <a id="profile-link" class="clearfix" href="/users/<%= objectId %>">
+    <img src="<%= src %>" class="stay-left photo photo-micro img-circle" alt="<%= photo_alt %>" width="23" height="23">
+    <span class="photo-float micro-float"><%= name %></span>
+  </a>
+</li>
 <li id="notifications" class="dropdown">
   <a id="nLabel" data-target="#" data-toggle="dropdown" role="menu" class="dropdown-toggle">
     <i class="icon icon-flag"></i>

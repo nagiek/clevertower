@@ -46,6 +46,7 @@
         });
         this.on("address:validated", function() {
           _this.state = 'property';
+          _this.model.set('title', _this.model.get('thoroughfare'));
           return require(["views/property/new/New", "templates/property/_form"], function(NewPropertyView) {
             _this.form = new NewPropertyView({
               wizard: _this,

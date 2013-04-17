@@ -4,12 +4,14 @@
     singularize: {
       leases: "lease",
       networks: "network",
-      units: "unit"
+      units: "unit",
+      properties: "property"
     },
     pluralize: {
       lease: "leases",
       network: "networks",
-      unit: "units"
+      unit: "units",
+      property: "properties"
     }
   });
 

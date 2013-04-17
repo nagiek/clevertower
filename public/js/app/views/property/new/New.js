@@ -14,7 +14,7 @@
 
       NewPropertyView.prototype.tagName = "form";
 
-      NewPropertyView.prototype.className = "property-form span12";
+      NewPropertyView.prototype.className = "property-form span8";
 
       NewPropertyView.prototype.initialize = function(attrs) {
         var _this = this;

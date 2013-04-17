@@ -56,19 +56,6 @@ define [
       action = if path then path.split("/") else Array('units')
       
       if action.length is 1 or action[0] is "add"
-        # vars = model: @model, params: params
-        # 
-        # # Get the query string, if it exists.
-        # querystring = e.currentTarget.search
-        # if querystring.length > 0
-        #   # Remove the leading "?" and split into components
-        #   queryComponents = querystring.substring(1).split('&')
-        #   vars.params = {}
-        #   d = decodeURIComponent
-        #   # march and parse
-        #   for combo in queryComponents
-        #     pair = combo.split('=')
-        #     vars.params[d(pair[0])] = d(pair[1])
         
         name = "views/property/sub/#{action.join("/")}"
         @renderSubView name, model: @model, params: params 
@@ -100,7 +87,7 @@ define [
       $('#preview-profile-picture img').prop('src', @model.cover('profile'))
     
     clear: =>
-      Parse.User.current().properties.trigger "close"
+      Parse.User.current().get("network").properties.trigger "close"
       @undelegateEvents()
       @remove()
       delete this

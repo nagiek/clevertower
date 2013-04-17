@@ -1,6 +1,6 @@
 (function() {
 
-  define(['underscore', 'backbone', "collections/tenant/TenantList", "models/Property", "models/Unit", "moment"], function(_, Parse, Property, Unit, moment) {
+  define(['underscore', 'backbone', "collections/tenant/TenantList", "models/Property", "models/Unit", "moment"], function(_, Parse, TenantList, Property, Unit, moment) {
     var Lease;
     return Lease = Parse.Object.extend("Lease", {
       className: "Lease",

@@ -1,16 +1,16 @@
 <fieldset>
-  <legend><%= i18nProperty.form.building %></legend>
+  <!-- <legend><%= i18nProperty.form.building %></legend> -->
   <div class="row">
     <div id="property-title-group" class="control-group span">
       <label for="property-title" class="control-label"><%= i18nProperty.fields.title %></label>
       <div class="controls">
-        <input type="text" name="property[title]" id="property-title" class="span4" value="<%= property.title ? property.title : property.get('thoroughfare') %>">
+        <input type="text" name="property[title]" id="property-title" class="span4" value="<%= property.title %>">
       </div>
     </div>
     <div class="control-group span">
       <label for="property-email" class="control-label"><%= i18nProperty.fields.property_type.label %></label>
       <div class="controls">
-        <select name="property[property_type]" id="property-property_type" class="span3">
+        <select name="property[property_type]" id="property-property_type" class="span2">
           <option value="" ><%= i18nCommon.form.select.select_value %></option>
           <option value="1" <%= property.property_type == 1 ? 'selected="selected"' : ''  %>><%= i18nProperty.fields.property_type.condo %></option>
           <option value="2" <%= property.property_type == 2 ? 'selected="selected"' : ''  %>><%= i18nProperty.fields.property_type.apartment %></option>
@@ -26,24 +26,46 @@
     <div class="control-group span">
       <label for="property-mls" class="control-label"><%= i18nProperty.fields.mls %></label>
       <div class="controls">
-        <input type="text" name="property[mls]" id="property-mls" class="span2" <%= property.description ? 'value="' + property.description + '"' : ''  %>>
+        <input type="text" name="property[mls]" id="property-mls" class="span1" <%= property.description ? 'value="' + property.description + '"' : ''  %>>
       </div>
     </div>
   </div>
 </fieldset>
 
+<hr>
+
 <fieldset>
-  <legend><%= i18nProperty.form.marketing %></legend>
+  <!-- <legend><%= i18nProperty.form.marketing %></legend> -->
   <div class="row">
     <div class="control-group span">
       <label for="property-description" class="control-label"><%= i18nProperty.fields.description %></label>
       <div class="controls">
-        <textarea rows="5" name="property[description]" id="property-description" class="span4"><%= property.description ? property.description : ''  %></textarea>
+        <textarea rows="12" name="property[description]" id="property-description" class="span3"><%= property.description ? property.description : ''  %></textarea>
       </div>
     </div>
-    <div class="control-group span6">
+    <div class="control-group span1">
+      <label for="property-included" class="control-label"><%= i18nProperty.form.included %></label>
+      <div class="controls">
+        <label for="property-electricity" class="checkbox">
+          <input type="checkbox" name="property[electricity]" id="property-electricity" <%= property.electricity ? checked="checked" : '' %>><%= i18nProperty.fields.electricity %>
+        </label>
+        <label for="property-furniture" class="checkbox">
+          <input type="checkbox" name="property[furniture]" id="property-furniture" <%= property.furniture ? checked="checked" : '' %>><%= i18nProperty.fields.furniture %>
+        </label>
+        <label for="property-gas" class="checkbox">
+          <input type="checkbox" name="property[gas]" id="property-gas" <%= property.gas ? checked="checked" : '' %>><%= i18nProperty.fields.gas %>
+        </label>
+        <label for="property-heat" class="checkbox">
+          <input type="checkbox" name="property[heat]" id="property-heat" <%= property.heat ? checked="checked" : '' %>><%= i18nProperty.fields.heat %>
+        </label>
+        <label for="property-hot_water" class="checkbox">
+          <input type="checkbox" name="property[hot_water]" id="property-hot_water" <%= property.hot_water ? checked="checked" : '' %>><%= i18nProperty.fields.hot_water %>
+        </label>
+      </div>
+    </div>
+    <div class="control-group span4">
       <label for="property-amenities" class="control-label"><%= i18nProperty.form.amenities %></label>
-      <div class="controls three-column">
+      <div class="controls two-column">
         <label for="property-air_conditioning" class="checkbox">
           <input type="checkbox" name="property[air_conditioning]" id="property-air_conditioning" <%= property.air_conditioning ? checked="checked" : '' %>><%= i18nProperty.fields.air_conditioning %>
         </label>
@@ -100,31 +122,13 @@
         </label>          
       </div>
     </div>
-    <div class="control-group span2">
-      <label for="property-included" class="control-label"><%= i18nProperty.form.included %></label>
-      <div class="controls">
-        <label for="property-electricity" class="checkbox">
-          <input type="checkbox" name="property[electricity]" id="property-electricity" <%= property.electricity ? checked="checked" : '' %>><%= i18nProperty.fields.electricity %>
-        </label>
-        <label for="property-furniture" class="checkbox">
-          <input type="checkbox" name="property[furniture]" id="property-furniture" <%= property.furniture ? checked="checked" : '' %>><%= i18nProperty.fields.furniture %>
-        </label>
-        <label for="property-gas" class="checkbox">
-          <input type="checkbox" name="property[gas]" id="property-gas" <%= property.gas ? checked="checked" : '' %>><%= i18nProperty.fields.gas %>
-        </label>
-        <label for="property-heat" class="checkbox">
-          <input type="checkbox" name="property[heat]" id="property-heat" <%= property.heat ? checked="checked" : '' %>><%= i18nProperty.fields.heat %>
-        </label>
-        <label for="property-hot_water" class="checkbox">
-          <input type="checkbox" name="property[hot_water]" id="property-hot_water" <%= property.hot_water ? checked="checked" : '' %>><%= i18nProperty.fields.hot_water %>
-        </label>
-      </div>
-    </div>
   </div>
 </fieldset>
 
+<hr>
+
 <fieldset>
-  <legend><%= i18nProperty.form.contact %></legend>
+  <!-- <legend><%= i18nProperty.form.contact %></legend> -->
   <div class="row">
     <div class="control-group span">
       <label for="property-email" class="control-label"><%= i18nProperty.fields.email %></label>

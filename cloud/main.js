@@ -312,12 +312,12 @@
       className: "_Role"
     };
     networkAddressQuery = (new Parse.Query("Property")).equalTo("network", network).withinKilometers("center", req.params.center, 0.001).first();
-    return Parse.Promise.when(userAddressQuery, networkAddressQuery).then(obj1, obj2)(function() {
+    return Parse.Promise.when(userAddressQuery, networkAddressQuery).then(function(obj1, obj2) {
       if (obj1) {
-        return res.error("" + obj.id + ":taken_by_user");
+        return res.error("" + obj1.id + ":taken_by_user");
       }
       if (obj2) {
-        return res.error("" + obj.id + ":taken_by_network");
+        return res.error("" + obj2.id + ":taken_by_network");
       }
       return res.success();
     }, function() {

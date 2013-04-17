@@ -64,7 +64,7 @@
 
   router = onNetwork ? "routers/Network" : "routers/Desktop";
 
-  require(["jquery", "backbone", "facebook", "collections/property/PropertyList", "models/Profile", router, "json2", "bootstrap", "serializeObject"], function($, Parse, FB, PropertyList, Profile, AppRouter) {
+  require(["jquery", "backbone", "facebook", "models/Profile", router, "json2", "bootstrap", "serializeObject"], function($, Parse, FB, Profile, AppRouter) {
     Parse.initialize("z00OPdGYL7X4uW9soymp8n5JGBSE6k26ILN1j3Hu", "NifB9pRHfmsTDQSDA9DKxMuux03S4w2WGVdcxPHm");
     Parse.onNetwork = onNetwork;
     Parse.FacebookUtils.init({

@@ -77,6 +77,7 @@ define
     confirmed:            "Confirmed"
   prepositions:           
     of:                   "of"
+    at:                   "at"
     eg:                   "E.g., "
   verbs:             
     loading:              "Loading"

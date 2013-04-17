@@ -60,7 +60,6 @@
           return Parse.history.loadUrl(location.pathname);
         });
         Parse.history.on("route", function() {
-          console.log(_this.view);
           if (_this.view) {
             _this.view.undelegateEvents();
             return delete _this.view;
@@ -81,7 +80,7 @@
 
       DesktopRouter.prototype.index = function() {
         if (Parse.User.current()) {
-          return $('#main').html("<h1>News Feed</h1>\n<div class=\"row\">\n  <div class=\"span8\">\n\n  </div>\n  <div class=\"span4\">\n    <!-- if user.get('type') is 'manager' then  -->\n    <ul class=\"nav nav-list\"><li><a href=\"/network/set\">Set up network</a></li></ul>\n  </div>\n</div>");
+          return $('#main').html("<h1>News Feed</h1>\n<div class=\"row\">\n  <div class=\"span8\">\n\n  </div>\n  <div class=\"span4\">\n    <!-- if user.get('type') is 'manager' then  -->\n    <ul class=\"nav nav-list well\"><li><a href=\"/network/set\">Set up network</a></li></ul>\n  </div>\n</div>");
         } else {
           return $('#main').html('<h1>Splash page</h1>');
         }

@@ -11,6 +11,26 @@ img[class*="span"] {
   height: auto;
 }
 
+.photo-micro {
+  height:@microImgLength;
+  width:@microImgLength;
+  img {
+    height:@microImgLength;
+    min-width:@microImgLength;
+    max-width:@tinyImgLength;
+  }
+}
+
+.photo-tiny {
+  height:@tinyImgLength;
+  width:@tinyImgLength;
+  img {
+    height:@tinyImgLength;
+    min-width:@tinyImgLength;
+    max-width:@thumbnailImgLength;
+  }
+}
+
 .photo-thumbnail {
   height:@thumbnailImgLength;
   width:@thumbnailImgLength;
@@ -54,6 +74,7 @@ img[class*="span"] {
 }
 
 .micro-float        { margin-left: @microImgLength     + @microImgPadding;      }
+.tiny-float         { margin-left: @tinyImgLength      + @tinyImgPadding;       }
 .thumbnail-float    { margin-left: @thumbnailImgLength + @thumbnailImgPadding;  }
 .profile-float      { margin-left: @profileImgLength   + @profileImgPadding;    }
 .medium-float       { margin-left: @mediumImgLength    + @mediumImgPadding;     }

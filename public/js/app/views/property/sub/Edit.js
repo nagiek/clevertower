@@ -42,6 +42,7 @@
           i18nProperty: i18nProperty,
           i18nCommon: i18nCommon
         };
+        vars.property.id = this.model.id;
         this.$el.html(JST["src/js/templates/property/sub/edit.jst"](vars));
         return this;
       };

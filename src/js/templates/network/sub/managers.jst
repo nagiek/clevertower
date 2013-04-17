@@ -1,0 +1,32 @@
+<header>
+  <h2><%= i18nCommon.classes.Managers %></h2>
+</header>
+
+<p><%= i18nGroup.form.instructions %></p>
+<p><%= i18nGroup.manager.instructions %></p>
+
+<form class="form-inline">
+  <div class="control-group emails-group">
+    <label for="manager-email" class="control-label element-invisible"><%= i18nCommon.adjectives.new %></label>
+    <div class="controls">
+      <input type="text" class="span3" name="manager[email]" maxlength="127" placeholder="<%= i18nCommon.nouns.sample_email %>" />
+    </div>
+    <button class="save btn"><%= i18nGroup.actions.invite_to_network %></button>
+  </div>
+</form>
+
+<table id="managers" class="table table-middle">
+  <thead class="element-invisible">
+    <tr>
+      <th><%= i18nCommon.fields.name %></th>
+      <th><%= i18nGroup.fields.status.label %></th>
+      <th><%= i18nCommon.form.operations %></th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+  <tfoot>
+    <tr>
+      <td class="empty" colspan="3"><%= i18nGroup.manager.deleted_if_empty %></td>
+    </tr>
+  </tfoor>
+</table>

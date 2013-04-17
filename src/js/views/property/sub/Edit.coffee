@@ -36,6 +36,7 @@ define [
         property: _.defaults(@model.attributes, Property::defaults)
         i18nProperty: i18nProperty
         i18nCommon: i18nCommon
+      vars.property.id = @model.id
       @$el.html JST["src/js/templates/property/sub/edit.jst"](vars)
       @
         

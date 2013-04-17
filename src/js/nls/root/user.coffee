@@ -19,7 +19,7 @@ define
   app_descriptions:
     facebook:             "Connect with friends and the world around you on Facebook."
   show:                   
-    portrait:             "%{user}'s portrait"
+    photo:      (name) -> "#{_.escape(name)}'s photo"
   fields:                 
     name:                 "Name"
     first_name:           "First Name"

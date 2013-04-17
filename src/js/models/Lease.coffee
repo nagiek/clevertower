@@ -5,7 +5,7 @@ define [
   "models/Property"
   "models/Unit"
   "moment"
-], (_, Parse, Property, Unit, moment) ->
+], (_, Parse, TenantList, Property, Unit, moment) ->
 
   Lease = Parse.Object.extend "Lease",
   

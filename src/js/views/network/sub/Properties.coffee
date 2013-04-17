@@ -8,7 +8,7 @@ define [
   "views/property/summary"
   "i18n!nls/property"
   "i18n!nls/common"
-  "templates/property/manage"
+  "templates/network/sub/properties"
   "templates/property/menu"
   "templates/property/menu/show"
   "templates/property/menu/reports"
@@ -20,14 +20,16 @@ define [
   
     # Instead of generating a new element, bind to the existing skeleton of
     # the App already present in the HTML.
-    el: "#main"
+    el: ".content"
     
     events:
       'click #new-property' : "newProperty"
     
-    initialize : ->
+    initialize : (attrs) ->
       
       _.bindAll this, 'newProperty'
+      
+      console.log Parse.User.current().get("network")
       
       # Setup the query for the collection to look for properties from the current user
       Parse.User.current().get("network").properties.on "add", @addOne
@@ -36,6 +38,10 @@ define [
       # custom listeners for seeing properties.
       Parse.User.current().get("network").properties.on "show", => @$propertyList.hide()
       Parse.User.current().get("network").properties.on "close", => @$propertyList.show()
+      
+      @render()
+      
+      if attrs.subaction then @newProperty()
 
     render: =>
       network = Parse.User.current().get("network")
@@ -44,8 +50,7 @@ define [
         i18nCommon: i18nCommon
         i18nProperty: i18nProperty
       # vars.title = network.get("name") unless vars.title
-      @$el.html JST["src/js/templates/property/manage.jst"](vars)
-      
+      @$el.html JST["src/js/templates/network/sub/properties.jst"](vars)
       
       @$propertyList = @$("#network-properties")
       @$managerList = @$("#network-managers")

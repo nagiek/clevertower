@@ -12,8 +12,11 @@ define [
       "properties/new"              : "propertiesNew"
       "properties/:id"              : "propertiesShow"
       "properties/:id/*splat"       : "propertiesShow"
-      "network/edit"                : "networkEdit"
-      "network/managers"            : "networkManagers"
+      "properties/:id/*splat"       : "propertiesShow"
+      "network/*splat"              : "networkShow"
+      "users/:id"                   : "profileShow"
+      "users/:id/edit"              : "profileEdit"
+      "account/:category"           : "accountSettings"
       "*actions"                    : "index"
 
     initialize: (options) ->
@@ -79,12 +82,14 @@ define [
       else
         @on "route", (route) => @signupOrLogin()
         @signupOrLogin()
-        
+
+
+    # Routes begin
+    # --------------
+
     index: =>
       if Parse.User.current()
-        require ["views/property/Manage"], (ManagePropertiesView) =>
-          @view = new ManagePropertiesView # if !@view or @view !instanceof ManagePropertiesView
-          @view.render()
+        @networkShow ""
       else
         @signupOrLogin()
 
@@ -93,60 +98,43 @@ define [
     # --------------
 
     propertiesNew: =>
-      require ["views/property/Manage"], (ManagePropertiesView) =>
-        @view = new ManagePropertiesView # if !@view or @view !instanceof ManagePropertiesView
-        @view.render()
-        @view.newProperty()
+      require ["views/network/Manage"], (NetworkView) => 
+
+        if !@view or @view !instanceof NetworkView
+          @view = new NetworkView(model: Parse.User.current().get("network"), path: "properties/new/wizard", params: {})
+        else
+          @view.changeSubView(path: "properties/new/wizard", params: {})
                 
     propertiesShow: (id, splat) =>
       require ["views/property/Show"], (PropertyView) => 
+        vars = @deparamAction splat
         if !@view or @view !instanceof PropertyView
-                
-          require ["models/Property", "collections/property/PropertyList"], (Property, PropertyList) => 
-            if Parse.User.current().properties
-              if model = Parse.User.current().properties.get id
-                combo = @deparamAction splat
-                vars = model:model, path: combo.path, params: combo.params
-              
-                $('#main').html '<div id="property"></div>'
-                @view = new PropertyView(vars)
-              else
-                new Parse.Query("Property").get id,
-                success: (model) =>
-                  Parse.User.current().properties.add model
-                  vars = @deparamAction splat
-                  vars.model = model
-                  $('#main').html '<div id="property"></div>'
-                  @view = new PropertyView(vars)
-                error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
-              
-            else
-              if !Parse.User.current().properties then Parse.User.current().properties = new PropertyList
-              new Parse.Query("Property").get id,
-              success: (model) =>
-                Parse.User.current().properties.add model
-                vars = @deparamAction splat
-                vars.model = model
-        
-                $('#main').html '<div id="property"></div>'
-                @view = new PropertyView(vars)
-              error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
-              
+          $('#main').html '<div id="property"></div>'
+          if model = Parse.User.current().get("network").properties.get id
+            vars.model = model
+            @view = new PropertyView(vars)
+          else
+            new Parse.Query("Property").get id,
+            success: (model) =>
+              Parse.User.current().get("network").properties.add model
+              vars.model = model
+              @view = new PropertyView(vars)
+            error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
         else
-          vars = @deparamAction splat
           @view.changeSubView(vars.path, vars.params)
 
     # Network
-    # --------------      
-    networkEdit : ->
-      require ["views/network/Edit"], (EditNetworkView) =>
-        @view = new EditNetworkView model: Parse.User.current().get("network")
-        @view.render()
-                    
-    networkManagers : ->
-      require ["views/network/Managers"], (NetworkManagersView) =>
-        @view = new NetworkManagersView model: Parse.User.current().get("network")
-        @view.render()
+    # --------------
+
+    networkShow: (splat) =>
+      require ["views/network/Manage"], (NetworkView) => 
+        vars = @deparamAction splat
+        if !@view or @view !instanceof NetworkView
+          vars.model = Parse.User.current().get("network")
+          @view = new NetworkView(vars)
+        else
+          @view.changeSubView(vars.path, vars.params)
+
 
     # User
     # --------------

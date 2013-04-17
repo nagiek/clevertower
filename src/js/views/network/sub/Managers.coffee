@@ -9,12 +9,12 @@ define [
   'views/manager/Summary'
   "i18n!nls/group"
   "i18n!nls/common"
-  'templates/network/managers'
+  'templates/network/sub/managers'
 ], ($, _, Parse, ManagerList, Manager, Profile, Alert, ManagerView, i18nGroup, i18nCommon) ->
 
   class NetworkManagersView extends Parse.View
   
-    el: "#main"
+    el: ".content"
     
     events:
       'submit form' : 'save'
@@ -39,11 +39,13 @@ define [
       @model.managers.on "add",   @addOne
       @model.managers.on "reset", @addAll
       
+      @render()
+      
     # Re-render the contents of the Unit item.
     render: ->
       
       vars = _.merge(i18nGroup: i18nGroup, i18nCommon: i18nCommon)
-      @$el.html JST["src/js/templates/network/managers.jst"](vars)
+      @$el.html JST["src/js/templates/network/sub/managers.jst"](vars)
       
       @$list = @$('table#managers tbody')
 

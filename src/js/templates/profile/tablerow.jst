@@ -12,7 +12,7 @@
   <% if (admin) { %><small>(<%= i18nCommon.adjectives.admin %>)</small><% } %>
 </td>
 <td>
-  <button class="delete btn">
+  <button class="<% if (current_user) { %>current <% } %>delete btn">
     <% if (current_user) { %> <%= current_user_leave %> <% } else { %> <%= i18nCommon.actions.remove %> <% } %>
   </button>
 </td>

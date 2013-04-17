@@ -18,13 +18,12 @@ define [
       vars = _.merge(
         @model.toJSON(),
         cover: @model.cover 'profile'
+        name: @model.name()
         i18nUser: i18nUser
         current: @current
         create: moment(@model.createdAt).format("LLL")
       )
       _.defaults vars, Profile::defaults
-      vars.name = @model.get "email" unless vars.name?
-      console.log vars.name 
       @$el.html JST["src/js/templates/profile/show.jst"](vars)
       @
       

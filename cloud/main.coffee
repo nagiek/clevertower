@@ -316,9 +316,9 @@ Parse.Cloud.define "CheckForUniqueProperty", (req, res) ->
   
   Parse.Promise
   .when(userAddressQuery, networkAddressQuery)
-  .then(obj1, obj2) ->
-    if obj1 then return res.error "#{obj.id}:taken_by_user"
-    if obj2 then return res.error "#{obj.id}:taken_by_network" 
+  .then (obj1, obj2) ->
+    if obj1 then return res.error "#{obj1.id}:taken_by_user"
+    if obj2 then return res.error "#{obj2.id}:taken_by_network" 
     res.success()
   , -> res.error 'bad_query'
 

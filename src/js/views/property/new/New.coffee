@@ -14,7 +14,7 @@ define [
   class NewPropertyView extends Parse.View
 
     tagName : "form"
-    className: "property-form span12"
+    className: "property-form span8"
 
     initialize: (attrs) ->
       

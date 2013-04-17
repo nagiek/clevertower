@@ -99,7 +99,7 @@
       };
 
       PropertyView.prototype.clear = function() {
-        Parse.User.current().properties.trigger("close");
+        Parse.User.current().get("network").properties.trigger("close");
         this.undelegateEvents();
         this.remove();
         return delete this;
