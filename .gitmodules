@@ -1,0 +1,15 @@
+[submodule "typeahead.js"]
+	path = components/typeahead.js
+	url = git://github.com/nagiek/typeahead.js.git
+
+[submodule "bootstrap"]
+	path = components/bootstrap
+	url = git://github.com/twitter/bootstrap.git
+
+[submodule "jquery"]
+	path = components/jquery
+	url = git://github.com/jquery/jquery.git
+
+[submodule "bootstrap-datepicker"]
+	path = components/bootstrap-datepicker
+	url = git://github.com/eternicode/bootstrap-datepicker.git
