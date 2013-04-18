@@ -470,10 +470,10 @@
   });
 
   Parse.Cloud.beforeSave("Property", function(req, res) {
-    var isPublic, network, query;
+    var isPublic, network, propertyACL, query;
     if (!(+req.object.get("center") !== +Parse.GeoPoint())) {
       return res.error('invalid_address');
-    } else if (!(req.object.get("thoroughfare") !== '' && req.object.get("locality") !== '' && req.object.get("administrative_area_level_1") !== '' && req.object.get("country") !== '' && req.object.get("postal_code") !== '')) {
+    } else if (req.object.get("thoroughfare") === '' || req.object.get("locality") === '' || req.object.get("administrative_area_level_1") === '' || req.object.get("country") === '' || req.object.get("postal_code") === '') {
       return res.error('insufficient_data');
     } else {
       if (!req.object.get("title")) {
@@ -488,9 +488,7 @@
       });
       return query = (new Parse.Query("Network")).get(network.id, {
         success: function(obj) {
-          var propertyACL;
-          propertyACL = obj.getACL();
-          req.object.setACL(propertyACL);
+          req.object.setACL(obj.getACL());
           return res.success();
         },
         error: function() {
@@ -499,7 +497,7 @@
       });
     } else {
       isPublic = req.object.get("public");
-      req.object.getACL();
+      propertyACL = req.object.getACL();
       if (propertyACL.getPublicReadAccess() !== isPublic) {
         propertyACL.setPublicReadAccess(isPublic);
         req.object.setACL(propertyACL);

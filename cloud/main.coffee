@@ -471,12 +471,12 @@ Parse.Cloud.beforeSave "Property", (req, res) ->
   unless ( +req.object.get("center") isnt +Parse.GeoPoint() )
     # Invalid address
     return res.error 'invalid_address'
-  else unless ( 
-    req.object.get("thoroughfare"                ) != '' and 
-    req.object.get("locality"                    ) != '' and
-    req.object.get("administrative_area_level_1" ) != '' and
-    req.object.get("country"                     ) != '' and
-    req.object.get("postal_code"                 ) != ''
+  else if ( 
+    req.object.get("thoroughfare"                ) is '' or 
+    req.object.get("locality"                    ) is '' or
+    req.object.get("administrative_area_level_1" ) is '' or
+    req.object.get("country"                     ) is '' or
+    req.object.get("postal_code"                 ) is ''
   )
     # Insufficient data
     return res.error 'insufficient_data'
@@ -490,15 +490,14 @@ Parse.Cloud.beforeSave "Property", (req, res) ->
       network: network
     query = (new Parse.Query "Network").get network.id,
     success : (obj) ->
-      propertyACL = obj.getACL()
-      req.object.setACL propertyACL
+      req.object.setACL obj.getACL()
       res.success()
     error : -> 
       res.error 'bad_query'
       
   else
     isPublic = req.object.get "public"
-    req.object.getACL()
+    propertyACL = req.object.getACL()
     if propertyACL.getPublicReadAccess() isnt isPublic
       propertyACL.setPublicReadAccess(isPublic)
       req.object.setACL propertyACL

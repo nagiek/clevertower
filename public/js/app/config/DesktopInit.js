@@ -22,6 +22,7 @@
       "canvas-to-blob": "//blueimp.github.com/JavaScript-Canvas-to-Blob/canvas-to-blob.min",
       "underscore.email": "app/plugins/underscore-email",
       "underscore.inflection": "app/plugins/underscore-inflection",
+      typeahead: "libs/typeahead.js/typeahead",
       pusher: "//d3dy5gmtp8yhk7.cloudfront.net/2.0/pusher.min",
       moment: "//cdnjs.cloudflare.com/ajax/libs/moment.js/2.0.0/moment.min",
       bootstrap: "libs/bootstrap/bootstrap",
@@ -43,6 +44,7 @@
       jqueryui: ["jquery"],
       jqueryuiwidget: ["jquery"],
       jquerymobile: ["jquery"],
+      typeahead: ["jquery"],
       backbone: {
         deps: ["underscore", "jquery"],
         exports: "Parse"
@@ -56,6 +58,12 @@
     }
   });
 
+  window.APPID = "z00OPdGYL7X4uW9soymp8n5JGBSE6k26ILN1j3Hu";
+
+  window.JSKEY = "NifB9pRHfmsTDQSDA9DKxMuux03S4w2WGVdcxPHm";
+
+  window.RESTAPIKEY = "NZDSkpVLG9Gw6NiZOUBevvLt4qPGtpCsLvWh4ZDc";
+
   define("gmaps", ["async!//maps.googleapis.com/maps/api/js?v=3&sensor=false&key=AIzaSyD_xrni-sLyPudfQ--6gn7yAhaW6nTuqkg"], function() {
     return window.google.maps;
   });
@@ -64,8 +72,8 @@
 
   router = onNetwork ? "routers/Network" : "routers/Desktop";
 
-  require(["jquery", "backbone", "facebook", "models/Profile", router, "json2", "bootstrap", "serializeObject"], function($, Parse, FB, Profile, AppRouter) {
-    Parse.initialize("z00OPdGYL7X4uW9soymp8n5JGBSE6k26ILN1j3Hu", "NifB9pRHfmsTDQSDA9DKxMuux03S4w2WGVdcxPHm");
+  require(["jquery", "backbone", "facebook", "models/Profile", router, "json2", "bootstrap", "serializeObject", "typeahead"], function($, Parse, FB, Profile, AppRouter) {
+    Parse.initialize(window.APPID, window.JSKEY);
     Parse.onNetwork = onNetwork;
     Parse.FacebookUtils.init({
       appId: '387187337995318',

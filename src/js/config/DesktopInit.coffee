@@ -46,6 +46,7 @@ require.config
                               
     # Plugins                 
     # ---------------
+    typeahead:                "libs/typeahead.js/typeahead"
     pusher:                   "//d3dy5gmtp8yhk7.cloudfront.net/2.0/pusher.min"
     moment:                   "//cdnjs.cloudflare.com/ajax/libs/moment.js/2.0.0/moment.min"
     bootstrap:                "libs/bootstrap/bootstrap"    
@@ -75,7 +76,8 @@ require.config
     jqueryui: ["jquery"]
     jqueryuiwidget: ["jquery"]
     jquerymobile: ["jquery"]
-
+    typeahead: ["jquery"]
+    
     # datepickermobile: ["jquerymobile", "jqueryui"]
     backbone:
       deps: ["underscore", "jquery"]
@@ -84,7 +86,11 @@ require.config
       exports: "Pusher"
     underscore:
       exports: "_"
-    
+
+window.APPID      = "z00OPdGYL7X4uW9soymp8n5JGBSE6k26ILN1j3Hu"
+window.JSKEY      = "NifB9pRHfmsTDQSDA9DKxMuux03S4w2WGVdcxPHm"
+window.RESTAPIKEY = "NZDSkpVLG9Gw6NiZOUBevvLt4qPGtpCsLvWh4ZDc"
+
   # config:
   #   i18n:
   #     locale: "fr-fr"
@@ -101,9 +107,9 @@ define "gmaps", ["async!//maps.googleapis.com/maps/api/js?v=3&sensor=false&key=A
 # This will bug out on "www" subdomain.
 onNetwork = window.location.host.split(".").length > 2
 router = if onNetwork then "routers/Network" else "routers/Desktop"
-require ["jquery", "backbone", "facebook", "models/Profile", router, "json2", "bootstrap", "serializeObject"], ($, Parse, FB, Profile, AppRouter) ->
+require ["jquery", "backbone", "facebook", "models/Profile", router, "json2", "bootstrap", "serializeObject", "typeahead"], ($, Parse, FB, Profile, AppRouter) ->
 
-  Parse.initialize "z00OPdGYL7X4uW9soymp8n5JGBSE6k26ILN1j3Hu", "NifB9pRHfmsTDQSDA9DKxMuux03S4w2WGVdcxPHm" # JS Key  
+  Parse.initialize window.APPID, window.JSKEY
 
   Parse.onNetwork = onNetwork
 

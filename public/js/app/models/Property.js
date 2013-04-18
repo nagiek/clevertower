@@ -56,6 +56,9 @@
         init: false,
         "public": false
       },
+      url: function() {
+        return "" + this.collection.url + "/" + this.id;
+      },
       cover: function(format) {
         var img;
         img = this.get("image_" + format);

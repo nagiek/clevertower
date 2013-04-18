@@ -80,6 +80,9 @@ define [
       init                : false
       public              : false
 
+    # Backbone default, as Parse function does not exist.
+    url: -> "#{@collection.url}/#{@id}"
+
     cover: (format) ->
       img = @get "image_#{format}"
       img = "/img/fallback/property-#{format}.png" if img is '' or !img?

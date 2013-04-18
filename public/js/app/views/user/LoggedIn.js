@@ -25,8 +25,8 @@
       LoggedInView.prototype.initialize = function(attrs) {
         var network;
         _.bindAll(this, "render", "updateNav", "logOut");
-        this.pusher = new Pusher('dee5c4022be4432d7152');
         network = Parse.User.current().get("network");
+        this.pusher = new Pusher('dee5c4022be4432d7152');
         if (network) {
           this.pusher.subscribe("networks-" + network.id);
         }

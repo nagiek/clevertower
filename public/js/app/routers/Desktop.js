@@ -2,7 +2,7 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "backbone", "views/user/Menu", "views/network/Menu"], function($, Parse, UserMenuView, NetworkMenuView) {
+  define(["jquery", "backbone", "views/user/Menu", "views/network/Menu", "views/helper/Search"], function($, Parse, UserMenuView, NetworkMenuView, SearchView) {
     var DesktopRouter;
     return DesktopRouter = (function(_super) {
 
@@ -29,6 +29,7 @@
         });
         this.userView = new UserMenuView().render();
         this.networkView = new NetworkMenuView().render();
+        new SearchView().render();
         Parse.Dispatcher.on("user:login", function(user) {
           return Parse.User.current().setup().then(function() {
             _this.userView.render();

@@ -1,0 +1,38 @@
+.typeahead {
+  margin-top:0; // Override a default Twitter Bootstrap setting
+  background-color: #fff;
+}
+
+.tt-dropdown-menu {
+  margin-top: 12px;
+  padding: 8px 0;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  .border-radius(8);
+  .box-shadow(0 5px 10px rgba(0,0,0,.2));
+  .nav-header {
+    margin:0;
+    text-transform:uppercase;
+  }
+}
+
+.tt-suggestion {
+  a {
+    padding: 3px 15px;
+    display:block;
+    &:hover {
+      text-decoration:none;
+    }
+  }
+  .empty {
+    padding: 3px 15px;
+    display:block;
+  }
+  &.tt-is-under-cursor {
+    a {
+      color: #fff;
+      background-color: #0097cf; 
+    }
+  }
+}

@@ -1,10 +1,6 @@
 (function() {
 
   define({
-    menu: {
-      home: "Home",
-      search: "Search"
-    },
     fields: {
       title: "Title",
       name: "Name"
@@ -16,6 +12,7 @@
       Network: "Network",
       Unit: "Unit",
       Tenant: "Tenant",
+      Tenants: "Tenants",
       unit: "unit",
       units: "units",
       Units: "Units",
@@ -28,6 +25,7 @@
       go: "Go",
       go_to: "Go to",
       show: "Show",
+      search: "Search",
       destroy: "Destroy",
       upload: "Upload",
       remove: "remove",
@@ -89,6 +87,8 @@
     },
     prepositions: {
       of: "of",
+      on: "on",
+      off: "off",
       at: "at",
       eg: "E.g., "
     },
@@ -96,6 +96,7 @@
       loading: "Loading"
     },
     nouns: {
+      home: "Home",
       link: "link",
       you: "You",
       sample_email: "keigan@example.com"
@@ -108,6 +109,7 @@
       unsaved: "Unsaved",
       linked: "Linked",
       all: "All",
+      "public": "Public",
       "private": "Private",
       landlord_only: "Landlord Only",
       admin: "admin"
@@ -132,7 +134,8 @@
       access_denied: "Access denied",
       no_permission: "You do not have permission to do that.",
       unknown: "An unknown error has occured.",
-      not_logged_in: "You are not logged in."
+      not_logged_in: "You are not logged in.",
+      no_results: "No results found."
     }
   });
 

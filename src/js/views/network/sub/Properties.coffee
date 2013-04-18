@@ -29,8 +29,6 @@ define [
       
       _.bindAll this, 'newProperty'
       
-      console.log Parse.User.current().get("network")
-      
       # Setup the query for the collection to look for properties from the current user
       Parse.User.current().get("network").properties.on "add", @addOne
       Parse.User.current().get("network").properties.on "reset", @addAll

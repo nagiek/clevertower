@@ -67,8 +67,8 @@
             return data.url = "https://api.parse.com/1/files/" + data.files[0].name;
           },
           beforeSend: function(event, files, index, xhr, handler, callBack) {
-            event.setRequestHeader("X-Parse-Application-Id", "6XgIM84FecTslR8rnXBZsjnDqZgVISa946m9OmfO");
-            return event.setRequestHeader("X-Parse-REST-API-Key", "qgfCjwKVtDGiIKHxQmojnhoIsID7dcTHnYWZ0cf1");
+            event.setRequestHeader("X-Parse-Application-Id", window.APPID);
+            return event.setRequestHeader("X-Parse-REST-API-Key", window.RESTAPIKEY);
           },
           send: function(e, data) {
             return delete data.headers['Content-Disposition'];

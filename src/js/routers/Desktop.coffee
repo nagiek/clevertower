@@ -3,7 +3,8 @@ define [
   "backbone",
   "views/user/Menu"
   "views/network/Menu"
-], ($, Parse, UserMenuView, NetworkMenuView) ->
+  "views/helper/Search"
+], ($, Parse, UserMenuView, NetworkMenuView, SearchView) ->
 
   class DesktopRouter extends Parse.Router
     routes:
@@ -20,6 +21,7 @@ define [
       
       @userView = new UserMenuView().render()
       @networkView = new NetworkMenuView().render()
+      new SearchView().render()
             
       Parse.Dispatcher.on "user:login", (user) =>
         Parse.User.current().setup().then =>

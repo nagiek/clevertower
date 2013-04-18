@@ -1,7 +1,4 @@
 define
-  menu:
-    home:                 "Home"
-    search:               "Search"
   fields:
     title:                "Title"
     name:                 "Name"
@@ -12,6 +9,7 @@ define
     Network:              "Network"
     Unit:                 "Unit"
     Tenant:               "Tenant"
+    Tenants:              "Tenants"
     unit:                 "unit"
     units:                "units"
     Units:                "Units"
@@ -23,6 +21,7 @@ define
     go:                   "Go"
     go_to:                "Go to"
     show:                 "Show"
+    search:               "Search"
     destroy:              "Destroy"
     upload:               "Upload"
     remove:               "remove"
@@ -77,11 +76,14 @@ define
     confirmed:            "Confirmed"
   prepositions:           
     of:                   "of"
+    on:                   "on"
+    off:                  "off"
     at:                   "at"
     eg:                   "E.g., "
   verbs:             
     loading:              "Loading"
-  nouns:             
+  nouns:
+    home:                 "Home"
     link:                 "link"
     you:                  "You"
     sample_email:         "keigan@example.com"
@@ -92,6 +94,7 @@ define
     unsaved:              "Unsaved"
     linked:               "Linked"
     all:                  "All"
+    public:               "Public"
     private:              "Private"
     landlord_only:        "Landlord Only"
     admin:                "admin"
@@ -113,3 +116,4 @@ define
     no_permission:        "You do not have permission to do that."
     unknown:              "An unknown error has occured."
     not_logged_in:        "You are not logged in."
+    no_results:           "No results found."

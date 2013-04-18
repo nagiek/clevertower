@@ -14,6 +14,8 @@
 
       PropertyList.prototype.model = Property;
 
+      PropertyList.prototype.url = "/properties";
+
       PropertyList.prototype.initialize = function(models, attrs) {
         return this.query = new Parse.Query("Property").equalTo("network", attrs.network);
       };

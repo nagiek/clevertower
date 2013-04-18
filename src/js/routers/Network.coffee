@@ -4,7 +4,8 @@ define [
   "models/Network"
   "views/user/Menu"
   "views/network/Menu"
-], ($, Parse, Network, UserMenuView, NetworkMenuView) ->
+  "views/helper/Search"
+], ($, Parse, Network, UserMenuView, NetworkMenuView, SearchView) ->
 
   class NetworkRouter extends Parse.Router
     routes:
@@ -24,6 +25,7 @@ define [
       
       @userView = new UserMenuView().render()
       @networkView = new NetworkMenuView().render()
+      new SearchView().render()
       
       Parse.Dispatcher.on "user:login", (user) =>
         Parse.User.current().setup().then =>

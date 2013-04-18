@@ -3,7 +3,7 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", "models/Property", 'views/helper/Alert', "i18n!nls/property", "i18n!nls/common", "templates/property/sub/edit", 'templates/property/_form'], function($, _, Parse, Property, Alert, i18nProperty, i18nCommon) {
+  define(["jquery", "underscore", "backbone", "models/Property", 'views/helper/Alert', "i18n!nls/property", "i18n!nls/common", "plugins/toggler", "templates/property/sub/edit", 'templates/property/_form'], function($, _, Parse, Property, Alert, i18nProperty, i18nCommon) {
     var PropertyEditView;
     return PropertyEditView = (function(_super) {
 
@@ -44,28 +44,29 @@
         };
         vars.property.id = this.model.id;
         this.$el.html(JST["src/js/templates/property/sub/edit.jst"](vars));
+        this.$('.toggle').toggler();
         return this;
       };
 
       PropertyEditView.prototype.save = function(e) {
+        var attrs,
+          _this = this;
         e.preventDefault();
-        if (this.unUploadedImages > 0) {
-          return $("#fileupload").fileupload('send').done(this._save());
-        } else {
-          return this._save();
-        }
-      };
-
-      PropertyEditView.prototype._save = function() {
-        var _this = this;
-        return this.model.save(this.$el.serializeObject().property, {
+        attrs = this.$('form').serializeObject().property;
+        return this.model.save(attrs, {
           success: function(property) {
-            return _this.trigger("property:save", property, _this);
+            _this.trigger("property:save", property, _this);
+            return new Alert({
+              event: 'model-save',
+              fade: true,
+              message: i18nCommon.actions.changes_saved,
+              type: 'success'
+            });
           },
           error: function(property, error) {
             _this.$el.find('.error').removeClass('error');
             new Alert({
-              event: 'property-save',
+              event: 'model-save',
               fade: false,
               message: i18nProperty.errors[error.message],
               type: 'error'
@@ -82,9 +83,8 @@
         if (confirm(i18nCommon.actions.confirm + " " + i18nCommon.warnings.no_undo)) {
           this.model.destroy();
           this.remove();
-          this.undelegateEvents();
-          delete this;
-          return Parse.history.navigate("/");
+          Parse.history.navigate("/", true);
+          return this.clear();
         }
       };
 
