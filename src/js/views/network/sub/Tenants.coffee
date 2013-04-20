@@ -2,17 +2,17 @@ define [
   "jquery"
   "underscore"
   "backbone"
-  'collections/manager/ManagerList'
-  'models/Manager'
+  'collections/tenant/TenantList'
+  'models/Tenant'
   'models/Profile'
   'views/helper/Alert'
-  'views/manager/Summary'
+  'views/tenant/Summary'
   "i18n!nls/group"
   "i18n!nls/common"
-  'templates/network/sub/managers'
-], ($, _, Parse, ManagerList, Manager, Profile, Alert, ManagerView, i18nGroup, i18nCommon) ->
+  'templates/network/sub/tenants'
+], ($, _, Parse, TenantList, Tenant, Profile, Alert, TenantView, i18nGroup, i18nCommon) ->
 
-  class NetworkManagersView extends Parse.View
+  class NetworkTenantsView extends Parse.View
   
     el: ".content"
     
@@ -24,7 +24,7 @@ define [
       _.bindAll this, 'addOne', 'addAll', 'render'
       
       @on "submit:success", (models) -> 
-        @model.managers.add models
+        @model.tenants.add models
         new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
         @$('.emails-group input').val('')
       
@@ -34,10 +34,10 @@ define [
         @$('.emails-group').addClass('error')
         new Alert event: 'model-save', fade: false, message: i18nCommon.errors[error.message], type: 'error'
       
-      @model.prep('managers')
+      @model.prep('tenants')
       
-      @model.managers.on "add",   @addOne
-      @model.managers.on "reset", @addAll
+      @model.tenants.on "add",   @addOne
+      @model.tenants.on "reset", @addAll
       
       @render()
       
@@ -45,19 +45,21 @@ define [
     render: ->
       
       vars = _.merge(i18nGroup: i18nGroup, i18nCommon: i18nCommon)
-      @$el.html JST["src/js/templates/network/sub/managers.jst"](vars)
+      @$el.html JST["src/js/templates/network/sub/tenants.jst"](vars)
       
-      @$list = @$('table#managers tbody')
+      @$list = @$('#tenants')
 
-      if @model.managers.length is 0 then @model.managers.fetch() else @addAll()
+      if @model.tenants.length is 0 then @model.tenants.fetch() else @addAll()
       @
       
-    addOne : (manager) ->
-      @$list.append (new ManagerView(model: manager)).render().el
+    addOne : (tenant) ->
+      @$list.append (new TenantView(model: tenant)).render().el
 
     addAll : ->
-      @$list.html ''
-      @model.managers.each @addOne
+      if @model.tenants.length is 0 then @$list.html "<li class='span'>#{i18nGroup.tenant.empty.index}</li>"
+      else
+        @$list.html ""
+        @model.tenants.each @addOne
             
     save : (e) ->
       e.preventDefault()
@@ -68,7 +70,7 @@ define [
       data = @$('form').serializeObject()
 
       # Validate tenants (assignment done in Cloud)
-      userValid = unless Parse.User::validate(email: data.manager.email) then true else false
+      userValid = unless Parse.User::validate(email: data.tenant.email) then true else false
 
       unless userValid
         @$('.emails-group').addClass('error')
@@ -76,9 +78,9 @@ define [
         @trigger "submit:fail", {message: 'email_incorrect'}
       else
         attrs =
-          emails: [ data.manager.email ]
+          emails: [ data.tenant.email ]
           networkId: @model.id
-        Parse.Cloud.run "AddManagers", attrs,
+        Parse.Cloud.run "AddTenants", attrs,
         success: (modelObject) => 
           models = _.toArray modelObject
           @trigger "submit:return"

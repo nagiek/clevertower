@@ -19,15 +19,35 @@
       PropertyEditView.prototype.el = ".content";
 
       PropertyEditView.prototype.events = {
-        'click .save': 'save',
+        'submit form': 'save',
         'click .remove': 'kill'
       };
 
       PropertyEditView.prototype.initialize = function() {
         _.bindAll(this, 'save');
-        this.on("view:change", this.clear);
-        this.on("property:save", this.clear);
-        return this.on("property:cancel", this.clear);
+        this.on("property:save", function() {
+          return new Alert({
+            event: 'model-save',
+            fade: true,
+            message: i18nCommon.actions.changes_saved,
+            type: 'success'
+          });
+        });
+        this.on("property:sync", function() {
+          return this.$('button.save').removeProp('disabled');
+        });
+        return this.model.on("invalid", function(error) {
+          new Alert({
+            event: 'model-save',
+            fade: false,
+            message: i18nProperty.errors[error.message],
+            type: 'error'
+          });
+          switch (error.message) {
+            case 'title_missing':
+              return this.$el.find('#property-title-group').addClass('error');
+          }
+        });
       };
 
       PropertyEditView.prototype.clear = function(e) {
@@ -52,29 +72,18 @@
         var attrs,
           _this = this;
         e.preventDefault();
+        this.$('.error').removeClass('error');
+        this.$('button.save').prop('disabled', 'disabled');
         attrs = this.$('form').serializeObject().property;
+        attrs["public"] = attrs["public"] === "1" ? true : false;
         return this.model.save(attrs, {
           success: function(property) {
-            _this.trigger("property:save", property, _this);
-            return new Alert({
-              event: 'model-save',
-              fade: true,
-              message: i18nCommon.actions.changes_saved,
-              type: 'success'
-            });
+            _this.trigger("property:sync", property, _this);
+            return _this.trigger("property:save", property, _this);
           },
           error: function(property, error) {
-            _this.$el.find('.error').removeClass('error');
-            new Alert({
-              event: 'model-save',
-              fade: false,
-              message: i18nProperty.errors[error.message],
-              type: 'error'
-            });
-            switch (error.message) {
-              case 'title_missing':
-                return _this.$el.find('#property-title-group').addClass('error');
-            }
+            _this.trigger("property:sync", property, _this);
+            return _this.model.trigger("invalid", error, _this);
           }
         });
       };

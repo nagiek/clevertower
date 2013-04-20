@@ -32,11 +32,7 @@ define [
       # Setup the query for the collection to look for properties from the current user
       Parse.User.current().get("network").properties.on "add", @addOne
       Parse.User.current().get("network").properties.on "reset", @addAll
-      
-      # custom listeners for seeing properties.
-      Parse.User.current().get("network").properties.on "show", => @$propertyList.hide()
-      Parse.User.current().get("network").properties.on "close", => @$propertyList.show()
-      
+            
       @render()
       
       if attrs.subaction then @newProperty()
@@ -54,19 +50,19 @@ define [
       @$managerList = @$("#network-managers")
       
       # Fetch all the property items for the network
-      if Parse.User.current().get("network").properties.length is 0
-        Parse.User.current().get("network").properties.fetch
-          success: (collection, resp, options) ->          
-            query = new Parse.Query("Unit");
-            query.containedIn "property", collection.models
-            # TODO: groupBy not supported yet.
-            # query.groupBy "property"
-            query.count
-              success: (number) ->
-                collection.each (property) -> 
-                  property.unitsLength = number
-      else
-        @addAll()
+      # if Parse.User.current().get("network").properties.length is 0
+      #   Parse.User.current().get("network").properties.fetch()
+      #     # success: (collection, resp, options) ->          
+      #     #   query = new Parse.Query("Unit");
+      #     #   query.containedIn "property", collection.models
+      #     #   # TODO: groupBy not supported yet.
+      #     #   # query.groupBy "property"
+      #     #   query.count
+      #     #     success: (number) ->
+      #     #       collection.each (property) -> 
+      #     #         property.unitsLength = number
+      # else
+      @addAll()
 
     
     # Add a single property item to the list by creating a view for it, and

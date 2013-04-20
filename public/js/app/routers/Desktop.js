@@ -61,6 +61,7 @@
           return Parse.history.loadUrl(location.pathname);
         });
         Parse.history.on("route", function() {
+          $('#search').val('').blur();
           if (_this.view) {
             _this.view.undelegateEvents();
             return delete _this.view;

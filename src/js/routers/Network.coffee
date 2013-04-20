@@ -14,7 +14,7 @@ define [
       "properties/:id"              : "propertiesShow"
       "properties/:id/*splat"       : "propertiesShow"
       "properties/:id/*splat"       : "propertiesShow"
-      "network/*splat"              : "networkShow"
+      "network/*splat"              : "networkManage"
       "users/:id"                   : "profileShow"
       "users/:id/edit"              : "profileEdit"
       "account/:category"           : "accountSettings"
@@ -40,7 +40,8 @@ define [
           Parse.history.navigate "/"
       
       # Clean up after views
-      Parse.history.on "route", (route) =>        
+      Parse.history.on "route", (route) =>
+        $('#search').val("").blur()
         if @view
           unless route is "propertiesShow"
             @view.undelegateEvents()
@@ -70,11 +71,11 @@ define [
           e.preventDefault()
           Parse.history.navigate href, true
           
-      # If user is not a part of the network, return access denied.          
+      # If user is not a part of the network, return access denied.      
       if Parse.User.current()
         @network = Parse.User.current().get("network")
         if @network
-          role = Parse.User.current().get("network").get("role")
+          role = @network.get("role")
           role.getUsers().query().get Parse.User.current().id,
             success: (user) -> @accessDenied() unless user
         else
@@ -91,7 +92,7 @@ define [
 
     index: =>
       if Parse.User.current()
-        @networkShow ""
+        @networkManage ""
       else
         @signupOrLogin()
 
@@ -100,25 +101,30 @@ define [
     # --------------
 
     propertiesNew: =>
+      'propertiesNew'
       require ["views/network/Manage"], (NetworkView) => 
 
         if !@view or @view !instanceof NetworkView
-          @view = new NetworkView(model: Parse.User.current().get("network"), path: "properties/new/wizard", params: {})
+          @view = new NetworkView(model: @network, path: "properties/new/wizard", params: {})
         else
           @view.changeSubView(path: "properties/new/wizard", params: {})
                 
     propertiesShow: (id, splat) =>
+      'propertiesShow'
       require ["views/property/Show"], (PropertyView) => 
         vars = @deparamAction splat
         if !@view or @view !instanceof PropertyView
           $('#main').html '<div id="property"></div>'
-          if model = Parse.User.current().get("network").properties.get id
+          if model = @network.properties.get id
             vars.model = model
             @view = new PropertyView(vars)
           else
             new Parse.Query("Property").get id,
             success: (model) =>
-              Parse.User.current().get("network").properties.add model
+              # Network properties are being fetched. Might return before query finishes. 
+              # Can't add to collection without introducing possibility of duplicate add.
+              # @network.properties.add model
+              model.collection = @network.properties
               vars.model = model
               @view = new PropertyView(vars)
             error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
@@ -128,11 +134,11 @@ define [
     # Network
     # --------------
 
-    networkShow: (splat) =>
+    networkManage: (splat) =>
       require ["views/network/Manage"], (NetworkView) => 
         vars = @deparamAction splat
         if !@view or @view !instanceof NetworkView
-          vars.model = Parse.User.current().get("network")
+          vars.model = @network
           @view = new NetworkView(vars)
         else
           @view.changeSubView(vars.path, vars.params)

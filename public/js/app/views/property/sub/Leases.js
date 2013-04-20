@@ -25,7 +25,6 @@
       PropertyLeasesView.prototype.initialize = function(attrs) {
         this.editing = false;
         this.on("view:change", this.clear);
-        this.model.prep('leases');
         this.model.leases.on("add", this.addOne);
         return this.model.leases.on("reset", this.addAll);
       };

@@ -16,9 +16,10 @@ define [
   
     initialize: ->
       
+      _.bindAll this, 'render'
+      
       # @model.collection.on 'show', => @undelegateEvents()
       # @model.collection.on 'close', => @delegateEvents()
-      
       @model.on "change", @render
       
     # show: (e) =>

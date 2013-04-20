@@ -35,7 +35,6 @@
         if (!this.model) {
           this.model = new Lease;
         }
-        this.model.prep('tenants');
         this.model.on('invalid', function(error) {
           var args, fn, msg;
           _this.$('.error').removeClass('error');
@@ -70,15 +69,25 @@
           }
         });
         this.on("save:success", function(model) {
+          var network, user;
+          new Alert({
+            event: 'model-save',
+            fade: true,
+            message: i18nCommon.actions.changes_saved,
+            type: 'success'
+          });
           _this.model.id = model.id;
-          _this.model.tenants.createQuery(model);
-          return require(["views/lease/Show"], function(ShowLeaseView) {
-            new Alert({
-              event: 'model-save',
-              fade: true,
-              message: i18nCommon.actions.changes_saved,
-              type: 'success'
+          user = Parse.User.current();
+          if (user) {
+            network = user.get("network");
+          }
+          if (user && network) {
+            _this.property.leases.add(_this.model);
+            new Parse.Query("Tenant").equalTo("lease", _this.model).include("profile").find().then(function(objs) {
+              return network.tenants.add(objs);
             });
+          }
+          return require(["views/lease/Show"], function(ShowLeaseView) {
             new ShowLeaseView({
               model: _this.model,
               property: _this.property

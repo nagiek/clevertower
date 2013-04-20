@@ -57,7 +57,7 @@
         "public": false
       },
       url: function() {
-        return "" + this.collection.url + "/" + this.id;
+        return "/" + this.collection.url + "/" + this.id;
       },
       cover: function(format) {
         var img;

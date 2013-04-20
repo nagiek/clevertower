@@ -42,7 +42,6 @@ define [
       @property = attrs.property
       
       @model = new Lease unless @model
-      @model.prep('tenants')
             
       @model.on 'invalid', (error) =>
         @$('.error').removeClass('error')
@@ -60,7 +59,7 @@ define [
             i18nLease.errors[error.message]
           else
             i18nCommon.errors.unknown
-                  
+            
         new Alert(event: 'model-save', fade: false, message: msg, type: 'error')
         switch error.message
           when 'unit_missing'
@@ -69,13 +68,20 @@ define [
             @$('.date-group').addClass('error')
       
       @on "save:success", (model) =>
-        # Save the tenants, now that we have an ID
+
+        new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
         @model.id = model.id
-        @model.tenants.createQuery(model)
+
+        # Add the tenants to the network
+        user = Parse.User.current() 
+        network = user.get("network") if user
+        if user and network
+          @property.leases.add @model
+          new Parse.Query("Tenant").equalTo("lease", @model).include("profile").find()
+          .then (objs) -> network.tenants.add objs
         
         require ["views/lease/Show"], (ShowLeaseView) =>
           # Alert the user and move on
-          new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
           new ShowLeaseView(model: @model, property: @property).render()
           Parse.history.navigate "/properties/#{@property.id}/leases/#{model.id}"
           @undelegateEvents()
@@ -94,7 +100,6 @@ define [
       @dates =
         start:  if @model.get "start_date"  then moment(@model.get("start_date")).format("L")  else moment(@current).format("L")
         end:    if @model.get "end_date"    then moment(@model.get("end_date")).format("L")    else moment(@current).add(1, 'year').subtract(1, 'day').format("L")
-      
 
     addOne : (u) =>
       HTML = "<option value='#{u.id}'" + (if @model.get("unit") and @model.get("unit").id == u.id then "selected='selected'" else "") + ">#{u.get('title')}</option>"

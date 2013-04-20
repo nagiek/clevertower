@@ -110,16 +110,33 @@ router = if onNetwork then "routers/Network" else "routers/Desktop"
 require ["jquery", "backbone", "facebook", "models/Profile", router, "json2", "bootstrap", "serializeObject", "typeahead"], ($, Parse, FB, Profile, AppRouter) ->
 
   Parse.initialize window.APPID, window.JSKEY
+  
+  # Always include these headers, unless otherwise noted.
+  $.ajaxSetup beforeSend: (jqXhr, settings) ->
+    jqXhr.setRequestHeader "X-Parse-Application-Id", window.APPID
+    jqXhr.setRequestHeader "X-Parse-REST-API-Key", window.RESTAPIKEY
 
   Parse.onNetwork = onNetwork
 
   # init the FB JS SDK
   Parse.FacebookUtils.init
-    appId      : '387187337995318'                # Facebook App ID
-    channelUrl : '//localhost:3000/fb-channel'      # Channel File (must be absolute path)
-    status     : true                             # check login status
-    cookie     : true                             # enable cookies to allow Parse to access the session
-    xfbml      : true                             # parse XFBML
+    appId      : '387187337995318'                        # Facebook App ID
+    channelUrl : '//clevertower.dev:3000/fb-channel'      # Channel File (must be absolute path)
+    status     : true                                     # check login status
+    cookie     : true                                     # enable cookies to allow Parse to access the session
+    xfbml      : true                                     # parse XFBML
+
+
+  # Bring Parse Collection up to speed with Backbone methods.
+  Parse.Collection::where = (attrs, first) ->
+    if _.isEmpty(attrs) 
+      return if first then undefined else [];
+    @[if first then 'find' else 'filter'] (model) ->
+      for key in attrs
+        if (attrs[key] isnt model.get(key)) then return false
+      true
+
+  Parse.Collection::findWhere = (attrs) -> @where attrs, true
 
 
   # Extend Parse User
@@ -150,14 +167,17 @@ require ["jquery", "backbone", "facebook", "models/Profile", router, "json2", "b
       # Load the network regardless if we are on a subdomain or not, as we need the link.
       # Should query for network when loading user... this is weird.
       # Set network on current user from loaded user.
-      network = user.get "network"
+      network = user.get "network" if user
 
-      if Parse.onNetwork 
+      if user and network
         # Create & fill our collections
-        network.prep("properties")
-        network.prep("managers")
-
-      @set "network", network
+        # Can't use a Promise here, as fetch does not return a promise.
+        network.prep("properties").fetch()
+        network.prep("managers").fetch()
+        network.prep("tenants").fetch()
+        
+        # Set the network and the role on the user.
+        @set "network", network
 
 
   # Set up Dispatcher for global events

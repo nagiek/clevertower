@@ -11,11 +11,25 @@ define [
     model: Tenant
 
     initialize: (models, attrs) ->
-      @createQuery(attrs.lease) if attrs and attrs.lease and attrs.lease.id
+      @lease = attrs.lease
+      @network = attrs.network
+      @property = attrs.property
+      @createQuery()
+
+    createLeaseQuery: (lease) ->
+      @lease = lease
+      @createQuery()
+              
+    createPropertyQuery: (property) ->
+      @property = property
+      @createQuery()
+              
+    createNetworkQuery: (network) ->
+      @network = network
+      @createQuery()
       
-    createQuery: (lease) ->
-      @lease = lease if lease
-      if @lease and @lease.id      
-        @query = new Parse.Query(Tenant)
-        .equalTo("lease", @lease)
-        .include("profile")
+    createQuery: ->
+      @query = new Parse.Query(Tenant).include("profile")
+      if @lease and @lease.id     then @query.equalTo("lease", @lease)
+      if @property and @property.id then @query.equalTo("property", @property)
+      if @network and @network.id then @query.equalTo("network", @network)

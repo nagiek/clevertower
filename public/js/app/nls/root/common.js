@@ -19,7 +19,9 @@
       Properties: "Properties",
       Managers: "Managers",
       tasks: "tasks",
-      finances: "finances"
+      finances: "finances",
+      Applicants: "Applicants",
+      Listings: "Listings"
     },
     actions: {
       go: "Go",

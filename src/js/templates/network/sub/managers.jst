@@ -23,7 +23,13 @@
       <th><%= i18nCommon.form.operations %></th>
     </tr>
   </thead>
-  <tbody></tbody>
+  <tbody>
+    <tr>
+      <td class="loading" colspan="3">
+        <img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" />
+      </td>
+    </tr>
+  </tbody>
   <tfoot>
     <tr>
       <td class="empty" colspan="3"><%= i18nGroup.manager.deleted_if_empty %></td>

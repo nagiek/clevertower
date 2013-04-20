@@ -15,17 +15,37 @@
       TenantList.prototype.model = Tenant;
 
       TenantList.prototype.initialize = function(models, attrs) {
-        if (attrs && attrs.lease && attrs.lease.id) {
-          return this.createQuery(attrs.lease);
-        }
+        this.lease = attrs.lease;
+        this.network = attrs.network;
+        this.property = attrs.property;
+        return this.createQuery();
       };
 
-      TenantList.prototype.createQuery = function(lease) {
-        if (lease) {
-          this.lease = lease;
-        }
+      TenantList.prototype.createLeaseQuery = function(lease) {
+        this.lease = lease;
+        return this.createQuery();
+      };
+
+      TenantList.prototype.createPropertyQuery = function(property) {
+        this.property = property;
+        return this.createQuery();
+      };
+
+      TenantList.prototype.createNetworkQuery = function(network) {
+        this.network = network;
+        return this.createQuery();
+      };
+
+      TenantList.prototype.createQuery = function() {
+        this.query = new Parse.Query(Tenant).include("profile");
         if (this.lease && this.lease.id) {
-          return this.query = new Parse.Query(Tenant).equalTo("lease", this.lease).include("profile");
+          this.query.equalTo("lease", this.lease);
+        }
+        if (this.property && this.property.id) {
+          this.query.equalTo("property", this.property);
+        }
+        if (this.network && this.network.id) {
+          return this.query.equalTo("network", this.network);
         }
       };
 

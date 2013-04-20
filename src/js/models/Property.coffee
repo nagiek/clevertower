@@ -81,7 +81,7 @@ define [
       public              : false
 
     # Backbone default, as Parse function does not exist.
-    url: -> "#{@collection.url}/#{@id}"
+    url: -> "/#{@collection.url}/#{@id}"
 
     cover: (format) ->
       img = @get "image_#{format}"

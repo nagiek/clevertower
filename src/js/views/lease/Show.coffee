@@ -13,9 +13,9 @@ define [
   "i18n!nls/common"
   'templates/lease/show'
 ], ($, _, Parse, moment, TenantList, Unit, Lease, Tenant, TenantView, i18nUnit, i18nLease, i18nCommon) ->
-
-  class ShowLeaseView extends Parse.View
   
+  class ShowLeaseView extends Parse.View
+    
     el: ".content"
     
     initialize: (attrs) =>
@@ -46,13 +46,17 @@ define [
       
       @$list = @$('ul#tenants')
       
-      @model.tenants.fetch() if @model.tenants.length is 0 else @addAll()
+      if @model.tenants.length is 0 then @model.tenants.fetch() else @addAll()
       @
       
-      
+    # We may have the network tenant list. Therefore, we must
+    # be sure that we are only displaying relevant users.
     addOne : (t) =>
-      @$("p.empty").text ''
-      @$list.append (new TenantView(model: t)).render().el
+      console.log t
+      console.log t.get("lease")
+      if t.get("lease").id is @model.id
+        @$("p.empty").text ''
+        @$list.append (new TenantView(model: t)).render().el
 
     addAll : =>
-      @model.tenants.each @addOne
+      _.each @model.tenants.where(lease: @model), @addOne

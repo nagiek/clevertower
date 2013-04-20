@@ -43,7 +43,6 @@
 
       PropertyUnitsView.prototype.initialize = function(attrs) {
         this.on("view:change", this.clear);
-        this.model.prep('units');
         this.model.units.on("add", this.addOne);
         this.model.units.on("reset", this.addAll);
         return this.editing = false;
@@ -63,9 +62,11 @@
         this.$table = this.$("#units-table");
         this.$actions = this.$(".form-actions");
         this.$undo = this.$actions.find('.undo');
-        this.model.units.fetch();
         if (this.model.units.length === 0) {
+          this.model.units.fetch();
           this.switchToEdit();
+        } else {
+          this.addAll();
         }
         return this;
       };

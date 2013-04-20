@@ -24,6 +24,9 @@ define [
       website             : ""
       phone               : ""
 
+    # Backbone default, as Parse function does not exist.
+    url: -> "/users/#{@id}"
+
     cover: (format) ->
       img = @get "image_#{format}"
       img = "/img/fallback/avatar-#{format}.png" if img is '' or !img?

@@ -26,8 +26,9 @@
 
       PropertyView.prototype.initialize = function(attrs) {
         var _this = this;
-        $('.home').on('click', this.clear);
         this.$form = $("#profile-picture-upload");
+        this.model.prep('units');
+        this.model.prep('leases');
         this.model.on('change:image_profile', function(model, name) {
           return _this.refresh;
         });
@@ -48,7 +49,7 @@
       };
 
       PropertyView.prototype.changeSubView = function(path, params) {
-        var action, name, node, propertyCentric, subaction, subid,
+        var action, name, node, propertyCentric, subaction, subid, submodel,
           _this = this;
         action = path ? path.split("/") : Array('units');
         if (action.length === 1 || action[0] === "add") {
@@ -63,10 +64,11 @@
           subid = action[1];
           subaction = action[2] ? action[2] : "show";
           name = "views/" + node + "/" + subaction;
-          if (this.model[action[0]]) {
+          submodel = this.model[action[0]].get(subid);
+          if (submodel) {
             return this.renderSubView(name, {
               property: this.model,
-              model: this.model[action[0]].get(subid)
+              model: submodel
             });
           } else {
             return (new Parse.Query(node)).get(subid, {
@@ -89,7 +91,6 @@
         this.$('.content').removeClass('in');
         return require([name], function(PropertySubView) {
           _this.subView = new PropertySubView(vars).render();
-          _this.delegateEvents();
           return _this.$('.content').addClass('in');
         });
       };

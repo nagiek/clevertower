@@ -22,8 +22,7 @@ define [
       @editing = false
       
       @on "view:change", @clear
-      
-      @model.prep('leases')
+
       @model.leases.on "add", @addOne
       @model.leases.on "reset", @addAll
 

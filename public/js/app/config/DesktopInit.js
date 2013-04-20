@@ -74,14 +74,42 @@
 
   require(["jquery", "backbone", "facebook", "models/Profile", router, "json2", "bootstrap", "serializeObject", "typeahead"], function($, Parse, FB, Profile, AppRouter) {
     Parse.initialize(window.APPID, window.JSKEY);
+    $.ajaxSetup({
+      beforeSend: function(jqXhr, settings) {
+        jqXhr.setRequestHeader("X-Parse-Application-Id", window.APPID);
+        return jqXhr.setRequestHeader("X-Parse-REST-API-Key", window.RESTAPIKEY);
+      }
+    });
     Parse.onNetwork = onNetwork;
     Parse.FacebookUtils.init({
       appId: '387187337995318',
-      channelUrl: '//localhost:3000/fb-channel',
+      channelUrl: '//clevertower.dev:3000/fb-channel',
       status: true,
       cookie: true,
       xfbml: true
     });
+    Parse.Collection.prototype.where = function(attrs, first) {
+      if (_.isEmpty(attrs)) {
+        if (first) {
+          return void 0;
+        } else {
+          return [];
+        }
+      }
+      return this[first ? 'find' : 'filter'](function(model) {
+        var key, _i, _len;
+        for (_i = 0, _len = attrs.length; _i < _len; _i++) {
+          key = attrs[_i];
+          if (attrs[key] !== model.get(key)) {
+            return false;
+          }
+        }
+        return true;
+      });
+    };
+    Parse.Collection.prototype.findWhere = function(attrs) {
+      return this.where(attrs, true);
+    };
     Parse.User.prototype.defaults = {
       privacy_visible: false,
       privacy_unit: false,
@@ -108,12 +136,15 @@
       return Parse.Promise.when(profilePromise, networkPromise).then(function(profile, user) {
         var network;
         _this.profile = profile;
-        network = user.get("network");
-        if (Parse.onNetwork) {
-          network.prep("properties");
-          network.prep("managers");
+        if (user) {
+          network = user.get("network");
         }
-        return _this.set("network", network);
+        if (user && network) {
+          network.prep("properties").fetch();
+          network.prep("managers").fetch();
+          network.prep("tenants").fetch();
+          return _this.set("network", network);
+        }
       });
     };
     Parse.Dispatcher = {};

@@ -8,8 +8,22 @@
         </a>
         <h3><%= title %></h3>
       </li>
-      <li><a href="/"><%= i18nCommon.classes.Properties %></a></li>
-      <li><a href="/network/managers"><%= i18nCommon.classes.Managers %></a></li>
+      <li id="properties-link"><a href="/"><%= i18nCommon.classes.Properties %><span class="pull-right badge count"></span></a></li>
+      <li id="managers-link">
+        <a href="/network/managers"><%= i18nCommon.classes.Managers %>
+          <span class="pull-right badge count"></span>
+        </a>
+      </li>
+      <li id="tenants-link">
+        <a href="/network/tenants"><%= i18nCommon.classes.Tenants %>
+          <span class="pull-right badge count"></span>
+        </a>
+      </li>
+      <li id="reports-link">
+        <a href="/network/reports"><%= i18nProperty.menu.reports %>
+          <span class="pull-right badge count"></span>
+        </a>
+      </li>
       <li class="divider"></li>
       <li>
         <a href="//clevertower.dev/networks/<%= name %>">
@@ -17,6 +31,10 @@
           <small><%= i18nCommon.prepositions.at %> clevertower.com/networks/<%= name %></small>
         </a>
       </li>
+    </ul>
+    <ul class="nav nav-list well">
+      <li><a href="/network/applicants"><%= i18nCommon.classes.Applicants %></a></li>
+      <li><a href="/network/listings"><%= i18nCommon.classes.Listings %></a></li>
     </ul>
   </div>
 </div>

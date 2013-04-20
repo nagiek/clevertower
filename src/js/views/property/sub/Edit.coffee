@@ -18,15 +18,24 @@ define [
     el: ".content"
     
     events:
-      'click .save'         : 'save'
+      'submit form'         : 'save'
       'click .remove'       : 'kill'
     
     initialize : ->
       _.bindAll this, 'save'
 
-      @on "view:change", @clear
-      @on "property:save", @clear
-      @on "property:cancel", @clear
+      @on "property:save", ->
+        new Alert(event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success')
+      
+      @on "property:sync", ->
+        @$('button.save').removeProp('disabled')
+      
+      @model.on "invalid", (error) ->
+
+        new Alert(event: 'model-save', fade: false, message: i18nProperty.errors[error.message], type: 'error')
+        switch error.message
+          when 'title_missing'
+            @$el.find('#property-title-group').addClass('error') # Add class to Control Group
 
     clear: (e) =>
       @undelegateEvents()
@@ -44,17 +53,18 @@ define [
         
     save : (e) ->
       e.preventDefault()
+      @$('.error').removeClass('error')
+      @$('button.save').prop('disabled', 'disabled')
+      
       attrs = @$('form').serializeObject().property
+      attrs.public = if attrs.public is "1" then true else false
       @model.save attrs,
         success: (property) =>
+          @trigger "property:sync", property, this
           @trigger "property:save", property, this
-          new Alert(event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success')
         error: (property, error) =>
-          @$el.find('.error').removeClass('error')
-          new Alert(event: 'model-save', fade: false, message: i18nProperty.errors[error.message], type: 'error')
-          switch error.message
-            when 'title_missing'
-              @$el.find('#property-title-group').addClass('error') # Add class to Control Group
+          @trigger "property:sync", property, this
+          @model.trigger "invalid", error, this
       
     kill : ->
       if confirm(i18nCommon.actions.confirm + " " + i18nCommon.warnings.no_undo)

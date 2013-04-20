@@ -17,6 +17,7 @@
       PropertySummaryView.prototype.className = "row";
 
       PropertySummaryView.prototype.initialize = function() {
+        _.bindAll(this, 'render');
         return this.model.on("change", this.render);
       };
 

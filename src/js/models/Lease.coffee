@@ -57,7 +57,12 @@ define [
     prep: (collectionName, options) ->
       return @[collectionName] if @[collectionName]
       switch collectionName
-        when "tenants" 
-          @[collectionName] = new TenantList [], lease: @
+        when "tenants"
+          user = Parse.User.current()
+          network = user.get("network") if user
+          unless user and network
+            @[collectionName] = new TenantList [], lease: @
+          else
+            @[collectionName] = if network.tenants then network.tenants else new TenantList [], lease: @
 
       @[collectionName]

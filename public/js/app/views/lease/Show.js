@@ -44,19 +44,29 @@
         });
         this.$el.html(JST["src/js/templates/lease/show.jst"](vars));
         this.$list = this.$('ul#tenants');
-        this.model.tenants.fetch()(this.model.tenants.length === 0 ? void 0 : this.addAll());
+        if (this.model.tenants.length === 0) {
+          this.model.tenants.fetch();
+        } else {
+          this.addAll();
+        }
         return this;
       };
 
       ShowLeaseView.prototype.addOne = function(t) {
-        this.$("p.empty").text('');
-        return this.$list.append((new TenantView({
-          model: t
-        })).render().el);
+        console.log(t);
+        console.log(t.get("lease"));
+        if (t.get("lease").id === this.model.id) {
+          this.$("p.empty").text('');
+          return this.$list.append((new TenantView({
+            model: t
+          })).render().el);
+        }
       };
 
       ShowLeaseView.prototype.addAll = function() {
-        return this.model.tenants.each(this.addOne);
+        return _.each(this.model.tenants.where({
+          lease: this.model
+        }), this.addOne);
       };
 
       return ShowLeaseView;

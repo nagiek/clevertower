@@ -16,18 +16,16 @@ define [
   class PropertyView extends Parse.View
 
     el: '#property'
-    # tagName: "div"
-    # id: "property"
     
     events:
       'click .edit-profile-picture': 'editProfilePicture'
 
     initialize: (attrs) ->
-      
-      # Bind this outside of events, as it is not with $el
-      $('.home').on 'click', @clear
             
       @$form = $("#profile-picture-upload")
+      
+      @model.prep('units')
+      @model.prep('leases')
       
       @model.on 'change:image_profile', (model, name) => @refresh
       @model.on 'destroy',  @clear
@@ -56,22 +54,25 @@ define [
       action = if path then path.split("/") else Array('units')
       
       if action.length is 1 or action[0] is "add"
-        
         name = "views/property/sub/#{action.join("/")}"
         @renderSubView name, model: @model, params: params 
         
       else
+
         # Subnode view
         propertyCentric = false
         node = action[0][0].toUpperCase() + inflection.singularize[action[0]].substring(1) # units => Unit
         subid = action[1]
         subaction = if action[2] then action[2] else "show"
-        name = "views/#{node}/#{subaction}"    
+        name = "views/#{node}/#{subaction}"
 
         # Load the model if it exists.
-        if @model[action[0]] then @renderSubView name, property: @model, model: @model[action[0]].get subid
+        submodel = @model[action[0]].get(subid)
+        if submodel
+          @renderSubView name, property: @model, model: submodel
         # Else get it from the server.
-        else (new Parse.Query(node)).get subid, success: (submodel) => @renderSubView name, property: @model, model: submodel
+        else (new Parse.Query(node)).get subid, success: (submodel) => 
+          @renderSubView name, property: @model, model: submodel
 
 
     renderSubView: (name, vars) =>
@@ -79,7 +80,6 @@ define [
       @$('.content').removeClass 'in'
       require [name], (PropertySubView) =>
         @subView = new PropertySubView(vars).render()
-        @delegateEvents()
         @$('.content').addClass 'in'
   
     # Re-render the contents of the property item.

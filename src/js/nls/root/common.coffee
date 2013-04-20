@@ -17,6 +17,8 @@ define
     Managers:             "Managers"
     tasks:                "tasks"
     finances:             "finances"
+    Applicants:           "Applicants"
+    Listings:             "Listings"
   actions:                
     go:                   "Go"
     go_to:                "Go to"

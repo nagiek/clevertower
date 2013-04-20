@@ -52,6 +52,7 @@ define [
       
       # Clean up after views
       Parse.history.on "route", =>
+        $('#search').val('').blur()
         if @view
           @view.undelegateEvents()
           delete @view

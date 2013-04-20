@@ -52,9 +52,9 @@ Parse.Cloud.define "AddTenants", (req, res) ->
         _.each emails, (email) ->
           found_profile = false
           found_profile = _.find profiles, (profile) -> return profile if email is profile.get "email"
-
+          
           if found_profile
-
+            
             # Profile exists, but user does not necessarily exist.
             tenant = new Parse.Object "Tenant"
             notification = new Parse.Object "Notification"
@@ -74,7 +74,7 @@ Parse.Cloud.define "AddTenants", (req, res) ->
               profile: found_profile
               accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb"
               ACL: tenantACL
-
+              
             notification.save
               text: "You have been invited to join #{title}"
               channels: [ "profiles-#{found_profile.id}" ]
@@ -198,7 +198,7 @@ Parse.Cloud.define "AddManagers", (req, res) ->
           manager = new Parse.Object "Manager"
           notification = new Parse.Object "Notification"
           user = found_profile.get("user")
-
+          
           if user
             notification.setACL new Parse.ACL().setReadAccess(user, true)
             mgrRoleUsers.add user if mgrRole
@@ -292,8 +292,7 @@ Parse.Cloud.define "AddManagers", (req, res) ->
           
           # Must return object.
           res.success arguments
-
-        
+                  
   , -> res.error "bad_query"
   
   error: ->

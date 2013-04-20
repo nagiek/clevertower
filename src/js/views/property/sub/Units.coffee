@@ -30,7 +30,6 @@ define [
       @on "view:change", @clear
       
       # Fetch all the property items for this user
-      @model.prep('units')
       @model.units.on "add", @addOne
       @model.units.on "reset", @addAll
       
@@ -47,9 +46,11 @@ define [
       @$actions   = @$(".form-actions")
       @$undo      = @$actions.find('.undo')
 
-      @model.units.fetch()
-      
-      if @model.units.length is 0 then @switchToEdit()
+      if @model.units.length is 0 
+        @model.units.fetch()
+        @switchToEdit()
+      else
+        @addAll()
       @
     
     clear: (e) =>

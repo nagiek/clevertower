@@ -3,7 +3,8 @@ define [
   'backbone'
   'collections/property/PropertyList'
   'collections/manager/ManagerList'
-], (_, Parse, PropertyList, ManagerList) ->
+  'collections/tenant/TenantList'
+], (_, Parse, PropertyList, ManagerList, TenantList) ->
 
   Network = Parse.Object.extend "Network"
   # class Property extends Parse.Object
@@ -35,5 +36,7 @@ define [
           @[collectionName] = new PropertyList [], network: @
         when "managers"
           @[collectionName] = new ManagerList [], network: @
+        when "tenants"
+          @[collectionName] = new TenantList [], network: @
 
       @[collectionName]
