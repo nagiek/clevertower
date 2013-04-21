@@ -15,27 +15,25 @@
         this.addOne = __bind(this.addOne, this);
 
         this.clear = __bind(this.clear, this);
-
-        this.render = __bind(this.render, this);
         return PropertyPhotosView.__super__.constructor.apply(this, arguments);
       }
 
       PropertyPhotosView.prototype.el = ".content";
 
       PropertyPhotosView.prototype.initialize = function() {
-        var _this;
-        _this = this;
-        _.bindAll(this, 'save');
+        _.bindAll(this, 'save', 'render');
         this.on("view:change", this.clear);
         this.unUploadedPhotos = 0;
-        this.photos = new PhotoList;
-        this.photos.query = new Parse.Query(Photo);
-        this.photos.query.equalTo("property", this.model);
+        this.photos = new PhotoList([], {
+          property: this.model
+        });
         this.photos.bind("add", this.addOne);
         return this.photos.bind("reset", this.addAll);
       };
 
       PropertyPhotosView.prototype.render = function() {
+        var _this;
+        _this = this;
         this.$el.html(JST["src/js/templates/property/sub/photos.jst"](_.merge({
           property: this.model,
           i18nProperty: i18nProperty,
@@ -75,6 +73,7 @@
             that._transition(data.context);
             file = data.result;
             _this.photos.create({
+              network: _this.model.get("network"),
               property: _this.model,
               url: file.url,
               name: file.name

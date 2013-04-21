@@ -35,6 +35,8 @@
         if (!this.model) {
           this.model = new Lease;
         }
+        this.template = "src/js/templates/lease/" + (this.model.isNew() ? 'new' : 'edit') + ".jst";
+        this.cancel_path = ("/properties/" + this.property.id) + (!this.model.isNew() ? "/leases/" + this.model.id : "");
         this.model.on('invalid', function(error) {
           var args, fn, msg;
           _this.$('.error').removeClass('error');
@@ -221,13 +223,13 @@
           lease: _.defaults(this.model.attributes, Lease.prototype.defaults),
           unit: this.model.get("unit") ? this.model.get("unit") : false,
           dates: this.dates,
-          cancel_path: ("/properties/" + this.property.id) + (!this.model.isNew() ? "/leases/" + this.model.id : ""),
+          cancel_path: this.cancel_path,
           moment: moment,
           i18nCommon: i18nCommon,
           i18nUnit: i18nUnit,
           i18nLease: i18nLease
         };
-        this.$el.html(JST["src/js/templates/lease/" + (this.model.isNew() ? 'new' : 'edit') + ".jst"](vars));
+        this.$el.html(JST[this.template](vars));
         this.$unitSelect = this.$('.unit-select');
         this.$startDate = this.$('.start-date');
         this.$endDate = this.$('.end-date');

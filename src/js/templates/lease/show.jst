@@ -8,15 +8,16 @@
       <%= i18nCommon.actions.edit %>
     </a>
     <a href="/properties/<%= property.objectId %>/add/tenants?lease=<%= objectId %>" class="btn add-tenants"
-            rel="tooltip"
-            data-original-title="<%= i18nLease.actions.add_tenants %>">
+        rel="tooltip"
+        data-original-title="<%= i18nLease.actions.add_tenants %>">
       <i class="icon-user"></i>
     </a>
-    <button class="btn extend"
-            rel="tooltip"
-            data-original-title="<%= i18nLease.actions.extend %>">
+    <a href="/properties/<%= property.objectId %>/leases/<%= objectId %>/extend"
+        class="btn extend"
+        rel="tooltip"
+        data-original-title="<%= i18nLease.actions.extend %>">
       <i class="icon-repeat"></i>
-    </button>
+    </a>
   </div>
 </header>
 <div class="row">

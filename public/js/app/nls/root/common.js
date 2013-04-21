@@ -99,8 +99,10 @@
     },
     nouns: {
       home: "Home",
+      cover_photo: "Cover Photo",
       link: "link",
       you: "You",
+      people: "People",
       sample_email: "keigan@example.com"
     },
     order: {
@@ -110,6 +112,7 @@
     adjectives: {
       unsaved: "Unsaved",
       linked: "Linked",
+      recently_added: "Recently Added",
       all: "All",
       "public": "Public",
       "private": "Private",

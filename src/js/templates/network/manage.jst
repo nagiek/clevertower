@@ -25,16 +25,23 @@
         </a>
       </li>
       <li class="divider"></li>
+      <li id="applicants-link">
+        <a href="/network/applicants"><%= i18nCommon.classes.Applicants %>
+          <span class="pull-right badge count"></span>
+        </a>
+      </li>
+      <li id="listings-link">
+        <a href="/network/listings"><%= i18nCommon.classes.Listings %>
+          <span class="pull-right badge count"></span>
+        </a>
+      </li>
+      <li class="divider"></li>
       <li>
         <a href="//clevertower.dev/networks/<%= name %>">
           <span class="display-block"><%= i18nProperty.menu.view_public %></span>
           <small><%= i18nCommon.prepositions.at %> clevertower.com/networks/<%= name %></small>
         </a>
       </li>
-    </ul>
-    <ul class="nav nav-list well">
-      <li><a href="/network/applicants"><%= i18nCommon.classes.Applicants %></a></li>
-      <li><a href="/network/listings"><%= i18nCommon.classes.Listings %></a></li>
     </ul>
   </div>
 </div>

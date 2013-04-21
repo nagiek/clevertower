@@ -36,5 +36,4 @@ define [
 
     # Remove the item, destroy the model.
     kill: ->
-      if confirm(i18nCommon.actions.confirm)
-        @model.destroy()
+      @model.destroy() if confirm(i18nCommon.actions.confirm)

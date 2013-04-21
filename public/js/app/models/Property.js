@@ -68,6 +68,7 @@
         return img;
       },
       prep: function(collectionName, options) {
+        var network, user;
         if (this[collectionName]) {
           return this[collectionName];
         }
@@ -81,6 +82,21 @@
             this[collectionName] = new LeaseList([], {
               property: this
             });
+            break;
+          case "tenants":
+            user = Parse.User.current();
+            if (user) {
+              network = user.get("network");
+            }
+            if (!(user && network)) {
+              this[collectionName] = new TenantList([], {
+                lease: this
+              });
+            } else {
+              this[collectionName] = network.tenants ? network.tenants : new TenantList([], {
+                lease: this
+              });
+            }
         }
         return this[collectionName];
       }

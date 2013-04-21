@@ -14,6 +14,14 @@
 
       PhotoList.prototype.model = Photo;
 
+      PhotoList.prototype.query = new Parse.Query("Photo");
+
+      PhotoList.prototype.initialize = function(models, attrs) {
+        if (attrs.property) {
+          return this.query.equalTo("property", attrs.property);
+        }
+      };
+
       return PhotoList;
 
     })(Parse.Collection);

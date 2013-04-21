@@ -13,7 +13,7 @@ define [
   "templates/property/menu/actions"
 ], ($, _, Parse, Property, i18nProperty, i18nCommon, inflection) ->
 
-  class PropertyView extends Parse.View
+  class ShowPropertyView extends Parse.View
 
     el: '#property'
     

@@ -23,21 +23,16 @@ define [
     
     initialize : ->
       
-      _this = @
-      _.bindAll this, 'save'
+      _.bindAll this, 'save', 'render'
       
       @on "view:change", @clear
       
       @unUploadedPhotos = 0
           
-      @photos = new PhotoList
-      # Setup the query for the collection to look for properties from the current user
-      @photos.query = new Parse.Query(Photo)
-      @photos.query.equalTo "property", @model
-      # @photos.query.equalTo "unit", ""
+      @photos = new PhotoList [], property: @model
+
       @photos.bind "add", @addOne
       @photos.bind "reset", @addAll
-      # @photos.bind "all", @render
 
       # @on 'added', (e, data) =>
       #   @unUploadedPhotos++
@@ -48,7 +43,8 @@ define [
       # @on "photo:remove", (e, data) =>
       #   @unUploadedPhotos--
 
-    render : =>
+    render : ->
+      _this = this
       @$el.html JST["src/js/templates/property/sub/photos.jst"](_.merge(property: @model, i18nProperty: i18nProperty, i18nCommon: i18nCommon))
       @$list = $("#photo-list")
       @$fileForm = $("#fileupload")
@@ -92,7 +88,11 @@ define [
           that._transition(data.context)
           file = data.result
 
-          _this.photos.create property: _this.model, url: file.url, name: file.name
+          _this.photos.create 
+            network: _this.model.get("network")
+            property: _this.model
+            url: file.url
+            name: file.name
           $('.empty').remove()
           
           data.context.each (index) ->

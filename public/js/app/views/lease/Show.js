@@ -53,8 +53,6 @@
       };
 
       ShowLeaseView.prototype.addOne = function(t) {
-        console.log(t);
-        console.log(t.get("lease"));
         if (t.get("lease").id === this.model.id) {
           this.$("p.empty").text('');
           return this.$list.append((new TenantView({

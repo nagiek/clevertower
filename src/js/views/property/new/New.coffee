@@ -35,8 +35,14 @@ define [
         delete this
         
     render : ->
+      networkVars = 
+        email: @model.get("network").get("email")
+        phone: @model.get("network").get("phone")
+        website: @model.get("network").get("website")
+      _.defaults(@model.attributes, Property::defaults)
+      _.defaults(@model.attributes, networkVars)
       vars = 
-        property: _.defaults(@model.attributes, Property::defaults)
+        property: @model.attributes
         i18nProperty: i18nProperty
         i18nCommon: i18nCommon
       @$el.html JST["src/js/templates/property/_form.jst"](vars)

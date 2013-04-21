@@ -1,0 +1,14 @@
+<header>
+  <h2><%= i18nLease.headers.extend_lease %></h2>
+  <p><%= i18nLease.form.extend_instructions %></p>
+</header>
+<form class="lease-form" enctype="multipart/form-data" method="post">
+  <%= JST["src/js/templates/lease/_form.jst"]({isNew: true, lease: lease, dates: dates, unit: unit, moment: moment, i18nCommon: i18nCommon, i18nUnit: i18nUnit, i18nLease: i18nLease}) %>
+  
+  <div class="form-actions">
+    <button class="save btn btn-primary"><%= i18nCommon.actions.save %></button>
+    <a href="<%= cancel_path %>" class="cancel btn"><%= i18nCommon.actions.cancel %></a>
+  </div>
+  
+  <a class="remove"><%= i18nCommon.actions.delete %></a>
+</form>

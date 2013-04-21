@@ -1,0 +1,86 @@
+<header>
+  <ul class="breadcrumb">
+    <li><a href="#"><%= property.country %></a> <span class="divider">/</span></li>
+    <li><a href="#"><%= property.administrative_area_level_1 %></a> <span class="divider">/</span></li>
+    <li><a href="#"><%= property.locality %></a> <span class="divider">/</span></li>
+    <li class="active"><%= property.title %></li>
+  </ul>
+  <h1><%= property.title %></h1>
+</header>
+<div class="row">
+  <img class="span9" src="<%= cover %>" alt="<%= i18nCommon.nouns.cover_photo %>">
+  <div class="span9">
+
+    <% if (property.description) { %>
+      <%= property.description %>
+    <% } %>
+    <ul id="photos" class="row no-bullet"></ul>
+
+    <h3><%= i18nProperty.form.included %></h3>
+    <ul id="included" class="checkbox-list">
+      <% if (property.electricity) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.electricity %></li><% } %>
+      <% if (property.furniture) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.furniture %></li><% } %>
+      <% if (property.gas) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.gas %></li><% } %>
+      <% if (property.heat) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.heat %></li><% } %>
+      <% if (property.hot_water) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.hot_water %></li><% } %>
+    </ul>
+
+    <h3><%= i18nProperty.form.amenities %></h3>
+    <ul id="included" class="checkbox-list">
+      <% if (property.air_conditioning) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.air_conditioning %></li><% } %>
+      <% if (property.back_yard) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.back_yard %></li><% } %>
+      <% if (property.balcony) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.balcony %></li><% } %>
+      <% if (property.cats_allowed) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.cats_allowed %></li><% } %>
+      <% if (property.concierge) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.concierge %></li><% } %>
+      <% if (property.dogs_allowed) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.dogs_allowed %></li><% } %>
+      <% if (property.doorman) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.doorman %></li><% } %>
+      <% if (property.elevator) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.elevator %></li><% } %>
+      <% if (property.exposed_brick) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.exposed_brick %></li><% } %>
+      <% if (property.fireplace) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.fireplace %></li><% } %>
+      <% if (property.front_yard) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.front_yard %></li><% } %>
+      <% if (property.gym) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.gym %></li><% } %>
+      <% if (property.laundry) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.laundry %></li><% } %>
+      <% if (property.indoor_parking) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.indoor_parking %></li><% } %>
+      <% if (property.outdoor_parking) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.outdoor_parking %></li><% } %>
+      <% if (property.pool) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.pool %></li><% } %>
+      <% if (property.sauna) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.sauna %></li><% } %>
+      <% if (property.wheelchair) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.wheelchair %></li><% } %>
+    </ul>
+  </div>
+  <div class="span3">
+
+    <% if (property.property_type) { %>
+      <%= i18nProperty.fields.property_type.label %>
+      <% if (property.property_type == 1) { %><%= i18nProperty.fields.property_type.condo %><% } %>
+      <% if (property.property_type == 2) { %><%= i18nProperty.fields.property_type.apartment %><% } %>
+    <% } %>
+    
+    <% if (property.year) { %>
+      <%= i18nProperty.fields.year %>
+      <%= property.year %>
+    <% } %>
+
+    <% if (property.mls) { %>
+      <%= i18nProperty.fields.mls %>
+      <%= property.mls %>
+    <% } %>
+
+    <hr>
+
+    <% if (property.email) { %>
+      <%= i18nProperty.fields.email %>
+      <%= property.email %>
+    <% } %>
+
+    <% if (property.phone) { %>
+      <%= i18nProperty.fields.phone %>
+      <%= property.phone %>
+    <% } %>
+
+    <% if (property.website) { %>
+      <%= i18nProperty.fields.website %>
+      <%= property.website %>
+    <% } %>
+
+  </div>
+</div>

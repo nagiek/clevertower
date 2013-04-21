@@ -11,6 +11,7 @@ define [
     routes:
       ""                            : "index"
       "properties/new"              : "propertiesNew"
+      "public/:id"                  : "propertiesPublic"
       "properties/:id"              : "propertiesShow"
       "properties/:id/*splat"       : "propertiesShow"
       "properties/:id/*splat"       : "propertiesShow"
@@ -97,6 +98,14 @@ define [
         @signupOrLogin()
 
 
+    propertiesPublic: (id) =>
+      require ["views/property/Public"], (PublicPropertyView) => 
+        new Parse.Query("Property").get id,
+          success: (model) => @view = new PublicPropertyView(model: model).render()
+          error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
+
+
+
     # Property
     # --------------
 
@@ -107,8 +116,8 @@ define [
         if !@view or @view !instanceof NetworkView
           @view = new NetworkView(model: @network, path: "properties/new/wizard", params: {})
         else
-          @view.changeSubView(path: "properties/new/wizard", params: {})
-                
+          @view.changeSubView path: "properties/new/wizard", params: {}
+    
     propertiesShow: (id, splat) =>
       'propertiesShow'
       require ["views/property/Show"], (PropertyView) => 

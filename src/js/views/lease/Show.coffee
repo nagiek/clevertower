@@ -52,8 +52,6 @@ define [
     # We may have the network tenant list. Therefore, we must
     # be sure that we are only displaying relevant users.
     addOne : (t) =>
-      console.log t
-      console.log t.get("lease")
       if t.get("lease").id is @model.id
         @$("p.empty").text ''
         @$list.append (new TenantView(model: t)).render().el

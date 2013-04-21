@@ -49,6 +49,19 @@
         }
       };
 
+      TenantList.prototype.filterRecent = function(conditions) {
+        var d;
+        d = new Date();
+        d.setDate(d.getDate() - 31);
+        return this.filter(function(t) {
+          var filterconditions;
+          filterconditions = conditions ? _.each(conditions, function(c, i) {
+            return t[i] === c;
+          }) : true;
+          return t.createdAt > d && filterconditions;
+        });
+      };
+
       return TenantList;
 
     })(Parse.Collection);

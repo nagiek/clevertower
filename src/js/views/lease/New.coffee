@@ -42,6 +42,8 @@ define [
       @property = attrs.property
       
       @model = new Lease unless @model
+      @template = "src/js/templates/lease/#{if @model.isNew() then 'new' else 'edit'}.jst"
+      @cancel_path = "/properties/#{@property.id}" + unless @model.isNew() then "/leases/#{@model.id}" else ""
             
       @model.on 'invalid', (error) =>
         @$('.error').removeClass('error')
@@ -193,14 +195,14 @@ define [
         lease: _.defaults(@model.attributes, Lease::defaults)
         unit: if @model.get "unit" then @model.get "unit" else false
         dates: @dates
-        cancel_path: "/properties/#{@property.id}" + unless @model.isNew() then "/leases/#{@model.id}" else ""
+        cancel_path: @cancel_path
         # units: @units
         moment: moment
         i18nCommon: i18nCommon
         i18nUnit: i18nUnit
         i18nLease: i18nLease
 
-      @$el.html JST["src/js/templates/lease/#{if @model.isNew() then 'new' else 'edit'}.jst"](vars)
+      @$el.html JST[@template](vars)
       
       # @el = "form.lease-form"
       # @$el = $("#content form.lease-form")

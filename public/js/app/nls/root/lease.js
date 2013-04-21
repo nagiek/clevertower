@@ -2,7 +2,9 @@
 
   define({
     headers: {
-      add_lease: "Add Lease"
+      add_lease: "Add Lease",
+      edit_lease: "Edit Lease",
+      extend_lease: "Extend Lease"
     },
     actions: {
       add_tenants: "add tenants to lease",
@@ -60,6 +62,7 @@
       garage_remotes: "Remotes"
     },
     form: {
+      extend_instructions: "This will create a new lease based on the old one.",
       enter_emails: "Enter the email addresses of the people you wish to add.",
       to_existing: "To existing lease on unit",
       dates: "Dates",

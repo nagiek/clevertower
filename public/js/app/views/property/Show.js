@@ -4,27 +4,27 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(["jquery", "underscore", "backbone", 'models/Property', "i18n!nls/property", "i18n!nls/common", "underscore.inflection", 'templates/property/show', "templates/property/menu/show", "templates/property/menu/reports", "templates/property/menu/building", "templates/property/menu/actions"], function($, _, Parse, Property, i18nProperty, i18nCommon, inflection) {
-    var PropertyView;
-    return PropertyView = (function(_super) {
+    var ShowPropertyView;
+    return ShowPropertyView = (function(_super) {
 
-      __extends(PropertyView, _super);
+      __extends(ShowPropertyView, _super);
 
-      function PropertyView() {
+      function ShowPropertyView() {
         this.clear = __bind(this.clear, this);
 
         this.renderSubView = __bind(this.renderSubView, this);
 
         this.changeSubView = __bind(this.changeSubView, this);
-        return PropertyView.__super__.constructor.apply(this, arguments);
+        return ShowPropertyView.__super__.constructor.apply(this, arguments);
       }
 
-      PropertyView.prototype.el = '#property';
+      ShowPropertyView.prototype.el = '#property';
 
-      PropertyView.prototype.events = {
+      ShowPropertyView.prototype.events = {
         'click .edit-profile-picture': 'editProfilePicture'
       };
 
-      PropertyView.prototype.initialize = function(attrs) {
+      ShowPropertyView.prototype.initialize = function(attrs) {
         var _this = this;
         this.$form = $("#profile-picture-upload");
         this.model.prep('units');
@@ -37,7 +37,7 @@
         return this.changeSubView(attrs.path, attrs.params);
       };
 
-      PropertyView.prototype.render = function() {
+      ShowPropertyView.prototype.render = function() {
         var vars;
         vars = _.merge(this.model.toJSON(), {
           cover: this.model.cover('profile'),
@@ -48,7 +48,7 @@
         return this;
       };
 
-      PropertyView.prototype.changeSubView = function(path, params) {
+      ShowPropertyView.prototype.changeSubView = function(path, params) {
         var action, name, node, propertyCentric, subaction, subid, submodel,
           _this = this;
         action = path ? path.split("/") : Array('units');
@@ -83,7 +83,7 @@
         }
       };
 
-      PropertyView.prototype.renderSubView = function(name, vars) {
+      ShowPropertyView.prototype.renderSubView = function(name, vars) {
         var _this = this;
         if (this.subView) {
           this.subView.trigger("view:change");
@@ -95,18 +95,18 @@
         });
       };
 
-      PropertyView.prototype.refresh = function() {
+      ShowPropertyView.prototype.refresh = function() {
         return $('#preview-profile-picture img').prop('src', this.model.cover('profile'));
       };
 
-      PropertyView.prototype.clear = function() {
+      ShowPropertyView.prototype.clear = function() {
         Parse.User.current().get("network").properties.trigger("close");
         this.undelegateEvents();
         this.remove();
         return delete this;
       };
 
-      PropertyView.prototype.editProfilePicture = function() {
+      ShowPropertyView.prototype.editProfilePicture = function() {
         var _this = this;
         _this = this;
         return require(['jquery.fileupload', 'jquery.fileupload-fp', 'jquery.fileupload-pr'], function() {
@@ -143,7 +143,7 @@
         });
       };
 
-      return PropertyView;
+      return ShowPropertyView;
 
     })(Parse.View);
   });

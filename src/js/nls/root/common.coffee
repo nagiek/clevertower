@@ -86,8 +86,10 @@ define
     loading:              "Loading"
   nouns:
     home:                 "Home"
+    cover_photo:          "Cover Photo"
     link:                 "link"
     you:                  "You"
+    people:               "People"
     sample_email:         "keigan@example.com"
   order:
     first:                "First"
@@ -95,6 +97,7 @@ define
   adjectives:
     unsaved:              "Unsaved"
     linked:               "Linked"
+    recently_added:       "Recently Added"
     all:                  "All"
     public:               "Public"
     private:              "Private"

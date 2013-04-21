@@ -34,9 +34,16 @@
       };
 
       NewPropertyView.prototype.render = function() {
-        var vars;
+        var networkVars, vars;
+        networkVars = {
+          email: this.model.get("network").get("email"),
+          phone: this.model.get("network").get("phone"),
+          website: this.model.get("network").get("website")
+        };
+        _.defaults(this.model.attributes, Property.prototype.defaults);
+        _.defaults(this.model.attributes, networkVars);
         vars = {
-          property: _.defaults(this.model.attributes, Property.prototype.defaults),
+          property: this.model.attributes,
           i18nProperty: i18nProperty,
           i18nCommon: i18nCommon
         };

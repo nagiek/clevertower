@@ -2,4 +2,4 @@ define [
   "views/lease/New"
 ], (NewLeaseView) ->
 
-  return NewLeaseView
+  class EditLeaseView extends NewLeaseView
