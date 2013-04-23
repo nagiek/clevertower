@@ -1,0 +1,133 @@
+<header>
+  <hgroup class="inline-block">
+    <h1><%= listing.title %></h1>
+  </hgroup>
+  <ul class="actions inline-block inline">
+    <li><button id="show-modal" class="btn"><%= i18nListing.actions.apply %></button></li>
+  </ul>
+</header>
+<div class="row">
+  <div class="span9">
+    <div class="row">
+      <img class="span9" src="<%= cover %>" alt="<%= i18nCommon.nouns.cover_photo %>">
+    </div>
+
+    <% if (property.description) { %>
+      <%= property.description %>
+    <% } %>
+    <ul id="photos" class="row no-bullet"></ul>
+
+    <h3><%= i18nCommon.classes.listing %></h3>
+    <ul id="listings"></ul>
+
+    <h3><%= i18nProperty.form.included %></h3>
+    <ul id="included" class="checkbox-list">
+      <% if (property.electricity) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.electricity %></li><% } %>
+      <% if (property.furniture) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.furniture %></li><% } %>
+      <% if (property.gas) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.gas %></li><% } %>
+      <% if (property.heat) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.heat %></li><% } %>
+      <% if (property.hot_water) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.hot_water %></li><% } %>
+    </ul>
+
+    <h3><%= i18nProperty.form.amenities %></h3>
+    <ul id="included" class="checkbox-list">
+      <% if (property.air_conditioning) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.air_conditioning %></li><% } %>
+      <% if (property.back_yard) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.back_yard %></li><% } %>
+      <% if (property.balcony) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.balcony %></li><% } %>
+      <% if (property.cats_allowed) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.cats_allowed %></li><% } %>
+      <% if (property.concierge) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.concierge %></li><% } %>
+      <% if (property.dogs_allowed) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.dogs_allowed %></li><% } %>
+      <% if (property.doorman) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.doorman %></li><% } %>
+      <% if (property.elevator) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.elevator %></li><% } %>
+      <% if (property.exposed_brick) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.exposed_brick %></li><% } %>
+      <% if (property.fireplace) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.fireplace %></li><% } %>
+      <% if (property.front_yard) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.front_yard %></li><% } %>
+      <% if (property.gym) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.gym %></li><% } %>
+      <% if (property.laundry) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.laundry %></li><% } %>
+      <% if (property.indoor_parking) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.indoor_parking %></li><% } %>
+      <% if (property.outdoor_parking) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.outdoor_parking %></li><% } %>
+      <% if (property.pool) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.pool %></li><% } %>
+      <% if (property.sauna) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.sauna %></li><% } %>
+      <% if (property.wheelchair) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.wheelchair %></li><% } %>
+    </ul>
+  </div>
+  <div class="span3">  
+    <ul class="breadcrumb">
+      <li><a href="#"><%= property.country %></a> <span class="divider">/</span></li>
+      <li><a href="#"><%= property.administrative_area_level_1 %></a> <span class="divider">/</span></li>
+      <li><a href="#"><%= property.locality %></a></li>
+    </ul>
+
+    <h2><a href="/properties/<%= propertyId %>"><%= property.title %></a></h2>
+
+    <p><strong class="field-label"><%= i18nCommon.adjectives.posted %>:</strong> <%= posted %></p>
+
+    <hr>
+
+    <% if (property.property_type) { %>
+      <%= i18nProperty.fields.property_type.label %>
+      <% if (property.property_type == 1) { %><%= i18nProperty.fields.property_type.condo %><% } %>
+      <% if (property.property_type == 2) { %><%= i18nProperty.fields.property_type.apartment %><% } %>
+    <% } %>
+    
+    <% if (property.year) { %>
+      <%= i18nProperty.fields.year %>
+      <%= property.year %>
+    <% } %>
+
+    <% if (property.mls) { %>
+      <%= i18nProperty.fields.mls %>
+      <%= property.mls %>
+    <% } %>
+
+    <hr>
+
+    <% if (property.email) { %>
+      <%= i18nProperty.fields.email %>
+      <%= property.email %>
+    <% } %>
+
+    <% if (property.phone) { %>
+      <%= i18nProperty.fields.phone %>
+      <%= property.phone %>
+    <% } %>
+
+    <% if (property.website) { %>
+      <%= i18nProperty.fields.website %>
+      <%= property.website %>
+    <% } %>
+
+  </div>
+</div>
+
+<div id="apply-modal" class="modal form-modal hide fade">
+  <form id="profile-picture-upload-form" method="POST">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-labelledby="edit-profile-picture-modal-label" aria-hidden="true">&times;</button>
+      <h3 id="edit-profile-picture-modal-label"><%= i18nListing.actions.apply_to %> <em>"<%= listing.title %>"</em></h3>
+    </div>
+    <div class="modal-body">
+      <div class="row-fluid">
+        <div class="date-group control-group">
+          <label for="inquiry-dates" class="control-label"><%= i18nListing.form.dates %> <span class="required">*</span></label>
+          <div class="controls">
+            <input type="text" class="span2 start-date datepicker" name="inquiry[start_date]" maxlength="12" value="<%= dates.start %>" data-date="<%= dates.start %>" data-date-format="<%= i18nCommon.dates.datepicker_format %>"  />
+            <input type="text" class="span2 end-date datepicker"   name="inquiry[end_date]"   maxlength="12" value="<%= dates.end %>" data-date="<%= dates.end %>"   data-date-format="<%= i18nCommon.dates.datepicker_format %>"  />
+          </div>
+        </div>
+        
+        <%= JST["src/js/templates/helper/field/tenant.jst"]({i18nCommon: i18nCommon, label: i18nListing.form.inquiry_tenants}) %>
+        <div class="control-group comments-group">
+          <label for="inquiry-comments" class="control-label"><%= i18nListing.form.comments %></label>
+          <div class="controls">
+            <textarea name="inquiry[comments]" rows="2" class="span12"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button id="apply" class="btn btn-primary"><%= i18nListing.actions.apply %></button>
+      <button class="btn" data-dismiss="modal"><%= i18nCommon.actions.close %></button>
+    </div>
+  </form>
+</div>

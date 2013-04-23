@@ -1,0 +1,20 @@
+<header>
+  <h2><%= i18nCommon.classes.Tenants %></h2>
+</header>
+
+<ul class="nav nav-tabs">
+  <li class="active">
+    <a class="filter-all" href="#"><%= i18nCommon.adjectives.all %>
+      <span class="count"></span>
+    </a>
+  </li>
+  <li>
+    <a class="filter-recent" href="#"><%= i18nCommon.adjectives.recently_added %>
+      <span class="count"></span>
+    </a>
+  </li>
+</ul>
+
+<ul id="tenants" class="row no-bullet">
+  <img src='/img/misc/spinner.gif' class='span spinner' alt="<%= i18nCommon.verbs.loading %>" />
+</ul>

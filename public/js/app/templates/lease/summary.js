@@ -14,7 +14,7 @@ __p += '<a href="/properties/' +
 '/units/' +
 ((__t = ( unitId )) == null ? '' : __t) +
 '">' +
-((__t = ( title )) == null ? '' : __t) +
+((__t = ( unitTitle )) == null ? '' : __t) +
 '</a> |';
  };
 __p += '\n  <a href="/properties/' +

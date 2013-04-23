@@ -1,0 +1,41 @@
+<header>
+  <h2><%= title %></h2>
+  <ul class="actions inline">
+    <li>
+      <a class="btn" href="/properties/<%= propertyId %>/listings/<%= objectId %>/edit">
+        <%= i18nCommon.actions.edit %>
+      </a>
+    </li>
+    <li>
+      <a href="/public/<%= propertyId %>/listings/<%= objectId %>"><%= i18nProperty.menu.view_public %></a>
+    </li>
+  </ul>
+</header>
+<div class="row">
+  <div class="span8">
+    <h3><%= i18nListing.inquiries.label %></h3>
+    <table id="inquiries" class="table">
+      <thead>
+        <tr>
+          <th><%= i18nCommon.adjectives.received %></th>
+          <th><%= i18nCommon.classes.Applicants %></th>
+          <th><%= i18nCommon.nouns.comments %></th>
+          <th><%= i18nCommon.verbs.Operations %></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="empty"><td colspan="4">
+          <img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" />
+        </td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="span4">
+    <h3><%= i18nCommon.form.info %></h3>
+    <p><strong class="field-label"><%= i18nCommon.adjectives.posted %>:</strong> <%= posted %></p>
+    <hr>
+    <p><strong class="field-label"><%= i18nCommon.classes.Unit %>:</strong> <a href="/properties/<%= propertyId %>/units/<%= unitId %>"><%= unitTitle %></a></p>
+    <p><strong class="field-label"><%= i18nListing.form.dates %>:</strong> <%= start_date %> - <%= end_date %></p>
+    <p><strong class="field-label"><%= i18nListing.fields.rent %>:</strong> $<%= rent %></p>
+  </div>
+</div>

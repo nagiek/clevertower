@@ -25,7 +25,7 @@
         var details, vars;
         details = {
           cover: this.model.cover('profile'),
-          tasks: '0',
+          listings: '0',
           incomes: '0',
           expenses: '0',
           vacant_units: '0'

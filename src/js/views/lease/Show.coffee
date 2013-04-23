@@ -3,7 +3,7 @@ define [
   "underscore"
   "backbone"
   "moment"
-  'collections/tenant/TenantList'
+  'collections/TenantList'
   'models/Unit'
   'models/Lease'
   'models/Tenant'
@@ -52,6 +52,7 @@ define [
     # We may have the network tenant list. Therefore, we must
     # be sure that we are only displaying relevant users.
     addOne : (t) =>
+      console.log t
       if t.get("lease").id is @model.id
         @$("p.empty").text ''
         @$list.append (new TenantView(model: t)).render().el

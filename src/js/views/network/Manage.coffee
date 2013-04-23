@@ -40,20 +40,19 @@ define [
       # vars.title = network.get("name") unless vars.title
       @$el.html JST["src/js/templates/network/manage.jst"](vars)
       
-      @$propertyCount = @$("#properties-link .count")
-      @$managerCount = @$("#managers-link .count")
-      @$tenantCount = @$("#tenants-link .count")
-
       @updatePropertyCount()
       @updateManagerCount()
       @updateTenantCount()
+      @updateListingCount()
+      @updateInquiryCount()
 
       @
 
-    updatePropertyCount: -> @$propertyCount.html @model.properties.length
-    updateManagerCount: -> @$managerCount.html @model.managers.length
-    updateTenantCount: -> @$tenantCount.html @model.tenants.length
-
+    updatePropertyCount: -> @$("#properties-link .count").html @model.properties.length
+    updateManagerCount: -> @$("#managers-link .count").html @model.managers.length
+    updateTenantCount: -> @$("#tenants-link .count").html @model.tenants.length
+    updateListingCount: -> @$("#listings-link .count").html @model.properties.length
+    updateInquiryCount: -> @$("#inquiries-link .count").html @model.managers.length
 
     changeSubView: (path, params) ->
 

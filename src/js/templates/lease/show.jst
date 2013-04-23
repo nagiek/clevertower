@@ -3,22 +3,28 @@
     <h2><%= i18nLease.attributes.lease_on_unit %> <a href="/properties/<%= propertyId %>/units/<%= unitId %>"><%=title %></a></h2>
     <h3><%= start_date %> - <%= end_date %></h3>
   </hgroup>
-  <div class="span offset1">
-    <a href="/properties/<%= property.objectId %>/leases/<%= objectId %>/edit" class="btn">
+  <ul class="span offset1 inline">
+    <li>
+      <a href="/properties/<%= property.objectId %>/leases/<%= objectId %>/edit" class="btn">
       <%= i18nCommon.actions.edit %>
-    </a>
-    <a href="/properties/<%= property.objectId %>/add/tenants?lease=<%= objectId %>" class="btn add-tenants"
-        rel="tooltip"
-        data-original-title="<%= i18nLease.actions.add_tenants %>">
-      <i class="icon-user"></i>
-    </a>
-    <a href="/properties/<%= property.objectId %>/leases/<%= objectId %>/extend"
-        class="btn extend"
-        rel="tooltip"
-        data-original-title="<%= i18nLease.actions.extend %>">
-      <i class="icon-repeat"></i>
-    </a>
-  </div>
+      </a>
+    </li>
+    <li>
+      <a href="/properties/<%= property.objectId %>/add/tenants?lease=<%= objectId %>" class="btn add-tenants"
+          rel="tooltip"
+          data-original-title="<%= i18nLease.actions.add_tenants %>">
+        <i class="icon-user"></i>
+      </a>
+    </li>
+    <li>
+      <a href="/properties/<%= property.objectId %>/leases/<%= objectId %>/extend"
+          class="btn extend"
+          rel="tooltip"
+          data-original-title="<%= i18nLease.actions.extend %>">
+        <i class="icon-repeat"></i>
+      </a>
+    </li>
+  </ul>
 </header>
 <div class="row">
   <div class="span9">

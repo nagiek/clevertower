@@ -1,9 +1,7 @@
-<div class="row">
-  <div class="control-group emails-group span">
-    <label for="emails" class="control-label"></label>
-    <div class="controls">
-      <textarea name="emails" rows="2" class="span12"></textarea>
-      <p class="help-block"><%= i18nCommon.form.comma_separated %></p>
-    </div>
+<div class="control-group emails-group">
+  <% if (label) { %><label for="emails" class="control-label"><%= label %></label><% } %>
+  <div class="controls">
+    <textarea name="emails" rows="2" class="span12"><%= emails %></textarea>
+    <p class="help-block"><%= i18nCommon.form.comma_separated %></p>
   </div>
 </div>

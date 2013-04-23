@@ -3,6 +3,9 @@ define [
   "underscore"
   "backbone"
   'models/Property'
+  'models/Unit'
+  'models/Lease'
+  'models/Inquiry'
   "i18n!nls/property"
   "i18n!nls/common"
   "underscore.inflection"
@@ -11,7 +14,7 @@ define [
   "templates/property/menu/reports"
   "templates/property/menu/building"
   "templates/property/menu/actions"
-], ($, _, Parse, Property, i18nProperty, i18nCommon, inflection) ->
+], ($, _, Parse, Property, Unit, Lease, Inquiry, i18nProperty, i18nCommon, inflection) ->
 
   class ShowPropertyView extends Parse.View
 
@@ -26,6 +29,8 @@ define [
       
       @model.prep('units')
       @model.prep('leases')
+      @model.prep('listings')
+      @model.prep('inquiries')
       
       @model.on 'change:image_profile', (model, name) => @refresh
       @model.on 'destroy',  @clear
@@ -67,12 +72,17 @@ define [
         name = "views/#{node}/#{subaction}"
 
         # Load the model if it exists.
-        submodel = @model[action[0]].get(subid)
+        submodel = if @model[action[0]] then @model[action[0]].get(subid) else false
         if submodel
           @renderSubView name, property: @model, model: submodel
         # Else get it from the server.
-        else (new Parse.Query(node)).get subid, success: (submodel) => 
-          @renderSubView name, property: @model, model: submodel
+        else
+          nodeType = switch action[0]
+            when "inquiries" then Inquiry
+            when "leases" then Lease
+            when "units" then Unit
+          (new Parse.Query(nodeType)).get subid, success: (submodel) =>
+            @renderSubView name, property: @model, model: submodel
 
 
     renderSubView: (name, vars) =>
@@ -110,9 +120,6 @@ define [
           context: @$form[0]
           submit: (e, data) ->
             data.url = "https://api.parse.com/1/files/" + data.files[0].name
-          beforeSend: (event, files, index, xhr, handler, callBack) ->
-            event.setRequestHeader "X-Parse-Application-Id", "6XgIM84FecTslR8rnXBZsjnDqZgVISa946m9OmfO"
-            event.setRequestHeader "X-Parse-REST-API-Key"  , "qgfCjwKVtDGiIKHxQmojnhoIsID7dcTHnYWZ0cf1"
           send: (e, data) ->
             delete data.headers['Content-Disposition']; # Parse does not accept this header.
           done: (e, data) ->

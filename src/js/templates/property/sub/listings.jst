@@ -1,0 +1,20 @@
+<header>
+  <h2>Listing units</h2>
+</header>
+
+<table id="listings-table" class="table form-condensed">
+  <thead>
+    <tr>
+      <th><%= i18nCommon.classes.Listing %></th>
+      <th><%= i18nListing.fields.rent %></th>
+      <th><%= i18nCommon.fields.status %></th>
+      <th><%= i18nListing.inquiries.label %></th>
+      <th><span class="element-invisible"><%=i18nCommon.form.Operations%></span></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td class="spinner-cell" colspan="4">
+      <img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" />
+    </td></tr>
+  </tbody>
+</table>

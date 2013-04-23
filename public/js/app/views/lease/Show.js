@@ -3,7 +3,7 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", "moment", 'collections/tenant/TenantList', 'models/Unit', 'models/Lease', 'models/Tenant', 'views/tenant/Summary', "i18n!nls/unit", "i18n!nls/lease", "i18n!nls/common", 'templates/lease/show'], function($, _, Parse, moment, TenantList, Unit, Lease, Tenant, TenantView, i18nUnit, i18nLease, i18nCommon) {
+  define(["jquery", "underscore", "backbone", "moment", 'collections/TenantList', 'models/Unit', 'models/Lease', 'models/Tenant', 'views/tenant/Summary', "i18n!nls/unit", "i18n!nls/lease", "i18n!nls/common", 'templates/lease/show'], function($, _, Parse, moment, TenantList, Unit, Lease, Tenant, TenantView, i18nUnit, i18nLease, i18nCommon) {
     var ShowLeaseView;
     return ShowLeaseView = (function(_super) {
 
@@ -53,6 +53,7 @@
       };
 
       ShowLeaseView.prototype.addOne = function(t) {
+        console.log(t);
         if (t.get("lease").id === this.model.id) {
           this.$("p.empty").text('');
           return this.$list.append((new TenantView({

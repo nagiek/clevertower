@@ -2,7 +2,7 @@ define [
   "jquery"
   "underscore"
   "backbone"
-  'collections/notification/NotificationList'
+  'collections/NotificationList'
   'models/Notification'
   'views/notification/Summary'
   "i18n!nls/common"
@@ -11,6 +11,9 @@ define [
   class NotificationIndexView extends Parse.View
   
     el: "#notifications"
+
+    events:
+      'click #nLabel' : 'markAllAsRead'
         
     initialize: (attrs) ->
       @editing = false
@@ -27,9 +30,11 @@ define [
       @$list = @$('ul')
       @$count = @$('#notifications-count')
 
-        # success: (collection, response, options) =>
-        #   @notifications.add [{property: @model}] if collection.length is 0
-                
+    markAllAsRead: =>
+      _.each @notifications.unread(), (n) -> 
+        n.add(read: [Parse.User.current()])
+        n.save null, patch: true
+
     # Re-rendering the App just means refreshing the statistics -- the rest
     # of the app doesn't change.
     render: =>

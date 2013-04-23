@@ -1,7 +1,7 @@
 define [
   'underscore'
   'backbone'
-  "collections/tenant/TenantList"
+  "collections/TenantList"
   "models/Property"
   "models/Unit"
   "moment"

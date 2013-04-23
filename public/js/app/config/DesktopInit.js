@@ -143,6 +143,9 @@
           network.prep("properties").fetch();
           network.prep("managers").fetch();
           network.prep("tenants").fetch();
+          network.prep("listings").fetch();
+          network.prep("applicants").fetch();
+          network.prep("inquiries").fetch();
           return _this.set("network", network);
         }
       });

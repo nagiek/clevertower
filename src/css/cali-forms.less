@@ -204,24 +204,31 @@ legend {
 @media (min-width: 480px) {
   .form-xlarge {
     .control-label {
-      font-size: 18px;
-      line-height: 24px;
+      // Legend
+      font-size: 19.5px;
+      line-height: 36px;
+      color: #333333;
     }
     input[type="text"],
     input[type="number"],
     input[type="date"],
     input[type="url"],
-    input[type="email"] {
+    input[type="email"],
+    select {
       font-size: 18px;
       height: 44px;
       line-height: 24px;
       padding: 8px 16px;
+    }
+    select {
+      height: 44px + 16px;
     }
     .help-inline,
     .help-block {
       font-size: 16px;
       line-height: 18px;
       margin-bottom: 16px;
+      font-weight: 300;
     }
     .add-on {    
       font-size: 18px;
@@ -254,16 +261,21 @@ legend {
     input[type="number"],
     input[type="date"],
     input[type="url"],
-    input[type="email"] {
+    input[type="email"],
+    select {
       font-size: 14px;
       height: 24px;
       line-height: 18px;
       padding: 6px 12px;
     }
+    select {
+      height: 24px + 12px;
+    }
     .help-inline,
     .help-block {
       font-size: 13px;
       line-height: 16px;
+      font-weight: 300;
     }
     .add-on {    
       font-size: 14px;

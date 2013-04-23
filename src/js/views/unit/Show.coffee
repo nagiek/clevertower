@@ -3,7 +3,7 @@ define [
   "underscore"
   "backbone"
   "moment"
-  "collections/lease/LeaseList"
+  "collections/LeaseList"
   'models/Unit'
   'models/Lease'
   "views/lease/summary"
@@ -21,9 +21,10 @@ define [
 
       @property = attrs.property
       
-      @leases = new LeaseList(unit: @model)
-      @leases.on "reset", @addAll
-      @leases.on "add", @addOne
+      console.log @model
+      @model.prep "leases"
+      @model.leases.on "reset", @addAll
+      @model.leases.on "add", @addOne
             
     # Re-render the contents of the Unit item.
     render: ->      
@@ -36,18 +37,19 @@ define [
       $(@el).html JST["src/js/templates/unit/show.jst"](vars)
       
       @$list = @$('#leases-table tbody')
-      @leases.fetch()
+      @model.leases.fetch()
       
       @
       
     # Add all items in the Units collection at once.
     addAll: (collection, filter) =>
       @$list.html ''
-      @leases.each @addOne
+      _.each @model.leases.where(unit: @model), @addOne
 
     # Add a single todo item to the list by creating a view for it, and
     # appending its element to the `<ul>`.
-    addOne: (unit) =>
+    addOne: (lease) =>
       @$('p.empty').hide()
-      view = new LeaseView(model: unit, onUnit: true)
-      @$list.append view.render().el
+      if lease.get("unit").id is @model.id
+        view = new LeaseView(model: lease, onUnit: true)
+        @$list.append view.render().el

@@ -61,7 +61,7 @@ define [
         onUnit: @onUnit
         propertyId: @model.get("property").id
         unitId: @model.get("unit").id
-        title: @model.get("unit").get("title")
+        unitTitle: @model.get("unit").get("title")
         moment: moment
         propertyId: @model.get("property").id
         objectId: @model.get "objectId"

@@ -18,7 +18,8 @@
         var vars;
         this.on("view:change", this.clear);
         vars = {
-          property: this.model
+          property: this.model,
+          network: this.model.get("network")
         };
         if (attrs.params && attrs.params.unit) {
           this.model.prep('units');
@@ -42,7 +43,7 @@
       };
 
       AddLeaseToPropertyView.prototype.clear = function() {
-        delete this.form.undelegateEvents();
+        this.form.undelegateEvents();
         delete this.form;
         this.undelegateEvents();
         delete this;

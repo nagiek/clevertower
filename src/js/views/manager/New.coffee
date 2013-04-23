@@ -2,7 +2,7 @@ define [
   "jquery"
   "underscore"
   "backbone"
-  "collections/tenant/TenantList"
+  "collections/TenantList"
   "models/Property"
   "models/Lease"
   "models/Tenant"

@@ -3,7 +3,7 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", "moment", "collections/tenant/TenantList", "models/Property", "models/Unit", "models/Lease", "models/Tenant", "views/helper/Alert", "i18n!nls/common", "i18n!nls/unit", "i18n!nls/lease", "templates/lease/new", "templates/lease/edit", "templates/lease/_form", "templates/helper/field/unit", "templates/helper/field/property", "templates/helper/field/tenant", "datepicker"], function($, _, Parse, moment, TenantList, Property, Unit, Lease, Tenant, Alert, i18nCommon, i18nUnit, i18nLease) {
+  define(["jquery", "underscore", "backbone", "moment", "models/Property", "models/Unit", "models/Lease", "models/Tenant", "views/helper/Alert", "i18n!nls/common", "i18n!nls/unit", "i18n!nls/lease", "templates/lease/new", "templates/lease/edit", "templates/lease/_form", "templates/helper/field/unit", "templates/helper/field/property", "templates/helper/field/tenant", "datepicker"], function($, _, Parse, moment, Property, Unit, Lease, Tenant, Alert, i18nCommon, i18nUnit, i18nLease) {
     var NewLeaseView;
     return NewLeaseView = (function(_super) {
 
@@ -33,7 +33,9 @@
         _.bindAll(this, 'addOne', 'addAll', 'save', 'setThisMonth', 'setNextMonth', 'setJulyJune');
         this.property = attrs.property;
         if (!this.model) {
-          this.model = new Lease;
+          this.model = new Lease({
+            network: Parse.User.current().get("network")
+          });
         }
         this.template = "src/js/templates/lease/" + (this.model.isNew() ? 'new' : 'edit') + ".jst";
         this.cancel_path = ("/properties/" + this.property.id) + (!this.model.isNew() ? "/leases/" + this.model.id : "");
@@ -131,7 +133,9 @@
       NewLeaseView.prototype.save = function(e) {
         var attrs, data, unit, userValid,
           _this = this;
-        e.preventDefault();
+        if (e) {
+          e.preventDefault();
+        }
         this.$('button.save').prop("disabled", "disabled");
         data = this.$('form').serializeObject();
         this.$('.error').removeClass('error');
@@ -227,7 +231,8 @@
           moment: moment,
           i18nCommon: i18nCommon,
           i18nUnit: i18nUnit,
-          i18nLease: i18nLease
+          i18nLease: i18nLease,
+          emails: this.model.get("emails") ? this.model.get("emails") : ""
         };
         this.$el.html(JST[this.template](vars));
         this.$unitSelect = this.$('.unit-select');

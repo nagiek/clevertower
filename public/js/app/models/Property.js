@@ -1,6 +1,6 @@
 (function() {
 
-  define(['underscore', 'backbone', "collections/unit/UnitList", "collections/lease/LeaseList", "models/Unit", "models/Lease", "underscore.inflection"], function(_, Parse, UnitList, LeaseList, Unit, Lease, inflection) {
+  define(['underscore', 'backbone', "collections/UnitList", "collections/LeaseList", "collections/InquiryList", "collections/TenantList", "collections/ApplicantList", "collections/ListingList", "models/Unit", "models/Lease", "underscore.inflection"], function(_, Parse, UnitList, LeaseList, InquiryList, TenantList, ApplicantList, ListingList, Unit, Lease, Listing, inflection) {
     var Property;
     return Property = Parse.Object.extend("Property", {
       className: "Property",
@@ -72,32 +72,93 @@
         if (this[collectionName]) {
           return this[collectionName];
         }
-        switch (collectionName) {
-          case "units":
-            this[collectionName] = new UnitList([], {
-              property: this
-            });
-            break;
-          case "leases":
-            this[collectionName] = new LeaseList([], {
-              property: this
-            });
-            break;
-          case "tenants":
-            user = Parse.User.current();
-            if (user) {
-              network = user.get("network");
-            }
-            if (!(user && network)) {
-              this[collectionName] = new TenantList([], {
-                lease: this
+        this[collectionName] = (function() {
+          switch (collectionName) {
+            case "units":
+              return new UnitList([], {
+                property: this
               });
-            } else {
-              this[collectionName] = network.tenants ? network.tenants : new TenantList([], {
-                lease: this
+            case "leases":
+              return new LeaseList([], {
+                property: this
               });
-            }
-        }
+            case "inquiries":
+              user = Parse.User.current();
+              if (user) {
+                network = user.get("network");
+              }
+              if (!(user && network)) {
+                return new InquiryList([], {
+                  property: this
+                });
+              } else {
+                if (network.inquiries) {
+                  return network.inquiries;
+                } else {
+                  return new InquiryList([], {
+                    property: this
+                  });
+                }
+              }
+              break;
+            case "listings":
+              user = Parse.User.current();
+              if (user) {
+                network = user.get("network");
+              }
+              if (!(user && network)) {
+                return new ListingList([], {
+                  property: this
+                });
+              } else {
+                if (network.listings) {
+                  return network.listings;
+                } else {
+                  return new ListingList([], {
+                    property: this
+                  });
+                }
+              }
+              break;
+            case "tenants":
+              user = Parse.User.current();
+              if (user) {
+                network = user.get("network");
+              }
+              if (!(user && network)) {
+                return new TenantList([], {
+                  property: this
+                });
+              } else {
+                if (network.tenants) {
+                  return network.tenants;
+                } else {
+                  return new TenantList([], {
+                    property: this
+                  });
+                }
+              }
+              break;
+            case "applicants":
+              user = Parse.User.current();
+              if (user) {
+                network = user.get("network");
+              }
+              if (!(user && network)) {
+                return new ApplicantList([], {
+                  property: this
+                });
+              } else {
+                if (network.applicants) {
+                  return network.applicants;
+                } else {
+                  return new ApplicantList([], {
+                    property: this
+                  });
+                }
+              }
+          }
+        }).call(this);
         return this[collectionName];
       }
     });

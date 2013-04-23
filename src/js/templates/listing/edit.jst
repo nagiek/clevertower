@@ -1,0 +1,11 @@
+<h2><%= i18nListing.headers.edit_listing %></h2>
+<form class="listing-form" enctype="multipart/form-data" method="post">
+  <%= JST["src/js/templates/listing/_form.jst"]({title_placeholder: title_placeholder, isNew: false, listing: listing, dates: dates, moment: moment, i18nCommon: i18nCommon, i18nUnit: i18nUnit, i18nListing: i18nListing}) %>
+  
+  <div class="form-actions">
+    <button class="save btn btn-primary"><%= i18nCommon.actions.save %></button>
+    <a href="<%= cancel_path %>" class="cancel btn"><%= i18nCommon.actions.cancel %></a>
+  </div>
+  
+  <a class="remove"><%= i18nCommon.actions.delete %></a>
+</form>

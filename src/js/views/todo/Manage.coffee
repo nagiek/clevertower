@@ -2,7 +2,7 @@ define [
   "jquery", 
   "underscore", 
   "backbone", 
-  'collections/todo/TodoList',
+  'collections/TodoList',
   'models/AppState',
   'models/Todo',
   'views/todo/Todo',

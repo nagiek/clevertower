@@ -7,13 +7,13 @@
         text-align:center;
       }
       > a {
-        &.unread,
+        &.unclicked,
         &:hover {
           #gradient > .vertical(lighten(@blueLight, 5%), @blueLight);
           background-color:@blueLight;
           color:@black;
         }
-        &.unread:hover {
+        &.unclicked:hover {
           #gradient > .vertical(@blueLight, darken(@blueLight, 5%));
           background-color:darken(@blueLight, 5%);
         }

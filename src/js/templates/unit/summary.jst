@@ -19,14 +19,10 @@
   <% if (isNew) { %>
     <span class="label label-warning"><%= i18nCommon.status.unsaved %></span>
   <% } else { %>  
-    <% if (confirmed) { %>
-      <% if (activeLease) { %>
-        <span class="label label-success"><%= i18nCommon.status.confirmed %></span>
-      <% } else { %>
-        <span class="label label-important"><%= i18nCommon.status.vacant %></span>
-      <% } %>
+    <% if (activeLease) { %>
+      <span class="label label-success"><%= i18nCommon.status.ok %></span>
     <% } else { %>
-      <span class="label label-info"><%= i18nCommon.status.pending %></span>
+      <span class="label label-important"><%= i18nCommon.status.vacant %></span>
     <% } %>
   <% } %>
 </td>

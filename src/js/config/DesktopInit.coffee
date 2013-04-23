@@ -175,6 +175,9 @@ require ["jquery", "backbone", "facebook", "models/Profile", router, "json2", "b
         network.prep("properties").fetch()
         network.prep("managers").fetch()
         network.prep("tenants").fetch()
+        network.prep("listings").fetch()
+        network.prep("applicants").fetch()
+        network.prep("inquiries").fetch()
         
         # Set the network and the role on the user.
         @set "network", network

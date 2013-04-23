@@ -1,5 +1,6 @@
 (function() {
-  var __hasProp = {}.hasOwnProperty,
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(["jquery", "backbone", "views/user/Menu", "views/network/Menu", "views/helper/Search"], function($, Parse, UserMenuView, NetworkMenuView, SearchView) {
@@ -9,11 +10,16 @@
       __extends(DesktopRouter, _super);
 
       function DesktopRouter() {
+        this.listingsPublic = __bind(this.listingsPublic, this);
+
+        this.propertiesPublic = __bind(this.propertiesPublic, this);
         return DesktopRouter.__super__.constructor.apply(this, arguments);
       }
 
       DesktopRouter.prototype.routes = {
         "": "index",
+        "public/:id": "propertiesPublic",
+        "public/:propertyId/listings/:id": "listingsPublic",
         "network/set": "networkSet",
         "network/:name": "networkShow",
         "users/:id": "profileShow",
@@ -86,6 +92,43 @@
         } else {
           return $('#main').html('<h1>Splash page</h1>');
         }
+      };
+
+      DesktopRouter.prototype.propertiesPublic = function(id) {
+        var _this = this;
+        return require(["views/property/Public"], function(PublicPropertyView) {
+          return new Parse.Query("Property").get(id, {
+            success: function(model) {
+              return _this.view = new PublicPropertyView({
+                model: model
+              }).render();
+            },
+            error: function(object, error) {
+              return _this.accessDenied();
+            }
+          });
+        });
+      };
+
+      DesktopRouter.prototype.listingsPublic = function(propertyId, id) {
+        var _this = this;
+        return require(["views/listing/Public"], function(PublicListingView) {
+          return new Parse.Query("Property").get(propertyId, {
+            success: function(property) {
+              return new Parse.Query("Listing").get(id, {
+                success: function(model) {
+                  return _this.view = new PublicListingView({
+                    property: property,
+                    model: model
+                  }).render();
+                }
+              });
+            },
+            error: function(object, error) {
+              return _this.accessDenied();
+            }
+          });
+        });
       };
 
       DesktopRouter.prototype.networkSet = function() {

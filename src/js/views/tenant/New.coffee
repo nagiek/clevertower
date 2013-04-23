@@ -87,7 +87,9 @@ define [
       
       return @trigger "submit:error", {message: 'lease_missing'} unless data.lease
       
-      attrs = lease: data.lease
+      attrs = 
+        objectId: data.lease
+        className: "Lease"
       
       # Validate tenants (assignment done in Cloud)
       userValid = true

@@ -9,6 +9,8 @@ define [
   class DesktopRouter extends Parse.Router
     routes:
       ""                            : "index"
+      "public/:id"                          : "propertiesPublic"
+      "public/:propertyId/listings/:id"     : "listingsPublic"
       "network/set"                 : "networkSet"
       "network/:name"               : "networkShow"
       "users/:id"                   : "profileShow"
@@ -89,6 +91,20 @@ define [
       else
         $('#main').html '<h1>Splash page</h1>'
 
+
+    propertiesPublic: (id) =>
+      require ["views/property/Public"], (PublicPropertyView) => 
+        new Parse.Query("Property").get id,
+          success: (model) => @view = new PublicPropertyView(model: model).render()
+          error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
+
+    listingsPublic: (propertyId, id) =>
+      require ["views/listing/Public"], (PublicListingView) => 
+        new Parse.Query("Property").get propertyId,
+          success: (property) => 
+            new Parse.Query("Listing").get id,
+              success: (model) => @view = new PublicListingView(property: property, model: model).render()
+          error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
 
     # User
     # --------------

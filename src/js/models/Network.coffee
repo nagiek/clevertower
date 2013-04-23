@@ -1,10 +1,13 @@
 define [
   'underscore'
   'backbone'
-  'collections/property/PropertyList'
-  'collections/manager/ManagerList'
-  'collections/tenant/TenantList'
-], (_, Parse, PropertyList, ManagerList, TenantList) ->
+  'collections/PropertyList'
+  'collections/ManagerList'
+  'collections/InquiryList'
+  'collections/TenantList'
+  'collections/ApplicantList'
+  "collections/ListingList"
+], (_, Parse, PropertyList, ManagerList, InquiryList, TenantList, ApplicantList, ListingList) ->
 
   Network = Parse.Object.extend "Network"
   # class Property extends Parse.Object
@@ -31,12 +34,12 @@ define [
       
     prep: (collectionName, options) ->
       return @[collectionName] if @[collectionName]
-      switch collectionName
-        when "properties"
-          @[collectionName] = new PropertyList [], network: @
-        when "managers"
-          @[collectionName] = new ManagerList [], network: @
-        when "tenants"
-          @[collectionName] = new TenantList [], network: @
+      @[collectionName] = switch collectionName
+        when "properties"   then new PropertyList [], network: @
+        when "managers"     then new ManagerList [], network: @
+        when "tenants"      then new TenantList [], network: @
+        when "applicants"   then new ApplicantList [], network: @
+        when "listings"     then new ListingList [], network: @
+        when "inquiries"    then new InquiryList [], network: @
 
       @[collectionName]

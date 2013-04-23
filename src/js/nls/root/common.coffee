@@ -1,6 +1,7 @@
 define
   fields:
     title:                "Title"
+    status:               "Status"
     name:                 "Name"
   classes:                
     lease:                "lease"
@@ -18,6 +19,9 @@ define
     tasks:                "tasks"
     finances:             "finances"
     Applicants:           "Applicants"
+    Inquiries:            "Inquiries"
+    listings:             "listings"
+    Listing:              "Listing"
     Listings:             "Listings"
   actions:                
     go:                   "Go"
@@ -57,25 +61,21 @@ define
     day:                  "Day"
     month:                "Month"
     year:                 "Year"
-    months:
-      short:               ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-      
+  months:
+    short:                ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
   notifications:
     img:                  "Notification Image"
     empty:                "No new notifications"
-    # title:
-    #   lease_invitation:   "Lease Invitation"
-    #   lease_application:  "Lease Application"
-    #   tenant_application: "Tenant Application"
     text:
+      new_inquiry:        (person, property) -> "<strong>#{_.escape(person)}</strong> has applied to join <strong>#{_.escape(property)}</strong>"
       lease_invitation:   (person) -> "You have been invited to a lease at <strong>#{_.escape(property)}</strong>"
-      lease_application:  (person, property) -> "<strong>#{_.escape(person)}</strong> has applied to join <strong>#{_.escape(property)}</strong>"
-      tenant_application: (person, property) -> "<strong>#{_.escape(person)}</strong> has applied to join <strong>#{_.escape(property)}</strong>"
+      inquiry_invitation: (person, property) -> "<strong>#{_.escape(person)}</strong> has indicated you are applying to join <strong>#{_.escape(property)}</strong>"
   status:
-    unsaved:              "Unsaved"
-    vacant:               "Vacant"
-    pending:              "Pending"
-    confirmed:            "Confirmed"
+    ok:                 "OK"
+    unsaved:            "Unsaved"
+    vacant:             "Vacant"
+    pending:            "Pending"
+    confirmed:          "Confirmed"
   prepositions:           
     of:                   "of"
     on:                   "on"
@@ -91,18 +91,22 @@ define
     you:                  "You"
     people:               "People"
     sample_email:         "keigan@example.com"
+    comments:             "Comments"
   order:
     first:                "First"
     last:                 "Last"
   adjectives:
+    new:                  "new"
     unsaved:              "Unsaved"
     linked:               "Linked"
+    received:             "Received"
     recently_added:       "Recently Added"
     all:                  "All"
     public:               "Public"
     private:              "Private"
     landlord_only:        "Landlord Only"
     admin:                "admin"
+    posted:               "Posted"
   form:                   
     operations:           "Operations"
     info:                 "Info"

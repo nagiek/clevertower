@@ -61,7 +61,7 @@
           onUnit: this.onUnit,
           propertyId: this.model.get("property").id,
           unitId: this.model.get("unit").id,
-          title: this.model.get("unit").get("title"),
+          unitTitle: this.model.get("unit").get("title"),
           moment: moment,
           propertyId: this.model.get("property").id,
           objectId: this.model.get("objectId"),

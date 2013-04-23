@@ -3,7 +3,7 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", "pusher", 'collections/property/PropertyList', 'models/Profile', 'views/notification/Index', "i18n!nls/devise", "i18n!nls/user", "templates/user/logged_in_menu"], function($, _, Parse, Pusher, PropertyList, Profile, NotificationsView, i18nDevise, i18nUser) {
+  define(["jquery", "underscore", "backbone", "pusher", 'collections/PropertyList', 'models/Profile', 'views/notification/Index', "i18n!nls/devise", "i18n!nls/user", "templates/user/logged_in_menu"], function($, _, Parse, Pusher, PropertyList, Profile, NotificationsView, i18nDevise, i18nUser) {
     var LoggedInView;
     return LoggedInView = (function(_super) {
 
@@ -44,6 +44,11 @@
       };
 
       LoggedInView.prototype.logOut = function(e) {
+        Parse.User.current().save({
+          lastLogin: Parse.User.current().updatedAt
+        }, {
+          patch: true
+        });
         Parse.User.logOut();
         Parse.Dispatcher.trigger("user:change");
         Parse.Dispatcher.trigger("user:logout");

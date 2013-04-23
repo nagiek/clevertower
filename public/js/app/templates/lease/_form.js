@@ -13,7 +13,7 @@ __p += '<fieldset>\n  <legend>' +
 ((__t = ( i18nCommon.classes.Unit )) == null ? '' : __t) +
 ' <span class="required">*</span></label>\n      <div class="controls">\n        ' +
 ((__t = ( JST["src/js/templates/helper/field/unit.jst"]({required: true, i18nUnit: i18nUnit, i18nCommon: i18nCommon}) )) == null ? '' : __t) +
-'\n      </div>\n    </div>\n    <div class="date-group control-group span">\n      <label for="lease-unit" class="control-label">' +
+'\n      </div>\n    </div>\n    <div class="date-group control-group span">\n      <label for="lease-dates" class="control-label">' +
 ((__t = ( i18nLease.form.dates )) == null ? '' : __t) +
 ' <span class="required">*</span></label>\n      <div class="controls">\n        <input type="text" class="span2 start-date datepicker" name="lease[start_date]" maxlength="12" value="' +
 ((__t = ( dates.start )) == null ? '' : __t) +
@@ -38,7 +38,7 @@ __p += '<fieldset>\n  <legend>' +
 __p += '\n  <fieldset>\n    <legend>' +
 ((__t = ( i18nLease.form.tenants )) == null ? '' : __t) +
 '</legend>\n    ' +
-((__t = ( JST["src/js/templates/helper/field/tenant.jst"]({i18nCommon: i18nCommon}) )) == null ? '' : __t) +
+((__t = ( JST["src/js/templates/helper/field/tenant.jst"]({emails: emails, i18nCommon: i18nCommon, label: false}) )) == null ? '' : __t) +
 '\n  </fieldset>\n';
  } ;
 __p += '\n\n<div class="row">\n  <fieldset class="span4">\n    <legend>' +

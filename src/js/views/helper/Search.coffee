@@ -15,6 +15,8 @@ define [
       'submit form': 'search'
 
     initialize : ->
+      _.bindAll @, 'search', 'render', 'clear'
+
       Parse.Dispatcher.on "user:logout", @clear
 
     search : (e) ->
@@ -93,7 +95,7 @@ define [
                               """
       ]
 
-      if Parse.onNetwork
+      if Parse.onNetwork and Parse.User.current()
 
         @vars[0].local = Parse.User.current().get("network").properties.map (p) ->
             value: p.get("title")

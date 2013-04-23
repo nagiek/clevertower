@@ -3,7 +3,7 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", "moment", "collections/lease/LeaseList", 'models/Unit', 'models/Lease', "views/lease/summary", "i18n!nls/unit", "i18n!nls/lease", "i18n!nls/common", 'templates/unit/show'], function($, _, Parse, moment, LeaseList, Unit, Lease, LeaseView, i18nUnit, i18nLease, i18nCommon) {
+  define(["jquery", "underscore", "backbone", "moment", "collections/LeaseList", 'models/Unit', 'models/Lease', "views/lease/summary", "i18n!nls/unit", "i18n!nls/lease", "i18n!nls/common", 'templates/unit/show'], function($, _, Parse, moment, LeaseList, Unit, Lease, LeaseView, i18nUnit, i18nLease, i18nCommon) {
     var ShowUnitView;
     return ShowUnitView = (function(_super) {
 
@@ -20,11 +20,10 @@
 
       ShowUnitView.prototype.initialize = function(attrs) {
         this.property = attrs.property;
-        this.leases = new LeaseList({
-          unit: this.model
-        });
-        this.leases.on("reset", this.addAll);
-        return this.leases.on("add", this.addOne);
+        console.log(this.model);
+        this.model.prep("leases");
+        this.model.leases.on("reset", this.addAll);
+        return this.model.leases.on("add", this.addOne);
       };
 
       ShowUnitView.prototype.render = function() {
@@ -38,23 +37,27 @@
         });
         $(this.el).html(JST["src/js/templates/unit/show.jst"](vars));
         this.$list = this.$('#leases-table tbody');
-        this.leases.fetch();
+        this.model.leases.fetch();
         return this;
       };
 
       ShowUnitView.prototype.addAll = function(collection, filter) {
         this.$list.html('');
-        return this.leases.each(this.addOne);
+        return _.each(this.model.leases.where({
+          unit: this.model
+        }), this.addOne);
       };
 
-      ShowUnitView.prototype.addOne = function(unit) {
+      ShowUnitView.prototype.addOne = function(lease) {
         var view;
         this.$('p.empty').hide();
-        view = new LeaseView({
-          model: unit,
-          onUnit: true
-        });
-        return this.$list.append(view.render().el);
+        if (lease.get("unit").id === this.model.id) {
+          view = new LeaseView({
+            model: lease,
+            onUnit: true
+          });
+          return this.$list.append(view.render().el);
+        }
       };
 
       return ShowUnitView;

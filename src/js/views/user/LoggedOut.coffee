@@ -28,6 +28,7 @@ define [
 
       Parse.Dispatcher.on "user:login", (user) =>
         $('#reset-password-modal').remove()
+
         @undelegateEvents()
         delete this
         

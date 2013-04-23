@@ -5,7 +5,10 @@
     <li><a href="#"><%= property.locality %></a> <span class="divider">/</span></li>
     <li class="active"><%= property.title %></li>
   </ul>
-  <h1><%= property.title %></h1>
+  <h1 class="inline-block"><%= property.title %></h1>
+  <ul class="actions inline-block inline">
+    <li><button class="btn"><%= i18nGroup.tenant.do_you_live_here %></button></li>
+  </ul>
 </header>
 <div class="row">
   <img class="span9" src="<%= cover %>" alt="<%= i18nCommon.nouns.cover_photo %>">
@@ -15,6 +18,9 @@
       <%= property.description %>
     <% } %>
     <ul id="photos" class="row no-bullet"></ul>
+
+    <h3><%= i18nCommon.classes.listing %></h3>
+    <ul id="listings"></ul>
 
     <h3><%= i18nProperty.form.included %></h3>
     <ul id="included" class="checkbox-list">

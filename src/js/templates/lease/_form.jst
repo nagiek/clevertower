@@ -8,7 +8,7 @@
       </div>
     </div>
     <div class="date-group control-group span">
-      <label for="lease-unit" class="control-label"><%= i18nLease.form.dates %> <span class="required">*</span></label>
+      <label for="lease-dates" class="control-label"><%= i18nLease.form.dates %> <span class="required">*</span></label>
       <div class="controls">
         <input type="text" class="span2 start-date datepicker" name="lease[start_date]" maxlength="12" value="<%= dates.start %>" data-date="<%= dates.start %>" data-date-format="<%= i18nCommon.dates.datepicker_format %>"  />
         <input type="text" class="span2 end-date datepicker"   name="lease[end_date]"   maxlength="12" value="<%= dates.end %>" data-date="<%= dates.end %>"   data-date-format="<%= i18nCommon.dates.datepicker_format %>"  />
@@ -27,7 +27,7 @@
 <% if (isNew) { %>
   <fieldset>
     <legend><%= i18nLease.form.tenants %></legend>
-    <%= JST["src/js/templates/helper/field/tenant.jst"]({i18nCommon: i18nCommon}) %>
+    <%= JST["src/js/templates/helper/field/tenant.jst"]({emails: emails, i18nCommon: i18nCommon, label: false}) %>
   </fieldset>
 <% } %>
 

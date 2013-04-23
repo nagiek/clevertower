@@ -28,7 +28,7 @@ define [
       if hostArray.length > 2
         # On a subdomain
         hostArray.shift()
-        $('#home-nav a').prop "href", hostArray.join(".")
+        $('#home-nav a').prop "href", '//' + hostArray.join(".")
         @$el.html if Parse.User.current() then "<a href='/'>#{i18nCommon.classes.Network}</a>" else ''
       else
         # On main domain

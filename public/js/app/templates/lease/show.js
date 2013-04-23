@@ -19,25 +19,25 @@ __p += '<header class="row">\n  <hgroup class="span">\n    <h2>' +
 ((__t = ( start_date )) == null ? '' : __t) +
 ' - ' +
 ((__t = ( end_date )) == null ? '' : __t) +
-'</h3>\n  </hgroup>\n  <div class="span offset1">\n    <a href="/properties/' +
+'</h3>\n  </hgroup>\n  <ul class="span offset1 inline">\n    <li>\n      <a href="/properties/' +
 ((__t = ( property.objectId )) == null ? '' : __t) +
 '/leases/' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '/edit" class="btn">\n      ' +
 ((__t = ( i18nCommon.actions.edit )) == null ? '' : __t) +
-'\n    </a>\n    <a href="/properties/' +
+'\n      </a>\n    </li>\n    <li>\n      <a href="/properties/' +
 ((__t = ( property.objectId )) == null ? '' : __t) +
 '/add/tenants?lease=' +
 ((__t = ( objectId )) == null ? '' : __t) +
-'" class="btn add-tenants"\n        rel="tooltip"\n        data-original-title="' +
+'" class="btn add-tenants"\n          rel="tooltip"\n          data-original-title="' +
 ((__t = ( i18nLease.actions.add_tenants )) == null ? '' : __t) +
-'">\n      <i class="icon-user"></i>\n    </a>\n    <a href="/properties/' +
+'">\n        <i class="icon-user"></i>\n      </a>\n    </li>\n    <li>\n      <a href="/properties/' +
 ((__t = ( property.objectId )) == null ? '' : __t) +
 '/leases/' +
 ((__t = ( objectId )) == null ? '' : __t) +
-'/extend"\n        class="btn extend"\n        rel="tooltip"\n        data-original-title="' +
+'/extend"\n          class="btn extend"\n          rel="tooltip"\n          data-original-title="' +
 ((__t = ( i18nLease.actions.extend )) == null ? '' : __t) +
-'">\n      <i class="icon-repeat"></i>\n    </a>\n  </div>\n</header>\n<div class="row">\n  <div class="span9">\n    <div>\n      <h3>' +
+'">\n        <i class="icon-repeat"></i>\n      </a>\n    </li>\n  </ul>\n</header>\n<div class="row">\n  <div class="span9">\n    <div>\n      <h3>' +
 ((__t = ( i18nLease.form.tenants )) == null ? '' : __t) +
 '</h3> \n      <p class="empty">' +
 ((__t = ( i18nLease.tenants.empty )) == null ? '' : __t) +

@@ -2,7 +2,7 @@ define [
   "jquery"
   "underscore"
   "backbone"
-  'collections/manager/ManagerList'
+  'collections/ManagerList'
   'models/Manager'
   'models/Profile'
   'views/helper/Alert'

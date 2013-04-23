@@ -3,6 +3,7 @@
   define({
     fields: {
       title: "Title",
+      status: "Status",
       name: "Name"
     },
     classes: {
@@ -21,6 +22,9 @@
       tasks: "tasks",
       finances: "finances",
       Applicants: "Applicants",
+      Inquiries: "Inquiries",
+      listings: "listings",
+      Listing: "Listing",
       Listings: "Listings"
     },
     actions: {
@@ -61,27 +65,28 @@
       date: "Date",
       day: "Day",
       month: "Month",
-      year: "Year",
-      months: {
-        short: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-      }
+      year: "Year"
+    },
+    months: {
+      short: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     },
     notifications: {
       img: "Notification Image",
       empty: "No new notifications",
       text: {
+        new_inquiry: function(person, property) {
+          return "<strong>" + (_.escape(person)) + "</strong> has applied to join <strong>" + (_.escape(property)) + "</strong>";
+        },
         lease_invitation: function(person) {
           return "You have been invited to a lease at <strong>" + (_.escape(property)) + "</strong>";
         },
-        lease_application: function(person, property) {
-          return "<strong>" + (_.escape(person)) + "</strong> has applied to join <strong>" + (_.escape(property)) + "</strong>";
-        },
-        tenant_application: function(person, property) {
-          return "<strong>" + (_.escape(person)) + "</strong> has applied to join <strong>" + (_.escape(property)) + "</strong>";
+        inquiry_invitation: function(person, property) {
+          return "<strong>" + (_.escape(person)) + "</strong> has indicated you are applying to join <strong>" + (_.escape(property)) + "</strong>";
         }
       }
     },
     status: {
+      ok: "OK",
       unsaved: "Unsaved",
       vacant: "Vacant",
       pending: "Pending",
@@ -103,21 +108,25 @@
       link: "link",
       you: "You",
       people: "People",
-      sample_email: "keigan@example.com"
+      sample_email: "keigan@example.com",
+      comments: "Comments"
     },
     order: {
       first: "First",
       last: "Last"
     },
     adjectives: {
+      "new": "new",
       unsaved: "Unsaved",
       linked: "Linked",
+      received: "Received",
       recently_added: "Recently Added",
       all: "All",
       "public": "Public",
       "private": "Private",
       landlord_only: "Landlord Only",
-      admin: "admin"
+      admin: "admin",
+      posted: "Posted"
     },
     form: {
       operations: "Operations",

@@ -2,7 +2,7 @@ define [
   "jquery"
   "underscore"
   "backbone"
-  'collections/property/PropertyList',
+  'collections/PropertyList',
   "models/Network"
   "models/Property"
   "views/property/summary"

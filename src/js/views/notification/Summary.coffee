@@ -14,50 +14,55 @@ define [
     tagName: "li"
   
     events:
-      'click' : 'markAsRead'
+      'click > a' : 'markAsClicked'
         
     initialize: ->
       @model.on "change", @render
         
-    markAsRead: (e) =>
-      @model.set "read", true
-      @model.save()
+    markAsClicked: (e) =>
+
+      @model.add(clicked: [Parse.User.current()])
+      @model.save null, patch: true
   
     # Re-render the contents of the property item.
     render: =>
       channels = @model.get "channels"
       network = @model.get "network"
       property = @model.get "property"
-      user = @model.get "user"
+      profile = @model.get "profile"
       event = @model.get "name" 
-      name = if user.get("name") then user.get("name") else user.get "email"
+      name = profile.name()
       
       if @model.get "forMgr"
-        url = "//#{network.get("name")}.#{location.host}"
+        url = ""
+        url += "//#{Parse.User.current().get("network").get("name")}.#{location.host}" if location.host.split(".").length is 2
         url += "/properties/#{property.id}" if property
         url += channels[0].replace("-", "/") unless channels[0].indexOf('properties') or channels[0].indexOf('profiles')
       else
         url = "/" + channels[0].replace("-", "/")
-      
+
       switch channels[0].split("-")[0]
         when 'properties'
           icon = 'person'
           photo_src = property.cover("thumb")
         when 'leases' or 'tenant'
           icon = 'plus'
-          photo_src = user.cover("thumb")
+          photo_src = profile.cover("thumb")
         else 
           icon = 'calendar'
-          photo_src = user.cover("thumb")
+          photo_src = profile.cover("thumb")
       
-      vars = _.merge(
+
+      text = i18nCommon.notifications.text[event](name, property.get("title"))
+
+      vars = 
         age: moment(@model.createdAt).fromNow()
-        text: i18nCommon.notifications.text[event](name, property.get("thoroughfare"))
+        text: text
         url: url
-        read: @model.get "read"
+        clicked: _.contains @model.get("clicked"), Parse.User.current()
         icon: icon
         photo_src: photo_src
         i18nCommon: i18nCommon
-      )
+
       @$el.html JST["src/js/templates/notification/summary.jst"](vars)
       @

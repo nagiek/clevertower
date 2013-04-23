@@ -9,17 +9,18 @@ define [
 
   class NetworkRouter extends Parse.Router
     routes:
-      ""                            : "index"
-      "properties/new"              : "propertiesNew"
-      "public/:id"                  : "propertiesPublic"
-      "properties/:id"              : "propertiesShow"
-      "properties/:id/*splat"       : "propertiesShow"
-      "properties/:id/*splat"       : "propertiesShow"
-      "network/*splat"              : "networkManage"
-      "users/:id"                   : "profileShow"
-      "users/:id/edit"              : "profileEdit"
-      "account/:category"           : "accountSettings"
-      "*actions"                    : "index"
+      ""                                    : "index"
+      "properties/new"                      : "propertiesNew"
+      "public/:id"                          : "propertiesPublic"
+      "public/:propertyId/listings/:id"     : "listingsPublic"
+      "properties/:id"                      : "propertiesShow"
+      "properties/:id/*splat"               : "propertiesShow"
+      "properties/:id/*splat"               : "propertiesShow"
+      "network/*splat"                      : "networkManage"
+      "users/:id"                           : "profileShow"
+      "users/:id/edit"                      : "profileEdit"
+      "account/:category"                   : "accountSettings"
+      "*actions"                            : "index"
 
     initialize: (options) ->
       Parse.history.start pushState: true
@@ -32,9 +33,17 @@ define [
         Parse.User.current().setup().then =>
           @userView.render()
           @networkView.render()
+
+          network = user.get("network")
+          network.prep("properties").fetch()
+          network.prep("managers").fetch()
+          network.prep("tenants").fetch()
+          network.prep("listings").fetch()
+          network.prep("applicants").fetch()
+          network.prep("inquiries").fetch()
           
           # Remove the Signup or Login callback
-          @off "route", @signupOrLogin
+          Parse.history.off "route", @signupOrLogin
           
           # Go to the dashboard.
           @index()
@@ -43,7 +52,7 @@ define [
       # Clean up after views
       Parse.history.on "route", (route) =>
         $('#search').val("").blur()
-        if @view
+        if @view and Parse.User.current()
           unless route is "propertiesShow"
             @view.undelegateEvents()
             delete @view
@@ -55,7 +64,7 @@ define [
         
       Parse.Dispatcher.on "network:set", => 
         # Remove the Access Denied callback
-        @off "route", @accessDenied
+        Parse.history.off "route", @accessDenied
         
       Parse.Dispatcher.on "user:logout", (route) => 
         # Navigate after a second to the top level domain.
@@ -80,11 +89,11 @@ define [
           role.getUsers().query().get Parse.User.current().id,
             success: (user) -> @accessDenied() unless user
         else
-          @on "route", (route) => @accessDenied()
+          Parse.history.on "route", (route) => @accessDenied
           @accessDenied()
 
       else
-        @on "route", (route) => @signupOrLogin()
+        Parse.history.on "route", (route) => @signupOrLogin
         @signupOrLogin()
 
 
@@ -104,6 +113,13 @@ define [
           success: (model) => @view = new PublicPropertyView(model: model).render()
           error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
 
+    listingsPublic: (propertyId, id) =>
+      require ["views/listing/Public"], (PublicListingView) => 
+        new Parse.Query("Property").get propertyId,
+          success: (property) => 
+            new Parse.Query("Listing").get id,
+              success: (model) => @view = new PublicListingView(property: property, model: model).render()
+          error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
 
 
     # Property
@@ -119,7 +135,6 @@ define [
           @view.changeSubView path: "properties/new/wizard", params: {}
     
     propertiesShow: (id, splat) =>
-      'propertiesShow'
       require ["views/property/Show"], (PropertyView) => 
         vars = @deparamAction splat
         if !@view or @view !instanceof PropertyView

@@ -25,10 +25,10 @@ __p += '\n        <a href="#" class="badge badge-info" rel="tooltip" data-origin
  } ;
 __p += '\n    </h2>\n    \n    <dl>\n      <!-- <div class="span"> -->\n        <dt><a href="/properties/' +
 ((__t = ( objectId )) == null ? '' : __t) +
-'/tasks">' +
-((__t = ( i18nCommon.classes.tasks )) == null ? '' : __t) +
+'/listings">' +
+((__t = ( i18nCommon.classes.listings )) == null ? '' : __t) +
 '</a></dt>\n        <dd>' +
-((__t = ( tasks )) == null ? '' : __t) +
+((__t = ( listings )) == null ? '' : __t) +
 '</dd>\n      <!-- </div> -->\n      <!-- <div class="span"> -->\n        <dt><a href="/properties/' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '/finance">' +
@@ -39,7 +39,7 @@ __p += '\n    </h2>\n    \n    <dl>\n      <!-- <div class="span"> -->\n        
 ((__t = ( expenses )) == null ? '' : __t) +
 '</span>\n        </dd>\n      <!-- </div> -->\n      <!-- <div class="span"> -->\n        <dt><a href="/properties/' +
 ((__t = ( objectId )) == null ? '' : __t) +
-'/tasks">' +
+'/listings">' +
 ((__t = ( i18nProperty.structure.vacancies )) == null ? '' : __t) +
 '</a></dt>\n        <dd>' +
 ((__t = ( vacant_units )) == null ? '' : __t) +

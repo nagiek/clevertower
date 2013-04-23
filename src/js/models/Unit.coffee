@@ -1,9 +1,10 @@
 define [
   'underscore'
   'backbone'
+  "collections/LeaseList"
   "models/Property"
   "i18n!nls/unit"
-], (_, Parse, Property, i18nUnit) ->
+], (_, Parse, LeaseList, Property, i18nUnit) ->
 
   class Unit extends Parse.Object
     
@@ -31,3 +32,12 @@ define [
       if attrs.title and attrs.title is ''
         return {message: 'title_missing'}
       false
+
+    prep: (collectionName, options) ->
+      return @[collectionName] if @[collectionName]
+      @[collectionName] = switch collectionName
+        when "leases"
+          property = @get("property")
+          if property.leases then property.leases else new LeaseList [], unit: @
+      @[collectionName]
+

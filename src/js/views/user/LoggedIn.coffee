@@ -3,7 +3,7 @@ define [
   "underscore"
   "backbone"
   "pusher"
-  'collections/property/PropertyList'
+  'collections/PropertyList'
   'models/Profile'
   'views/notification/Index'
   "i18n!nls/devise"
@@ -41,6 +41,10 @@ define [
 
     # Logs out the user and shows the login view
     logOut: (e) ->
+
+      # Record the user login time for next session.
+      Parse.User.current().save {lastLogin: Parse.User.current().updatedAt}, {patch: true}
+
       Parse.User.logOut()
       Parse.Dispatcher.trigger "user:change"
       Parse.Dispatcher.trigger "user:logout"

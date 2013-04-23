@@ -31,7 +31,7 @@ define [
       details = 
         cover        : @model.cover('profile')
         # Convert to collections.
-        tasks        : '0'            # @model.tasks()
+        listings     : '0'            # @model.listings()
         incomes      : '0'            # @model.incomes().sum()
         expenses     : '0'            # @model.expenses().sum()
         vacant_units : '0'            # @model.units().vacant().length

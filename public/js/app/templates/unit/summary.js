@@ -44,21 +44,13 @@ __p += '\n    <span class="label label-warning">' +
 '</span>\n  ';
  } else { ;
 __p += '  \n    ';
- if (confirmed) { ;
-__p += '\n      ';
  if (activeLease) { ;
-__p += '\n        <span class="label label-success">' +
-((__t = ( i18nCommon.status.confirmed )) == null ? '' : __t) +
-'</span>\n      ';
+__p += '\n      <span class="label label-success">' +
+((__t = ( i18nCommon.status.ok )) == null ? '' : __t) +
+'</span>\n    ';
  } else { ;
-__p += '\n        <span class="label label-important">' +
+__p += '\n      <span class="label label-important">' +
 ((__t = ( i18nCommon.status.vacant )) == null ? '' : __t) +
-'</span>\n      ';
- } ;
-__p += '\n    ';
- } else { ;
-__p += '\n      <span class="label label-info">' +
-((__t = ( i18nCommon.status.pending )) == null ? '' : __t) +
 '</span>\n    ';
  } ;
 __p += '\n  ';

@@ -3,7 +3,7 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", 'models/Property', "i18n!nls/property", "i18n!nls/common", "underscore.inflection", 'templates/property/show', "templates/property/menu/show", "templates/property/menu/reports", "templates/property/menu/building", "templates/property/menu/actions"], function($, _, Parse, Property, i18nProperty, i18nCommon, inflection) {
+  define(["jquery", "underscore", "backbone", 'models/Property', 'models/Unit', 'models/Lease', 'models/Inquiry', "i18n!nls/property", "i18n!nls/common", "underscore.inflection", 'templates/property/show', "templates/property/menu/show", "templates/property/menu/reports", "templates/property/menu/building", "templates/property/menu/actions"], function($, _, Parse, Property, Unit, Lease, Inquiry, i18nProperty, i18nCommon, inflection) {
     var ShowPropertyView;
     return ShowPropertyView = (function(_super) {
 
@@ -29,6 +29,8 @@
         this.$form = $("#profile-picture-upload");
         this.model.prep('units');
         this.model.prep('leases');
+        this.model.prep('listings');
+        this.model.prep('inquiries');
         this.model.on('change:image_profile', function(model, name) {
           return _this.refresh;
         });
@@ -49,7 +51,7 @@
       };
 
       ShowPropertyView.prototype.changeSubView = function(path, params) {
-        var action, name, node, propertyCentric, subaction, subid, submodel,
+        var action, name, node, nodeType, propertyCentric, subaction, subid, submodel,
           _this = this;
         action = path ? path.split("/") : Array('units');
         if (action.length === 1 || action[0] === "add") {
@@ -64,14 +66,24 @@
           subid = action[1];
           subaction = action[2] ? action[2] : "show";
           name = "views/" + node + "/" + subaction;
-          submodel = this.model[action[0]].get(subid);
+          submodel = this.model[action[0]] ? this.model[action[0]].get(subid) : false;
           if (submodel) {
             return this.renderSubView(name, {
               property: this.model,
               model: submodel
             });
           } else {
-            return (new Parse.Query(node)).get(subid, {
+            nodeType = (function() {
+              switch (action[0]) {
+                case "inquiries":
+                  return Inquiry;
+                case "leases":
+                  return Lease;
+                case "units":
+                  return Unit;
+              }
+            })();
+            return (new Parse.Query(nodeType)).get(subid, {
               success: function(submodel) {
                 return _this.renderSubView(name, {
                   property: _this.model,
@@ -120,10 +132,6 @@
             context: _this.$form[0],
             submit: function(e, data) {
               return data.url = "https://api.parse.com/1/files/" + data.files[0].name;
-            },
-            beforeSend: function(event, files, index, xhr, handler, callBack) {
-              event.setRequestHeader("X-Parse-Application-Id", "6XgIM84FecTslR8rnXBZsjnDqZgVISa946m9OmfO");
-              return event.setRequestHeader("X-Parse-REST-API-Key", "qgfCjwKVtDGiIKHxQmojnhoIsID7dcTHnYWZ0cf1");
             },
             send: function(e, data) {
               return delete data.headers['Content-Disposition'];

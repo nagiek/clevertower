@@ -4,7 +4,7 @@ define [
   "backbone"
   "models/Property"
   "models/Photo"
-  "collections/photo/PhotoList"
+  "collections/PhotoList"
   "views/photo/Show"
   "i18n!nls/property"
   "i18n!nls/common"
@@ -76,9 +76,6 @@ define [
         ]
         submit: (e, data) ->
           data.url = "https://api.parse.com/1/files/" + data.files[0].name
-        # beforeSend: (event, files, index, xhr, handler, callBack) ->
-        #   event.setRequestHeader "X-Parse-Application-Id", window.APPID
-        #   event.setRequestHeader "X-Parse-REST-API-Key", window.RESTAPIKEY
         send: (e, data) ->
           delete data.headers['Content-Disposition']; # Parse does not accept this header.
         done: (e, data) ->

@@ -2,16 +2,20 @@
 
   define({
     singularize: {
+      listings: "listing",
       leases: "lease",
       networks: "network",
       units: "unit",
-      properties: "property"
+      properties: "property",
+      inquiries: "inquiry"
     },
     pluralize: {
+      listing: "listings",
       lease: "leases",
       network: "networks",
       unit: "units",
-      property: "properties"
+      property: "properties",
+      inquiry: "inquiries"
     }
   });
 

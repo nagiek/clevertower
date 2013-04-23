@@ -17,7 +17,7 @@ define [
       
       @on "view:change", @clear
       
-      vars = property: @model
+      vars = property: @model, network: @model.get("network")
       if attrs.params and attrs.params.unit
         @model.prep('units')
         @model.units.fetch() if @model.units.length is 0
@@ -29,7 +29,7 @@ define [
       @form = new NewLeaseView(model: @lease, property: @model).render()
     
     clear : ->
-      delete @form.undelegateEvents()
+      @form.undelegateEvents()
       delete @form
       @undelegateEvents()
       delete this

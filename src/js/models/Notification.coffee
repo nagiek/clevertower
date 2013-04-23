@@ -6,4 +6,5 @@ define [
   Notification = Parse.Object.extend "Notification",
 
     defaults:
-      read         : false
+      read         : []
+      clicked      : []

@@ -3,7 +3,6 @@ define [
   "underscore"
   "backbone"
   "moment"
-  "collections/tenant/TenantList"
   "models/Property"
   "models/Unit"
   "models/Lease"
@@ -19,7 +18,7 @@ define [
   "templates/helper/field/property"
   "templates/helper/field/tenant"
   "datepicker"
-], ($, _, Parse, moment, TenantList, Property, Unit, Lease, Tenant, Alert, i18nCommon, i18nUnit, i18nLease) ->
+], ($, _, Parse, moment, Property, Unit, Lease, Tenant, Alert, i18nCommon, i18nUnit, i18nLease) ->
 
   class NewLeaseView extends Parse.View
     
@@ -38,10 +37,10 @@ define [
     initialize : (attrs) ->
       
       _.bindAll this, 'addOne', 'addAll', 'save', 'setThisMonth', 'setNextMonth', 'setJulyJune'
-      
+
       @property = attrs.property
       
-      @model = new Lease unless @model
+      @model = new Lease(network: Parse.User.current().get("network")) unless @model
       @template = "src/js/templates/lease/#{if @model.isNew() then 'new' else 'edit'}.jst"
       @cancel_path = "/properties/#{@property.id}" + unless @model.isNew() then "/leases/#{@model.id}" else ""
             
@@ -104,7 +103,7 @@ define [
         end:    if @model.get "end_date"    then moment(@model.get("end_date")).format("L")    else moment(@current).add(1, 'year').subtract(1, 'day').format("L")
 
     addOne : (u) =>
-      HTML = "<option value='#{u.id}'" + (if @model.get("unit") and @model.get("unit").id == u.id then "selected='selected'" else "") + ">#{u.get('title')}</option>"
+      HTML = "<option value='#{u.id}'" + (if @model.get("unit") and @model.get("unit").id is u.id then "selected='selected'" else "") + ">#{u.get('title')}</option>"
       @$unitSelect.append HTML
       # @$unitSelect.children(':last').before HTML
 
@@ -117,7 +116,7 @@ define [
       @units.each @addOne
 
     save : (e) ->
-      e.preventDefault()
+      e.preventDefault() if e
       
       @$('button.save').prop "disabled", "disabled"
       data = @$('form').serializeObject()
@@ -192,7 +191,7 @@ define [
 
     render: ->
       vars =
-        lease: _.defaults(@model.attributes, Lease::defaults)
+        lease: _.defaults @model.attributes, Lease::defaults
         unit: if @model.get "unit" then @model.get "unit" else false
         dates: @dates
         cancel_path: @cancel_path
@@ -201,6 +200,7 @@ define [
         i18nCommon: i18nCommon
         i18nUnit: i18nUnit
         i18nLease: i18nLease
+        emails: if @model.get "emails" then @model.get "emails" else ""
 
       @$el.html JST[@template](vars)
       
