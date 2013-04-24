@@ -88,12 +88,12 @@
        data-original-title="<%= i18nUnit.actions.add_lease %>">
       <i class="icon-plus"></i>
     </a>
-    <!-- <a class="btn btn-mini add-task view-specific view-show"
-       href="/properties/<%= property.objectId %>/add/task?unit=<%= objectId %>"
+    <a class="btn btn-mini add-listing view-specific view-show"
+       href="/properties/<%= property.objectId %>/add/listing?unit=<%= objectId %>"
        rel="tooltip" 
-       data-original-title="<%= i18nUnit.actions.add_task %>">
+       data-original-title="<%= i18nUnit.actions.add_listing %>">
       <i class="icon-plus"></i>
-    </a> -->
+    </a>
     <% if (activeLease) { %>
       <a class="btn btn-mini add-tenants view-specific view-show"
          href="/properties/<%= property.objectId %>/add/tenants?lease=<%= activeLease.id %>" 

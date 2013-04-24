@@ -2,7 +2,7 @@ define [
   "jquery"
   "underscore"
   "backbone"
-  "collections/tenant/TenantList"
+  "collections/TenantList"
   "models/Property"
   "models/Lease"
   "models/Tenant"
@@ -116,12 +116,12 @@ define [
           @trigger "submit:error", message: 'tenants_incorrect'
 
     render: ->
-      vars = _.merge(
+      vars =
         property_path: "/properties/#{@property.id}"
         cancel_path: "/properties/#{@property.id}" + if @leaseId then "/leases/#{@leaseId}"
         i18nCommon: i18nCommon
         i18nLease: i18nLease
-      )
+      
       @$el.html JST["src/js/templates/tenant/new.jst"](vars)
       
       @$leaseSelect = @$('.lease-select')

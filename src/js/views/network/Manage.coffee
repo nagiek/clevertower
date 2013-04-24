@@ -17,11 +17,12 @@ define [
     
     initialize: (attrs) ->
 
-      _.bindAll this, 'updatePropertyCount', 'updateManagerCount', 'updateTenantCount', 'changeSubView', 'renderSubView'
+      _.bindAll this, 'updatePropertyCount', 'updateManagerCount', 'updateListingCount', 'updateTenantCount', 'changeSubView', 'renderSubView'
 
       @model = Parse.User.current().get("network")
 
       @model.properties.on 'add reset', @updatePropertyCount
+      @model.listings.on 'add reset', @updateListingCount
       @model.managers.on 'add reset', @updateManagerCount
       @model.tenants.on 'add reset', @updateTenantCount
       
@@ -34,9 +35,13 @@ define [
     # Re-render the contents of the property item.
     render: =>
       _.defaults @model.attributes, Network::defaults
-      vars = _.merge @model.toJSON(),
+      name = @model.get("name")
+      vars = 
+        title: @model.get("title")
+        name: name
         i18nCommon: i18nCommon
         i18nProperty: i18nProperty
+        public_url: "//" + location.host.split(".").slice(1).join(".") + "/networks/#{name}" 
       # vars.title = network.get("name") unless vars.title
       @$el.html JST["src/js/templates/network/manage.jst"](vars)
       
@@ -44,7 +49,6 @@ define [
       @updateManagerCount()
       @updateTenantCount()
       @updateListingCount()
-      @updateInquiryCount()
 
       @
 
@@ -52,7 +56,6 @@ define [
     updateManagerCount: -> @$("#managers-link .count").html @model.managers.length
     updateTenantCount: -> @$("#tenants-link .count").html @model.tenants.length
     updateListingCount: -> @$("#listings-link .count").html @model.properties.length
-    updateInquiryCount: -> @$("#inquiries-link .count").html @model.managers.length
 
     changeSubView: (path, params) ->
 

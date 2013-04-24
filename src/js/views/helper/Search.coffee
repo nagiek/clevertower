@@ -153,6 +153,7 @@ define [
             img_src: p.cover("tiny")
             url: p.url()
             tokens: _.union(p.get("title").split(" "), p.get("thoroughfare").split(" "), [p.get("locality")])          
+
           @$('#search').typeahead @vars
 
         Parse.User.current().get("network").tenants.on "add reset", =>
@@ -166,6 +167,7 @@ define [
             value: name
             img_src: p.cover("tiny")
             url: p.url()
+
           @$('#search').typeahead @vars
           
         # Parse.User.current().get("network").managers.on "add reset", =>
@@ -177,7 +179,8 @@ define [
         #     url: p.url()
         #   @$('#search').typeahead @vars
 
-      @$('#search').typeahead @vars
+      else
+        @$('#search').typeahead @vars
       
       @
       

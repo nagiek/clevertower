@@ -135,13 +135,13 @@ __p += '\n    <a class="btn btn-mini add-lease view-specific view-show"\n       
 ((__t = ( objectId )) == null ? '' : __t) +
 '" \n       rel="tooltip" \n       data-original-title="' +
 ((__t = ( i18nUnit.actions.add_lease )) == null ? '' : __t) +
-'">\n      <i class="icon-plus"></i>\n    </a>\n    <!-- <a class="btn btn-mini add-task view-specific view-show"\n       href="/properties/' +
+'">\n      <i class="icon-plus"></i>\n    </a>\n    <a class="btn btn-mini add-listing view-specific view-show"\n       href="/properties/' +
 ((__t = ( property.objectId )) == null ? '' : __t) +
-'/add/task?unit=' +
+'/add/listing?unit=' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '"\n       rel="tooltip" \n       data-original-title="' +
-((__t = ( i18nUnit.actions.add_task )) == null ? '' : __t) +
-'">\n      <i class="icon-plus"></i>\n    </a> -->\n    ';
+((__t = ( i18nUnit.actions.add_listing )) == null ? '' : __t) +
+'">\n      <i class="icon-plus"></i>\n    </a>\n    ';
  if (activeLease) { ;
 __p += '\n      <a class="btn btn-mini add-tenants view-specific view-show"\n         href="/properties/' +
 ((__t = ( property.objectId )) == null ? '' : __t) +
