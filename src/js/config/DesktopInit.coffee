@@ -51,7 +51,8 @@ require.config
     moment:                   "//cdnjs.cloudflare.com/ajax/libs/moment.js/2.0.0/moment.min"
     bootstrap:                "libs/bootstrap/bootstrap"    
     json2:                    "//cdnjs.cloudflare.com/ajax/libs/json2/20121008/json2"                 # "libs/plugins/json2"
-                              
+    "underscore.string":      "//cdnjs.cloudflare.com/ajax/libs/underscore.string/2.3.0/underscore.string.min"
+
     # RequireJS Plugins       
     # -----------------       
     text:                     "libs/plugins/text"
@@ -107,9 +108,12 @@ define "gmaps", ["async!//maps.googleapis.com/maps/api/js?v=3&sensor=false&key=A
 # This will bug out on "www" subdomain.
 onNetwork = window.location.host.split(".").length > 2
 router = if onNetwork then "routers/Network" else "routers/Desktop"
-require ["jquery", "backbone", "facebook", "models/Profile", router, "json2", "bootstrap", "serializeObject", "typeahead"], ($, Parse, FB, Profile, AppRouter) ->
+require ["jquery", "underscore", "backbone", "facebook", "models/Profile", router, "underscore.string", "json2", "bootstrap", "serializeObject", "typeahead"], ($, _, Parse, FB, Profile, AppRouter, _String) ->
 
   Parse.initialize window.APPID, window.JSKEY
+
+  # Import Underscore.string to separate object, because there are conflict functions (include, reverse, contains)
+  _.str = _String
   
   # Always include these headers, unless otherwise noted.
   $.ajaxSetup beforeSend: (jqXhr, settings) ->

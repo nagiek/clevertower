@@ -69,10 +69,10 @@
       date: "Date",
       day: "Day",
       month: "Month",
-      year: "Year"
-    },
-    months: {
-      short: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+      year: "Year",
+      months: {
+        short: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+      }
     },
     notifications: {
       img: "Notification Image",
@@ -97,6 +97,7 @@
       confirmed: "Confirmed"
     },
     prepositions: {
+      about: "About",
       of: "of",
       on: "on",
       off: "off",
@@ -113,7 +114,8 @@
       you: "You",
       people: "People",
       sample_email: "keigan@example.com",
-      comments: "Comments"
+      comments: "Comments",
+      activity: "Activity"
     },
     order: {
       first: "First",
@@ -123,6 +125,7 @@
       "new": "new",
       unsaved: "Unsaved",
       linked: "Linked",
+      joined: "Joined",
       received: "Received",
       recently_added: "Recently Added",
       all: "All",

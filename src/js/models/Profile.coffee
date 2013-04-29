@@ -35,7 +35,11 @@ define [
       
     name: ->
       name = @get("name")
-      name = @get("email") unless name?
+      unless name?
+        email = @get("email") 
+        chunks = []
+        _.each email.split("@")[0].split("."), (component) -> chunks.push _.str.capitalize(component)
+        name = chunks.join(" ")
       name
       
     validate: (attrs, options) ->

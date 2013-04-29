@@ -27,6 +27,7 @@
       moment: "//cdnjs.cloudflare.com/ajax/libs/moment.js/2.0.0/moment.min",
       bootstrap: "libs/bootstrap/bootstrap",
       json2: "//cdnjs.cloudflare.com/ajax/libs/json2/20121008/json2",
+      "underscore.string": "//cdnjs.cloudflare.com/ajax/libs/underscore.string/2.3.0/underscore.string.min",
       text: "libs/plugins/text",
       async: "libs/plugins/async",
       propertyParser: "libs/plugins/propertyParser",
@@ -72,8 +73,9 @@
 
   router = onNetwork ? "routers/Network" : "routers/Desktop";
 
-  require(["jquery", "backbone", "facebook", "models/Profile", router, "json2", "bootstrap", "serializeObject", "typeahead"], function($, Parse, FB, Profile, AppRouter) {
+  require(["jquery", "underscore", "backbone", "facebook", "models/Profile", router, "underscore.string", "json2", "bootstrap", "serializeObject", "typeahead"], function($, _, Parse, FB, Profile, AppRouter, _String) {
     Parse.initialize(window.APPID, window.JSKEY);
+    _.str = _String;
     $.ajaxSetup({
       beforeSend: function(jqXhr, settings) {
         jqXhr.setRequestHeader("X-Parse-Application-Id", window.APPID);

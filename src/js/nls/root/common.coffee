@@ -65,8 +65,8 @@ define
     day:                  "Day"
     month:                "Month"
     year:                 "Year"
-  months:
-    short:                ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    months:
+      short:                ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
   notifications:
     img:                  "Notification Image"
     empty:                "No new notifications"
@@ -75,12 +75,13 @@ define
       lease_invitation:   (person) -> "You have been invited to a lease at <strong>#{_.escape(property)}</strong>"
       inquiry_invitation: (person, property) -> "<strong>#{_.escape(person)}</strong> has indicated you are applying to join <strong>#{_.escape(property)}</strong>"
   status:
-    ok:                 "OK"
-    unsaved:            "Unsaved"
-    vacant:             "Vacant"
-    pending:            "Pending"
-    confirmed:          "Confirmed"
+    ok:                   "OK"
+    unsaved:              "Unsaved"
+    vacant:               "Vacant"
+    pending:              "Pending"
+    confirmed:            "Confirmed"
   prepositions:           
+    about:                "About"
     of:                   "of"
     on:                   "on"
     off:                  "off"
@@ -96,6 +97,7 @@ define
     people:               "People"
     sample_email:         "keigan@example.com"
     comments:             "Comments"
+    activity:             "Activity"
   order:
     first:                "First"
     last:                 "Last"
@@ -103,6 +105,7 @@ define
     new:                  "new"
     unsaved:              "Unsaved"
     linked:               "Linked"
+    joined:               "Joined"
     received:             "Received"
     recently_added:       "Recently Added"
     all:                  "All"

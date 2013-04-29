@@ -1,31 +1,38 @@
-<section class="offset1 span10">
-  <a href="/user/1" class="photo photo-medium stay-left">
-    <img src="<%= cover %>" alt="<%= name %>" width="180" height="180" />
-  </a>
+<section class="row">
+  <header class="offset1 span3">
+    <div class="photo row">
+      <img src="<%= cover %>" class="span3" alt="<%= name %>" width="270" height="270" />
+    </div>
+  
+    <h1 class="soften"><%= name %></h1>
 
-  <div class="photo-float medium-float">
-    <h1><%= name %></h1>
+
+  </header>
+
+  <div class="span7">
 
     <% if (current) { %>
-      <div class="btn-group">
-        <a href="/account/edit" class="btn"><%= i18nUser.menu.edit_my_profile %></a>
-        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-          <span class="caret"></span>
-        </a>
-        <ul class="dropdown-menu">
-          <li><a href="/account/settings"><%= i18nUser.menu.account_settings %></a></li>
-          <li><a href="/account/privacy"><%= i18nUser.menu.privacy_settings %></a></li>
-          <li><a href="/account/apps"><%= i18nUser.menu.apps %></a></li>
-        </ul>
-      </div>
+      <a href="/account/edit" class="btn pull-right"><%= i18nUser.menu.edit_my_profile %></a>
     <% } %>
+    <ul class="nav nav-tabs">
+      <li class="active"><a href="#activity"><%= i18nCommon.nouns.activity %></a></li>
+      <li><a href="#about"><%= i18nCommon.prepositions.about %></a></li>
+    </ul>
 
-    <% if (bio) { %>
-      <div><%= bio %></div>
-    <% } %>
-    
-    <% if (website) { %>
-      <div><%= website %></div>
-    <% } %>
-  </div><!--/.info-->
+    <div class="tab-content">
+      <div id="activity" class="tab-pane active">
+      </div>
+      <div id="about" class="tab-pane">
+
+        <strong><%= i18nCommon.adjectives.joined %>:</strong> <%= createdAt %>
+
+        <% if (bio) { %>
+          <div><%= bio %></div>
+        <% } %>
+        
+        <% if (website) { %>
+          <div><%= website %></div>
+        <% } %>
+      </div>
+  </div>
 </section>
