@@ -13,9 +13,12 @@ __p += '<label for="emails" class="control-label">' +
 ((__t = ( label )) == null ? '' : __t) +
 '</label>';
  } ;
-__p += '\n  <div class="controls">\n    <textarea name="emails" rows="2" class="span12">' +
-((__t = ( emails )) == null ? '' : __t) +
-'</textarea>\n    <p class="help-block">' +
+__p += '\n  <div class="controls">\n    <textarea name="emails" rows="2" class="input-block-level">';
+ if (emails) { ;
+__p +=
+((__t = ( emails )) == null ? '' : __t);
+ } ;
+__p += '</textarea>\n    <p class="help-block">' +
 ((__t = ( i18nCommon.form.comma_separated )) == null ? '' : __t) +
 '</p>\n  </div>\n</div>';
 

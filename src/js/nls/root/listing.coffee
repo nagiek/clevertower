@@ -8,6 +8,7 @@ define
     apply:                "Apply"
     apply_to:             "Apply to"
   attributes:
+    applied:              "Applied"
     starting:             "Starting"
     ending:               "Ending"
     listing_on_unit:      "Listing on Unit"

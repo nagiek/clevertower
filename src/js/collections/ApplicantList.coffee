@@ -15,6 +15,7 @@ define [
       @listing = attrs.listing
       @property = attrs.property
       @network = attrs.network
+      @profile = attrs.profile
       @createQuery()
 
     createInquiryQuery: (inquiry) ->
@@ -32,6 +33,10 @@ define [
     createNetworkQuery: (network) ->
       @network = network
       @createQuery()
+
+    createProfileQuery: (profile) ->
+      @profile = profile
+      @createQuery()
               
     createQuery: ->
       @query = new Parse.Query(Applicant).include("profile")
@@ -39,3 +44,4 @@ define [
       if @listing and @listing.id then @query.equalTo("listing", @listing)
       if @property and @property.id then @query.equalTo("property", @property)
       if @network and @network.id then @query.equalTo("network", @network)
+      if @profile and @profile.id then @query.equalTo("profile", @profile)

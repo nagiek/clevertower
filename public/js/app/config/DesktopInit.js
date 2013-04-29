@@ -135,6 +135,7 @@
       networkPromise = (new Parse.Query("_User")).include('network.role').equalTo("objectId", this.id).first();
       return Parse.Promise.when(profilePromise, networkPromise).then(function(profile, user) {
         var network;
+        profile.prep("applicants").fetch();
         _this.profile = profile;
         if (user) {
           network = user.get("network");

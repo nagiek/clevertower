@@ -12,7 +12,7 @@ define [
   "i18n!nls/unit"
   "i18n!nls/lease"
   "templates/lease/new"
-  "templates/lease/edit"
+  "templates/lease/new-modal"
   "templates/lease/_form"
   "templates/helper/field/unit"
   "templates/helper/field/property"
@@ -26,6 +26,7 @@ define [
     
     events:
       'submit form'                 : 'save'
+      'click .close'                : 'close'
 
       'click .starting-this-month'  : 'setThisMonth'
       'click .starting-next-month'  : 'setNextMonth'
@@ -39,9 +40,13 @@ define [
       _.bindAll this, 'addOne', 'addAll', 'save', 'setThisMonth', 'setNextMonth', 'setJulyJune'
 
       @property = attrs.property
-      
+
       @model = new Lease(network: Parse.User.current().get("network")) unless @model
-      @template = "src/js/templates/lease/#{if @model.isNew() then 'new' else 'edit'}.jst"
+
+      @setElement '#apply-modal' if attrs.modal
+
+      tmpl = (if @model.isNew() then 'new' else 'edit') + if attrs.modal then "-modal" else ""
+      @template = "src/js/templates/lease/#{tmpl}.jst"
       @cancel_path = "/properties/#{@property.id}" + unless @model.isNew() then "/leases/#{@model.id}" else ""
             
       @model.on 'invalid', (error) =>
@@ -92,7 +97,7 @@ define [
         @undelegateEvents()
         delete this
       
-      @units = @property.prep("units") if @property
+      @units = @property.prep("units") if @property # We may on public page instead of network.
 
       @units.bind "add", @addOne
       @units.bind "reset", @addAll
@@ -195,6 +200,7 @@ define [
         unit: if @model.get "unit" then @model.get "unit" else false
         dates: @dates
         cancel_path: @cancel_path
+        title: if @property then @property.get "title" else false
         # units: @units
         moment: moment
         i18nCommon: i18nCommon
@@ -213,3 +219,10 @@ define [
       $('.datepicker').datepicker()
       
       if @units.length is 0 then @units.fetch() else @addAll()
+
+      @
+
+
+    close : ->
+      @undelegateEvents()
+      delete this

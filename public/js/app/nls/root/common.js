@@ -4,7 +4,8 @@
     fields: {
       title: "Title",
       status: "Status",
-      name: "Name"
+      name: "Name",
+      posted: "Posted"
     },
     classes: {
       lease: "lease",
@@ -25,7 +26,8 @@
       Inquiries: "Inquiries",
       listings: "listings",
       Listing: "Listing",
-      Listings: "Listings"
+      Listings: "Listings",
+      Photos: "Photos"
     },
     actions: {
       go: "Go",
@@ -47,6 +49,8 @@
       undo: "Undo",
       link: "Link",
       leave: "Leave",
+      apply: "Apply",
+      live_at: "Live at",
       revoke_access: "Revoke access",
       confirm: "Are you sure?",
       add_more: "Add more",
@@ -125,8 +129,7 @@
       "public": "Public",
       "private": "Private",
       landlord_only: "Landlord Only",
-      admin: "admin",
-      posted: "Posted"
+      admin: "admin"
     },
     form: {
       operations: "Operations",

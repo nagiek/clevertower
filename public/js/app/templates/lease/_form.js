@@ -27,13 +27,13 @@ __p += '<fieldset>\n  <legend>' +
 ((__t = ( dates.end )) == null ? '' : __t) +
 '"   data-date-format="' +
 ((__t = ( i18nCommon.dates.datepicker_format )) == null ? '' : __t) +
-'"  />\n      </div>\n    </div>\n    <div class="help-inline">\n      <ul class="unstyled">\n        <li><small><a href="#" class="starting-this-month">' +
+'"  />\n        <div class="help-inline align-top">\n          <ul class="unstyled">\n            <li><small><a href="#" class="starting-this-month">' +
 ((__t = ( i18nLease.dates.starting_this_month )) == null ? '' : __t) +
-'</a></small></li>\n        <li><small><a href="#" class="starting-next-month">' +
+'</a></small></li>\n            <li><small><a href="#" class="starting-next-month">' +
 ((__t = ( i18nLease.dates.starting_next_month )) == null ? '' : __t) +
-'</a></small></li>\n        <li><small><a href="#" class="july-to-june">' +
+'</a></small></li>\n            <li><small><a href="#" class="july-to-june">' +
 ((__t = ( i18nLease.dates.july_to_june )) == null ? '' : __t) +
-'</a></small></li>\n      </ul>\n    </div>\n  </div>\n</fieldset>\n\n';
+'</a></small></li>\n          </ul>\n        </div>\n      </div>\n    </div>\n  </div>\n</fieldset>\n\n';
  if (isNew) { ;
 __p += '\n  <fieldset>\n    <legend>' +
 ((__t = ( i18nLease.form.tenants )) == null ? '' : __t) +

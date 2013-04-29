@@ -1,7 +1,8 @@
 define [
   'underscore',
   'backbone',
-], (_, Parse, UnitList, LeaseList, Unit, Lease, inflection) ->
+  'collections/ApplicantList'
+], (_, Parse, ApplicantList) ->
 
   Profile = Parse.Object.extend "Profile"
     
@@ -42,3 +43,9 @@ define [
         return {message: "invalid_email"} unless /^([a-zA-Z0-9_.-])+@([a-zA-Z0-9_.-])+\.([a-zA-Z])+([a-zA-Z])+/.test attrs.email
       false  
     
+    prep: (collectionName, options) ->
+      return @[collectionName] if @[collectionName]
+      @[collectionName] = switch collectionName
+        when "applicants"   then new ApplicantList [], profile: @
+
+      @[collectionName]

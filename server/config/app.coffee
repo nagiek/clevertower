@@ -1,7 +1,7 @@
 # Load dependencies
 express       = require 'express'
 less          = require 'less'
-nib           = require 'nib'
+Parse         = require('parse').Parse
 config        = require './config'
 routes        = require './routes'
 environment   = require './environment'
@@ -17,6 +17,8 @@ helpers     = require '../controllers/helpers'
 module.exports = ->
   # Create Server
   app = express()
+
+  Parse.initialize 'z00OPdGYL7X4uW9soymp8n5JGBSE6k26ILN1j3Hu', 'NifB9pRHfmsTDQSDA9DKxMuux03S4w2WGVdcxPHm'
 
   helpers(app)
 

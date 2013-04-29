@@ -12,14 +12,14 @@
       <div class="controls">
         <input type="text" class="span2 start-date datepicker" name="lease[start_date]" maxlength="12" value="<%= dates.start %>" data-date="<%= dates.start %>" data-date-format="<%= i18nCommon.dates.datepicker_format %>"  />
         <input type="text" class="span2 end-date datepicker"   name="lease[end_date]"   maxlength="12" value="<%= dates.end %>" data-date="<%= dates.end %>"   data-date-format="<%= i18nCommon.dates.datepicker_format %>"  />
+        <div class="help-inline align-top">
+          <ul class="unstyled">
+            <li><small><a href="#" class="starting-this-month"><%= i18nLease.dates.starting_this_month %></a></small></li>
+            <li><small><a href="#" class="starting-next-month"><%= i18nLease.dates.starting_next_month %></a></small></li>
+            <li><small><a href="#" class="july-to-june"><%= i18nLease.dates.july_to_june %></a></small></li>
+          </ul>
+        </div>
       </div>
-    </div>
-    <div class="help-inline">
-      <ul class="unstyled">
-        <li><small><a href="#" class="starting-this-month"><%= i18nLease.dates.starting_this_month %></a></small></li>
-        <li><small><a href="#" class="starting-next-month"><%= i18nLease.dates.starting_next_month %></a></small></li>
-        <li><small><a href="#" class="july-to-june"><%= i18nLease.dates.july_to_june %></a></small></li>
-      </ul>
     </div>
   </div>
 </fieldset>

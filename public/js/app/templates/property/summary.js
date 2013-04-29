@@ -29,7 +29,7 @@ __p += '\n    </h2>\n    \n    <dl>\n      <!-- <div class="span"> -->\n        
 ((__t = ( i18nCommon.classes.listings )) == null ? '' : __t) +
 '</a></dt>\n        <dd>' +
 ((__t = ( listings )) == null ? '' : __t) +
-'</dd>\n      <!-- </div> -->\n      <!-- <div class="span"> -->\n        <dt><a href="/properties/' +
+'</dd>\n      <!-- </div> -->\n      <!-- <div class="span"> -->\n<!--         <dt><a href="/properties/' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '/finance">' +
 ((__t = ( i18nCommon.classes.finances )) == null ? '' : __t) +
@@ -37,7 +37,7 @@ __p += '\n    </h2>\n    \n    <dl>\n      <!-- <div class="span"> -->\n        
 ((__t = ( incomes )) == null ? '' : __t) +
 '</span>\n          <span class="expenses">' +
 ((__t = ( expenses )) == null ? '' : __t) +
-'</span>\n        </dd>\n      <!-- </div> -->\n      <!-- <div class="span"> -->\n        <dt><a href="/properties/' +
+'</span>\n        </dd> -->\n      <!-- </div> -->\n      <!-- <div class="span"> -->\n        <dt><a href="/properties/' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '/listings">' +
 ((__t = ( i18nProperty.structure.vacancies )) == null ? '' : __t) +

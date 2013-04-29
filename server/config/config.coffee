@@ -4,7 +4,6 @@
 
 express     = require 'express'
 path        = require 'path'
-nib         = require 'nib'
 
 # Exports
 

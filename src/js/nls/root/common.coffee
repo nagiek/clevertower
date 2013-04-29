@@ -3,6 +3,7 @@ define
     title:                "Title"
     status:               "Status"
     name:                 "Name"
+    posted:               "Posted"
   classes:                
     lease:                "lease"
     Lease:                "Lease"
@@ -23,6 +24,7 @@ define
     listings:             "listings"
     Listing:              "Listing"
     Listings:             "Listings"
+    Photos:               "Photos"
   actions:                
     go:                   "Go"
     go_to:                "Go to"
@@ -43,6 +45,8 @@ define
     undo:                 "Undo"
     link:                 "Link"
     leave:                "Leave"
+    apply:                "Apply"
+    live_at:              "Live at"
     revoke_access:        "Revoke access"
     confirm:              "Are you sure?"
     add_more:             "Add more"
@@ -106,7 +110,6 @@ define
     private:              "Private"
     landlord_only:        "Landlord Only"
     admin:                "admin"
-    posted:               "Posted"
   form:                   
     operations:           "Operations"
     info:                 "Info"

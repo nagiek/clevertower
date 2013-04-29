@@ -639,8 +639,10 @@ Parse.Cloud.beforeSave "Lease", (req, res) ->
      
     return res.success() if existed
 
-    # Set attributes
-    req.object.set user: req.user
+    # Set default attributes
+    req.object.set 
+      user: req.user
+      confirmed: false
     
     # Change the status depending on who is creating the lease.
     propertyId = req.object.get("property").id
@@ -656,6 +658,13 @@ Parse.Cloud.beforeSave "Lease", (req, res) ->
         users = mgrRole.getUsers()
         users.query().get req.user.id,
         success: (obj) ->
+
+          if obj?
+            req.object.set "confirmed", true
+          else
+            emails = req.object.get "emails" || []
+            emails.push req.user.getEmail()
+            req.object.set "emails", emails
             
           # Role lists
           randomId = ""
@@ -669,7 +678,6 @@ Parse.Cloud.beforeSave "Lease", (req, res) ->
           leaseACL.setRoleReadAccess current, true
           leaseACL.setRoleWriteAccess mgrRole, true
           leaseACL.setRoleReadAccess mgrRole, true
-          
           req.object.setACL leaseACL
 
           # Create new role (API not chainable)
@@ -713,10 +721,6 @@ Parse.Cloud.afterSave "Lease", (req) ->
   },
   success: (res) ->
   error: (res) ->
-
-  propertyId = req.object.get("property").id
-  (new Parse.Query "Property").include('network.role').get propertyId,
-  success: (property) ->
 
 # Lease validation
 Parse.Cloud.beforeSave "Listing", (req, res) ->

@@ -11,7 +11,7 @@ define [
   
     #... is a list tag.
     tagName: "li"
-    className: "span3"
+    className: "span4"
     
     initialize: ->
       _.bindAll this, "render"

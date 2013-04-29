@@ -1,7 +1,7 @@
 <div class="control-group emails-group">
   <% if (label) { %><label for="emails" class="control-label"><%= label %></label><% } %>
   <div class="controls">
-    <textarea name="emails" rows="2" class="span12"><%= emails %></textarea>
+    <textarea name="emails" rows="2" class="input-block-level"><% if (emails) { %><%= emails %><% } %></textarea>
     <p class="help-block"><%= i18nCommon.form.comma_separated %></p>
   </div>
 </div>

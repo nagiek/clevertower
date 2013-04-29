@@ -16,7 +16,7 @@ define [
           .include('profile')
           .descending("createdAt")
           # .equalTo("user", Parse.User.current())
-          .limit(10) 
+          .limit(6) 
       
     comparator: (notification) -> -notification.createdAt
 

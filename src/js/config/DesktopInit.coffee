@@ -162,6 +162,7 @@ require ["jquery", "backbone", "facebook", "models/Profile", router, "json2", "b
     networkPromise = (new Parse.Query("_User")).include('network.role').equalTo("objectId", @id).first()
     Parse.Promise.when(profilePromise, networkPromise).then (profile, user) => 
 
+      profile.prep("applicants").fetch()
       @profile = profile
 
       # Load the network regardless if we are on a subdomain or not, as we need the link.

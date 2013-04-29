@@ -655,7 +655,8 @@
         return res.success();
       }
       req.object.set({
-        user: req.user
+        user: req.user,
+        confirmed: false
       });
       propertyId = req.object.get("property").id;
       return (new Parse.Query("Property")).include('network.role').get(propertyId, {
@@ -667,7 +668,14 @@
             users = mgrRole.getUsers();
             return users.query().get(req.user.id, {
               success: function(obj) {
-                var current, leaseACL, possible, randomId, role, _i;
+                var current, emails, leaseACL, possible, randomId, role, _i;
+                if (obj != null) {
+                  req.object.set("confirmed", true);
+                } else {
+                  emails = req.object.get("emails" || []);
+                  emails.push(req.user.getEmail());
+                  req.object.set("emails", emails);
+                }
                 randomId = "";
                 possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
                 for (_i = 1; _i < 16; _i++) {
@@ -706,7 +714,7 @@
   });
 
   Parse.Cloud.afterSave("Lease", function(req) {
-    var end_date, propertyId, start_date, today;
+    var end_date, start_date, today;
     today = new Date;
     start_date = req.object.get("start_date");
     end_date = req.object.get("end_date");
@@ -718,7 +726,7 @@
         }
       });
     }
-    Parse.Cloud.run("AddTenants", {
+    return Parse.Cloud.run("AddTenants", {
       propertyId: req.object.get("property").id,
       objectId: req.object.id,
       emails: req.object.get("emails"),
@@ -726,10 +734,6 @@
     }, {
       success: function(res) {},
       error: function(res) {}
-    });
-    propertyId = req.object.get("property").id;
-    return (new Parse.Query("Property")).include('network.role').get(propertyId, {
-      success: function(property) {}
     });
   });
 

@@ -1,59 +1,51 @@
-<header>
-  <ul class="breadcrumb">
-    <li><a href="#"><%= property.country %></a> <span class="divider">/</span></li>
-    <li><a href="#"><%= property.administrative_area_level_1 %></a> <span class="divider">/</span></li>
-    <li><a href="#"><%= property.locality %></a> <span class="divider">/</span></li>
-    <li class="active"><%= property.title %></li>
-  </ul>
-  <h1 class="inline-block"><%= property.title %></h1>
-  <ul class="actions inline-block inline">
-    <li><button class="btn"><%= i18nGroup.tenant.do_you_live_here %></button></li>
-  </ul>
-</header>
-<div class="row">
-  <img class="span9" src="<%= cover %>" alt="<%= i18nCommon.nouns.cover_photo %>">
-  <div class="span9">
-
-    <% if (property.description) { %>
-      <%= property.description %>
-    <% } %>
-    <ul id="photos" class="row no-bullet"></ul>
-
-    <h3><%= i18nCommon.classes.listing %></h3>
-    <ul id="listings"></ul>
-
-    <h3><%= i18nProperty.form.included %></h3>
-    <ul id="included" class="checkbox-list">
-      <% if (property.electricity) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.electricity %></li><% } %>
-      <% if (property.furniture) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.furniture %></li><% } %>
-      <% if (property.gas) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.gas %></li><% } %>
-      <% if (property.heat) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.heat %></li><% } %>
-      <% if (property.hot_water) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.hot_water %></li><% } %>
-    </ul>
-
-    <h3><%= i18nProperty.form.amenities %></h3>
-    <ul id="included" class="checkbox-list">
-      <% if (property.air_conditioning) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.air_conditioning %></li><% } %>
-      <% if (property.back_yard) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.back_yard %></li><% } %>
-      <% if (property.balcony) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.balcony %></li><% } %>
-      <% if (property.cats_allowed) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.cats_allowed %></li><% } %>
-      <% if (property.concierge) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.concierge %></li><% } %>
-      <% if (property.dogs_allowed) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.dogs_allowed %></li><% } %>
-      <% if (property.doorman) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.doorman %></li><% } %>
-      <% if (property.elevator) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.elevator %></li><% } %>
-      <% if (property.exposed_brick) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.exposed_brick %></li><% } %>
-      <% if (property.fireplace) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.fireplace %></li><% } %>
-      <% if (property.front_yard) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.front_yard %></li><% } %>
-      <% if (property.gym) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.gym %></li><% } %>
-      <% if (property.laundry) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.laundry %></li><% } %>
-      <% if (property.indoor_parking) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.indoor_parking %></li><% } %>
-      <% if (property.outdoor_parking) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.outdoor_parking %></li><% } %>
-      <% if (property.pool) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.pool %></li><% } %>
-      <% if (property.sauna) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.sauna %></li><% } %>
-      <% if (property.wheelchair) { %><li class="span3"><i class="icon icon-check"></i><%= i18nProperty.fields.wheelchair %></li><% } %>
+<header class="row">
+  <div class="span8">
+    <h1 class="pull-left"><%= property.title %></h1>
+    <ul class="breadcrumb pull-right">
+      <li><a href="#"><%= property.locality %></a> <span class="divider">/</span></li>
+      <li class="active"><%= property.title %></li>
     </ul>
   </div>
-  <div class="span3">
+  <ul class="span4 actions unstyled">
+    <li class="center"><button id="new-lease" class="btn"><%= i18nGroup.tenant.do_you_live_here %></button></li>
+  </ul>
+</header>
+
+
+<% if (property.description) { %><%= property.description %><% } %>
+
+<div class="row">
+  <div class="span8">
+
+    <div class="row"><img class="span8" src="<%= cover %>" alt="<%= i18nCommon.nouns.cover_photo %>"></div>
+
+    <ul class="nav nav-tabs">
+      <li class="active"><a href="#listings" id="listings-link"><%= i18nCommon.classes.Listings %> <small class="count"></small></a></li>
+      <li><a href="#photos" id="photos-link"><%= i18nCommon.classes.Photos %> <small class="count"></small></a></li>
+    </ul>
+
+    <div class="tab-content">
+      <div class="tab-pane active" id="listings">
+        <table class="table">
+          <thead>
+            <th><%= i18nCommon.classes.Listing %></th>
+            <th><%= i18nListing.fields.rent %></th>
+            <th><%= i18nCommon.fields.posted %></th>
+            <th><span class="element-invisible"><%=i18nCommon.form.Operations%></span></th>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="tab-pane" id="photos">
+        <ul class="row no-bullet"></ul>
+      </div>
+    </div>
+
+  </div>
+  <div class="span4">
+
+    <div id="mapCanvas"></div>
+
 
     <% if (property.property_type) { %>
       <%= i18nProperty.fields.property_type.label %>
@@ -88,5 +80,38 @@
       <%= property.website %>
     <% } %>
 
+    <h3><%= i18nProperty.form.included %></h3>
+    <ul id="included" class="checkbox-list">
+      <% if (property.electricity) { %><li class="span4"><i class="icon icon-check"></i><%= i18nProperty.fields.electricity %></li><% } %>
+      <% if (property.furniture) { %><li class="span4"><i class="icon icon-check"></i><%= i18nProperty.fields.furniture %></li><% } %>
+      <% if (property.gas) { %><li class="span4"><i class="icon icon-check"></i><%= i18nProperty.fields.gas %></li><% } %>
+      <% if (property.heat) { %><li class="span4"><i class="icon icon-check"></i><%= i18nProperty.fields.heat %></li><% } %>
+      <% if (property.hot_water) { %><li class="span4"><i class="icon icon-check"></i><%= i18nProperty.fields.hot_water %></li><% } %>
+    </ul>
+
+    <h3><%= i18nProperty.form.amenities %></h3>
+    <ul id="included" class="checkbox-list">
+      <% if (property.air_conditioning) { %><li class="span4"><i class="icon icon-check"></i><%= i18nProperty.fields.air_conditioning %></li><% } %>
+      <% if (property.back_yard) { %><li class="span4"><i class="icon icon-check"></i><%= i18nProperty.fields.back_yard %></li><% } %>
+      <% if (property.balcony) { %><li class="span4"><i class="icon icon-check"></i><%= i18nProperty.fields.balcony %></li><% } %>
+      <% if (property.cats_allowed) { %><li class="span4"><i class="icon icon-check"></i><%= i18nProperty.fields.cats_allowed %></li><% } %>
+      <% if (property.concierge) { %><li class="span4"><i class="icon icon-check"></i><%= i18nProperty.fields.concierge %></li><% } %>
+      <% if (property.dogs_allowed) { %><li class="span4"><i class="icon icon-check"></i><%= i18nProperty.fields.dogs_allowed %></li><% } %>
+      <% if (property.doorman) { %><li class="span4"><i class="icon icon-check"></i><%= i18nProperty.fields.doorman %></li><% } %>
+      <% if (property.elevator) { %><li class="span4"><i class="icon icon-check"></i><%= i18nProperty.fields.elevator %></li><% } %>
+      <% if (property.exposed_brick) { %><li class="span4"><i class="icon icon-check"></i><%= i18nProperty.fields.exposed_brick %></li><% } %>
+      <% if (property.fireplace) { %><li class="span4"><i class="icon icon-check"></i><%= i18nProperty.fields.fireplace %></li><% } %>
+      <% if (property.front_yard) { %><li class="span4"><i class="icon icon-check"></i><%= i18nProperty.fields.front_yard %></li><% } %>
+      <% if (property.gym) { %><li class="span4"><i class="icon icon-check"></i><%= i18nProperty.fields.gym %></li><% } %>
+      <% if (property.laundry) { %><li class="span4"><i class="icon icon-check"></i><%= i18nProperty.fields.laundry %></li><% } %>
+      <% if (property.indoor_parking) { %><li class="span4"><i class="icon icon-check"></i><%= i18nProperty.fields.indoor_parking %></li><% } %>
+      <% if (property.outdoor_parking) { %><li class="span4"><i class="icon icon-check"></i><%= i18nProperty.fields.outdoor_parking %></li><% } %>
+      <% if (property.pool) { %><li class="span4"><i class="icon icon-check"></i><%= i18nProperty.fields.pool %></li><% } %>
+      <% if (property.sauna) { %><li class="span4"><i class="icon icon-check"></i><%= i18nProperty.fields.sauna %></li><% } %>
+      <% if (property.wheelchair) { %><li class="span4"><i class="icon icon-check"></i><%= i18nProperty.fields.wheelchair %></li><% } %>
+    </ul>
+
   </div>
 </div>
+
+<div id="apply-modal" class="modal form-modal fade"></div>

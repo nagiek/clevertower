@@ -7,10 +7,11 @@ define [
   "collections/TenantList"
   "collections/ApplicantList"
   "collections/ListingList"
+  "collections/PhotoList"
   "models/Unit"
   "models/Lease"
   "underscore.inflection"
-], (_, Parse, UnitList, LeaseList, InquiryList, TenantList, ApplicantList, ListingList, Unit, Lease, Listing, inflection) ->
+], (_, Parse, UnitList, LeaseList, InquiryList, TenantList, ApplicantList, ListingList, PhotoList, Unit, Lease, Listing, inflection) ->
 
   Property = Parse.Object.extend "Property"
   # class Property extends Parse.Object
@@ -94,39 +95,26 @@ define [
 
     prep: (collectionName, options) ->
       return @[collectionName] if @[collectionName]
+
+      user = Parse.User.current()
+      network = user.get("network") if user
+      basedOnNetwork = user and network and network.properties and network.properties.contains @
+
       @[collectionName] = switch collectionName
         when "units" 
           new UnitList [], property: @
         when "leases"
           new LeaseList [], property: @
+        when "photos"
+          new PhotoList [], property: @
         when "inquiries"
-          user = Parse.User.current()
-          network = user.get("network") if user
-          unless user and network
-            new InquiryList [], property: @
-          else
-            if network.inquiries then network.inquiries else new InquiryList [], property: @
+          if basedOnNetwork then network.inquiries else new InquiryList [], property: @
         when "listings"
-          user = Parse.User.current()
-          network = user.get("network") if user
-          unless user and network
-            new ListingList [], property: @
-          else
-            if network.listings then network.listings else new ListingList [], property: @
+          if basedOnNetwork then network.listings else new ListingList [], property: @
         when "tenants"
-          user = Parse.User.current()
-          network = user.get("network") if user
-          unless user and network
-            new TenantList [], property: @
-          else
-            if network.tenants then network.tenants else new TenantList [], property: @
+          if basedOnNetwork then network.tenants else new TenantList [], property: @
         when "applicants"
-          user = Parse.User.current()
-          network = user.get("network") if user
-          unless user and network
-            new ApplicantList [], property: @
-          else
-            if network.applicants then network.applicants else new ApplicantList [], property: @
+          if basedOnNetwork then network.applicants else new ApplicantList [], property: @
 
       @[collectionName]
 

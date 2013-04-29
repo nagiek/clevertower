@@ -3,7 +3,7 @@
   <a href="/properties/<%= propertyId %>/listings/<%= objectId %>"><%= title %></a>
 </td>
 <td><%= rent %></td>
-<td><span class="label<% console.log(public); if (public) { %> label-success<% } %>"><%= status %></span></td>
+<td><span class="label<% if (public) { %> label-success<% } %>"><%= status %></span></td>
 <td>
   <span class="badge"><%= count %></span>
   <% if (newInquiries) { %><small>(<%= newInquiries %> <%= i18nCommon.adjectives.new %>)</small><% } %>
