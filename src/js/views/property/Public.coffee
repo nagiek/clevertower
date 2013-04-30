@@ -41,7 +41,7 @@ define [
 
     showTab : (e) ->
       e.preventDefault()
-      $(e.currentTarget).tab('show')
+      $(e.currentTarget.hash).tab('show')
 
     render: ->
       vars =

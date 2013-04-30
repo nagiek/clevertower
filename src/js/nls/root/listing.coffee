@@ -4,9 +4,9 @@ define
     edit_listing:         "Edit Listing"
     extend_listing:       "Extend Listing"
   actions:
-    add_tenants:          "Add tenants"
     apply:                "Apply"
     apply_to:             "Apply to"
+    withdraw:             "withdraw"
   attributes:
     applied:              "Applied"
     starting:             "Starting"
@@ -25,7 +25,7 @@ define
       property:           "You don't have any listings in the property yet."
   inquiries:
     label:                "Inquiries"
-    chosen:               " - Chosen - "
+    chosen:               "Chosen"
     empty:
       listing:            "No one has responded to the listing yet."
       network:            "You don't have any listings in the network yet."

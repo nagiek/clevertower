@@ -98,7 +98,7 @@ define [
 
       user = Parse.User.current()
       network = user.get("network") if user
-      basedOnNetwork = user and network and network.properties and network.properties.contains @
+      basedOnNetwork = user and network and @get("network").id is network.id
 
       @[collectionName] = switch collectionName
         when "units" 

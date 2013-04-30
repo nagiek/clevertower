@@ -18,7 +18,7 @@ define [
       "properties/:id/*splat"               : "propertiesShow"
       "network/*splat"                      : "networkManage"
       "users/:id"                           : "profileShow"
-      "users/:id/edit"                      : "profileEdit"
+      "users/:id/*splat"                    : "profileShow"
       "account/:category"                   : "accountSettings"
       "*actions"                            : "index"
 
@@ -51,16 +51,15 @@ define [
       
       # Clean up after views
       Parse.history.on "route", (route) =>
+
         $('#search').val("").blur()
-        if @view and Parse.User.current()
-          unless route is "propertiesShow"
+        @oldConstructor
+
+        if @view 
+          if @oldConstructor isnt @view.constructor
+            @oldConstructor = @view.constructor
             @view.undelegateEvents()
             delete @view
-          else
-            require ["views/property/Show"], (PropertyView) => 
-              if @view !instanceof PropertyView
-                @view.undelegateEvents()
-                delete @view
         
       Parse.Dispatcher.on "network:set", => 
         # Remove the Access Denied callback
@@ -126,18 +125,18 @@ define [
     # --------------
 
     propertiesNew: =>
-      'propertiesNew'
+      view = @view
       require ["views/network/Manage"], (NetworkView) => 
-
-        if !@view or @view !instanceof NetworkView
+        if !view or view !instanceof NetworkView
           @view = new NetworkView(model: @network, path: "properties/new/wizard", params: {})
         else
           @view.changeSubView path: "properties/new/wizard", params: {}
     
     propertiesShow: (id, splat) =>
-      require ["views/property/Show"], (PropertyView) => 
+      view = @view
+      require ["views/property/Show"], (PropertyView) =>
         vars = @deparamAction splat
-        if !@view or @view !instanceof PropertyView
+        if !view or view !instanceof PropertyView
           $('#main').html '<div id="property"></div>'
           if model = @network.properties.get id
             vars.model = model
@@ -153,46 +152,39 @@ define [
               @view = new PropertyView(vars)
             error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
         else
-          @view.changeSubView(vars.path, vars.params)
+          view.changeSubView(vars.path, vars.params)
 
     # Network
     # --------------
 
     networkManage: (splat) =>
+      view = @view
       require ["views/network/Manage"], (NetworkView) => 
         vars = @deparamAction splat
-        if !@view or @view !instanceof NetworkView
+        if !view or view !instanceof NetworkView
           vars.model = @network
           @view = new NetworkView(vars)
         else
-          @view.changeSubView(vars.path, vars.params)
+          view.changeSubView(vars.path, vars.params)
 
 
     # User
     # --------------
-
-    profileShow : (id) ->
+    
+    profileShow : (id, splat) =>
+      view = @view
       require ["models/Profile", "views/profile/Show"], (Profile, ShowProfileView) =>
-        if Parse.User.current().profile and id is Parse.User.current().profile.id
-          @view = new ShowProfileView model: Parse.User.current().profile, current: true
-          @view.render()
+        vars = @deparamAction splat
+        if !view or view !instanceof ShowProfileView
+          if Parse.User.current().profile and id is Parse.User.current().profile.id
+            @view = new ShowProfileView path: vars.path, params: vars.params, model: Parse.User.current().profile, current: true
+          else
+            (new Parse.Query(Profile)).get id,
+            success: (obj) => 
+              @view = new ShowProfileView path: vars.path, params: vars.params, model: obj, current: false
         else
-          (new Parse.Query(Profile)).get id,
-          success: (obj) => 
-            @view = new ShowProfileView model: obj, current: false
-            @view.render()
+          view.changeSubView(vars.path, vars.params)
 
-    profileEdit : (id) ->
-      require ["models/Profile", "views/profile/Edit"], (Profile, EditProfileView) =>
-        if Parse.User.current().profile and id is Parse.User.current().profile.id
-          @view = new EditProfileView model: Parse.User.current().profile, current: true
-          @view.render()
-        else
-          (new Parse.Query(Profile)).get id,
-          success: (obj) => 
-            @view = new EditProfileView model: obj, current: false
-            @view.render()
-            
     accountSettings : (category) ->
       if category is 'edit'
         require ["views/profile/edit"], (UserSettingsView) =>

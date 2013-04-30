@@ -8,7 +8,7 @@ define [
   class ListingList extends Parse.Collection
 
     model: Listing
-    query: new Parse.Query("Listing").include("unit")
+    query: new Parse.Query("Listing").include("unit").descending("createdAt")
       
     initialize: (models, attrs) ->
       if attrs.property

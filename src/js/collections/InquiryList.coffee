@@ -8,7 +8,7 @@ define [
   class InquiryList extends Parse.Collection
 
     model: Inquiry
-    query: new Parse.Query("Inquiry")
+    query: new Parse.Query("Inquiry").descending("createdAt")
       
     initialize: (models, attrs) ->
       if attrs.property

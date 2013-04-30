@@ -18,17 +18,16 @@ define [
 
     prep: (collectionName, options) ->
       return @[collectionName] if @[collectionName]
+
       user = Parse.User.current()
       network = user.get("network") if user
+      basedOnNetwork = user and network and @get("network").id is network.id
+
       @[collectionName] = switch collectionName
-        when "applicants"
-          unless user and network
-            new ApplicantList [], listing: @
-          else
-            if network.applicants then network.applicants else new ApplicantList [], listing: @
         when "inquiries"
-          unless user and network
-            new InquiryList [], listing: @
-          else
-            if network.inquiries then network.inquiries else new InquiryList [], listing: @
+          if basedOnNetwork then network.inquiries else new InquiryList [], property: @
+        when "applicants"
+          if basedOnNetwork then network.applicants else new ApplicantList [], property: @
+
       @[collectionName]
+

@@ -6,7 +6,7 @@
     paths: {
       jquery: "//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min",
       underscore: "//cdnjs.cloudflare.com/ajax/libs/lodash.js/1.0.1/lodash.min",
-      backbone: "//www.parsecdn.com/js/parse-1.2.2",
+      backbone: "//www.parsecdn.com/js/parse-1.2.7",
       facebook: "//connect.facebook.net/en_US/all",
       jqueryuiwidget: "libs/jqueryui/jquery.ui.widget.min",
       jquerymobile: "//cdnjs.cloudflare.com/ajax/libs/jquery-mobile/1.2.0/jquery.mobile.min",
@@ -86,7 +86,6 @@
     Parse.FacebookUtils.init({
       appId: '387187337995318',
       channelUrl: '//clevertower.dev:3000/fb-channel',
-      status: true,
       cookie: true,
       xfbml: true
     });

@@ -55,6 +55,15 @@
         description: "Other tenants will be able to see which unit you live in."
       }
     },
+    empty: {
+      inquiries: "You have not applied to any listings yet",
+      activities: {
+        self: "You haven't done anything yet!",
+        other: function(name) {
+          return "" + (_.escape(name)) + " has no activity.";
+        }
+      }
+    },
     form: {
       bulk_edit: "Edit users",
       building: {

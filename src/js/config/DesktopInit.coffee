@@ -15,7 +15,7 @@ require.config
     # jqueryui:                 "libs/jqueryui/jquery-ui-1.10.1.custom.min",                  # includes core, widget, slider, datepicker
     # underscore:               "//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min"
     underscore:               "//cdnjs.cloudflare.com/ajax/libs/lodash.js/1.0.1/lodash.min" # "libs/underscore/lodash"
-    backbone:                 "//www.parsecdn.com/js/parse-1.2.2"                       # "libs/backbone/parse"
+    backbone:                 "//www.parsecdn.com/js/parse-1.2.7"                       # "libs/backbone/parse"
                               
     # Async Libraries         
     # ---------------         
@@ -126,9 +126,9 @@ require ["jquery", "underscore", "backbone", "facebook", "models/Profile", route
   Parse.FacebookUtils.init
     appId      : '387187337995318'                        # Facebook App ID
     channelUrl : '//clevertower.dev:3000/fb-channel'      # Channel File (must be absolute path)
-    status     : true                                     # check login status
     cookie     : true                                     # enable cookies to allow Parse to access the session
     xfbml      : true                                     # parse XFBML
+    # status     : true                                     # check login status
 
 
   # Bring Parse Collection up to speed with Backbone methods.

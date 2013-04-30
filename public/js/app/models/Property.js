@@ -76,7 +76,7 @@
         if (user) {
           network = user.get("network");
         }
-        basedOnNetwork = user && network && network.properties && network.properties.contains(this);
+        basedOnNetwork = user && network && this.get("network").id === network.id;
         this[collectionName] = (function() {
           switch (collectionName) {
             case "units":

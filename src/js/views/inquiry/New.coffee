@@ -42,8 +42,8 @@ define [
       
       @on "save:success", (model) =>
         new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
-        Parse.user.current().profile.applicants.create 
-          profile: Parse.user.current().profile
+        Parse.User.current().profile.applicants.create 
+          profile: Parse.User.current().profile
           inquiry: @model
           listing: @model.get "listing"
           property: @model.get "property"

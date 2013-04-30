@@ -10,6 +10,8 @@
       __extends(DesktopRouter, _super);
 
       function DesktopRouter() {
+        this.profileShow = __bind(this.profileShow, this);
+
         this.listingsPublic = __bind(this.listingsPublic, this);
 
         this.propertiesPublic = __bind(this.propertiesPublic, this);
@@ -23,7 +25,7 @@
         "network/set": "networkSet",
         "network/:name": "networkShow",
         "users/:id": "profileShow",
-        "users/:id/edit": "profileEdit",
+        "users/:id/*splat": "profileShow",
         "account/:category": "accountSettings",
         "*actions": "index"
       };
@@ -66,11 +68,15 @@
           _this.networkView.render();
           return Parse.history.loadUrl(location.pathname);
         });
-        Parse.history.on("route", function() {
-          $('#search').val('').blur();
+        Parse.history.on("route", function(route) {
+          $('#search').val("").blur();
+          _this.oldConstructor;
           if (_this.view) {
-            _this.view.undelegateEvents();
-            return delete _this.view;
+            if (_this.oldConstructor !== _this.view.constructor) {
+              _this.oldConstructor = _this.view.constructor;
+              _this.view.undelegateEvents();
+              return delete _this.view;
+            }
           }
         });
         return $(document).on("click", "a", function(e) {
@@ -145,48 +151,35 @@
         }
       };
 
-      DesktopRouter.prototype.profileShow = function(id) {
-        var _this = this;
+      DesktopRouter.prototype.profileShow = function(id, splat) {
+        var view,
+          _this = this;
+        view = this.view;
         return require(["models/Profile", "views/profile/Show"], function(Profile, ShowProfileView) {
-          if (Parse.User.current().profile && id === Parse.User.current().profile.id) {
-            _this.view = new ShowProfileView({
-              model: Parse.User.current().profile,
-              current: true
-            });
-            return _this.view.render();
+          var vars;
+          vars = _this.deparamAction(splat);
+          if (!view || !(view instanceof ShowProfileView)) {
+            if (Parse.User.current().profile && id === Parse.User.current().profile.id) {
+              return _this.view = new ShowProfileView({
+                path: vars.path,
+                params: vars.params,
+                model: Parse.User.current().profile,
+                current: true
+              });
+            } else {
+              return (new Parse.Query(Profile)).get(id, {
+                success: function(obj) {
+                  return _this.view = new ShowProfileView({
+                    path: vars.path,
+                    params: vars.params,
+                    model: obj,
+                    current: false
+                  });
+                }
+              });
+            }
           } else {
-            return (new Parse.Query(Profile)).get(id, {
-              success: function(obj) {
-                _this.view = new ShowProfileView({
-                  model: obj,
-                  current: false
-                });
-                return _this.view.render();
-              }
-            });
-          }
-        });
-      };
-
-      DesktopRouter.prototype.profileEdit = function(id) {
-        var _this = this;
-        return require(["models/Profile", "views/profile/Edit"], function(Profile, EditProfileView) {
-          if (Parse.User.current().profile && id === Parse.User.current().profile.id) {
-            _this.view = new EditProfileView({
-              model: Parse.User.current().profile,
-              current: true
-            });
-            return _this.view.render();
-          } else {
-            return (new Parse.Query(Profile)).get(id, {
-              success: function(obj) {
-                _this.view = new EditProfileView({
-                  model: obj,
-                  current: false
-                });
-                return _this.view.render();
-              }
-            });
+            return view.changeSubView(vars.path, vars.params);
           }
         });
       };

@@ -106,6 +106,8 @@ define
     unsaved:              "Unsaved"
     linked:               "Linked"
     joined:               "Joined"
+    open:                 "Open"
+    closed:               "Closed"
     received:             "Received"
     recently_added:       "Recently Added"
     all:                  "All"

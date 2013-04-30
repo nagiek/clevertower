@@ -14,7 +14,7 @@ define [
       "network/set"                 : "networkSet"
       "network/:name"               : "networkShow"
       "users/:id"                   : "profileShow"
-      "users/:id/edit"              : "profileEdit"
+      "users/:id/*splat"            : "profileShow"
       "account/:category"           : "accountSettings"
       "*actions"                    : "index"
 
@@ -53,11 +53,16 @@ define [
       
       
       # Clean up after views
-      Parse.history.on "route", =>
-        $('#search').val('').blur()
-        if @view
-          @view.undelegateEvents()
-          delete @view
+      Parse.history.on "route", (route) =>
+
+        $('#search').val("").blur()
+        @oldConstructor
+
+        if @view 
+          if @oldConstructor isnt @view.constructor
+            @oldConstructor = @view.constructor
+            @view.undelegateEvents()
+            delete @view
   
       
       # Use delegation to avoid initial DOM selection and allow all matching elements to bubble
@@ -118,27 +123,20 @@ define [
         @signupOrLogin()
     
 
-    profileShow : (id) ->
+    profileShow : (id, splat) =>
+      view = @view
       require ["models/Profile", "views/profile/Show"], (Profile, ShowProfileView) =>
-        if Parse.User.current().profile and id is Parse.User.current().profile.id
-          @view = new ShowProfileView model: Parse.User.current().profile, current: true
-          @view.render()
+        vars = @deparamAction splat
+        if !view or view !instanceof ShowProfileView
+          if Parse.User.current().profile and id is Parse.User.current().profile.id
+            @view = new ShowProfileView path: vars.path, params: vars.params, model: Parse.User.current().profile, current: true
+          else
+            (new Parse.Query(Profile)).get id,
+            success: (obj) => 
+              @view = new ShowProfileView path: vars.path, params: vars.params, model: obj, current: false
         else
-          (new Parse.Query(Profile)).get id,
-          success: (obj) => 
-            @view = new ShowProfileView model: obj, current: false
-            @view.render()
+          view.changeSubView(vars.path, vars.params)
 
-    profileEdit : (id) ->
-      require ["models/Profile", "views/profile/Edit"], (Profile, EditProfileView) =>
-        if Parse.User.current().profile and id is Parse.User.current().profile.id
-          @view = new EditProfileView model: Parse.User.current().profile, current: true
-          @view.render()
-        else
-          (new Parse.Query(Profile)).get id,
-          success: (obj) => 
-            @view = new EditProfileView model: obj, current: false
-            @view.render()
             
     accountSettings : (category) ->
       if Parse.User.current()
