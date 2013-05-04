@@ -13,6 +13,12 @@ define
     ending:               "Ending"
     listing_on_unit:      "Listing on Unit"
     rent_this_month:      "Rent this month"
+  display:
+    map:                  "Map"
+    list:                 "List"
+    photo:                "Photo"
+  map:
+    redo_search_in_area:  "Redo search in this area"
   dates:
     starting_this_month:  "Starting This Month"
     starting_next_month:  "Starting Next Month"
@@ -23,6 +29,7 @@ define
     empty:
       network:            "You don't have any listings in the network yet."
       property:           "You don't have any listings in the property yet."
+      index:              "No one has posted any thing here yet."
   inquiries:
     label:                "Inquiries"
     chosen:               "Chosen"
@@ -50,5 +57,5 @@ define
                           "Newly renovated kitchen makes this a dream."
                           "Cozy studio for students/young professionals."
                           ]
-    title_help:           "First thing shown to potential applicants. Specifics help!"
+    title_help:           "First thing shown to potential applicants. What makes your place special?"
     unit_help:            "Only visible to managers."

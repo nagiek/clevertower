@@ -24,6 +24,8 @@
         "public/:propertyId/listings/:id": "listingsPublic",
         "network/set": "networkSet",
         "network/:name": "networkShow",
+        "search/:location": "search",
+        "search/:location/page/:page": "search",
         "users/:id": "profileShow",
         "users/:id/*splat": "profileShow",
         "account/:category": "accountSettings",
@@ -37,7 +39,7 @@
         });
         this.userView = new UserMenuView().render();
         this.networkView = new NetworkMenuView().render();
-        new SearchView().render();
+        Parse.App.search = new SearchView().render();
         Parse.Dispatcher.on("user:login", function(user) {
           return Parse.User.current().setup().then(function() {
             _this.userView.render();
@@ -93,11 +95,28 @@
       };
 
       DesktopRouter.prototype.index = function() {
-        if (Parse.User.current()) {
-          return $('#main').html("<h1>News Feed</h1>\n<div class=\"row\">\n  <div class=\"span8\">\n\n  </div>\n  <div class=\"span4\">\n    <!-- if user.get('type') is 'manager' then  -->\n    <ul class=\"nav nav-list well\"><li><a href=\"/network/set\">Set up network</a></li></ul>\n  </div>\n</div>");
-        } else {
-          return $('#main').html('<h1>Splash page</h1>');
-        }
+        var view,
+          _this = this;
+        view = this.view;
+        return require(["views/home/index"], function(HomeIndexView) {
+          if (!view || !(view instanceof HomeIndexView)) {
+            return _this.view = new HomeIndexView().render();
+          }
+        });
+      };
+
+      DesktopRouter.prototype.search = function(location, page) {
+        var view,
+          _this = this;
+        view = this.view;
+        return require(["views/home/index"], function(HomeIndexView) {
+          if (!view || !(view instanceof HomeIndexView)) {
+            return _this.view = new HomeIndexView({
+              location: location,
+              page: page
+            }).render();
+          }
+        });
       };
 
       DesktopRouter.prototype.propertiesPublic = function(id) {

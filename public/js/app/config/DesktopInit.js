@@ -14,6 +14,7 @@
       serializeObject: "app/plugins/serialize_object",
       filePicker: "app/plugins/file_picker",
       toggler: "app/plugins/toggler",
+      masonry: "libs/jquery/jquery.masonry",
       "jquery.fileupload-pr": "app/plugins/jquery-fileupload-pr",
       "jquery.fileupload-ui": "app/plugins/jquery-fileupload-ui",
       "jquery.fileupload-fp": "app/plugins/jquery-fileupload-fp",
@@ -22,12 +23,12 @@
       "canvas-to-blob": "//blueimp.github.com/JavaScript-Canvas-to-Blob/canvas-to-blob.min",
       "underscore.email": "app/plugins/underscore-email",
       "underscore.inflection": "app/plugins/underscore-inflection",
-      typeahead: "libs/typeahead.js/typeahead",
+      "underscore.string": "//cdnjs.cloudflare.com/ajax/libs/underscore.string/2.3.0/underscore.string.min",
+      typeahead: "libs/typeahead.js/typeahead-computed",
       pusher: "//d3dy5gmtp8yhk7.cloudfront.net/2.0/pusher.min",
       moment: "//cdnjs.cloudflare.com/ajax/libs/moment.js/2.0.0/moment.min",
       bootstrap: "libs/bootstrap/bootstrap",
       json2: "//cdnjs.cloudflare.com/ajax/libs/json2/20121008/json2",
-      "underscore.string": "//cdnjs.cloudflare.com/ajax/libs/underscore.string/2.3.0/underscore.string.min",
       text: "libs/plugins/text",
       async: "libs/plugins/async",
       propertyParser: "libs/plugins/propertyParser",
@@ -59,13 +60,15 @@
     }
   });
 
+  window.GMAPS_KEY = "AIzaSyDX4LWzK2LTiw4EJFKlOHwBK3m7AmIdpgE";
+
   window.APPID = "z00OPdGYL7X4uW9soymp8n5JGBSE6k26ILN1j3Hu";
 
   window.JSKEY = "NifB9pRHfmsTDQSDA9DKxMuux03S4w2WGVdcxPHm";
 
   window.RESTAPIKEY = "NZDSkpVLG9Gw6NiZOUBevvLt4qPGtpCsLvWh4ZDc";
 
-  define("gmaps", ["async!//maps.googleapis.com/maps/api/js?v=3&sensor=false&key=AIzaSyD_xrni-sLyPudfQ--6gn7yAhaW6nTuqkg"], function() {
+  define("gmaps", ["async!//maps.googleapis.com/maps/api/js?v=3.11&libraries=places&sensor=false&key=" + window.GMAPS_KEY], function() {
     return window.google.maps;
   });
 
@@ -73,8 +76,56 @@
 
   router = onNetwork ? "routers/Network" : "routers/Desktop";
 
-  require(["jquery", "underscore", "backbone", "facebook", "models/Profile", router, "underscore.string", "json2", "bootstrap", "serializeObject", "typeahead"], function($, _, Parse, FB, Profile, AppRouter, _String) {
+  require(["jquery", "underscore", "backbone", "facebook", "models/Profile", router, "underscore.string", "json2", "bootstrap", "serializeObject", "typeahead", "masonry"], function($, _, Parse, FB, Profile, AppRouter, _String) {
+    var listenEvents, listenMethods;
+    listenMethods = {
+      listenTo: "on",
+      listenToOnce: "once"
+    };
+    listenEvents = {};
+    _.each(listenMethods, function(implementation, method) {
+      return listenEvents[method] = function(obj, name, callback) {
+        var id, listeners;
+        listeners = this._listeners || (this._listeners = {});
+        id = obj._listenerId || (obj._listenerId = _.uniqueId("l"));
+        listeners[id] = obj;
+        if (typeof name === "object") {
+          callback = this;
+        }
+        obj[implementation](name, callback, this);
+        return this;
+      };
+    });
+    listenEvents.stopListening = function(obj, name, callback) {
+      var deleteListener, id, listeners;
+      listeners = this._listeners;
+      if (!listeners) {
+        return this;
+      }
+      deleteListener = !name && !callback;
+      if (typeof name === "object") {
+        callback = this;
+      }
+      if (obj) {
+        (listeners = {})[obj._listenerId] = obj;
+      }
+      for (id in listeners) {
+        listeners[id].off(name, callback, this);
+        if (deleteListener) {
+          delete this._listeners[id];
+        }
+      }
+      return this;
+    };
+    _.extend(Parse.View.prototype, listenEvents);
+    _.extend(Parse.Object.prototype, listenEvents);
+    Parse.View.prototype.remove = function() {
+      this.$el.remove();
+      this.stopListening();
+      return this;
+    };
     Parse.initialize(window.APPID, window.JSKEY);
+    Parse.App = {};
     _.str = _String;
     $.ajaxSetup({
       beforeSend: function(jqXhr, settings) {

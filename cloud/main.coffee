@@ -737,8 +737,13 @@ Parse.Cloud.beforeSave "Listing", (req, res) ->
   
   return res.success() if req.object.existed()
 
-  (new Parse.Query "Network").include('role').get req.object.get("network").id,
-  success: (network) ->
+  (new Parse.Query "Property").include('network.role').get req.object.get("property").id,
+  success: (property) ->
+
+    # Update the listing with the location
+    req.object.set "center", property.get("center")
+
+    network = property.get "network"
     mgrRole = network.get "role"
   
     # Give public access to read the lease, and managers to read/write
@@ -1053,20 +1058,24 @@ Parse.Cloud.afterSave "Notification", (req) ->
       req.object.set "error", JSON.stringify(error)
       req.object.save()
 
-
-# Task validation
-Parse.Cloud.beforeSave "Task", (req, res) ->
+# Search validation
+Parse.Cloud.beforeSave "Search", (req, res) ->
   req.object.set "user", req.user
   res.success()
 
+# # Task validation
+# Parse.Cloud.beforeSave "Task", (req, res) ->
+#   req.object.set "user", req.user
+#   res.success()
 
-# Income validation
-Parse.Cloud.beforeSave "Income", (req, res) ->
-  req.object.set "user", req.user
-  res.success()
+
+# # Income validation
+# Parse.Cloud.beforeSave "Income", (req, res) ->
+#   req.object.set "user", req.user
+#   res.success()
 
 
-# Expense validation
-Parse.Cloud.beforeSave "Expense", (req, res) ->
-  req.object.set "user", req.user
-  res.success()
+# # Expense validation
+# Parse.Cloud.beforeSave "Expense", (req, res) ->
+#   req.object.set "user", req.user
+#   res.success()

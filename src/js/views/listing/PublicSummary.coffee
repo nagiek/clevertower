@@ -5,10 +5,10 @@ define [
   "moment"
   "i18n!nls/listing"
   "i18n!nls/common"
-  'templates/listing/headline'
+  'templates/listing/publicsummary'
 ], ($, _, Parse, moment, i18nListing, i18nCommon) ->
 
-  class ListingHeadlineView extends Parse.View
+  class ListingPublicSummaryView extends Parse.View
   
     #... is a table row.
     tagName: "tr"
@@ -30,7 +30,7 @@ define [
         i18nCommon: i18nCommon
         i18nListing: i18nListing
 
-      @$el.html JST["src/js/templates/listing/headline.jst"](vars)
+      @$el.html JST["src/js/templates/listing/publicsummary.jst"](vars)
       @
 
     showModal: (e) =>

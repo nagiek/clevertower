@@ -85,6 +85,9 @@ define [
       init                : false
       public              : false
 
+    GPoint : ->
+      new google.maps.LatLng @get("center")._latitude, @get("center")._longitude
+
     # Backbone default, as Parse function does not exist.
     url: -> "/#{@collection.url}/#{@id}"
 

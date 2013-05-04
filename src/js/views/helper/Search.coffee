@@ -3,28 +3,47 @@ define [
   "underscore"
   "backbone"
   "models/Property"
+  "models/Search"
   "i18n!nls/common"
   'templates/helper/search'
-], ($, _, Parse, Property, i18nCommon) ->
+  'gmaps'
+], ($, _, Parse, Property, Search, i18nCommon) ->
 
   class SearchView extends Parse.View
     
     el: '#search-menu'
     
     events:
-      'submit form': 'search'
+      'submit form': 'doNothing'
 
     initialize : ->
       _.bindAll @, 'search', 'render', 'clear'
 
+      @autoService = new google.maps.places.AutocompleteService()
+
+      @on "google:search", (data) => 
+        # Store last ref in case we have to come and get it.
+        @lastReference = data.reference
+
+        # Send our user to the right page. 
+        # If we are already on a Search page, view will not be re-init'ed.
+        Parse.history.navigate "/search/#{data.location}", trigger: true 
+        new Search(reference: data.reference, location: data.location).save()
+
       Parse.Dispatcher.on "user:logout", @clear
 
-    search : (e) ->
-      # typeahead widget takes care of navigation.
-      e.preventDefault()
+    # typeahead widget takes care of navigation.
+    doNothing : (e) -> e.preventDefault()
+
+    googleSearch : (e, data) => 
+      if data.reference
+        data.location = _.map(data.terms, (t) -> t.value).join("--").replace(" ", "-")
+        @trigger "google:search", data
 
     render : ->
       @$el.html JST["src/js/templates/helper/search.jst"](i18nCommon: i18nCommon)
+
+      @$('#search').on "typeahead:selected", @googleSearch
 
       @vars = [
         name: 'properties'
@@ -51,7 +70,7 @@ define [
               img_src: if p.image_tiny then p.image_tiny else "/img/fallback/property-tiny.png"
               url: "/properties/#{p.objectId}"
               tokens: _.union(p.title.split(" "), p.thoroughfare.split(" "), [p.locality])
-        limit: 10
+        limit: 5
         template: _.template  """
                               <% if (value) { %>
                               <a href="<%= url %>">
@@ -84,7 +103,7 @@ define [
               value: p.name()
               img_src: p.cover("tiny")
               url: p.url()
-        limit: 10
+        limit: 5
         template: _.template  """
                               <% if (value) { %>
                               <a href="<%= url %>">
@@ -93,6 +112,53 @@ define [
                               </a>
                               <% } %>
                               """
+      ,
+
+
+        name: 'places'
+        header: "<span class='nav-header'>#{i18nCommon.nouns.places}</span>"
+        footer: """
+                <span class='nav-header'>
+                  <img src='https://maps.gstatic.com/mapfiles/powered-by-google-on-white.png' alt='Powered by Google'>
+                </span>
+                """
+        computed: (q, done) => 
+          @autoService.getPlacePredictions {input: q, types: ['geocode']}, (predictions, status) -> 
+            predictions ||= []
+            _.each predictions, (p) ->
+              p.url = _.map(p.terms, (t) -> t.value).join("--").replace(" ", "-")
+              p.value = p.description
+
+            done(predictions, status)
+        limit: 5
+        template: _.template  """
+                              <% if (value) { %>
+                              <a href="/search/<%= url %>" data-reference="<%= reference %>" class="google">
+                                <strong><%= value %></strong>
+                              </a>
+                              <% } %>
+                              """
+
+      
+        # XML HTTP Request code
+        # name: 'places'
+        # header: "<span class='nav-header'>#{i18nCommon.nouns.Places}</span>"
+
+        # remote:
+        #   method: "GET"
+        #   dataType: 'jsonp'
+        #   url: "https://maps.googleapis.com/maps/api/place/autocomplete/json" +   # Return JSON format
+        #         "?input=%QUERY" +                                                 # Autocomplete
+        #         "&types=geocode" +                                                # Places only
+        #         "&key=#{window.GMAPS_KEY}" +                                      # Key
+        #         "&sensor=false"                                                   # No Geocode
+        #   filter: (parsedResponse) -> console.log parsedResponse; parsedResponse.predictions
+        # limit: 5
+        # template: _.template  """
+        #                       <% if (value) { %>
+        #                       <strong><%= value %></strong>
+        #                       <% } %>
+        #                       """
       ]
 
       if Parse.onNetwork and Parse.User.current()
@@ -169,6 +235,7 @@ define [
             url: p.url()
 
           @$('#search').typeahead @vars
+
           
         # Parse.User.current().get("network").managers.on "add reset", =>
         #   @$('#search').typeahead 'destroy'

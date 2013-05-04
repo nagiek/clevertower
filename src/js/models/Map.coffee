@@ -18,9 +18,13 @@ define [
       @marker = attrs.marker
       
       opts = 
-        zoom          : 2
-        center        : @GPoint(@marker.get "center")
-        mapTypeId     : google.maps.MapTypeId.ROADMAP
+        zoom              : 2
+        center            : @GPoint(@marker.get "center")
+        mapTypeId         : google.maps.MapTypeId.ROADMAP
+        mapTypeControl    : false
+        streetViewControl : false
+        draggable         : false
+        disableDoubleClickZoom : true
       
       # @opts = _.defaults(attrs.mapOpts, mapDefaults)
       

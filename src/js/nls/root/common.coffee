@@ -95,6 +95,7 @@ define
     link:                 "link"
     you:                  "You"
     people:               "People"
+    places:               "Places"
     sample_email:         "keigan@example.com"
     comments:             "Comments"
     activity:             "Activity"

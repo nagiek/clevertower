@@ -13,6 +13,8 @@ define [
       "public/:propertyId/listings/:id"     : "listingsPublic"
       "network/set"                 : "networkSet"
       "network/:name"               : "networkShow"
+      "search/:location"            : "search"
+      "search/:location/page/:page" : "search"
       "users/:id"                   : "profileShow"
       "users/:id/*splat"            : "profileShow"
       "account/:category"           : "accountSettings"
@@ -23,7 +25,7 @@ define [
       
       @userView = new UserMenuView().render()
       @networkView = new NetworkMenuView().render()
-      new SearchView().render()
+      Parse.App.search = new SearchView().render()
             
       Parse.Dispatcher.on "user:login", (user) =>
         Parse.User.current().setup().then =>
@@ -80,22 +82,16 @@ define [
     # --------------
           
     index: ->
-      if Parse.User.current()
-        $('#main').html """
-                        <h1>News Feed</h1>
-                        <div class="row">
-                          <div class="span8">
+      view = @view
+      require ["views/home/index"], (HomeIndexView) =>
+        if !view or view !instanceof HomeIndexView
+          @view = new HomeIndexView().render()
 
-                          </div>
-                          <div class="span4">
-                            <!-- if user.get('type') is 'manager' then  -->
-                            <ul class="nav nav-list well"><li><a href="/network/set">Set up network</a></li></ul>
-                          </div>
-                        </div>
-                        """
-      else
-        $('#main').html '<h1>Splash page</h1>'
-
+    search: (location, page) ->
+      view = @view
+      require ["views/home/index"], (HomeIndexView) =>
+        if !view or view !instanceof HomeIndexView
+          @view = new HomeIndexView(location: location, page: page).render()
 
     propertiesPublic: (id) =>
       require ["views/property/Public"], (PublicPropertyView) => 

@@ -27,6 +27,7 @@ define [
       
     render : ->
       @form = new NewLeaseView(model: @lease, property: @model).render()
+      @
     
     clear : ->
       @form.undelegateEvents()

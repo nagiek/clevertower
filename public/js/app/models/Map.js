@@ -10,7 +10,11 @@
         opts = {
           zoom: 2,
           center: this.GPoint(this.marker.get("center")),
-          mapTypeId: google.maps.MapTypeId.ROADMAP
+          mapTypeId: google.maps.MapTypeId.ROADMAP,
+          mapTypeControl: false,
+          streetViewControl: false,
+          draggable: false,
+          disableDoubleClickZoom: true
         };
         return this.set({
           "point_exists": false,

@@ -27,6 +27,7 @@ define [
       
     render : ->
       @form = new NewTenantsView(@vars).render()
+      @
     
     clear : ->
       delete @form.undelegateEvents()

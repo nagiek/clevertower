@@ -762,9 +762,11 @@
     if (req.object.existed()) {
       return res.success();
     }
-    return (new Parse.Query("Network")).include('role').get(req.object.get("network").id, {
-      success: function(network) {
-        var listingACL, mgrRole;
+    return (new Parse.Query("Property")).include('network.role').get(req.object.get("property").id, {
+      success: function(property) {
+        var listingACL, mgrRole, network;
+        req.object.set("center", property.get("center"));
+        network = property.get("network");
         mgrRole = network.get("role");
         listingACL = new Parse.ACL();
         listingACL.setPublicReadAccess(true);
@@ -1062,17 +1064,7 @@
     });
   });
 
-  Parse.Cloud.beforeSave("Task", function(req, res) {
-    req.object.set("user", req.user);
-    return res.success();
-  });
-
-  Parse.Cloud.beforeSave("Income", function(req, res) {
-    req.object.set("user", req.user);
-    return res.success();
-  });
-
-  Parse.Cloud.beforeSave("Expense", function(req, res) {
+  Parse.Cloud.beforeSave("Search", function(req, res) {
     req.object.set("user", req.user);
     return res.success();
   });

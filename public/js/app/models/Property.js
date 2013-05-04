@@ -56,6 +56,9 @@
         init: false,
         "public": false
       },
+      GPoint: function() {
+        return new google.maps.LatLng(this.get("center")._latitude, this.get("center")._longitude);
+      },
       url: function() {
         return "/" + this.collection.url + "/" + this.id;
       },

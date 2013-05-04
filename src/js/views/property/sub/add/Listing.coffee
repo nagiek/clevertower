@@ -27,6 +27,7 @@ define [
       
     render : ->
       @form = new NewListingView(model: @listing, property: @model).render()
+      @
     
     clear : ->
       @form.undelegateEvents()

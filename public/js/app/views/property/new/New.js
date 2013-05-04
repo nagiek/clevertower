@@ -36,9 +36,9 @@
       NewPropertyView.prototype.render = function() {
         var networkVars, vars;
         networkVars = {
-          email: this.model.get("network").get("email"),
-          phone: this.model.get("network").get("phone"),
-          website: this.model.get("network").get("website")
+          email: Parse.User.current().get("network").get("email"),
+          phone: Parse.User.current().get("network").get("phone"),
+          website: Parse.User.current().get("network").get("website")
         };
         _.defaults(this.model.attributes, Property.prototype.defaults);
         _.defaults(this.model.attributes, networkVars);

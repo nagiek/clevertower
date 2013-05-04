@@ -36,9 +36,9 @@ define [
         
     render : ->
       networkVars = 
-        email: @model.get("network").get("email")
-        phone: @model.get("network").get("phone")
-        website: @model.get("network").get("website")
+        email: Parse.User.current().get("network").get("email")
+        phone: Parse.User.current().get("network").get("phone")
+        website: Parse.User.current().get("network").get("website")
       _.defaults(@model.attributes, Property::defaults)
       _.defaults(@model.attributes, networkVars)
       vars = 

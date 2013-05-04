@@ -32,6 +32,7 @@ require.config
     serializeObject:          "app/plugins/serialize_object"
     filePicker:               "app/plugins/file_picker"
     toggler:                  "app/plugins/toggler"
+    masonry:                  "libs/jquery/jquery.masonry"
     "jquery.fileupload-pr":   "app/plugins/jquery-fileupload-pr" # Profile  (single)
     "jquery.fileupload-ui":   "app/plugins/jquery-fileupload-ui" # UI       (multiple)
     "jquery.fileupload-fp":   "app/plugins/jquery-fileupload-fp" # File Processing
@@ -42,16 +43,16 @@ require.config
     # Underscore plugins      
     # ---------------
     "underscore.email":       "app/plugins/underscore-email"
-    "underscore.inflection":  "app/plugins/underscore-inflection"                  
+    "underscore.inflection":  "app/plugins/underscore-inflection"
+    "underscore.string":      "//cdnjs.cloudflare.com/ajax/libs/underscore.string/2.3.0/underscore.string.min"
                               
     # Plugins                 
     # ---------------
-    typeahead:                "libs/typeahead.js/typeahead"
+    typeahead:                "libs/typeahead.js/typeahead-computed"
     pusher:                   "//d3dy5gmtp8yhk7.cloudfront.net/2.0/pusher.min"
     moment:                   "//cdnjs.cloudflare.com/ajax/libs/moment.js/2.0.0/moment.min"
     bootstrap:                "libs/bootstrap/bootstrap"    
     json2:                    "//cdnjs.cloudflare.com/ajax/libs/json2/20121008/json2"                 # "libs/plugins/json2"
-    "underscore.string":      "//cdnjs.cloudflare.com/ajax/libs/underscore.string/2.3.0/underscore.string.min"
 
     # RequireJS Plugins       
     # -----------------       
@@ -88,6 +89,7 @@ require.config
     underscore:
       exports: "_"
 
+window.GMAPS_KEY  = "AIzaSyDX4LWzK2LTiw4EJFKlOHwBK3m7AmIdpgE"
 window.APPID      = "z00OPdGYL7X4uW9soymp8n5JGBSE6k26ILN1j3Hu"
 window.JSKEY      = "NifB9pRHfmsTDQSDA9DKxMuux03S4w2WGVdcxPHm"
 window.RESTAPIKEY = "NZDSkpVLG9Gw6NiZOUBevvLt4qPGtpCsLvWh4ZDc"
@@ -98,7 +100,7 @@ window.RESTAPIKEY = "NZDSkpVLG9Gw6NiZOUBevvLt4qPGtpCsLvWh4ZDc"
       # locale: localStorage.getItem("locale") || "fr-fr"
 
 # convert Google Maps into an AMD module
-define "gmaps", ["async!//maps.googleapis.com/maps/api/js?v=3&sensor=false&key=AIzaSyD_xrni-sLyPudfQ--6gn7yAhaW6nTuqkg"], ->
+define "gmaps", ["async!//maps.googleapis.com/maps/api/js?v=3.11&libraries=places&sensor=false&key=#{window.GMAPS_KEY}"], ->
 
   # return the gmaps namespace for brevity
   window.google.maps
@@ -108,9 +110,54 @@ define "gmaps", ["async!//maps.googleapis.com/maps/api/js?v=3&sensor=false&key=A
 # This will bug out on "www" subdomain.
 onNetwork = window.location.host.split(".").length > 2
 router = if onNetwork then "routers/Network" else "routers/Desktop"
-require ["jquery", "underscore", "backbone", "facebook", "models/Profile", router, "underscore.string", "json2", "bootstrap", "serializeObject", "typeahead"], ($, _, Parse, FB, Profile, AppRouter, _String) ->
+require ["jquery", "underscore", "backbone", "facebook", "models/Profile", router, "underscore.string", "json2", "bootstrap", "serializeObject", "typeahead", "masonry"], ($, _, Parse, FB, Profile, AppRouter, _String) ->
+
+  # Add Listen functionality.
+
+  # Inversion-of-control versions of `on` and `once`. Tell *this* object to
+  # listen to an event in another object ... keeping track of what it's
+  # listening to.
+  listenMethods =
+    listenTo: "on"
+    listenToOnce: "once"
+  listenEvents = {}
+
+  _.each listenMethods, (implementation, method) ->
+    listenEvents[method] = (obj, name, callback) ->
+      listeners = @_listeners or (@_listeners = {})
+      id = obj._listenerId or (obj._listenerId = _.uniqueId("l"))
+      listeners[id] = obj
+      callback = @  if typeof name is "object"
+      obj[implementation] name, callback, @
+      @
+
+  listenEvents.stopListening = (obj, name, callback) ->
+    listeners = @_listeners
+    return @  unless listeners
+    deleteListener = not name and not callback
+    callback = @  if typeof name is "object"
+    (listeners = {})[obj._listenerId] = obj  if obj
+    for id of listeners
+      listeners[id].off name, callback, @
+      delete @_listeners[id]  if deleteListener
+    @
+
+  _.extend Parse.View.prototype, listenEvents
+  _.extend Parse.Object.prototype, listenEvents
+
+  # Remove this view by taking the element out of the DOM, and removing any
+  # applicable Backbone.Events listeners.
+  Parse.View::remove = ->
+    @$el.remove()
+    @stopListening()
+    @
+
+
+
+
 
   Parse.initialize window.APPID, window.JSKEY
+  Parse.App = {}
 
   # Import Underscore.string to separate object, because there are conflict functions (include, reverse, contains)
   _.str = _String
@@ -141,6 +188,16 @@ require ["jquery", "underscore", "backbone", "facebook", "models/Profile", route
       true
 
   Parse.Collection::findWhere = (attrs) -> @where attrs, true
+
+
+
+
+  
+
+
+
+
+
 
 
   # Extend Parse User

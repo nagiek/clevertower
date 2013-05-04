@@ -3,7 +3,7 @@ define [
   "underscore"
   "backbone"
   "views/photo/Public"
-  "views/listing/Headline"
+  "views/listing/PublicSummary"
   "i18n!nls/property"
   "i18n!nls/listing"
   "i18n!nls/unit"
@@ -30,12 +30,12 @@ define [
       @model.prep "photos"
       @model.prep "listings"
 
-      @model.photos.bind "add", @addOne
-      @model.photos.bind "reset", @addAll
+      @model.photos.on "add", @addOne
+      @model.photos.on "reset", @addAll
 
       @model.listings.title = @model.get "title"
-      @model.listings.bind "add", @addOneListing
-      @model.listings.bind "reset", @addAllListings
+      @model.listings.on "add", @addOneListing
+      @model.listings.on "reset", @addAllListings
 
     GPoint : (GeoPoint)-> new google.maps.LatLng GeoPoint._latitude, GeoPoint._longitude
 
@@ -69,8 +69,8 @@ define [
       @$list = $("#photos > ul")
       @$listings = $("#listings > table > tbody")
       
-      if @model.photos.length is 0 then @model.photos.fetch() else @addAll
-      if @model.listings.length is 0 then @model.listings.fetch() else @addAllListings
+      if @model.photos.length is 0 then @model.photos.fetch() else @addAll()
+      if @model.listings.length is 0 then @model.listings.fetch() else @addAllListings()
 
       @
 
@@ -110,7 +110,7 @@ define [
             @$listings.append '<tr class="divider"><td colspan="4">' + i18nUnit.fields.bedrooms + ": #{i}</td></tr>"
             _.each listings, @addOneListing
       else
-        @$listings.before '<p class="empty">' + i18nProperty.collection.empty.photos + '</p>'
+        @$listings.before '<p class="empty">' + i18nProperty.collection.empty.listings + '</p>'
 
     showModal: (e) =>
       e.preventDefault()
