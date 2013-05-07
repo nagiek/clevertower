@@ -8,6 +8,7 @@ define [
   "i18n!nls/common"
   'templates/listing/index'
   'masonry'
+  'jqueryui'
   "gmaps"
 ], ($, _, Parse, HomeList, FeedListingView, i18nListing, i18nCommon) ->
 
@@ -20,8 +21,6 @@ define [
     
     initialize : (attrs) ->
 
-      console.log 'init'
-
       @location = attrs.location || "Montreal--QC--Canada"
       @page = attrs.page || 1
 
@@ -32,6 +31,9 @@ define [
       @redoSearch = true
       @display = 'List'
       @mapId = "mapCanvas"
+      @min = 0
+      @max = 6000
+
       @resultsPerPage = 20
       # The chunk is the start of the group of pages we are displaying
       @chunk = Math.floor(@page / @resultsPerPage) + 1
@@ -39,7 +41,7 @@ define [
       @chunkSize = 10
       @firstRun = true
 
-      Parse.App.listings = new HomeList() unless Parse.App.listings
+      Parse.App.listings = new HomeList [], min: @min, max: @max unless Parse.App.listings
       Parse.App.listings.on "add", @addOne
       Parse.App.listings.on "reset", @addAll
       
@@ -73,6 +75,21 @@ define [
       
       @$list = @$("> ul")
       @$pagination = @$("> .pagination ul")
+
+      $("#price-slider").slider
+        values: [@min, @max]
+        step: 10
+        range: true 
+        min: 0
+        max: 6000
+        slide: (event, ui) -> 
+          selector = if ui.value is ui.values[0] then "#slider-min" else "#slider-max"
+          $(selector).html ui.value
+        stop: (event, ui) => 
+          @min = ui.values[0]
+          @max = ui.values[1]
+          Parse.App.listings.query.greaterThanOrEqualTo("rent", @min).lessThanOrEqualTo("rent", @max)
+          @performSearchWithinMap()
 
       @map = new google.maps.Map document.getElementById(@mapId), 
         zoom              : 12
@@ -108,7 +125,6 @@ define [
         @performSearchWithinMap()
 
     checkIfShouldSearch : =>
-      console.log 'checkIfShouldSearch'
       if @redoSearch
         Parse.history.navigate "/search/#{@location}"
         @chunk = 1
@@ -130,13 +146,22 @@ define [
       else
         # Groom the incoming data.
         listingsToRemove = []
-        Parse.App.listings.each (l) -> 
+        Parse.App.listings.each (l) => 
           lat = l.get('center')._latitude
           lng = l.get('center')._longitude
+          rent = l.get('rent')
+
           # If it is outside the box
-          if lat < sw._latitude || ne._latitude < lat || lng < sw._longitude || ne._longitude < lng
+          if lat < sw._latitude || 
+             ne._latitude < lat || 
+             lng < sw._longitude || 
+             ne._longitude < lng || 
+
+             # Or if it does not fit the price targets
+             rent < @min || 
+             rent > @max
             listingsToRemove.push l
-        
+
         if listingsToRemove.length > 0
           Parse.App.listings.remove(listingsToRemove) 
           # Find new things to replace
@@ -153,7 +178,6 @@ define [
             replaceQuery = Parse.App.listings.query
             replaceQuery.limit(@resultsPerPage - Parse.App.listings.length).notContainedIn("objectId", Parse.App.listings.map((l) -> l.id)).find()
             .then (objs) =>
-              console.log objs
               Parse.App.listings.add objs
             .then =>
               @$list.masonry 'reload'

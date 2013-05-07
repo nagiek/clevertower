@@ -23,9 +23,6 @@ define [
       @display = @view.display
       @map = @view.map
 
-      console.log Parse.Events
-      console.log Parse.View.prototype
-
       @listenTo @model, "remove", @clear
       @listenTo @view, "view:changeDisplay", @setDisplay
 
@@ -49,10 +46,9 @@ define [
 
     # Re-render the contents of the Unit item.
     render: =>
-      console.log @model
       vars = 
         title: @model.get("title")
-        rent: @model.get("rent")
+        rent: "$" + @model.get("rent")
         pos: @model.pos() + 1
         propertyId: @model.get("property").id
         cover: @model.get("property").cover('large')
@@ -87,6 +83,7 @@ define [
       @marker.setZIndex 1
 
     clear : => 
+      console.log 'clear'
       @marker.setMap null
       @model.off "remove", @el
       @view.off "view:changeDisplay", @el

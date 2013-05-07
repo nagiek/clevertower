@@ -139,6 +139,15 @@ define [
         else 
           unit = @units.get data.unit.id
         attrs.unit = unit
+
+      # Massage the Only-String data from serializeObject()
+      _.each ['rent'], (attr) ->
+        data.listing[attr] = 0 if data.listing[attr] is '' or data.listing[attr] is '0'
+        data.listing[attr] = Number data.listing[attr] if data.listing[attr] and isNaN data.listing[attr]
+
+      _.each ['start_date', 'end_date'], (attr) ->
+        data.listing[attr] = moment(data.listing[attr], i18nCommon.dates.moment_format).toDate() unless data.listing[attr] is ''
+        data.listing[attr] = new Date if typeof data.listing[attr] is 'string'
       
       # Validate tenants (assignment done in Cloud)
       userValid = true

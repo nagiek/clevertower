@@ -12,7 +12,7 @@ require.config
     # Core Libraries
     # --------------
     jquery:                   "//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min"     # "libs/jquery/jquery"
-    # jqueryui:                 "libs/jqueryui/jquery-ui-1.10.1.custom.min",                  # includes core, widget, slider, datepicker
+    jqueryui:                 "libs/jqueryui/jquery-ui-1.10.3.custom.min",                  # includes core, widget, slider, datepicker
     # underscore:               "//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min"
     underscore:               "//cdnjs.cloudflare.com/ajax/libs/lodash.js/1.0.1/lodash.min" # "libs/underscore/lodash"
     backbone:                 "//www.parsecdn.com/js/parse-1.2.7"                       # "libs/backbone/parse"
@@ -33,6 +33,9 @@ require.config
     filePicker:               "app/plugins/file_picker"
     toggler:                  "app/plugins/toggler"
     masonry:                  "libs/jquery/jquery.masonry"
+    rangeSlider:              "libs/jquery/jquery.rangeSlider"
+    rangeSliderHandle:        "libs/jquery/jquery.rangeSliderHandle"
+    rangeSliderDraggable:     "libs/jquery/jquery.rangeSliderDraggable"
     "jquery.fileupload-pr":   "app/plugins/jquery-fileupload-pr" # Profile  (single)
     "jquery.fileupload-ui":   "app/plugins/jquery-fileupload-ui" # UI       (multiple)
     "jquery.fileupload-fp":   "app/plugins/jquery-fileupload-fp" # File Processing

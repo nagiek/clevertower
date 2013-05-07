@@ -5,6 +5,7 @@
     baseUrl: "/js",
     paths: {
       jquery: "//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min",
+      jqueryui: "libs/jqueryui/jquery-ui-1.10.3.custom.min",
       underscore: "//cdnjs.cloudflare.com/ajax/libs/lodash.js/1.0.1/lodash.min",
       backbone: "//www.parsecdn.com/js/parse-1.2.7",
       facebook: "//connect.facebook.net/en_US/all",
@@ -15,6 +16,9 @@
       filePicker: "app/plugins/file_picker",
       toggler: "app/plugins/toggler",
       masonry: "libs/jquery/jquery.masonry",
+      rangeSlider: "libs/jquery/jquery.rangeSlider",
+      rangeSliderHandle: "libs/jquery/jquery.rangeSliderHandle",
+      rangeSliderDraggable: "libs/jquery/jquery.rangeSliderDraggable",
       "jquery.fileupload-pr": "app/plugins/jquery-fileupload-pr",
       "jquery.fileupload-ui": "app/plugins/jquery-fileupload-ui",
       "jquery.fileupload-fp": "app/plugins/jquery-fileupload-fp",

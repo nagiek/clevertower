@@ -38,8 +38,13 @@
 
 .inline-block {
   display: inline-block;
-  vertical-align: top;
 }
+@media (min-width:767px) {
+  .inline-block + .inline-block {
+    margin-left: 10px;
+  }
+}
+
 
 .align-top    { vertical-align: top;    }
 .align-middle { vertical-align: middle; }
