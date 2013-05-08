@@ -17,6 +17,7 @@ define [
     events:
       "mouseover > a" : "highlightMarker"
       "mouseout > a"  : "unHighlightMarker"
+      "click a" : "goToProperty"
 
     initialize : (attrs) ->
       @view = attrs.view
@@ -25,6 +26,7 @@ define [
 
       @listenTo @model, "remove", @clear
       @listenTo @view, "view:changeDisplay", @setDisplay
+      @listenTo @view, "model:viewDetails", @clear
 
       @icon = 
         url: "/img/icon/pins-sprite.png"
@@ -43,6 +45,15 @@ define [
       google.maps.event.removeListener @highlightListener
       google.maps.event.removeListener @unHighlightListener
       super
+
+    goToProperty: (e) =>
+      e.preventDefault()
+      require ["views/property/Public"], (PublicPropertyView) => 
+        property = @model.get("property")
+        new PublicPropertyView(model: property).render()
+        Parse.history.navigate "/public/#{property.id}"
+        @view.trigger "model:viewDetails"
+
 
     # Re-render the contents of the Unit item.
     render: =>
@@ -83,7 +94,6 @@ define [
       @marker.setZIndex 1
 
     clear : => 
-      console.log 'clear'
       @marker.setMap null
       @model.off "remove", @el
       @view.off "view:changeDisplay", @el
@@ -91,5 +101,4 @@ define [
       delete @marker
       @remove()
       @undelegateEvents()
-      @stopListening()
       delete this

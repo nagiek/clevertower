@@ -31,6 +31,7 @@ define [
         @$('button.save').removeProp('disabled')
       
       @model.on "invalid", (error) ->
+        console.log error
 
         new Alert(event: 'model-save', fade: false, message: i18nProperty.errors[error.message], type: 'error')
         switch error.message
@@ -57,7 +58,44 @@ define [
       @$('button.save').prop('disabled', 'disabled')
       
       attrs = @$('form').serializeObject().property
-      attrs.public = if attrs.public is "1" then true else false
+
+      bools = ['electricity'
+        'furniture'
+        'gas'
+        'heat'
+        'hot_water'
+        # Included
+        'air_conditioning'
+        'back_yard'
+        'balcony'
+        'cats_allowed'
+        'concierge'
+        'dogs_allowed'
+        'doorman'
+        'elevator'
+        'exposed_brick'
+        'fireplace'
+        'front_yard'
+        'gym'
+        'laundry'
+        'indoor_parking'
+        'outdoor_parking'
+        'pool'
+        'sauna'
+        'wheelchair'
+        # Private
+        'public'
+        'anon'
+      ]
+
+      console.log attrs
+      debugger
+
+      _.each bools, (attr) -> 
+        # Have to return true because returning false breaks the _.each loop.
+        attrs[attr] = if attrs[attr] is "on" or attrs[attr] is "1" then true else false
+        true
+
       @model.save attrs,
         success: (property) =>
           @trigger "property:sync", property, this

@@ -24,9 +24,11 @@ define [
       @location = attrs.location || "Montreal--QC--Canada"
       @page = attrs.page || 1
 
-      $('#redo-search').on "click", => 
+      @listenTo $('#redo-search'), "click", => 
         @redoSearch = if @redoSearch then false else true
         if @redoSearch then @performSearchWithinMap()
+
+      @on "model:viewDetails", @clear
 
       @redoSearch = true
       @display = 'List'
@@ -55,7 +57,11 @@ define [
       else if attrs.location
         new Parse.Query("Search").descending("createdAt").equalTo("location", attrs.location).first()
         .then (obj) => 
-          @placesService.getDetails reference: obj.get("reference"), @initWithCenter
+          if obj
+            @placesService.getDetails reference: obj.get("reference"), @initWithCenter
+          else 
+            @center = new google.maps.LatLng 43.6481, -79.4042
+            @render()
         , =>
           @center = new google.maps.LatLng 43.6481, -79.4042
           @render()
@@ -286,3 +292,7 @@ define [
     #   google.maps.event.removeListener @zoomListener
 
     #   super
+    clear : => 
+      @remove()
+      @undelegateEvents()
+      delete this

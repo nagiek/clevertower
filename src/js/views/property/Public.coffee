@@ -41,7 +41,7 @@ define [
 
     showTab : (e) ->
       e.preventDefault()
-      $(e.currentTarget.hash).tab('show')
+      $("#{e.currentTarget.hash}-link").tab('show')
 
     render: ->
       vars =
@@ -52,6 +52,8 @@ define [
         i18nGroup: i18nGroup
         i18nListing: i18nListing
         i18nUnit: i18nUnit
+
+      console.log vars
 
       @$el.html JST["src/js/templates/property/public.jst"](vars)
 

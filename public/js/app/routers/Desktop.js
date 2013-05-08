@@ -83,6 +83,9 @@
         });
         return $(document).on("click", "a", function(e) {
           var href;
+          if (e.isDefaultPrevented()) {
+            return;
+          }
           href = $(this).attr("href");
           if (href === "#" || !(href != null)) {
             return;
@@ -121,6 +124,7 @@
 
       DesktopRouter.prototype.propertiesPublic = function(id) {
         var _this = this;
+        console.log('propertiesPublic');
         return require(["views/property/Public"], function(PublicPropertyView) {
           return new Parse.Query("Property").get(id, {
             success: function(model) {
