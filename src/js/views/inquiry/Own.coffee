@@ -50,6 +50,7 @@ define [
         objectId: @model.id
         propertyId: @model.get("property").id
         propertyTitle: @model.get("property").get("title")
+        publicUrl: @model.get("property").publicUrl()
         i18nCommon: i18nCommon
         i18nListing: i18nListing
       $(@el).html JST["src/js/templates/inquiry/own.jst"](vars)

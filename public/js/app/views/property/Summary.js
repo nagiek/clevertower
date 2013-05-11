@@ -25,6 +25,7 @@
         var details, vars;
         details = {
           cover: this.model.cover('profile'),
+          publicUrl: this.model.publicUrl(),
           listings: '0',
           incomes: '0',
           expenses: '0',

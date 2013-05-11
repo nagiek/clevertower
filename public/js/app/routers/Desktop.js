@@ -12,20 +12,16 @@
       function DesktopRouter() {
         this.profileShow = __bind(this.profileShow, this);
 
-        this.listingsPublic = __bind(this.listingsPublic, this);
-
         this.propertiesPublic = __bind(this.propertiesPublic, this);
         return DesktopRouter.__super__.constructor.apply(this, arguments);
       }
 
       DesktopRouter.prototype.routes = {
         "": "index",
-        "public/:id": "propertiesPublic",
-        "public/:propertyId/listings/:id": "listingsPublic",
+        "places/:country/:region/:city/:id/:slug": "propertiesPublic",
         "network/set": "networkSet",
         "network/:name": "networkShow",
-        "search/:location": "search",
-        "search/:location/page/:page": "search",
+        "search/*splat": "search",
         "users/:id": "profileShow",
         "users/:id/*splat": "profileShow",
         "account/:category": "accountSettings",
@@ -71,11 +67,12 @@
           return Parse.history.loadUrl(location.pathname);
         });
         Parse.history.on("route", function(route) {
-          $('#search').val("").blur();
+          $('#search-menu input.search').val("").blur();
           _this.oldConstructor;
           if (_this.view) {
             if (_this.oldConstructor !== _this.view.constructor) {
               _this.oldConstructor = _this.view.constructor;
+              _this.view.trigger("view:change");
               _this.view.undelegateEvents();
               return delete _this.view;
             }
@@ -108,50 +105,33 @@
         });
       };
 
-      DesktopRouter.prototype.search = function(location, page) {
+      DesktopRouter.prototype.search = function(splat) {
         var view,
           _this = this;
         view = this.view;
-        return require(["views/home/index"], function(HomeIndexView) {
-          if (!view || !(view instanceof HomeIndexView)) {
-            return _this.view = new HomeIndexView({
-              location: location,
-              page: page
+        return require(["views/listing/index"], function(ListingIndexView) {
+          var vars;
+          if (!view || !(view instanceof ListingIndexView)) {
+            vars = _this.deparamAction(splat);
+            return _this.view = new ListingIndexView({
+              location: vars.path,
+              params: vars.params
             }).render();
           }
         });
       };
 
-      DesktopRouter.prototype.propertiesPublic = function(id) {
-        var _this = this;
-        console.log('propertiesPublic');
+      DesktopRouter.prototype.propertiesPublic = function(country, region, city, id, slug) {
+        var place,
+          _this = this;
+        place = "" + city + "--" + region + "--" + country;
         return require(["views/property/Public"], function(PublicPropertyView) {
           return new Parse.Query("Property").get(id, {
             success: function(model) {
               return _this.view = new PublicPropertyView({
-                model: model
+                model: model,
+                place: place
               }).render();
-            },
-            error: function(object, error) {
-              return _this.accessDenied();
-            }
-          });
-        });
-      };
-
-      DesktopRouter.prototype.listingsPublic = function(propertyId, id) {
-        var _this = this;
-        return require(["views/listing/Public"], function(PublicListingView) {
-          return new Parse.Query("Property").get(propertyId, {
-            success: function(property) {
-              return new Parse.Query("Listing").get(id, {
-                success: function(model) {
-                  return _this.view = new PublicListingView({
-                    property: property,
-                    model: model
-                  }).render();
-                }
-              });
             },
             error: function(object, error) {
               return _this.accessDenied();

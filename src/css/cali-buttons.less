@@ -32,31 +32,18 @@ td.btn-group > .btn {
   }
 }
 
-.btn-facebook,
-.btn-facebook:hover,
-.btn-facebook:active,
-.btn-facebook.active {
-  background-image: url("@{imagesFolder}/vendor/facebook/fb-sprites.png"); // url(https://static.ak.fbcdn.net/rsrc.php/v2/yL/r/FGFbc80dUKj.png);
-  background-repeat: no-repeat;
-  background-position: -1px -138px;
-  color: @white;
-  text-shadow: 0 -1px 0 rgba(0,0,0,.25);
-}
-
 .btn-facebook {
   padding-left: 35px !important;
   min-height: 26px;
+  background-image: url("@{imagesFolder}/vendor/facebook/fb-sprites.png"); // url(https://static.ak.fbcdn.net/rsrc.php/v2/yL/r/FGFbc80dUKj.png);
+  background-repeat: no-repeat;
+  background-position: -1px -138px;
   background-color: #5B74A8;
   border-color: #879AC0 #29447E #1A356E;
   border-width: 1px;
   border-style: solid;
-  //#gradient > .vertical-three-colors(#ffffff, #ffffff, 25%, darken(#ffffff, 10%)); // Don't use .gradientbar() here since it does a three-color gradient
-  //.buttonBackground(@fbBlue, @fbBlueDark);
-  display: inline-block;
   font-family: 'Lucida Grande', Tahoma, Verdana, Arial, sans-serif;
-  font-size: 13px;
-  font-weight: bold;
-  line-height: 16px;
+  color: @white;
   font-weight: bold;
   text-shadow: none;
   .border-radius(0);
@@ -76,6 +63,10 @@ td.btn-group > .btn {
   &:active,
   &.active {
     background-color: @fbBlue;
+    text-shadow: 0 -1px 0 rgba(0,0,0,.25);
+  }
+  &.btn-large {
+    background-position: -1px -60px;
   }
 }
 

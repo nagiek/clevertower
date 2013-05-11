@@ -2,7 +2,7 @@ define [
   "jquery"
   "underscore"
   "backbone"
-  'collections/HomeList'
+  'collections/ListingFeedList'
   "views/listing/feed"
   "i18n!nls/listing"
   "i18n!nls/common"
@@ -10,25 +10,31 @@ define [
   'masonry'
   'jqueryui'
   "gmaps"
-], ($, _, Parse, HomeList, FeedListingView, i18nListing, i18nCommon) ->
+], ($, _, Parse, ListingFeedList, FeedListingView, i18nListing, i18nCommon) ->
 
   class IndexListingView extends Parse.View
   
-    el: ".content"
+    el: "#main"
 
     events:
       'click .display' : 'changeDisplay'
+      # 'scroll' : 'tracker'
+      # 'resize' : 'resize'
     
     initialize : (attrs) ->
 
       @location = attrs.location || "Montreal--QC--Canada"
-      @page = attrs.page || 1
+      @locationAppend = if attrs.params.lat and attrs.params.lng then "?lat=#{attrs.params.lat}&lng=#{attrs.params.lng}" else ''
+      @page = attrs.params.page || 1
 
       @listenTo $('#redo-search'), "click", => 
         @redoSearch = if @redoSearch then false else true
         if @redoSearch then @performSearchWithinMap()
 
       @on "model:viewDetails", @clear
+
+      # Create a timer to buffer window re-draws.
+      @time = null
 
       @redoSearch = true
       @display = 'List'
@@ -43,14 +49,17 @@ define [
       @chunkSize = 10
       @firstRun = true
 
-      Parse.App.listings = new HomeList [], min: @min, max: @max unless Parse.App.listings
+      Parse.App.listings = new ListingFeedList [], min: @min, max: @max unless Parse.App.listings
       Parse.App.listings.on "add", @addOne
       Parse.App.listings.on "reset", @addAll
-      
-      @placesService = new google.maps.places.PlacesService(document.getElementById(@mapId))
 
+      @render()
+      
       # Set the initial map location if we have one
-      if Parse.App.search.lastReference
+      if attrs.params.lat and attrs.params.lng
+        @center = new google.maps.LatLng attrs.params.lat, attrs.params.lng
+        @renderMap()
+      else if Parse.App.search.lastReference
         @placesService.getDetails reference: Parse.App.search.lastReference, @initWithCenter
       else if Parse.User.current() and Parse.User.current().lastReference
         @placesService.getDetails reference: Parse.User.current().lastReference, @initWithCenter
@@ -61,13 +70,13 @@ define [
             @placesService.getDetails reference: obj.get("reference"), @initWithCenter
           else 
             @center = new google.maps.LatLng 43.6481, -79.4042
-            @render()
+            @renderMap()
         , =>
           @center = new google.maps.LatLng 43.6481, -79.4042
-          @render()
+          @renderMap()
       else
         @center = new google.maps.LatLng 43.6481, -79.4042
-        @render()
+        @renderMap()
       
       Parse.App.search.on "google:search", (data) =>
         @location = data.location
@@ -79,8 +88,11 @@ define [
         i18nCommon: i18nCommon
       @$el.html JST["src/js/templates/listing/index.jst"](vars)
       
-      @$list = @$("> ul")
-      @$pagination = @$("> .pagination ul")
+      @$list = @$(".content > ul")
+      @$pagination = @$(".content > .pagination ul")
+      # Record our fixed block.
+      @$block = @$('#map-container')
+      @$block.original_position = @$block.offset()
 
       $("#price-slider").slider
         values: [@min, @max]
@@ -97,6 +109,15 @@ define [
           Parse.App.listings.query.greaterThanOrEqualTo("rent", @min).lessThanOrEqualTo("rent", @max)
           @performSearchWithinMap()
 
+      @placesService = new google.maps.places.PlacesService(document.getElementById(@mapId))
+
+      # Track scrolling & resizing for map
+      $(window).resize @resize
+      $(document.documentElement).resize @resize
+      $(window).scroll @tracker
+      $(document.documentElement).scroll @tracker
+
+    renderMap : =>
       @map = new google.maps.Map document.getElementById(@mapId), 
         zoom              : 12
         center            : @center
@@ -108,10 +129,9 @@ define [
       @zoomListener = google.maps.event.addListener @map, 'zoom_changed', @checkIfShouldSearch
       google.maps.event.addListenerOnce @map, 'idle', @performSearchWithinMap
 
-
     initWithCenter : (place, status) =>
       @center = place.geometry.location if status is google.maps.places.PlacesServiceStatus.OK
-      @render()
+      @renderMap()
 
     googleSearch : (place, status) =>
 
@@ -131,8 +151,10 @@ define [
         @performSearchWithinMap()
 
     checkIfShouldSearch : =>
+      center = @map.getCenter()
+      @locationAppend = "?lat=#{center.lat()}&lng=#{center.lng()}"
+      Parse.history.navigate "/search/#{@location}#{@locationAppend}"
       if @redoSearch
-        Parse.history.navigate "/search/#{@location}"
         @chunk = 1
         @page = 1
         @performSearchWithinMap()
@@ -245,8 +267,14 @@ define [
       if pages > @chunkSize then pages = @chunkSize; next = true
 
       if @chunk > 1 then @$pagination.append "<li><a href='#' class='prev' data-page='prev'>...</a></li>"
+
+      url = "/search/#{@location}" 
       for page in [@chunk..@chunk + pages - 1] by 1
-        @$pagination.append "<li><a data-page='#{page}' href='/search/#{@location}#{unless page is 1 then '/page/' + page else ''}'>#{page}</a></li>"
+        if page > 1
+          append = @locationAppend + (if @locationAppend.length > 0 then "&" else "?") + "page=#{page}"
+        else 
+          append = @locationAppend
+        @$pagination.append "<li><a data-page='#{page}' href='#{url}#{append}'>#{page}</a></li>"
       if next then @$pagination.append "<li><a href='#' class='next' data-page='next'>...</a></li>"
 
       if @chunk <= @page and @page < @chunk + @chunkSize
@@ -259,7 +287,7 @@ define [
 
     # Change the page within the current pagination.
     changePage : (e) =>
-      
+      e.preventDefault()
       selected = e.currentTarget.attributes["data-page"].value
 
       if selected is 'next' or selected is 'prev'
@@ -280,6 +308,38 @@ define [
         # Reset and get new
         Parse.App.listings.fetch()
 
+    
+    # Track positioning and visibility.
+    tracker: =>
+
+      # Track position relative to the viewport and set position.
+      vOffset = (document.documentElement.scrollTop or document.body.scrollTop)
+      
+      # @@@K Hack
+      # trigger = 58
+      if vOffset > @$block.original_position.top
+        @$block.addClass "float-block-fixed offset8"
+      else
+        @$block.removeClass "float-block-fixed offset8"
+  
+    # Track resizing.
+    resize : =>
+      
+      # Ensure minimum time between adjustments.
+      return if @time
+      @time = setTimeout =>
+
+        # Reset the block and calculate new position
+        @$block.removeClass "float-block-fixed"
+        @$block.original_position = @$block.offset()
+
+        @tracker()
+
+        # Reset timer
+        @time = null
+      , 250
+
+    
 
     # These break everything. 
     # undelegateEvents is called after init. No idea why.
@@ -288,11 +348,13 @@ define [
     #   Parse.App.listings.off "add"
     #   Parse.App.listings.off "reset"
 
+    #   Parse.App.search.off "google:search"
+
     #   google.maps.event.removeListener @dragListener
     #   google.maps.event.removeListener @zoomListener
 
     #   super
     clear : => 
-      @remove()
+      @stopListening()
       @undelegateEvents()
       delete this

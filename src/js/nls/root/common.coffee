@@ -60,7 +60,7 @@ define
   dates:
     moment_format:        "MM/DD/YYYY" # Convenience reference to moment().format("L")
     datepicker_format:    "mm/dd/yyyy" # Same as above, but for datepicker widget
-    per_month:            "Per month"
+    per_month:            "per month"
     date:                 "Date"
     day:                  "Day"
     month:                "Month"
@@ -87,6 +87,9 @@ define
     off:                  "off"
     at:                   "at"
     eg:                   "E.g., "
+  conjuctions:             
+    or:                   "or"
+    and:                  "and"
   verbs:             
     loading:              "Loading"
   nouns:
@@ -116,6 +119,7 @@ define
     private:              "Private"
     landlord_only:        "Landlord Only"
     admin:                "admin"
+    not_specified:        "Not specified"
   form:                   
     operations:           "Operations"
     info:                 "Info"

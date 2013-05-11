@@ -31,47 +31,39 @@ html(lang="en")
       script(src="//html5shiv.googlecode.com/svn/trunk/html5.js")
     
   body
-    
+
+    header(data-role='header', role="navigation")
+      #primary-nav.navbar.navbar-fixed-top
+        .navbar-inner
+          .container
+            button.btn.btn-navbar(data-target=".nav-collapse", data-toggle="collapse")
+              span.icon-bar
+              span.icon-bar
+              span.icon-bar              
+            a.brand(href="/", title="Home")
+              img(src="/img/logos/logo.png", alt="logo")
+            ul.nav#domain-menu
+              li#home-nav
+                a(href="/") Home
+              li#network-nav
+            .nav-collapse.collapse
+              ul.nav#search-menu
+              ul.nav.pull-right#user-menu
+
+    // Branding
+    #brand-strip.hide
+
+    // Messages
+    #messages.container
+
+    // Facebook root.
+    #fb-root
+
     #page.page(data-role='page')      
-      
-      header(data-role='header', role="navigation")
-        #primary-nav.navbar.navbar-fixed-top
-          .navbar-inner
-            .container
-              button.btn.btn-navbar(data-target=".nav-collapse", data-toggle="collapse")
-                span.icon-bar
-                span.icon-bar
-                span.icon-bar              
-              a.brand(href="/", title="Home")
-                img(src="/img/logos/logo.png", alt="logo")
-              ul.nav#domain-menu
-                li#home-nav
-                  a(href="/") Home
-                li#network-nav
-              .nav-collapse.in.collapse
-                ul.nav#search-menu
-                ul.nav.pull-right#user-menu
 
-      // Branding
-      .brand-strip.hide
-    
-      .container
-        .row
-          // Messages
-          #messages.container
-
-          // Facebook root.
-          #fb-root
-
-
-          // Main
-          #main.span12
-            block content
-              #todoapp
-                .title
-                  h1 Parse Todos
-                .content
-            
+      // Main
+      #main
+        block content
           
       // Footer
       footer.footer(data-role='footer')

@@ -62,6 +62,15 @@
       url: function() {
         return "/" + this.collection.url + "/" + this.id;
       },
+      publicUrl: function() {
+        return "/places/" + (this.country()) + "/" + (this.get("administrative_area_level_1")) + "/" + (this.get("locality")) + "/" + this.id + "/" + (this.slug());
+      },
+      slug: function() {
+        return this.get("title").replace(/\s+/g, '-').toLowerCase();
+      },
+      country: function() {
+        return Parse.App.countryCodes[this.get("country")];
+      },
       cover: function(format) {
         var img;
         img = this.get("image_" + format);

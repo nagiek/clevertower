@@ -33,6 +33,7 @@ define [
     render: ->
       vars = _.merge @model.toJSON(),
         posted: moment(@model.createdAt).fromNow()
+        publicUrl: @property.publicUrl()
         propertyId: @property.id
         property: @property.toJSON()
         unitId: @model.get("unit").id

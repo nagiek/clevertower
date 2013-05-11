@@ -2,42 +2,40 @@
  * @file cali-modal.less
  * Style the Modal display.
  */
-.modal-body {
-  max-height:none;
-  overflow-y:auto;
-  padding: 0;
-}
-.modal-footer {
-  &.form-actions {
-    label {
-      float:none;
-      display:inline-block;
-      vertical-align:middle;
-    }
-  }
-}
-
 .modal {
   overflow: hidden;
   background-color:@bodyBackground;
-  left: 43%;
-  width: 700px;
-  &.form-modal {
-    .modal-body {
-      padding-bottom:18px;
-    }
-  }
   .modal-body {
     max-height:400px;
     overflow-y:scroll;
     padding: 15px 15px 0;
   }
-
   form {
     margin-bottom:0;
   }
-  #modal-throbber {
-    text-align:center;
-    margin:18px 0;
-  }  
+  legend {
+    text-transform: uppercase;
+    font-size: 14px;
+    color: @gray;
+    border-bottom: 0;
+  }
+}
+
+.modal-form {
+  .modal-body {
+    padding-bottom:18px;
+  }
+}
+
+.modal-large {
+  .modal-footer {
+    height: 42px;
+  }
+}
+
+@media (min-width: 767px) {
+  .modal-thin {
+    width: 400px;
+    left: 60%;
+  }
 }

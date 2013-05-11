@@ -30,6 +30,7 @@ define [
     render: ->
       details = 
         cover        : @model.cover('profile')
+        publicUrl    : @model.publicUrl()
         # Convert to collections.
         listings     : '0'            # @model.listings()
         incomes      : '0'            # @model.incomes().sum()

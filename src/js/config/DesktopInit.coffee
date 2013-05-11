@@ -34,8 +34,7 @@ require.config
     toggler:                  "app/plugins/toggler"
     masonry:                  "libs/jquery/jquery.masonry"
     rangeSlider:              "libs/jquery/jquery.rangeSlider"
-    rangeSliderHandle:        "libs/jquery/jquery.rangeSliderHandle"
-    rangeSliderDraggable:     "libs/jquery/jquery.rangeSliderDraggable"
+    slideshowify:              "libs/jquery/jquery.slideshowify"
     "jquery.fileupload-pr":   "app/plugins/jquery-fileupload-pr" # Profile  (single)
     "jquery.fileupload-ui":   "app/plugins/jquery-fileupload-ui" # UI       (multiple)
     "jquery.fileupload-fp":   "app/plugins/jquery-fileupload-fp" # File Processing
@@ -113,7 +112,7 @@ define "gmaps", ["async!//maps.googleapis.com/maps/api/js?v=3.11&libraries=place
 # This will bug out on "www" subdomain.
 onNetwork = window.location.host.split(".").length > 2
 router = if onNetwork then "routers/Network" else "routers/Desktop"
-require ["jquery", "underscore", "backbone", "facebook", "models/Profile", router, "underscore.string", "json2", "bootstrap", "serializeObject", "typeahead", "masonry"], ($, _, Parse, FB, Profile, AppRouter, _String) ->
+require ["jquery", "underscore", "backbone", "facebook", "models/Profile", "collections/ListingFeaturedList", router, "underscore.string", "json2", "bootstrap", "serializeObject", "typeahead", "masonry"], ($, _, Parse, FB, Profile, FeaturedListingList, AppRouter, _String) ->
 
   # Add Listen functionality.
 
@@ -161,6 +160,14 @@ require ["jquery", "underscore", "backbone", "facebook", "models/Profile", route
 
   Parse.initialize window.APPID, window.JSKEY
   Parse.App = {}
+
+  Parse.App.featuredListings = new FeaturedListingList unless onNetwork
+
+  Parse.App.countryCodes = 
+    CA: "Canada"
+    US: "United States"
+
+
 
   # Import Underscore.string to separate object, because there are conflict functions (include, reverse, contains)
   _.str = _String

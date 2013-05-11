@@ -3,6 +3,16 @@
  * Form Styling
  */
 
+form {
+  fieldset + hr {
+    margin: 0 0 18px;
+  }
+}
+
+legend {
+  margin-bottom:9px;
+}
+
 .form-condensed {
   .control-group,
   .control-label,
@@ -21,22 +31,16 @@
   }
 }
 
-form {
-  hr {
-    margin: 0 0 18px;
-  }
-}
-
-legend {
-  margin-bottom:9px;
-}
-
 .form-inline {
   h4 {
     margin:0;
     margin-right:5px;
     display:inline-block;
   }
+  legend + .control-group {
+    margin-top:0;
+  }
+
   .control-group,
   .control-label,
   .controls {
@@ -47,6 +51,13 @@ legend {
     margin-bottom: 0;  
   }
 }
+
+.form-horizontal,
+.form-inline {
+  .input-block-level {
+    display: block;
+  }
+} 
 
 /**
  * jQuery File Upload UI Plugin CSS 6.10
@@ -204,12 +215,11 @@ legend {
 @media (min-width: 480px) {
   .form-xlarge {
     .control-label {
-      // Legend
-      font-size: 19.5px;
-      line-height: 36px;
-      color: #333333;
+      font-size: 18px;
+      line-height: 18px;
     }
     input[type="text"],
+    input[type="password"],
     input[type="number"],
     input[type="date"],
     input[type="url"],
@@ -258,6 +268,7 @@ legend {
       line-height: 24px;
     }
     input[type="text"],
+    input[type="password"],
     input[type="number"],
     input[type="date"],
     input[type="url"],
@@ -318,9 +329,6 @@ legend {
     }
   }
 }
-
-
-
 
 .input-xsmall {
   width: 60px;
@@ -390,54 +398,5 @@ form {
     margin-right: 20px;
     display:inline-block;
     vertical-align:middle;
-  }
-}
-
-.no-bullet {
-  list-style: none;
-}
-
-.control-group {
-  .three-column {
-    -moz-column-count: 3;
-    -moz-column-gap: 10px;
-    -webkit-column-count: 3;
-    -webkit-column-gap: 10px;
-    column-count: 3;
-    column-gap: 10px;
-  }
-  .two-column {
-    -moz-column-count: 2;
-    -moz-column-gap: 10px;
-    -webkit-column-count: 2;
-    -webkit-column-gap: 10px;
-    column-count: 2;
-    column-gap: 10px;
-  }
-}
-
-@media (max-width: 767px) { 
-  .control-group {
-    .three-column {
-      -moz-column-count: 2;
-      -moz-column-gap: 10px;
-      -webkit-column-count: 2;
-      -webkit-column-gap: 10px;
-      column-count: 2;
-      column-gap: 10px;
-    }
-  }
-}
-
-@media (max-width: 480px) { 
-  .control-group {
-    .three-column {
-      -moz-column-count: 1;
-      -moz-column-gap: 0;
-      -webkit-column-count: 1;
-      -webkit-column-gap: 0;
-      column-count: 1;
-      column-gap: 0;
-    }
   }
 }

@@ -43,6 +43,7 @@ define [
     render: ->
       vars = _.merge(
         @model.toJSON(),
+        publicUrl: @model.publicUrl()
         cover: @model.cover 'profile'
         i18nProperty: i18nProperty
         i18nCommon: i18nCommon

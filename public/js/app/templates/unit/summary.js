@@ -125,9 +125,7 @@ __p += '\n</td>\n<td class="view-specific view-edit hide">\n  <div class="contro
 ((__t = ( square_feet )) == null ? '' : __t) +
 '">\n\t\t\t<div class="add-on">' +
 ((__t = ( i18nUnit.form.squarefeetsymbol )) == null ? '' : __t) +
-'</div>\n\t\t</div>\n\t</div>\n</td>\n<td class="view-specific view-edit hide">\n  <div class="control-group">\n\t\t<div class="controls">\n      <textarea class="span4" name="description" rows="2">' +
-((__t = ( description )) == null ? '' : __t) +
-'</textarea>\n\t\t</div>\n\t</div>\n</td>\n<td>\n  ';
+'</div>\n\t\t</div>\n\t</div>\n</td>\n<td>\n  ';
  if (objectId) { ;
 __p += '\n    <a class="btn btn-mini add-lease view-specific view-show"\n       href="/properties/' +
 ((__t = ( property.objectId )) == null ? '' : __t) +

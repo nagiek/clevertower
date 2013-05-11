@@ -65,7 +65,7 @@
     dates: {
       moment_format: "MM/DD/YYYY",
       datepicker_format: "mm/dd/yyyy",
-      per_month: "Per month",
+      per_month: "per month",
       date: "Date",
       day: "Day",
       month: "Month",
@@ -104,6 +104,10 @@
       at: "at",
       eg: "E.g., "
     },
+    conjuctions: {
+      or: "or",
+      and: "and"
+    },
     verbs: {
       loading: "Loading"
     },
@@ -135,7 +139,8 @@
       "public": "Public",
       "private": "Private",
       landlord_only: "Landlord Only",
-      admin: "admin"
+      admin: "admin",
+      not_specified: "Not specified"
     },
     form: {
       operations: "Operations",

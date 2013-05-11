@@ -90,6 +90,13 @@ define [
 
     # Backbone default, as Parse function does not exist.
     url: -> "/#{@collection.url}/#{@id}"
+    
+    # URL friendly title
+    publicUrl: -> "/places/#{@country()}/#{@get("administrative_area_level_1")}/#{@get("locality")}/#{@id}/#{@slug()}"
+
+    slug: -> @get("title").replace(/\s+/g, '-').toLowerCase()
+
+    country: -> Parse.App.countryCodes[@get("country")]
 
     cover: (format) ->
       img = @get "image_#{format}"

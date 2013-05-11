@@ -25,6 +25,10 @@
       unlock_account: "Unlock my account",
       back_to_profile: "Back to profile"
     },
+    "switch": {
+      signup: "Don't have an account?",
+      login: "Already have an account?"
+    },
     form: {
       email: "Email",
       password: "Password",

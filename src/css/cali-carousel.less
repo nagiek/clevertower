@@ -1,0 +1,40 @@
+// Left/right controls for nav
+// ---------------------------
+
+.carousel-control {
+  
+  background: transparent;
+  border: none;
+  top: 45%;
+  .opacity(0);
+
+  // we can't have this transition here
+  // because webkit cancels the carousel
+  // animation if you trip this while
+  // in the middle of another animation
+  // ;_;
+  // .transition(opacity .2s linear);
+
+  // Reposition the right one
+
+
+  // Hover/focus state
+  &:hover,
+  &:focus {
+    color: @white;
+    text-decoration: none;
+    .opacity(90);
+  }
+}
+
+.carousel-inner {
+  margin-bottom:0;
+}
+
+#featured-listings-wrapper {
+  .carousel-caption {
+    bottom:5px;
+    left:5px;
+    right:5px;
+  }
+}

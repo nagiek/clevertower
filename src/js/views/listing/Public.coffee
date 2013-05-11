@@ -52,6 +52,7 @@ define [
         posted: moment(@model.createdAt).fromNow()
         propertyId: @property.id
         property: @property.toJSON()
+        publicUrl: @property.publicUrl()
         dates: @dates
         cover: @property.cover('span9')
         i18nProperty: i18nProperty

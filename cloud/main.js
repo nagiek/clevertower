@@ -492,6 +492,7 @@
       return query = (new Parse.Query("Network")).get(req.user.get("network").id, {
         success: function(network) {
           req.object.set({
+            "public": true,
             user: req.user,
             network: network,
             ACL: network.getACL()
@@ -508,8 +509,27 @@
       if (propertyACL.getPublicReadAccess() !== isPublic) {
         propertyACL.setPublicReadAccess(isPublic);
         req.object.setACL(propertyACL);
+        return (new Parse.Query("Listing")).equalTo('property', req.object).find().then(function(objs) {
+          var _;
+          if (objs) {
+            _ = require("underscore");
+            _.each(objs, function(l) {
+              var listingACL;
+              if (l.get("public" !== isPublic)) {
+                listingACL = l.getACL();
+                listingACL.setPublicReadAccess(isPublic);
+                return l.save({
+                  "public": isPublic,
+                  ACL: listingACL
+                });
+              }
+            });
+            return res.success();
+          } else {
+            return res.success();
+          }
+        });
       }
-      return res.success();
     }
   });
 
@@ -759,21 +779,41 @@
     if (!req.object.get("rent")) {
       return res.error('rent_missing');
     }
-    if (req.object.existed()) {
-      return res.success();
-    }
-    return (new Parse.Query("Property")).include('network.role').get(req.object.get("property").id, {
+    return (new Parse.Query("Unit")).include('property.network.role').get(req.object.get("unit").id, {
       success: function(property) {
-        var listingACL, mgrRole, network;
-        req.object.set("center", property.get("center"));
-        network = property.get("network");
-        mgrRole = network.get("role");
-        listingACL = new Parse.ACL();
-        listingACL.setPublicReadAccess(true);
-        listingACL.setRoleWriteAccess(mgrRole, true);
-        listingACL.setRoleReadAccess(mgrRole, true);
-        req.object.setACL(listingACL);
-        return res.success();
+        var isPublic, listingACL, mgrRole, network, propertyIsPublic;
+        if (!req.object.existed()) {
+          property = unit.get("property");
+          network = property.get("network");
+          mgrRole = network.get("role");
+          req.object.set({
+            locality: property.get("locality"),
+            center: property.get("center"),
+            bedrooms: unit.get("bedrooms"),
+            bathrooms: unit.get("bathrooms"),
+            square_feet: unit.get("square_feet")
+          });
+          listingACL = new Parse.ACL();
+          propertyIsPublic = property.getACL().getPublicReadAccess();
+          req.object.set("public", propertyIsPublic);
+          listingACL.setPublicReadAccess(propertyIsPublic);
+          listingACL.setRoleWriteAccess(mgrRole, true);
+          listingACL.setRoleReadAccess(mgrRole, true);
+          req.object.setACL(listingACL);
+          return res.success();
+        } else {
+          isPublic = req.object.get("public");
+          propertyIsPublic = property.getACL().getPublicReadAccess();
+          if (propertyIsPublic === false && isPublic === true) {
+            listingACL = req.object.getACL();
+            listingACL.setPublicReadAccess(false);
+            req.object.set({
+              "public": false,
+              ACL: listingACL
+            });
+          }
+          return res.success();
+        }
       }
     });
   });

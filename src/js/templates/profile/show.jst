@@ -1,50 +1,52 @@
-<section class="row">
-  <header class="span3">
-    <div class="photo row">
-      <img src="<%= cover %>" class="span3" alt="<%= name %>" width="270" height="270" />
-    </div>
-  
-    <h1 class="soften"><%= name %></h1>
-
-    <strong><%= i18nCommon.adjectives.joined %>:</strong> <%= createdAt %>
-
-    <% if (bio) { %>
-      <div><%= bio %></div>
-    <% } %>
-    
-    <% if (website) { %>
-      <div><%= website %></div>
-    <% } %>
-
-  </header>
-
-  <div class="span9">
-
-    <% if (current) { %>
-      <a href="/account/edit" class="btn pull-right"><%= i18nUser.menu.edit_my_profile %></a>
-    <% } %>
-    <ul class="nav nav-tabs">
-      <li class="active"><a id="activities-link" href="/users/<%= objectId %>" data-target="#activities"><%= i18nCommon.nouns.activity %></a></li>
-      <% if (current) { %>
-        <li><a id="inquiries-link" href="/users/<%= objectId %>/inquiries" data-target="#inquiries">
-          <%= i18nCommon.classes.Inquiries %>
-          <span class="label label-info"><%= i18nCommon.adjectives.private %></span>
-        </a></li>
-      <% } %>
-    </ul>
-
-    <div class="tab-content">
-      <div id="activities" class="tab-pane active">
-        <ul class="unstyled">
-          <li><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" /></li>
-        </ul>
+<div class="container">
+  <section class="row">
+    <header class="span3">
+      <div class="photo row">
+        <img src="<%= cover %>" class="span3" alt="<%= name %>" width="270" height="270" />
       </div>
+    
+      <h1 class="soften"><%= name %></h1>
+
+      <strong><%= i18nCommon.adjectives.joined %>:</strong> <%= createdAt %>
+
+      <% if (bio) { %>
+        <div><%= bio %></div>
+      <% } %>
+      
+      <% if (website) { %>
+        <div><%= website %></div>
+      <% } %>
+
+    </header>
+
+    <div class="span9">
+
       <% if (current) { %>
-        <div id="inquiries" class="tab-pane">
+        <a href="/account/edit" class="btn pull-right"><%= i18nUser.menu.edit_my_profile %></a>
+      <% } %>
+      <ul class="nav nav-tabs">
+        <li class="active"><a id="activities-link" href="/users/<%= objectId %>" data-target="#activities"><%= i18nCommon.nouns.activity %></a></li>
+        <% if (current) { %>
+          <li><a id="inquiries-link" href="/users/<%= objectId %>/inquiries" data-target="#inquiries">
+            <%= i18nCommon.classes.Inquiries %>
+            <span class="label label-info"><%= i18nCommon.adjectives.private %></span>
+          </a></li>
+        <% } %>
+      </ul>
+
+      <div class="tab-content">
+        <div id="activities" class="tab-pane active">
           <ul class="unstyled">
             <li><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" /></li>
           </ul>
         </div>
-      <% } %>
-  </div>
-</section>
+        <% if (current) { %>
+          <div id="inquiries" class="tab-pane">
+            <ul class="unstyled">
+              <li><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" /></li>
+            </ul>
+          </div>
+        <% } %>
+    </div>
+  </section>
+</div>

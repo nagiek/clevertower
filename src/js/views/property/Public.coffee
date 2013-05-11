@@ -21,9 +21,11 @@ define [
       'click .nav a' : 'showTab'
       'click #new-lease' : 'showModal'
 
-    initialize: ->
+    initialize: (attrs) ->
 
       _.bindAll @, 'showTab', 'render', 'addOne', 'addAll', 'addOneListing', 'addAllListings', 'showModal'
+
+      @place = if attrs.place then attrs.place else @model.get("locality") + "--" + @model.get("administrative_area_level_1") + "--" + Parse.App.countryCodes[@model.get("country")]
 
       @mapId = "mapCanvas"
 
@@ -46,14 +48,13 @@ define [
     render: ->
       vars =
         property: @model.toJSON()
+        place: @place
         cover: @model.cover('span9')
         i18nProperty: i18nProperty
         i18nCommon: i18nCommon
         i18nGroup: i18nGroup
         i18nListing: i18nListing
         i18nUnit: i18nUnit
-
-      console.log vars
 
       @$el.html JST["src/js/templates/property/public.jst"](vars)
 
@@ -97,8 +98,7 @@ define [
     # --------
 
     addOneListing : (listing) =>
-      view = new ListingView(model: listing)
-      @$listings.append view.render().el
+      @$listings.append new ListingView(model: listing).render().el
       
     addAllListings: (collection, filter) =>
 
@@ -106,8 +106,16 @@ define [
 
       @$listings.html ""
       unless @model.listings.length is 0
+
+        # Get listings with unknown # of bedrooms.
+        listings = @model.listings.filter (l) -> l.get("bedrooms") is undefined
+        if listings.length > 0
+          @$listings.append "<tr class='divider'><td colspan='4'>#{i18nUnit.fields.bedrooms}: #{i18nCommon.adjectives.not_specified}</td></tr>"
+          _.each listings, @addOneListing
+
+        # Get listings where we have a # of bedooms.
         for i in [0..6]
-          listings = @model.listings.filter (l) -> l.get("unit").get("bedrooms") is i
+          listings = @model.listings.filter (l) -> l.get("bedrooms") is i
           if listings.length > 0
             @$listings.append '<tr class="divider"><td colspan="4">' + i18nUnit.fields.bedrooms + ": #{i}</td></tr>"
             _.each listings, @addOneListing

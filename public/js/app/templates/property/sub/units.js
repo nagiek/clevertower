@@ -36,8 +36,6 @@ __p += '<form id="units" method="post">\n  <header>\n    <h2 class="pull-left">'
 ((__t = (i18nUnit.fields.bathrooms)) == null ? '' : __t) +
 '</th>\n        <th class="view-specific view-edit hide">' +
 ((__t = (i18nUnit.fields.square_feet)) == null ? '' : __t) +
-'</th>\n        <th class="view-specific view-edit hide">' +
-((__t = (i18nUnit.fields.description)) == null ? '' : __t) +
 '</th>\n        <th><span class="element-invisible">' +
 ((__t = (i18nCommon.form.Operations)) == null ? '' : __t) +
 '</span></th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr><td class="spinner-cell" colspan="9"><img src=\'/img/misc/spinner.gif\' class=\'spinner\' alt="' +

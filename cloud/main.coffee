@@ -494,8 +494,8 @@ Parse.Cloud.beforeSave "Property", (req, res) ->
     query = (new Parse.Query "Network").get req.user.get("network").id,
     success : (network) ->
 
-      # Do not make a role for tenants: can be done with simple ACL.
       req.object.set
+        public: true
         user: req.user
         network: network
         ACL: network.getACL()
@@ -511,7 +511,22 @@ Parse.Cloud.beforeSave "Property", (req, res) ->
     if propertyACL.getPublicReadAccess() isnt isPublic
       propertyACL.setPublicReadAccess(isPublic)
       req.object.setACL propertyACL
-    res.success()
+
+      # Listings can only be public if the property is public
+      (new Parse.Query "Listing").equalTo('property', req.object).find()
+      .then (objs) ->
+        if objs
+          _ = require "underscore"
+          _.each objs, (l) ->
+            if l.get "public" isnt isPublic
+              listingACL = l.getACL()
+              listingACL.setPublicReadAccess isPublic
+              l.save
+                public: isPublic
+                ACL: listingACL 
+          res.success()
+        else
+          res.success()
 
 
 # Unit validation
@@ -722,6 +737,7 @@ Parse.Cloud.afterSave "Lease", (req) ->
   success: (res) ->
   error: (res) ->
 
+
 # Lease validation
 Parse.Cloud.beforeSave "Listing", (req, res) ->
   
@@ -734,25 +750,51 @@ Parse.Cloud.beforeSave "Listing", (req, res) ->
   if start_date > end_date          then return res.error 'dates_incorrect'
   unless req.object.get "title"     then return res.error 'title_missing'
   unless req.object.get "rent"      then return res.error 'rent_missing'
-  
-  return res.success() if req.object.existed()
 
-  (new Parse.Query "Property").include('network.role').get req.object.get("property").id,
+  (new Parse.Query "Unit").include('property.network.role').get req.object.get("unit").id,
   success: (property) ->
 
-    # Update the listing with the location
-    req.object.set "center", property.get("center")
+    unless req.object.existed()
 
-    network = property.get "network"
-    mgrRole = network.get "role"
-  
-    # Give public access to read the lease, and managers to read/write
-    listingACL = new Parse.ACL()
-    listingACL.setPublicReadAccess true
-    listingACL.setRoleWriteAccess mgrRole, true
-    listingACL.setRoleReadAccess mgrRole, true
-    req.object.setACL listingACL
-    res.success()
+      property = unit.get "property"
+      network = property.get "network"
+      mgrRole = network.get "role"
+
+      req.object.set 
+        # Update the listing with the location
+        locality: property.get "locality"
+        center: property.get "center"
+        # Update the listing with the Unit characteristics
+        bedrooms: unit.get "bedrooms"
+        bathrooms: unit.get "bathrooms"
+        square_feet: unit.get "square_feet"
+
+      # Give public access to read the lease, and managers to read/write
+      listingACL = new Parse.ACL()
+
+      propertyIsPublic = property.getACL().getPublicReadAccess()
+
+      req.object.set "public", propertyIsPublic
+      listingACL.setPublicReadAccess propertyIsPublic
+
+      listingACL.setRoleWriteAccess mgrRole, true
+      listingACL.setRoleReadAccess mgrRole, true
+      req.object.setACL listingACL
+      res.success()
+
+    else
+
+      isPublic = req.object.get "public"
+      propertyIsPublic = property.getACL().getPublicReadAccess()
+
+      # A listing can only be public if the property is public.
+      if propertyIsPublic is false and isPublic is true
+        listingACL = req.object.getACL()
+        listingACL.setPublicReadAccess false
+        req.object.set
+          public: false
+          ACL: listingACL
+      res.success()
 
 
 # Tenant validation

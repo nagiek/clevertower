@@ -1,42 +1,44 @@
-<div class="row">
-  <div class="span8 content fade in"></div>
-  <div class="span4">
-    <ul class="nav nav-list well">
-      <li>
-        <a class="pull-right" href="/network/edit" rel="tooltip" data-original-title="<%= i18nCommon.actions.edit %>">
-          <i class="icon icon-edit"></i>
-        </a>
-        <h3><%= title %></h3>
-      </li>
-      <li id="properties-link"><a href="/"><%= i18nCommon.classes.Properties %><span class="pull-right badge count"></span></a></li>
-      <li id="listings-link">
-        <a href="/network/listings"><%= i18nCommon.classes.Listings %>
-          <span class="pull-right badge count"></span>
-        </a>
-      </li>
-      <li id="tenants-link">
-        <a href="/network/tenants"><%= i18nCommon.classes.Tenants %>
-          <span class="pull-right badge count"></span>
-        </a>
-      </li>
-      <li class="divider"></li>
-      <li id="managers-link">
-        <a href="/network/managers"><%= i18nCommon.classes.Managers %>
-          <span class="pull-right badge count"></span>
-        </a>
-      </li>
-      <li id="reports-link">
-        <a href="/network/reports"><%= i18nProperty.menu.reports %>
-          <span class="pull-right badge count"></span>
-        </a>
-      </li>
-      <li class="divider"></li>
-      <li>
-        <a href="<%= public_url %>">
-          <span class="display-block"><%= i18nProperty.menu.view_public %></span>
-          <small><%= i18nCommon.prepositions.at %> clevertower.com/networks/<%= name %></small>
-        </a>
-      </li>
-    </ul>
+<div class="container">
+  <div class="row">
+    <div class="span8 content fade in"></div>
+    <div class="span4">
+      <ul class="nav nav-list well">
+        <li>
+          <a class="pull-right" href="/network/edit" rel="tooltip" data-original-title="<%= i18nCommon.actions.edit %>">
+            <i class="icon icon-edit"></i>
+          </a>
+          <h3><%= title %></h3>
+        </li>
+        <li id="properties-link"><a href="/"><%= i18nCommon.classes.Properties %><span class="pull-right badge count"></span></a></li>
+        <li id="listings-link">
+          <a href="/network/listings"><%= i18nCommon.classes.Listings %>
+            <span class="pull-right badge count"></span>
+          </a>
+        </li>
+        <li id="tenants-link">
+          <a href="/network/tenants"><%= i18nCommon.classes.Tenants %>
+            <span class="pull-right badge count"></span>
+          </a>
+        </li>
+        <li class="divider"></li>
+        <li id="managers-link">
+          <a href="/network/managers"><%= i18nCommon.classes.Managers %>
+            <span class="pull-right badge count"></span>
+          </a>
+        </li>
+        <li id="reports-link">
+          <a href="/network/reports"><%= i18nProperty.menu.reports %>
+            <span class="pull-right badge count"></span>
+          </a>
+        </li>
+        <li class="divider"></li>
+        <li>
+          <a href="<%= public_url %>">
+            <span class="display-block"><%= i18nProperty.menu.view_public %></span>
+            <small><%= i18nCommon.prepositions.at %> clevertower.com/networks/<%= name %></small>
+          </a>
+        </li>
+      </ul>
+    </div>
   </div>
 </div>

@@ -15,14 +15,23 @@ h6 {
   font-family: @sansFontFamily;
 }
 
-h1.soften {
-  color: @blueDark;
-  font-size: 26px;
-  font-weight: bold;
-  height: 26px;
-  letter-spacing: -1px;
-  line-height: 26px;
-  text-overflow: ellipsis;
+h1 {
+  &.soften {
+    color: @blueDark;
+    font-size: 26px;
+    font-weight: bold;
+    height: 26px;
+    letter-spacing: -1px;
+    line-height: 26px;
+    text-overflow: ellipsis;
+  }
+}
+
+.hero-unit h1 {
+  &.inverse {
+    color:@white;
+    text-shadow:0 1px 25px @grayDark;
+  }
 }
 
 

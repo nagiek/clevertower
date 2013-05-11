@@ -11,11 +11,12 @@ define [
   
     # Instead of generating a new element, bind to the existing skeleton of
     # the App already present in the HTML.
-    el: ".user-content"
+    el: "#user-content"
     
     initialize: (attrs) ->
 
-      _.bindAll this, 'render'
+      Parse.Dispatcher.on "user:logout", @clear
+
 
     # Re-render the contents of the property item.
     render: =>
@@ -24,3 +25,7 @@ define [
         i18nUser: i18nUser
       @$el.html JST["src/js/templates/user/home.jst"](vars)
       @
+
+    clear: =>
+      @undelegateEvents()
+      delete this

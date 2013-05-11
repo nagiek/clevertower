@@ -32,19 +32,6 @@ define [
 
       Parse.Dispatcher.on "user:logout", @clear
 
-    # typeahead widget takes care of navigation.
-    doNothing : (e) -> e.preventDefault()
-
-    googleSearch : (e, data) => 
-      if data.reference
-        data.location = _.map(data.terms, (t) -> t.value).join("--").replace(" ", "-")
-        @trigger "google:search", data
-
-    render : ->
-      @$el.html JST["src/js/templates/helper/search.jst"](i18nCommon: i18nCommon)
-
-      @$('#search').on "typeahead:selected", @googleSearch
-
       @vars = [
         name: 'properties'
         header: "<span class='nav-header'>#{i18nCommon.classes.Properties}</span>"
@@ -213,17 +200,17 @@ define [
         # ------------------------------------
 
         Parse.User.current().get("network").properties.on "add reset", =>
-          @$('#search').typeahead 'destroy'
+          @$('.search').typeahead 'destroy'
           @vars[0].local = Parse.User.current().get("network").properties.map (p) ->
             value: p.get("title")
             img_src: p.cover("tiny")
             url: p.url()
             tokens: _.union(p.get("title").split(" "), p.get("thoroughfare").split(" "), [p.get("locality")])          
 
-          @$('#search').typeahead @vars
+          @$('.search').typeahead @vars
 
         Parse.User.current().get("network").tenants.on "add reset", =>
-          @$('#search').typeahead 'destroy'
+          @$('.search').typeahead 'destroy'
           @vars[2].local =  Parse.User.current().get("network").tenants.map (t) ->
             p = t.get("profile")
             name = p.name()
@@ -234,24 +221,26 @@ define [
             img_src: p.cover("tiny")
             url: p.url()
 
-          @$('#search').typeahead @vars
+    if Parse.onNetwork and Parse.User.current()
+          @$('.search').typeahead @vars
 
-          
-        # Parse.User.current().get("network").managers.on "add reset", =>
-        #   @$('#search').typeahead 'destroy'
-        #   @vars[2].local=  Parse.User.current().get("network").managers.map (t) ->
-        #     p = t.get("profile")
-        #     value: p.name()
-        #     img_src: p.cover("tiny")
-        #     url: p.url()
-        #   @$('#search').typeahead @vars
 
-      else
-        @$('#search').typeahead @vars
-      
+    # typeahead widget takes care of navigation.
+    doNothing : (e) -> e.preventDefault()
+
+    googleSearch : (e, data) => 
+      if data.reference
+        data.location = _.map(data.terms, (t) -> t.value).join("--").replace(" ", "-")
+        @trigger "google:search", data
+
+    render : ->
+      @$el.html JST["src/js/templates/helper/search.jst"](i18nCommon: i18nCommon)
+
+      @$('.search').on "typeahead:selected", @googleSearch
+      @$('.search').typeahead @vars unless Parse.onNetwork and Parse.User.current()
       @
       
     clear : ->
-      @$('#search').typeahead('destroy')
+      @$('.search').typeahead('destroy')
       @remove()
       

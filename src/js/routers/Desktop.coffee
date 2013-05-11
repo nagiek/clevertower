@@ -9,12 +9,10 @@ define [
   class DesktopRouter extends Parse.Router
     routes:
       ""                            : "index"
-      "public/:id"                          : "propertiesPublic"
-      "public/:propertyId/listings/:id"     : "listingsPublic"
+      "places/:country/:region/:city/:id/:slug" : "propertiesPublic"
       "network/set"                 : "networkSet"
       "network/:name"               : "networkShow"
-      "search/:location"            : "search"
-      "search/:location/page/:page" : "search"
+      "search/*splat"               : "search"
       "users/:id"                   : "profileShow"
       "users/:id/*splat"            : "profileShow"
       "account/:category"           : "accountSettings"
@@ -57,12 +55,13 @@ define [
       # Clean up after views
       Parse.history.on "route", (route) =>
 
-        $('#search').val("").blur()
+        $('#search-menu input.search').val("").blur()
         @oldConstructor
 
         if @view 
           if @oldConstructor isnt @view.constructor
             @oldConstructor = @view.constructor
+            @view.trigger("view:change")
             @view.undelegateEvents()
             delete @view
   
@@ -88,26 +87,20 @@ define [
         if !view or view !instanceof HomeIndexView
           @view = new HomeIndexView().render()
 
-    search: (location, page) ->
+    search: (splat) ->
       view = @view
-      require ["views/home/index"], (HomeIndexView) =>
-        if !view or view !instanceof HomeIndexView
-          @view = new HomeIndexView(location: location, page: page).render()
+      require ["views/listing/index"], (ListingIndexView) =>
+        if !view or view !instanceof ListingIndexView
+          vars = @deparamAction splat
+          @view = new ListingIndexView(location: vars.path, params: vars.params).render()
 
-    propertiesPublic: (id) =>
-      console.log 'propertiesPublic'
+    propertiesPublic: (country, region, city, id, slug) =>
+      place = "#{city}--#{region}--#{country}"
       require ["views/property/Public"], (PublicPropertyView) => 
         new Parse.Query("Property").get id,
-          success: (model) => @view = new PublicPropertyView(model: model).render()
+          success: (model) => @view = new PublicPropertyView(model: model, place: place).render()
           error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
 
-    listingsPublic: (propertyId, id) =>
-      require ["views/listing/Public"], (PublicListingView) => 
-        new Parse.Query("Property").get propertyId,
-          success: (property) => 
-            new Parse.Query("Listing").get id,
-              success: (model) => @view = new PublicListingView(property: property, model: model).render()
-          error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
 
     # User
     # --------------

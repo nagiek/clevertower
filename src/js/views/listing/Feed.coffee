@@ -7,6 +7,7 @@ define [
   "i18n!nls/common"
   'templates/listing/feedList'
   'templates/listing/feedPhoto'
+  'gmaps'
 ], ($, _, Parse, moment, i18nListing, i18nCommon) ->
 
   class ListingFeedView extends Parse.View
@@ -49,9 +50,10 @@ define [
     goToProperty: (e) =>
       e.preventDefault()
       require ["views/property/Public"], (PublicPropertyView) => 
-        property = @model.get("property")
-        new PublicPropertyView(model: property).render()
-        Parse.history.navigate "/public/#{property.id}"
+        p = @model.get("property")
+        # Could assign a place from last search, but we don't know for sure.
+        new PublicPropertyView(model: p).render()
+        Parse.history.navigate p.publicUrl()
         @view.trigger "model:viewDetails"
 
 
@@ -62,6 +64,7 @@ define [
         rent: "$" + @model.get("rent")
         pos: @model.pos() + 1
         propertyId: @model.get("property").id
+        publicUrl: @model.get("property").publicUrl()
         cover: @model.get("property").cover('large')
         createdAt: moment(@model.createdAt).fromNow()
         i18nCommon: i18nCommon

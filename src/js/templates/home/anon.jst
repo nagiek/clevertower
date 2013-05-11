@@ -1,1 +1,46 @@
-<h1>Splash page</h1>
+<div id="splash">
+  <div class="content position-relative">
+    <div id="backdrops" class="position-absolute box-fill"></div><!-- Photos are inserted here -->
+    <div class="container">
+      <div class="row">
+        <div class="span6">
+          <div class="hero-unit">
+            <h1>Splash page</h1>
+            <form class="form-search form-large">
+              <div class="controls">
+                <div class="input-append">
+                  <input class="input-large typeahead search search-query" type="text" name="q" placeholder="<%= i18nCommon.actions.search %>" autocomplete="off" spellcheck="off">
+                  <button class="btn" type="submit" rel="tooltip" data-original-title="<%= i18nCommon.actions.search %>">
+                    <i class="icon icon-search icon-big"></i>
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div id="featured-listings-wrapper" class="carousel span4 offset1">
+          <!-- Carousel items -->
+          <ul id="featured-listings" class="carousel-inner unstyled"></ul>
+          <!-- Carousel nav -->
+          <a class="fade left carousel-control" href="#featured-listings-wrapper" data-slide="prev">&lsaquo;</a>
+          <a class="fade right carousel-control" href="#featured-listings-wrapper" data-slide="next">&rsaquo;</a>
+
+          <div id="caption" class="carousel-caption fade">
+            <div id="network-photo" class="photo photo-mini stay-left"></div>
+            <div class="photo-float mini-float">
+              <p class="stay-right"><span id="rent"></span> <%= i18nCommon.dates.per_month %></p>
+              <h4 id="title"></h4>
+              <p id="locality" class="small"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Tour starts -->
+  <div class="container">
+    <hr>
+    <h2 class="text-center">Thousands use CleverTower to manage their real estate</h2>
+  </div>
+</div>
+

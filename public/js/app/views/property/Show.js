@@ -42,6 +42,7 @@
       ShowPropertyView.prototype.render = function() {
         var vars;
         vars = _.merge(this.model.toJSON(), {
+          publicUrl: this.model.publicUrl(),
           cover: this.model.cover('profile'),
           i18nProperty: i18nProperty,
           i18nCommon: i18nCommon

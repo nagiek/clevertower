@@ -11,8 +11,6 @@ define [
     routes:
       ""                                    : "index"
       "properties/new"                      : "propertiesNew"
-      "public/:id"                          : "propertiesPublic"
-      "public/:propertyId/listings/:id"     : "listingsPublic"
       "properties/:id"                      : "propertiesShow"
       "properties/:id/*splat"               : "propertiesShow"
       "properties/:id/*splat"               : "propertiesShow"

@@ -17,8 +17,7 @@
       toggler: "app/plugins/toggler",
       masonry: "libs/jquery/jquery.masonry",
       rangeSlider: "libs/jquery/jquery.rangeSlider",
-      rangeSliderHandle: "libs/jquery/jquery.rangeSliderHandle",
-      rangeSliderDraggable: "libs/jquery/jquery.rangeSliderDraggable",
+      slideshowify: "libs/jquery/jquery.slideshowify",
       "jquery.fileupload-pr": "app/plugins/jquery-fileupload-pr",
       "jquery.fileupload-ui": "app/plugins/jquery-fileupload-ui",
       "jquery.fileupload-fp": "app/plugins/jquery-fileupload-fp",
@@ -80,7 +79,7 @@
 
   router = onNetwork ? "routers/Network" : "routers/Desktop";
 
-  require(["jquery", "underscore", "backbone", "facebook", "models/Profile", router, "underscore.string", "json2", "bootstrap", "serializeObject", "typeahead", "masonry"], function($, _, Parse, FB, Profile, AppRouter, _String) {
+  require(["jquery", "underscore", "backbone", "facebook", "models/Profile", "collections/ListingFeaturedList", router, "underscore.string", "json2", "bootstrap", "serializeObject", "typeahead", "masonry"], function($, _, Parse, FB, Profile, FeaturedListingList, AppRouter, _String) {
     var listenEvents, listenMethods;
     listenMethods = {
       listenTo: "on",
@@ -130,6 +129,13 @@
     };
     Parse.initialize(window.APPID, window.JSKEY);
     Parse.App = {};
+    if (!onNetwork) {
+      Parse.App.featuredListings = new FeaturedListingList;
+    }
+    Parse.App.countryCodes = {
+      CA: "Canada",
+      US: "United States"
+    };
     _.str = _String;
     $.ajaxSetup({
       beforeSend: function(jqXhr, settings) {
