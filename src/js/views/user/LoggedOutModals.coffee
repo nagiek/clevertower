@@ -15,9 +15,9 @@ define [
     el: "body"
 
     events:
-      "submit form.login-form"              : "logIn"
-      "submit form.signup-form"             : "signUp"
-      "submit form.reset-password-form"     : "resetPassword"
+      "submit form#login-form"              : "logIn"
+      "submit form#signup-form"             : "signUp"
+      "submit form#reset-password-form"     : "resetPassword"
       "click #switch-signup"                : "switchToSignup"
       "click #switch-login"                 : "switchToLogin"
       "click .reset-password-link"          : "switchToResetPassword"
@@ -45,8 +45,8 @@ define [
       Parse.User.requestPasswordReset $("#reset-email").val(),
         success: ->
           new Alert(event: 'reset-password', message: i18nDevise.messages.password_reset)
-          $('#reset-password-modal').find('.error').removeClass('error')
-          $('#reset-password-modal').modal('close')
+          @$('> #reset-password-modal').find('.error').removeClass('error')
+          @$('> #reset-password-modal').modal('close')
         error: (error) ->
           msg = switch error.code
             when 125 then i18nDevise.errors.invalid_email_format
@@ -65,6 +65,7 @@ define [
         success: (user) =>
           Parse.Dispatcher.trigger "user:login", user
           Parse.Dispatcher.trigger "user:change", user
+          @$('> #login-modal').modal('close')
 
         error: (user, error) =>
           @$('.login-form .username-group').addClass('error')
@@ -83,6 +84,7 @@ define [
         success: (user) ->
           Parse.Dispatcher.trigger "user:login", user
           Parse.Dispatcher.trigger "user:change", user
+          @$('> .modal.in').modal('close')
         error: (user, error) ->
             
     signUp: (e) =>
@@ -95,6 +97,7 @@ define [
         success: (user) =>
           Parse.Dispatcher.trigger "user:login", user
           Parse.Dispatcher.trigger "user:change", user
+          @$('> #signup-modal').modal('close')
 
         error: (user, error) =>
           @$(".signup-form .error").removeClass('error')

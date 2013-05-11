@@ -28,7 +28,9 @@ define [
     showSignupModal: (e) =>
       e.preventDefault()
       $('#signup-modal').modal()
+      $('#signup-modal .username-group input').focus()
 
     showLoginModal: (e) =>
       e.preventDefault()
       $('#login-modal').modal()
+      $('#login-modal .username-group input').focus()
