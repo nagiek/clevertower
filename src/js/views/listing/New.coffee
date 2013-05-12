@@ -46,7 +46,6 @@ define [
       @cancel_path = "/properties/#{@property.id}" + unless @model.isNew() then "/listings/#{@model.id}" else ""
             
       @model.on 'invalid', (error) =>
-        console.log error
         @$('.error').removeClass('error')
         @$('button.save').removeProp "disabled"
 
@@ -123,8 +122,11 @@ define [
       @$('button.save').prop "disabled", "disabled"
       data = @$('form').serializeObject()
       @$('.error').removeClass('error')
-      
+
       # Massage the Only-String data from serializeObject()
+      data.listing.rent = 0 if data.listing.rent is '' or data.listing.rent is '0'
+      data.listing.rent = Number data.listing.rent if data.listing.rent
+
       _.each ['start_date', 'end_date'], (attr) ->
         data.listing[attr] = moment(data.listing[attr], i18nCommon.dates.moment_format).toDate() unless data.listing[attr] is ''
         data.listing[attr] = new Date if typeof data.listing[attr] is 'string'
@@ -140,31 +142,7 @@ define [
           unit = @units.get data.unit.id
         attrs.unit = unit
 
-      # Massage the Only-String data from serializeObject()
-      _.each ['rent'], (attr) ->
-        data.listing[attr] = 0 if data.listing[attr] is '' or data.listing[attr] is '0'
-        data.listing[attr] = Number data.listing[attr] if data.listing[attr] and isNaN data.listing[attr]
-
-      _.each ['start_date', 'end_date'], (attr) ->
-        data.listing[attr] = moment(data.listing[attr], i18nCommon.dates.moment_format).toDate() unless data.listing[attr] is ''
-        data.listing[attr] = new Date if typeof data.listing[attr] is 'string'
-      
-      # Validate tenants (assignment done in Cloud)
-      userValid = true
-      if data.emails and data.emails isnt ''
-        # Create a temporary array to temporarily hold accounts unvalidated users.
-        attrs.emails = []
-        _.each data.emails.split(","), (email) =>
-          email = $.trim(email)
-          # validate is a backwards function.
-          userValid = unless Parse.User::validate(email: email) then true else false
-          attrs.emails.push email if userValid
-      
-      unless userValid
-        @$('.emails-group').addClass('error')
-        @model.trigger "invalid", {message: 'tenants_incorrect'}
-      else
-        @model.save attrs,
+      @model.save attrs,
         success: (model) => 
           @trigger "save:success", model, this
         error: (model, error) => 

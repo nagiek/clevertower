@@ -59,6 +59,15 @@ legend {
   }
 } 
 
+input {
+  // Colons (1 and 2 depending) needed for each pseudo-selector.
+  &::-webkit-input-placeholder { color:@grayLight; }
+  &::-moz-placeholder          { color:@grayLight; }
+  &:-moz-placeholder           { color:@grayLight; }
+  &:-ms-input-placeholder      { color:@grayLight; }
+}
+
+
 /**
  * jQuery File Upload UI Plugin CSS 6.10
  * https://github.com/blueimp/jQuery-File-Upload

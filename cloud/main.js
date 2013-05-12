@@ -780,10 +780,10 @@
       return res.error('rent_missing');
     }
     return (new Parse.Query("Unit")).include('property.network.role').get(req.object.get("unit").id, {
-      success: function(property) {
-        var isPublic, listingACL, mgrRole, network, propertyIsPublic;
+      success: function(unit) {
+        var isPublic, listingACL, mgrRole, network, property, propertyIsPublic;
+        property = unit.get("property");
         if (!req.object.existed()) {
-          property = unit.get("property");
           network = property.get("network");
           mgrRole = network.get("role");
           req.object.set({
@@ -816,6 +816,28 @@
         }
       }
     });
+  });
+
+  Parse.Cloud.afterSave("Listing", function(req, res) {
+    if (!req.object.existed() && req.object.get("public" === true)) {
+      return (new Parse.Query("Profile")).equalTo('user', req.user).first().then(function(profile) {
+        var activity, activityACL;
+        activity = new Parse.Object("Activity");
+        activityACL = new Parse.ACL;
+        activityACL.setPublicReadAccess(true);
+        return activity.save({
+          listing: req.object,
+          unit: req.object.get("unit"),
+          property: req.object.get("property"),
+          network: req.object.get("network"),
+          title: req.object.get("title"),
+          profile: profile,
+          ACL: activityACL
+        });
+      }, function() {
+        return res.error("bad_query");
+      });
+    }
   });
 
   Parse.Cloud.beforeSave("Tenant", function(req, res) {
@@ -1105,8 +1127,41 @@
   });
 
   Parse.Cloud.beforeSave("Search", function(req, res) {
+    req.object.set({
+      user: req.user,
+      ACL: new Parse.ACL()
+    });
+    return res.success();
+  });
+
+  Parse.Cloud.beforeSave("Post", function(req, res) {
     req.object.set("user", req.user);
     return res.success();
+  });
+
+  Parse.Cloud.afterSave("Post", function(req, res) {
+    if (!req.object.existed()) {
+      return (new Parse.Query("Property")).include('role').include('network.role').get(req.object.get("property").id, {
+        success: function(property) {
+          var activity, activityACL, mgrRole, network, tntRole;
+          tntRole = property.get("role");
+          network = property.get("network");
+          mgrRole = network.get("role");
+          activity = new Parse.Object("Activity");
+          activityACL = new Parse.ACL;
+          activityACL.setRoleReadAccess(tntRole, true);
+          activityACL.setRoleReadAccess(mgrRole, true);
+          activityACL.setWriteAccess(req.user, true);
+          return activity.save({
+            post: req.object,
+            ACL: activityACL
+          });
+        },
+        error: function() {
+          return req.error("bad_query");
+        }
+      });
+    }
   });
 
 }).call(this);

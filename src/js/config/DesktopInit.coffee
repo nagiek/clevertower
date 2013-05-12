@@ -202,14 +202,6 @@ require ["jquery", "underscore", "backbone", "facebook", "models/Profile", "coll
 
 
 
-  
-
-
-
-
-
-
-
   # Extend Parse User
   Parse.User::defaults = 
     privacy_visible:  false
@@ -253,6 +245,8 @@ require ["jquery", "underscore", "backbone", "facebook", "models/Profile", "coll
         
         # Set the network and the role on the user.
         @set "network", network
+
+
 
 
   # Set up Dispatcher for global events

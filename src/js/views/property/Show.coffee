@@ -74,6 +74,7 @@ define [
 
         # Load the model if it exists.
         submodel = if @model[action[0]] then @model[action[0]].get(subid) else false
+
         if submodel
           @renderSubView name, property: @model, model: submodel
         # Else get it from the server.

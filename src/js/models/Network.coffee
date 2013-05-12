@@ -2,12 +2,12 @@ define [
   'underscore'
   'backbone'
   'collections/PropertyList'
-  'collections/ManagerList'
+  'collections/ListingList'
   'collections/InquiryList'
   'collections/TenantList'
   'collections/ApplicantList'
-  "collections/ListingList"
-], (_, Parse, PropertyList, ManagerList, InquiryList, TenantList, ApplicantList, ListingList) ->
+  'collections/ManagerList'
+], (_, Parse, PropertyList, ListingList, InquiryList, TenantList, ApplicantList, ManagerList) ->
 
   Network = Parse.Object.extend "Network"
   # class Property extends Parse.Object

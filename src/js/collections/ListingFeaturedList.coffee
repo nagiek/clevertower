@@ -2,8 +2,7 @@ define [
   'jquery',
   'underscore',
   'backbone',
-  'models/Listing'
-], ($, _, Parse, Listing) ->
+], ($, _, Parse) ->
 
   class FeaturedListingList extends Parse.Collection
 

@@ -149,7 +149,7 @@
           if (data.lease[attr] === '' || data.lease[attr] === '0') {
             data.lease[attr] = 0;
           }
-          if (data.lease[attr] && isNaN(data.lease[attr])) {
+          if (data.lease[attr]) {
             return data.lease[attr] = Number(data.lease[attr]);
           }
         });

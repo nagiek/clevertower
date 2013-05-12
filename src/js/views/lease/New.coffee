@@ -130,7 +130,7 @@ define [
       # Massage the Only-String data from serializeObject()
       _.each ['rent', 'keys', 'garage_remotes', 'security_deposit', 'parking_fee'], (attr) ->
         data.lease[attr] = 0 if data.lease[attr] is '' or data.lease[attr] is '0'
-        data.lease[attr] = Number data.lease[attr] if data.lease[attr] and isNaN data.lease[attr]
+        data.lease[attr] = Number data.lease[attr] if data.lease[attr]
 
       _.each ['start_date', 'end_date'], (attr) ->
         data.lease[attr] = moment(data.lease[attr], i18nCommon.dates.moment_format).toDate() unless data.lease[attr] is ''
