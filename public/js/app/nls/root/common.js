@@ -3,6 +3,7 @@
   define({
     fields: {
       title: "Title",
+      body: "Body",
       status: "Status",
       name: "Name",
       posted: "Posted"
@@ -120,7 +121,8 @@
       places: "Places",
       sample_email: "keigan@example.com",
       comments: "Comments",
-      activity: "Activity"
+      activity: "Activity",
+      optional_description: "Optional description"
     },
     order: {
       first: "First",

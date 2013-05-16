@@ -46,6 +46,7 @@ define [
       @cancel_path = "/properties/#{@property.id}" + unless @model.isNew() then "/listings/#{@model.id}" else ""
             
       @model.on 'invalid', (error) =>
+        console.log error
         @$('.error').removeClass('error')
         @$('button.save').removeProp "disabled"
 
@@ -70,6 +71,7 @@ define [
             @$('.date-group').addClass('error')
       
       @on "save:success", (model) =>
+        console.log model
 
         new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
         @model.id = model.id
@@ -196,3 +198,4 @@ define [
       $('.datepicker').datepicker()
       
       if @units.length is 0 then @units.fetch() else @addAll()
+      @

@@ -52,10 +52,9 @@ define [
     # We may have the network tenant list. Therefore, we must
     # be sure that we are only displaying relevant users.
     addOne : (t) =>
-      console.log t
       if t.get("lease").id is @model.id
         @$("p.empty").text ''
         @$list.append (new TenantView(model: t)).render().el
 
     addAll : =>
-      _.each @model.tenants.where(lease: @model), @addOne
+      @model.tenants.chain().select((t) => t.get("lease").id is @model.id).each(@addOne)

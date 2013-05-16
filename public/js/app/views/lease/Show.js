@@ -53,7 +53,6 @@
       };
 
       ShowLeaseView.prototype.addOne = function(t) {
-        console.log(t);
         if (t.get("lease").id === this.model.id) {
           this.$("p.empty").text('');
           return this.$list.append((new TenantView({
@@ -63,9 +62,10 @@
       };
 
       ShowLeaseView.prototype.addAll = function() {
-        return _.each(this.model.tenants.where({
-          lease: this.model
-        }), this.addOne);
+        var _this = this;
+        return this.model.tenants.chain().select(function(t) {
+          return t.get("lease").id === _this.model.id;
+        }).each(this.addOne);
       };
 
       return ShowLeaseView;

@@ -47,7 +47,7 @@ define [
 
     # Re-render the contents of the Unit item.
     render: ->
-      inquiries = @model.inquiries.where(listing: @model)
+      inquiries = @model.inquiries.select (i) => i.get("listing").id is @model.id
       lastLogin = Parse.User.current().get("lastLogin") || Parse.User.current().updatedAt
 
       vars = _.merge @model.toJSON(),

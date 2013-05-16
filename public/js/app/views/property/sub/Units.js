@@ -51,13 +51,13 @@
       PropertyUnitsView.prototype.render = function() {
         var today, vars;
         today = moment(new Date).format('L');
-        vars = _.merge({
+        vars = {
           i18nProperty: i18nProperty,
           i18nCommon: i18nCommon,
           i18nUnit: i18nUnit,
           i18nLease: i18nLease,
           today: today
-        });
+        };
         this.$el.html(JST["src/js/templates/property/sub/units.jst"](vars));
         this.$table = this.$("#units-table");
         this.$actions = this.$(".form-actions");

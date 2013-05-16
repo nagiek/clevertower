@@ -32,7 +32,7 @@ define [
     render: =>
       template = if @model.isNew() then "src/js/templates/unit/new.jst" else "src/js/templates/unit/edit.jst"      
       $(@el).html JST[template](_.merge(@model.toJSON(), propertyId: @model.get("property").id, i18nUnit: i18nUnit, i18nCommon: i18nCommon))
-      this
+      @
       
     update: (e) ->
       name = e.currentTarget.name

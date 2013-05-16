@@ -45,6 +45,7 @@ define
     inquiries:                  "You have not applied to any listings yet"
     activities:                 
       self:                     "You haven't done anything yet!"
+      index:                    "Nothing's happened so far."
       other:         (name) -> "#{_.escape(name)} has no activity."
   form:                         
     bulk_edit:                  "Edit users"

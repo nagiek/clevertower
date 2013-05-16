@@ -10,8 +10,10 @@ define [
     # Reference to this collection's model.
     model: Activity
 
-    query: new Parse.Query(Activity).include("property")
-
     initialize: (models, attrs) ->
       @profile = attrs.profile
-      @query.equalTo("profile", @profile).descending("createdAt")
+      @query = new Parse.Query(Activity).descending("createdAt")
+
+      # Activity List is very personal to the user.
+      if Parse.User.current().get("property") then @query.equalTo("property", Parse.User.current().get("property"))
+      else if Parse.User.current().get("network") then @query.equalTo("network", Parse.User.current().get("network"))

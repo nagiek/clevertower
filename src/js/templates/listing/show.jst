@@ -1,18 +1,18 @@
-<header>
-  <h2><%= title %></h2>
-  <ul class="actions inline">
-    <li>
-      <a class="btn" href="/properties/<%= propertyId %>/listings/<%= objectId %>/edit">
-        <%= i18nCommon.actions.edit %>
-      </a>
-    </li>
-    <li>
-      <a href="<%= publicUrl %>"><%= i18nProperty.menu.view_public %></a>
-    </li>
-  </ul>
-</header>
 <div class="row">
   <div class="span8">
+    <header class="clearfix">
+      <h2 class="pull-left"><%= title %></h2>
+      <ul class="pull-right actions inline">
+        <li>
+          <a class="btn" href="/properties/<%= propertyId %>/listings/<%= objectId %>/edit">
+            <%= i18nCommon.actions.edit %>
+          </a>
+        </li>
+        <li>
+          <a href="<%= topDomain %><%= publicUrl %>"><%= i18nProperty.menu.view_public %></a>
+        </li>
+      </ul>
+    </header>
     <h3><%= i18nListing.inquiries.label %></h3>
     <table id="inquiries" class="table">
       <thead>

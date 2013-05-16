@@ -38,7 +38,12 @@ define [
     # Re-render the contents of the property item.
     render: =>
       today = moment(new Date).format('L')
-      vars = _.merge(i18nProperty: i18nProperty, i18nCommon: i18nCommon, i18nUnit: i18nUnit, i18nLease: i18nLease, today: today)
+      vars = 
+        i18nProperty: i18nProperty
+        i18nCommon: i18nCommon
+        i18nUnit: i18nUnit
+        i18nLease: i18nLease
+        today: today
 
       @$el.html JST["src/js/templates/property/sub/units.jst"](vars)      
       

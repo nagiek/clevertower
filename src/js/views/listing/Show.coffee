@@ -31,8 +31,14 @@ define [
       
     # Re-render the contents of the Unit item.
     render: ->
+
+      topDomain = location.host.split(".")
+      topDomain.shift()
+      topDomain = '//' + topDomain.join(".")
+
       vars = _.merge @model.toJSON(),
         posted: moment(@model.createdAt).fromNow()
+        topDomain: topDomain
         publicUrl: @property.publicUrl()
         propertyId: @property.id
         property: @property.toJSON()
@@ -61,9 +67,8 @@ define [
 
     addAll : =>
       @$list.html ""
-      visible = @model.inquiries.where(listing: @model)
-
+      visible = @model.inquiries.select (i) => i.get("listing").id is @model.id
       unless visible.length is 0
         _.each visible, @addOne
       else
-        @$list.html '<tr class="empty"><td>' + i18nListing.inquiries.empty.listing + '</td></tr>'
+        @$list.html '<tr class="empty"><td colspan="3">' + i18nListing.inquiries.empty.listing + '</td></tr>'

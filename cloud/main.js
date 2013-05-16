@@ -247,7 +247,6 @@
                   accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb",
                   ACL: managerACL
                 }));
-                console.log(manager);
                 Mandrill.sendEmail({
                   message: {
                     subject: "You have been invited to try CleverTower",
@@ -783,27 +782,27 @@
       success: function(unit) {
         var isPublic, listingACL, mgrRole, network, property, propertyIsPublic;
         property = unit.get("property");
+        propertyIsPublic = property.getACL().getPublicReadAccess();
         if (!req.object.existed()) {
           network = property.get("network");
           mgrRole = network.get("role");
+          listingACL = new Parse.ACL();
+          listingACL.setPublicReadAccess(propertyIsPublic);
+          listingACL.setRoleWriteAccess(mgrRole, true);
+          listingACL.setRoleReadAccess(mgrRole, true);
           req.object.set({
             locality: property.get("locality"),
             center: property.get("center"),
             bedrooms: unit.get("bedrooms"),
             bathrooms: unit.get("bathrooms"),
-            square_feet: unit.get("square_feet")
+            square_feet: unit.get("square_feet"),
+            user: req.user,
+            "public": propertyIsPublic,
+            ACL: listingACL
           });
-          listingACL = new Parse.ACL();
-          propertyIsPublic = property.getACL().getPublicReadAccess();
-          req.object.set("public", propertyIsPublic);
-          listingACL.setPublicReadAccess(propertyIsPublic);
-          listingACL.setRoleWriteAccess(mgrRole, true);
-          listingACL.setRoleReadAccess(mgrRole, true);
-          req.object.setACL(listingACL);
           return res.success();
         } else {
           isPublic = req.object.get("public");
-          propertyIsPublic = property.getACL().getPublicReadAccess();
           if (propertyIsPublic === false && isPublic === true) {
             listingACL = req.object.getACL();
             listingACL.setPublicReadAccess(false);
@@ -818,14 +817,15 @@
     });
   });
 
-  Parse.Cloud.afterSave("Listing", function(req, res) {
-    if (!req.object.existed() && req.object.get("public" === true)) {
+  Parse.Cloud.afterSave("Listing", function(req) {
+    if (!req.object.existed() && req.object.get("public")) {
       return (new Parse.Query("Profile")).equalTo('user', req.user).first().then(function(profile) {
         var activity, activityACL;
         activity = new Parse.Object("Activity");
         activityACL = new Parse.ACL;
         activityACL.setPublicReadAccess(true);
         return activity.save({
+          activityType: "new_listing",
           listing: req.object,
           unit: req.object.get("unit"),
           property: req.object.get("property"),
@@ -834,20 +834,16 @@
           profile: profile,
           ACL: activityACL
         });
-      }, function() {
-        return res.error("bad_query");
       });
     }
   });
 
   Parse.Cloud.beforeSave("Tenant", function(req, res) {
-    var className;
-    className = req.object.get("lease") ? "Lease" : "Inquiry";
     if (req.object.get("accessToken") === "AZeRP2WAmbuyFY8tSWx8azlPEb") {
       req.object.unset("accessToken");
       return res.success();
     }
-    return (new Parse.Query(className)).include('role').get(req.object.get(className.toLowerCase()).id, {
+    return (new Parse.Query("Lease")).include('role').get(req.object.get("lease").id, {
       success: function(obj) {
         var profile, propertyId, status, tntRole, user;
         propertyId = obj.get("property").id;
@@ -855,9 +851,10 @@
         user = profile.get("user");
         status = req.object.get("status");
         tntRole = obj.get("role");
-        return (new Parse.Query("Property")).include('network.role').get(propertyId, {
+        return (new Parse.Query("Property")).include('role').include('network.role').get(propertyId, {
           success: function(property) {
-            var mgrRole, network, tenantACL, users;
+            var mgrRole, network, propRole, tenantACL, users;
+            propRole = property.get("role");
             network = property.get("network");
             mgrRole = network.get("role");
             if (!req.object.existed()) {
@@ -872,6 +869,7 @@
                 tenantACL.setRoleWriteAccess(mgrRole, true);
               }
               req.object.set({
+                property: property,
                 network: network,
                 ACL: tenantACL
               });
@@ -880,68 +878,105 @@
               users = mgrRole.getUsers();
               return users.query().get(req.user.id, {
                 success: function(obj) {
-                  var notification, notificationACL, propertyACL, title;
+                  var activity, activityACL, newStatus, notification, notificationACL, profileACL, title;
                   if (obj) {
-                    if (tntRole) {
-                      tntRole.getUsers().add(user);
-                      tntRole.save();
+                    if (user) {
+                      if (tntRole) {
+                        tntRole.getUsers().add(user);
+                        tntRole.save();
+                      }
+                      if (propRole) {
+                        propRole.getUsers().add(user);
+                        propRole.save();
+                      }
                     }
-                    title = property.get("thoroughfare");
-                    notificationACL = new Parse.ACL;
-                    notificationACL.setReadAccess(user, true);
-                    notificationACL.setWriteAccess(user, true);
-                    new Parse.Object("Notification").save({
-                      name: ("" + className + "_invitation").toLowerCase(),
-                      text: "You have been invited to join " + title,
-                      channels: ["profiles-" + profile.id],
-                      channel: "profiles-" + profile.id,
-                      forMgr: false,
-                      property: property,
-                      network: network,
-                      ACL: notificationACL
-                    });
-                    status = status && status === 'pending' ? 'current' : 'invited';
-                    req.object.set("status", status);
-                    if (status === 'current' && user) {
-                      propertyACL = property.getACL();
-                      propertyACL.setReadAccess(user, true);
-                      property.setACL(propertyACL);
-                      property.save();
+                    if (status && status === 'pending') {
+                      newStatus = 'current';
+                      activity = new Parse.Object("Activity");
+                      activityACL = new Parse.ACL;
+                      if (mgrRole) {
+                        activityACL.setRoleReadAccess(mgrRole, true);
+                      }
+                      if (propRole) {
+                        activityACL.setRoleReadAccess(propRole, true);
+                      }
+                      activity.save({
+                        activityType: "new_tenant",
+                        lease: req.object,
+                        unit: req.object.get("unit"),
+                        property: req.object.get("property"),
+                        network: req.object.get("network"),
+                        profile: profile,
+                        ACL: activityACL
+                      });
+                    } else {
+                      newStatus = 'invited';
+                      title = property.get("thoroughfare");
+                      notificationACL = new Parse.ACL;
+                      notificationACL.setReadAccess(user, true);
+                      notificationACL.setWriteAccess(user, true);
+                      new Parse.Object("Notification").save({
+                        name: "lease_invitation",
+                        text: "You have been invited to join " + title,
+                        channels: ["profiles-" + profile.id],
+                        channel: "profiles-" + profile.id,
+                        forMgr: false,
+                        property: property,
+                        network: network,
+                        ACL: notificationACL
+                      });
                     }
+                    req.object.set("status", newStatus);
                     return res.success();
                   } else {
-                    notification = new Parse.Object("Notification");
-                    notificationACL = new Parse.ACL;
-                    notificationACL.setRoleReadAccess(mgrRole, true);
-                    notificationACL.setRoleWriteAccess(mgrRole, true);
-                    notification.save({
-                      name: "tenant_inquiry",
-                      text: "%NAME wants to join your property.",
-                      channels: ["networks-" + network.id, "properties-" + propertyId],
-                      channel: "networks-" + network.id,
-                      forMgr: true,
-                      property: property,
-                      network: network,
-                      ACL: notificationACL
-                    });
-                    (new Parse.Query("_User")).get(user.id, {
-                      success: function(user) {
-                        var userACL;
-                        userACL = user.getACL;
-                        userACL.setRoleReadAccess(mgrRole, true);
-                        return user.save({
-                          ACL: userACL
-                        });
-                      }
-                    });
-                    status = status && status === 'invited' ? 'current' : 'pending';
-                    req.object.set("status", status);
-                    if (status === 'current' && user) {
-                      propertyACL = property.getACL();
-                      propertyACL.setReadAccess(user, true);
-                      property.setACL(propertyACL);
-                      property.save();
+                    if (mgrRole) {
+                      profileACL = profile.getACL;
+                      profileACL.setRoleReadAccess(mgrRole, true);
+                      profile.save({
+                        ACL: userACL
+                      });
                     }
+                    if (status && status === 'invited') {
+                      newStatus = 'current';
+                      activity = new Parse.Object("Activity");
+                      activityACL = new Parse.ACL;
+                      if (mgrRole) {
+                        activityACL.setRoleReadAccess(mgrRole, true);
+                      }
+                      if (propRole) {
+                        activityACL.setRoleReadAccess(propRole, true);
+                      }
+                      activity.save({
+                        activityType: "new_tenant",
+                        lease: req.object,
+                        unit: req.object.get("unit"),
+                        property: req.object.get("property"),
+                        network: req.object.get("network"),
+                        profile: profile,
+                        ACL: activityACL
+                      });
+                    } else {
+                      newStatus = 'pending';
+                      notification = new Parse.Object("Notification");
+                      notificationACL = new Parse.ACL;
+                      if (mgrRole) {
+                        notificationACL.setRoleReadAccess(mgrRole, true);
+                      }
+                      if (mgrRole) {
+                        notificationACL.setRoleWriteAccess(mgrRole, true);
+                      }
+                      notification.save({
+                        name: "tenant_inquiry",
+                        text: "%NAME wants to join your property.",
+                        channels: ["networks-" + network.id, "properties-" + propertyId],
+                        channel: "networks-" + network.id,
+                        forMgr: true,
+                        property: property,
+                        network: network,
+                        ACL: notificationACL
+                      });
+                    }
+                    req.object.set("status", newStatus);
                     return res.success();
                   }
                 },
@@ -990,25 +1025,29 @@
           users = mgrRole.getUsers();
           return users.query().get(req.user.id, {
             success: function(obj) {
-              var notification, notificationACL, title;
+              var newStatus, notification, notificationACL, title;
               if (obj) {
                 users.add(user);
                 mgrRole.save();
-                title = network.get("title");
-                notification = new Parse.Object("Notification");
-                notificationACL = new Parse.ACL();
-                notificationACL.setReadAccess(req.object.get("user"), true);
-                notificationACL.setWriteAccess(req.object.get("user"), true);
-                notification.save({
-                  name: "network_invitation",
-                  text: "You have been invited to join " + title,
-                  channels: ["networks-" + network.id],
-                  channel: "networks-" + network.id,
-                  forMgr: false,
-                  network: network
-                }, ACL(notificationACL));
-                status = status && status === 'pending' ? 'current' : 'invited';
-                req.object.set("status", status);
+                if (status && status === 'pending') {
+                  newStatus = 'current';
+                } else {
+                  newStatus = 'invited';
+                  title = network.get("title");
+                  notification = new Parse.Object("Notification");
+                  notificationACL = new Parse.ACL();
+                  notificationACL.setReadAccess(req.object.get("user"), true);
+                  notificationACL.setWriteAccess(req.object.get("user"), true);
+                  notification.save({
+                    name: "network_invitation",
+                    text: "You have been invited to join " + title,
+                    channels: ["networks-" + network.id],
+                    channel: "networks-" + network.id,
+                    forMgr: false,
+                    network: network
+                  }, ACL(notificationACL));
+                }
+                req.object.set("status", newStatus);
                 return res.success();
               } else {
                 notification = new Parse.Object("Notification");
@@ -1034,8 +1073,8 @@
                     });
                   }
                 });
-                status = status && status === 'invited' ? 'current' : 'pending';
-                req.object.set("status", status);
+                newStatus = status && status === 'invited' ? 'current' : 'pending';
+                req.object.set("status", newStatus);
                 return res.success();
               }
             },

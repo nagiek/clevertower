@@ -4,55 +4,68 @@ define [
   "backbone"
   "moment"
   'models/Activity'
+  "i18n!nls/property"
   "i18n!nls/user"
   "i18n!nls/common"
-], ($, _, Parse, moment, Activity, i18nUser, i18nCommon) ->
+  'templates/activity/summary'
+  'gmaps'
+], ($, _, Parse, moment, Activity, i18nProperty, i18nUser, i18nCommon) ->
 
-  class InquirySummaryView extends Parse.View
+  class ActivitySummaryView extends Parse.View
     
-    tagName: "tr"
+    tagName: "li"
 
-    events:
-      'click .delete'     : 'kill'
-      
     initialize: (attrs) ->
-
-      _.bindAll @, 'render', 'kill', 'addOne', 'addAll'
-        
-      @model.on "destroy", =>
-        @remove()
-        @undelegateEvents()
-        delete this
+      @property = attrs.property
       
-      @model.prep('applicants')
-
     # Re-render the contents of the Unit item.
     render: ->
+
       vars =
         createdAt: moment(@model.createdAt).format("LL")
         i18nCommon: i18nCommon
+        i18nProperty: i18nProperty
         i18nUser: i18nUser
-      $(@el).html "<p>activity</p>"
-
-
-
-      @$list = @$('ul.applicants')
-      @addAll()
+      switch @model.get("type")
+      when "new_listing"
+        vars.content = """
+                      <div class="photo">
+                        <img src="#{@property.cover("span6")}">
+                        <div class="caption">
+                          <h4>#{@model.get('title')}</h4>
+                        </div>
+                      </div>
+                      """
+        
+      when "new_tenant"
+        vars.content = """
+                      <div class="photo">
+                        <img src="#{@model.get('profile').cover("span6")}">
+                        <div class="caption">
+                          <h4>#{@model.get('profile').name()}</h4>
+                        </div>
+                      </div>
+                      """
+      when "new_manager"
+        vars.content = """
+                      <div class="photo">
+                        <img src="#{@model.get('profile').cover("span6")}">
+                        <div class="caption">
+                          <h4>#{@model.get('profile').name()}</h4>
+                        </div>
+                      </div>
+                      """
+      when "new_post"
+        vars.content = """
+                      <div class="photo">
+                        <img src="#{@model.get('profile').cover("span6")}">
+                        <div class="caption">
+                          <h4>#{@model.get('profile').name()}</h4>
+                        </div>
+                      </div>
+                      """
+      when "new_photo"
+      
+      @$el.html JST["src/js/templates/activity/summary.jst"](vars)
 
       @
-
-    # We may have the network tenant list. Therefore, we must
-    # be sure that we are only displaying relevant users.
-    addOne : (a) =>
-      if a.get("inquiry").id is @model.id
-        @$(".empty").remove()
-        @$list.append (new ApplicantView(model: a)).render().el
-
-    addAll : =>
-      @$list.html ""
-      visible = @model.applicants.where(inquiry: @model)
-      _.each visible, @addOne
-
-    kill : (e) ->
-      e.preventDefault()
-      @model.destroy()

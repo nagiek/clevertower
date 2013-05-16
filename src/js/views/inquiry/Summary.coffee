@@ -3,8 +3,6 @@ define [
   "underscore"
   "backbone"
   "moment"
-  'models/Lease'
-  'models/Unit'
   'models/Inquiry'
   'views/helper/Alert'
   'views/applicant/summary'
@@ -12,7 +10,7 @@ define [
   "i18n!nls/group"
   "i18n!nls/common"
   'templates/inquiry/summary'
-], ($, _, Parse, moment, Lease, Unit, Inquiry, Alert, ApplicantView, i18nListing, i18nGroup, i18nCommon) ->
+], ($, _, Parse, moment, Inquiry, Alert, ApplicantView, i18nListing, i18nGroup, i18nCommon) ->
 
   class InquirySummaryView extends Parse.View
     
@@ -22,8 +20,6 @@ define [
       'click .delete'     : 'kill'
       
     initialize: (attrs) ->
-
-      _.bindAll @, 'render', 'kill', 'addOne', 'addAll'
         
       @model.on "destroy", =>
         @remove()
@@ -33,7 +29,7 @@ define [
       @model.prep('applicants')
 
     # Re-render the contents of the Unit item.
-    render: ->
+    render: =>
       vars =
         createdAt: moment(@model.createdAt).format("LL")
         comments: @model.get "comments"
@@ -44,7 +40,8 @@ define [
         i18nCommon: i18nCommon
         i18nGroup: i18nGroup
         i18nListing: i18nListing
-      $(@el).html JST["src/js/templates/inquiry/summary.jst"](vars)
+
+      @$el.html JST["src/js/templates/inquiry/summary.jst"](vars)
 
       @$list = @$('ul.applicants')
       @addAll()
@@ -60,9 +57,8 @@ define [
 
     addAll : =>
       @$list.html ""
-      visible = @model.applicants.where(inquiry: @model)
-      _.each visible, @addOne
+      @model.applicants.chain().select((a) => a.get("inquiry").id is @model.id).each(@addOne)
 
-    kill : (e) ->
+    kill : (e) =>
       e.preventDefault()
       @model.destroy()

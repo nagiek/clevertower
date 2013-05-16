@@ -1,6 +1,7 @@
 define
   fields:
     title:                "Title"
+    body:                 "Body"
     status:               "Status"
     name:                 "Name"
     posted:               "Posted"
@@ -102,6 +103,7 @@ define
     sample_email:         "keigan@example.com"
     comments:             "Comments"
     activity:             "Activity"
+    optional_description: "Optional description"
   order:
     first:                "First"
     last:                 "Last"

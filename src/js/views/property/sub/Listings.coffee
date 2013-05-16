@@ -54,6 +54,6 @@ define [
 
     addAll : ->
       @$list.html ""
-      visible = @model.listings.where(property: @model)
+      visible = @model.listings.select (l) => l.get("property").id is @model.id
       if visible.length is 0 then @$list.html "<tr class='empty'><tr colspan='3'>#{i18nGroup.tenant.empty.index}</td></tr>"
       else _.each visible, @addOne

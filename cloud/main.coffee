@@ -253,9 +253,7 @@ Parse.Cloud.define "AddManagers", (req, res) ->
               profile: profile
               accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb"
               ACL: managerACL
-            
-            console.log manager
-            
+                        
             # Notify the user
             Mandrill.sendEmail
               message:
@@ -755,10 +753,17 @@ Parse.Cloud.beforeSave "Listing", (req, res) ->
   success: (unit) ->
 
     property = unit.get "property"
+    propertyIsPublic = property.getACL().getPublicReadAccess()
 
     unless req.object.existed()
       network = property.get "network"
       mgrRole = network.get "role"
+
+      # Give public access to read the lease, and managers to read/write
+      listingACL = new Parse.ACL()
+      listingACL.setPublicReadAccess propertyIsPublic
+      listingACL.setRoleWriteAccess mgrRole, true
+      listingACL.setRoleReadAccess mgrRole, true
 
       req.object.set 
         # Update the listing with the location
@@ -768,24 +773,17 @@ Parse.Cloud.beforeSave "Listing", (req, res) ->
         bedrooms: unit.get "bedrooms"
         bathrooms: unit.get "bathrooms"
         square_feet: unit.get "square_feet"
+        # Save user
+        user: req.user
+        # Save public
+        public: propertyIsPublic
+        ACL: listingACL
 
-      # Give public access to read the lease, and managers to read/write
-      listingACL = new Parse.ACL()
-
-      propertyIsPublic = property.getACL().getPublicReadAccess()
-
-      req.object.set "public", propertyIsPublic
-      listingACL.setPublicReadAccess propertyIsPublic
-
-      listingACL.setRoleWriteAccess mgrRole, true
-      listingACL.setRoleReadAccess mgrRole, true
-      req.object.setACL listingACL
       res.success()
 
     else
 
       isPublic = req.object.get "public"
-      propertyIsPublic = property.getACL().getPublicReadAccess()
 
       # A listing can only be public if the property is public.
       if propertyIsPublic is false and isPublic is true
@@ -798,9 +796,9 @@ Parse.Cloud.beforeSave "Listing", (req, res) ->
 
 
 # Listing validation
-Parse.Cloud.afterSave "Listing", (req, res) ->
-  
-  if !req.object.existed() and req.object.get "public" is true
+Parse.Cloud.afterSave "Listing", (req) ->
+
+  if !req.object.existed() and req.object.get "public"
 
     # Create activity
     (new Parse.Query "Profile").equalTo('user', req.user).first()
@@ -809,6 +807,7 @@ Parse.Cloud.afterSave "Listing", (req, res) ->
       activityACL = new Parse.ACL
       activityACL.setPublicReadAccess true
       activity.save
+        activityType: "new_listing"
         listing: req.object
         unit: req.object.get "unit"
         property: req.object.get "property"
@@ -816,19 +815,34 @@ Parse.Cloud.afterSave "Listing", (req, res) ->
         title: req.object.get "title"
         profile: profile
         ACL: activityACL
-    , -> res.error "bad_query"
 
 
 # Tenant validation
+# 
+# Legend:
+#   user means req.user (decider)
+#   account means targer (object)
+# 
+# Paths:
+# 
+#                                / target had previously asked to join
+#              user is manager
+#         /                      \ target had not previously asked to join
+#        /
+#   start
+#        \
+#         \                      / target was previously invited
+#            user is not manager  
+#                                \ target was not previously invited
+#                       
+# 
 Parse.Cloud.beforeSave "Tenant", (req, res) ->
-
-  className = if req.object.get("lease") then "Lease" else "Inquiry"
 
   if req.object.get("accessToken") is "AZeRP2WAmbuyFY8tSWx8azlPEb"
     req.object.unset "accessToken"
     return res.success()
     
-  (new Parse.Query className).include('role').get req.object.get(className.toLowerCase()).id,
+  (new Parse.Query "Lease").include('role').get req.object.get("lease").id,
   success: (obj) ->
     propertyId = obj.get("property").id
     profile = req.object.get "profile"
@@ -837,8 +851,9 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
     tntRole = obj.get "role"
     
     # Change the status depending on who is creating the link.
-    (new Parse.Query "Property").include('network.role').get propertyId,
+    (new Parse.Query "Property").include('role').include('network.role').get propertyId,
     success: (property) ->
+      propRole = property.get "role"
       network = property.get "network"
       mgrRole = network.get "role"
       
@@ -849,6 +864,7 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
         tenantACL.setRoleReadAccess mgrRole, true if mgrRole
         tenantACL.setRoleWriteAccess mgrRole, true if mgrRole
         req.object.set 
+          property: property
           network: network
           ACL: tenantACL
       
@@ -860,74 +876,99 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
         success: (obj) ->
           if obj
             
-            # Add the user to the tenant ACL list. Currently, there is only 
-            # one list, but this may have to be divided in the future.
-            if tntRole
-              tntRole.getUsers().add user
-              tntRole.save()
-            
-            # Notify the user.
-            title = property.get "thoroughfare"
-            notificationACL = new Parse.ACL
-            notificationACL.setReadAccess(user, true)
-            notificationACL.setWriteAccess(user, true)
-            new Parse.Object("Notification").save
-              name: "#{className}_invitation".toLowerCase()
-              text: "You have been invited to join #{title}"
-              channels: [ "profiles-#{profile.id}" ]
-              channel: "profiles-#{profile.id}"
-              forMgr: false
-              property: property
-              network: network
-              ACL: notificationACL
-            
+            # Add the user to the tenant ACL list (lease AND property). 
+            if user
+              if tntRole 
+                tntRole.getUsers().add user
+                tntRole.save()
+              if propRole
+                propRole.getUsers().add user
+                propRole.save()
+
             # Upgrade the status
-            status = if status and status is 'pending' then 'current' else 'invited'
-            req.object.set "status", status
+            if status and status is 'pending'
+              newStatus = 'current'
 
-            # Add users to property ACL individually
-            if status is 'current' and user
-              propertyACL = property.getACL()
-              propertyACL.setReadAccess user, true
-              property.setACL propertyACL
-              property.save()
+              # Create activity
+              activity = new Parse.Object("Activity")
+              activityACL = new Parse.ACL
+              activityACL.setRoleReadAccess mgrRole, true if mgrRole
+              activityACL.setRoleReadAccess propRole, true if propRole
 
+              activity.save
+                activityType: "new_tenant"
+                lease: req.object
+                unit: req.object.get "unit"
+                property: req.object.get "property"
+                network: req.object.get "network"
+                profile: profile
+                ACL: activityACL
+
+            else
+              newStatus = 'invited'
+
+              # Notify the user.
+              title = property.get "thoroughfare"
+              notificationACL = new Parse.ACL
+              notificationACL.setReadAccess(user, true)
+              notificationACL.setWriteAccess(user, true)
+              new Parse.Object("Notification").save
+                name: "lease_invitation"
+                text: "You have been invited to join #{title}"
+                channels: [ "profiles-#{profile.id}" ]
+                channel: "profiles-#{profile.id}"
+                forMgr: false
+                property: property
+                network: network
+                ACL: notificationACL
+            
+            req.object.set "status", newStatus
             res.success()
               
           else
-            
-            # Notify the property.
-            notification = new Parse.Object("Notification")
-            notificationACL = new Parse.ACL
-            notificationACL.setRoleReadAccess(mgrRole, true)
-            notificationACL.setRoleWriteAccess(mgrRole, true)
-            notification.save
-              name: "tenant_inquiry"
-              text: "%NAME wants to join your property."
-              channels: [ "networks-#{network.id}", "properties-#{propertyId}" ]
-              channel: "networks-#{network.id}"
-              forMgr: true
-              property: property
-              network: network
-              ACL: notificationACL
-            
-            # Give property managers access to user.
-            (new Parse.Query "_User").get user.id,
-            success: (user) ->
-              userACL = user.getACL
-              userACL.setRoleReadAccess(mgrRole, true)
-              user.save ACL: userACL
-                        
-            # There is only one lease role, so no need to change.
-            status = if status and status is 'invited' then 'current' else 'pending'
-            req.object.set "status", status
 
-            # Add users to property ACL individually
-            if status is 'current' and user
-              propertyACL = property.getACL()
-              propertyACL.setReadAccess user, true
-              property.setACL propertyACL
-              property.save()
+            # Give property managers access to user.
+            if mgrRole
+              profileACL = profile.getACL
+              profileACL.setRoleReadAccess mgrRole, true 
+              profile.save ACL: userACL
+
+            if status and status is 'invited' 
+              newStatus = 'current'
+
+              # Create activity
+              activity = new Parse.Object("Activity")
+              activityACL = new Parse.ACL
+              activityACL.setRoleReadAccess mgrRole, true if mgrRole
+              activityACL.setRoleReadAccess propRole, true if propRole
+
+              activity.save
+                activityType: "new_tenant"
+                lease: req.object
+                unit: req.object.get "unit"
+                property: req.object.get "property"
+                network: req.object.get "network"
+                profile: profile
+                ACL: activityACL
+
+            else
+              newStatus = 'pending'
+              # Notify the property.
+              notification = new Parse.Object("Notification")
+              notificationACL = new Parse.ACL
+              notificationACL.setRoleReadAccess mgrRole, true if mgrRole
+              notificationACL.setRoleWriteAccess mgrRole, true if mgrRole
+              notification.save
+                name: "tenant_inquiry"
+                text: "%NAME wants to join your property."
+                channels: [ "networks-#{network.id}", "properties-#{propertyId}" ]
+                channel: "networks-#{network.id}"
+                forMgr: true
+                property: property
+                network: network
+                ACL: notificationACL
+            
+            req.object.set "status", newStatus
 
             res.success()
         error: -> res.error "bad_query"
@@ -935,8 +976,26 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
     error: -> res.error "bad_query"
   error: -> res.error "bad_query"
 
+# Manager validation
+# 
+# Legend:
+#   user means req.user (decider)
+#   account means targer (object)
+# 
+# Paths:
+# 
+#                                / target had previously asked to join
+#              user is manager
+#         /                      \ target had not previously asked to join
+#        /
+#   start
+#        \
+#         \                      / target was previously invited
+#            user is not manager  
+#                                \ target was not previously invited
+#                       
+# 
 
-# Tenant validation
 Parse.Cloud.beforeSave "Manager", (req, res) ->
   
   if req.object.get("accessToken") is "AZeRP2WAmbuyFY8tSWx8azlPEb"
@@ -967,29 +1026,34 @@ Parse.Cloud.beforeSave "Manager", (req, res) ->
       success: (obj) ->
         if obj
           
-          # Add the user to the tenant ACL list. Currently, there is only 
+          # Add the user to the mgr ACL list. Currently, there is only 
           # one list, but this may have to be divided in the future.
           users.add user
           mgrRole.save()
-          
-          # Notify the user.
-          title = network.get "title"
-          notification = new Parse.Object("Notification")
-          notificationACL = new Parse.ACL()
-          notificationACL.setReadAccess(req.object.get("user"), true)
-          notificationACL.setWriteAccess(req.object.get("user"), true)
-          notification.save
-            name: "network_invitation"
-            text: "You have been invited to join #{title}"
-            channels: [ "networks-#{network.id}" ]
-            channel: "networks-#{network.id}"
-            forMgr: false
-            network: network
-            ACL notificationACL
-            
+
           # Upgrade the status
-          status = if status and status is 'pending' then 'current' else 'invited'
-          req.object.set "status", status
+          if status and status is 'pending' 
+            newStatus = 'current'
+
+          else 
+            newStatus = 'invited'
+                  
+            # Notify the user.
+            title = network.get "title"
+            notification = new Parse.Object("Notification")
+            notificationACL = new Parse.ACL()
+            notificationACL.setReadAccess(req.object.get("user"), true)
+            notificationACL.setWriteAccess(req.object.get("user"), true)
+            notification.save
+              name: "network_invitation"
+              text: "You have been invited to join #{title}"
+              channels: [ "networks-#{network.id}" ]
+              channel: "networks-#{network.id}"
+              forMgr: false
+              network: network
+              ACL notificationACL
+
+          req.object.set "status", newStatus            
           res.success()
           
         else
@@ -1016,8 +1080,8 @@ Parse.Cloud.beforeSave "Manager", (req, res) ->
             user.save ACL: userACL
             
           # There is only one lease role, so no need to change.
-          status = if status and status is 'invited' then 'current' else 'pending'
-          req.object.set "status", status
+          newStatus = if status and status is 'invited' then 'current' else 'pending'
+          req.object.set "status", newStatus
           res.success()
       error: -> res.error "bad_query"
     else res.error "no matching role"

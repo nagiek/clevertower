@@ -112,7 +112,7 @@ define "gmaps", ["async!//maps.googleapis.com/maps/api/js?v=3.11&libraries=place
 # This will bug out on "www" subdomain.
 onNetwork = window.location.host.split(".").length > 2
 router = if onNetwork then "routers/Network" else "routers/Desktop"
-require ["jquery", "underscore", "backbone", "facebook", "models/Profile", "collections/ListingFeaturedList", router, "underscore.string", "json2", "bootstrap", "serializeObject", "typeahead", "masonry"], ($, _, Parse, FB, Profile, FeaturedListingList, AppRouter, _String) ->
+require ["jquery", "underscore", "backbone", "facebook", "models/Profile", "collections/ListingFeaturedList", "collections/ActivityList", router, "underscore.string", "json2", "bootstrap", "serializeObject", "typeahead", "masonry"], ($, _, Parse, FB, Profile, FeaturedListingList, ActivityList, AppRouter, _String) ->
 
   # Add Listen functionality.
 
@@ -161,7 +161,7 @@ require ["jquery", "underscore", "backbone", "facebook", "models/Profile", "coll
   Parse.initialize window.APPID, window.JSKEY
   Parse.App = {}
 
-  Parse.App.featuredListings = new FeaturedListingList unless onNetwork
+  Parse.App.featuredListings = new FeaturedListingList 
 
   Parse.App.countryCodes = 
     CA: "Canada"
@@ -225,15 +225,21 @@ require ["jquery", "underscore", "backbone", "facebook", "models/Profile", "coll
     networkPromise = (new Parse.Query("_User")).include('network.role').equalTo("objectId", @id).first()
     Parse.Promise.when(profilePromise, networkPromise).then (profile, user) => 
 
+      # Find where the user has applied
       profile.prep("applicants").fetch()
       @profile = profile
 
       # Load the network regardless if we are on a subdomain or not, as we need the link.
       # Should query for network when loading user... this is weird.
       # Set network on current user from loaded user.
-      network = user.get "network" if user
+      network = user.get "network"
+      property = user.get "property"
 
-      if user and network
+      if network
+        # Activity list for *network*
+        @activity = new ActivityList [], network: network
+        @activity.fetch()
+
         # Create & fill our collections
         # Can't use a Promise here, as fetch does not return a promise.
         network.prep("properties").fetch()
@@ -245,6 +251,10 @@ require ["jquery", "underscore", "backbone", "facebook", "models/Profile", "coll
         
         # Set the network and the role on the user.
         @set "network", network
+      else if property
+        # Activity list for *property*
+        @activity = new ActivityList [], property: property
+        @activity.fetch()
 
 
 

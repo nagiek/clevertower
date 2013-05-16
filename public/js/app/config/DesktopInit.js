@@ -79,7 +79,7 @@
 
   router = onNetwork ? "routers/Network" : "routers/Desktop";
 
-  require(["jquery", "underscore", "backbone", "facebook", "models/Profile", "collections/ListingFeaturedList", router, "underscore.string", "json2", "bootstrap", "serializeObject", "typeahead", "masonry"], function($, _, Parse, FB, Profile, FeaturedListingList, AppRouter, _String) {
+  require(["jquery", "underscore", "backbone", "facebook", "models/Profile", "collections/ListingFeaturedList", "collections/ActivityList", router, "underscore.string", "json2", "bootstrap", "serializeObject", "typeahead", "masonry"], function($, _, Parse, FB, Profile, FeaturedListingList, ActivityList, AppRouter, _String) {
     var listenEvents, listenMethods;
     listenMethods = {
       listenTo: "on",
@@ -129,9 +129,7 @@
     };
     Parse.initialize(window.APPID, window.JSKEY);
     Parse.App = {};
-    if (!onNetwork) {
-      Parse.App.featuredListings = new FeaturedListingList;
-    }
+    Parse.App.featuredListings = new FeaturedListingList;
     Parse.App.countryCodes = {
       CA: "Canada",
       US: "United States"
@@ -196,13 +194,16 @@
       profilePromise = (new Parse.Query(Profile)).equalTo("user", this).first();
       networkPromise = (new Parse.Query("_User")).include('network.role').equalTo("objectId", this.id).first();
       return Parse.Promise.when(profilePromise, networkPromise).then(function(profile, user) {
-        var network;
+        var network, property;
         profile.prep("applicants").fetch();
         _this.profile = profile;
-        if (user) {
-          network = user.get("network");
-        }
-        if (user && network) {
+        network = user.get("network");
+        property = user.get("property");
+        if (network) {
+          _this.activity = new ActivityList([], {
+            network: network
+          });
+          _this.activity.fetch();
           network.prep("properties").fetch();
           network.prep("managers").fetch();
           network.prep("tenants").fetch();
@@ -210,6 +211,11 @@
           network.prep("applicants").fetch();
           network.prep("inquiries").fetch();
           return _this.set("network", network);
+        } else if (property) {
+          _this.activity = new ActivityList([], {
+            property: property
+          });
+          return _this.activity.fetch();
         }
       });
     };
