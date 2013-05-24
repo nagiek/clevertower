@@ -1,5 +1,4 @@
 (function() {
-
   define({
     menu: {
       account_settings: "Account settings"

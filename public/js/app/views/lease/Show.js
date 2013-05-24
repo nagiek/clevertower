@@ -4,18 +4,16 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(["jquery", "underscore", "backbone", "moment", 'collections/TenantList', 'models/Unit', 'models/Lease', 'models/Tenant', 'views/tenant/Summary', "i18n!nls/unit", "i18n!nls/lease", "i18n!nls/common", 'templates/lease/show'], function($, _, Parse, moment, TenantList, Unit, Lease, Tenant, TenantView, i18nUnit, i18nLease, i18nCommon) {
-    var ShowLeaseView;
-    return ShowLeaseView = (function(_super) {
+    var ShowLeaseView, _ref;
 
+    return ShowLeaseView = (function(_super) {
       __extends(ShowLeaseView, _super);
 
       function ShowLeaseView() {
         this.addAll = __bind(this.addAll, this);
-
         this.addOne = __bind(this.addOne, this);
-
-        this.initialize = __bind(this.initialize, this);
-        return ShowLeaseView.__super__.constructor.apply(this, arguments);
+        this.initialize = __bind(this.initialize, this);        _ref = ShowLeaseView.__super__.constructor.apply(this, arguments);
+        return _ref;
       }
 
       ShowLeaseView.prototype.el = ".content";
@@ -29,6 +27,7 @@
 
       ShowLeaseView.prototype.render = function() {
         var modelVars, unitId, vars;
+
         modelVars = this.model.toJSON();
         unitId = this.model.get("unit").id;
         modelVars.propertyId = this.property.id;
@@ -63,6 +62,7 @@
 
       ShowLeaseView.prototype.addAll = function() {
         var _this = this;
+
         return this.model.tenants.chain().select(function(t) {
           return t.get("lease").id === _this.model.id;
         }).each(this.addOne);

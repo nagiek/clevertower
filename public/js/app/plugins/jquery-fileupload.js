@@ -1,15 +1,12 @@
 (function() {
-
   (function(factory) {
-    "use strict";
-    if (typeof define === "function" && define.amd) {
+    "use strict";    if (typeof define === "function" && define.amd) {
       return define(["jquery", "jqueryuiwidget"], factory);
     } else {
       return factory(window.jQuery);
     }
   })(function($) {
-    "use strict";
-    $.support.xhrFileUpload = !!(window.XMLHttpRequestUpload && window.FileReader);
+    "use strict";    $.support.xhrFileUpload = !!(window.XMLHttpRequestUpload && window.FileReader);
     $.support.xhrFormDataFileUpload = !!window.FormData;
     $.propHooks.elements = {
       get: function(form) {
@@ -59,6 +56,7 @@
         this.bitrate = 0;
         return this.getBitrate = function(now, loaded, interval) {
           var timeDiff;
+
           timeDiff = now - this.timestamp;
           if (!this.bitrate || !interval || timeDiff > interval) {
             this.bitrate = (loaded - this.loaded) * (1000 / timeDiff) * 8;
@@ -73,6 +71,7 @@
       },
       _getFormData: function(options) {
         var formData;
+
         formData = void 0;
         if (typeof options.formData === "function") {
           return options.formData(options.form);
@@ -94,6 +93,7 @@
       },
       _getTotal: function(files) {
         var total;
+
         total = 0;
         $.each(files, function(index, file) {
           return total += file.size || 1;
@@ -102,6 +102,7 @@
       },
       _onProgress: function(e, data) {
         var loaded, now, total;
+
         if (e.lengthComputable) {
           now = +(new Date());
           total = void 0;
@@ -128,11 +129,13 @@
       },
       _initProgressListener: function(options) {
         var that, xhr;
+
         that = this;
         xhr = (options.xhr ? options.xhr() : $.ajaxSettings.xhr());
         if (xhr.upload) {
           $(xhr.upload).bind("progress", function(e) {
             var oe;
+
             oe = e.originalEvent;
             e.lengthComputable = oe.lengthComputable;
             e.loaded = oe.loaded;
@@ -146,6 +149,7 @@
       },
       _initXHRData: function(options) {
         var file, formData, multipart, paramName;
+
         formData = void 0;
         file = options.files[0];
         multipart = options.multipart || !$.support.xhrFileUpload;
@@ -225,12 +229,14 @@
       },
       _getParamName: function(options) {
         var fileInput, paramName;
+
         fileInput = $(options.fileInput);
         paramName = options.paramName;
         if (!paramName) {
           paramName = [];
           fileInput.each(function() {
             var i, input, name, _results;
+
             input = $(this);
             name = input.prop("name") || "files[]";
             i = (input.prop("files") || [1]).length;
@@ -272,6 +278,7 @@
       },
       _getAJAXSettings: function(data) {
         var options;
+
         options = $.extend({}, this.options, data);
         this._initFormSettings(options);
         this._initDataSettings(options);
@@ -285,6 +292,7 @@
       },
       _getXHRPromise: function(resolveOrReject, context, args) {
         var dfd, promise;
+
         dfd = $.Deferred();
         promise = dfd.promise();
         context = context || this.options.context || promise;
@@ -300,6 +308,7 @@
       },
       _getUploadedBytes: function(jqXHR) {
         var parts, range, upperBytesPos;
+
         range = jqXHR.getResponseHeader("Range");
         parts = range && range.split("-");
         upperBytesPos = parts && parts.length > 1 && parseInt(parts[1], 10);
@@ -307,6 +316,7 @@
       },
       _chunkedUpload: function(options, testOnly) {
         var dfd, file, fs, jqXHR, mcs, promise, slice, that, ub, upload;
+
         that = this;
         file = options.files[0];
         fs = file.size;
@@ -329,6 +339,7 @@
         }
         upload = function() {
           var o;
+
           o = $.extend({}, options);
           o.blob = slice.call(file, ub, ub + mcs, file.type);
           o.chunkSize = o.blob.size;
@@ -382,6 +393,7 @@
       },
       _onDone: function(result, textStatus, jqXHR, options) {
         var total;
+
         if (!this._isXHRUpload(options) || !options.loaded || options.loaded < options.total) {
           total = this._getTotal(options.files) || 1;
           this._onProgress($.Event("progress", {
@@ -416,6 +428,7 @@
       },
       _onSend: function(e, data) {
         var aborted, jqXHR, options, pipe, send, slot, that;
+
         that = this;
         jqXHR = void 0;
         aborted = void 0;
@@ -431,6 +444,7 @@
             return that._onFail(jqXHR, textStatus, errorThrown, options);
           }).always(function(jqXHRorResult, textStatus, jqXHRorError) {
             var isPending, nextSlot, _results;
+
             that._sending -= 1;
             that._onAlways(jqXHRorResult, textStatus, jqXHRorError, options);
             if (options.limitConcurrentUploads && options.limitConcurrentUploads > that._sending) {
@@ -475,6 +489,7 @@
       },
       _onAdd: function(e, data) {
         var fileSet, i, limit, options, paramName, paramNameSet, paramNameSlice, result, that;
+
         that = this;
         result = true;
         options = $.extend({}, this.options, data);
@@ -506,6 +521,7 @@
         data.originalFiles = data.files;
         $.each(fileSet || data.files, function(index, element) {
           var newData;
+
           newData = $.extend({}, data);
           newData.files = (fileSet ? element : [element]);
           newData.paramName = paramNameSet[index];
@@ -520,6 +536,7 @@
       },
       _replaceFileInput: function(input) {
         var inputClone;
+
         inputClone = input.clone(true);
         $("<form></form>").append(inputClone)[0].reset();
         input.after(inputClone).detach();
@@ -536,6 +553,7 @@
       },
       _handleFileTreeEntry: function(entry, path) {
         var dfd, dirReader, errorHandler, that;
+
         that = this;
         dfd = $.Deferred();
         errorHandler = function(e) {
@@ -570,6 +588,7 @@
       },
       _handleFileTreeEntries: function(entries, path) {
         var that;
+
         that = this;
         return $.when.apply($, $.map(entries, function(entry) {
           return that._handleFileTreeEntry(entry, path);
@@ -579,11 +598,13 @@
       },
       _getDroppedFiles: function(dataTransfer) {
         var items;
+
         dataTransfer = dataTransfer || {};
         items = dataTransfer.items;
         if (items && items.length && (items[0].webkitGetAsEntry || items[0].getAsEntry)) {
           return this._handleFileTreeEntries($.map(items, function(item) {
             var entry;
+
             entry = void 0;
             if (item.webkitGetAsEntry) {
               entry = item.webkitGetAsEntry();
@@ -599,6 +620,7 @@
       },
       _getSingleFileInputFiles: function(fileInput) {
         var entries, files, value;
+
         fileInput = $(fileInput);
         entries = fileInput.prop("webkitEntries") || fileInput.prop("entries");
         files = void 0;
@@ -635,6 +657,7 @@
       },
       _onChange: function(e) {
         var data, that;
+
         that = this;
         data = {
           fileInput: $(e.target),
@@ -652,6 +675,7 @@
       },
       _onPaste: function(e) {
         var cbd, data, items;
+
         cbd = e.originalEvent.clipboardData;
         items = (cbd && cbd.items) || [];
         data = {
@@ -659,6 +683,7 @@
         };
         $.each(items, function(index, item) {
           var file;
+
           file = item.getAsFile && item.getAsFile();
           if (file) {
             return data.files.push(file);
@@ -670,6 +695,7 @@
       },
       _onDrop: function(e) {
         var data, dataTransfer, that;
+
         that = this;
         dataTransfer = e.dataTransfer = e.originalEvent.dataTransfer;
         data = {};
@@ -685,6 +711,7 @@
       },
       _onDragOver: function(e) {
         var dataTransfer;
+
         dataTransfer = e.dataTransfer = e.originalEvent.dataTransfer;
         if (this._trigger("dragover", e) === false) {
           return false;
@@ -715,6 +742,7 @@
       },
       _setOption: function(key, value) {
         var refresh;
+
         refresh = $.inArray(key, this._refreshOptionsList) !== -1;
         if (refresh) {
           this._destroyEventHandlers();
@@ -727,6 +755,7 @@
       },
       _initSpecialOptions: function() {
         var options;
+
         options = this.options;
         if (options.fileInput === undefined) {
           options.fileInput = (this.element.is("input[type=\"file\"]") ? this.element : this.element.find("input[type=\"file\"]"));
@@ -744,6 +773,7 @@
       },
       _create: function() {
         var options;
+
         options = this.options;
         $.extend(options, $(this.element[0].cloneNode(false)).data());
         this._initSpecialOptions();
@@ -757,6 +787,7 @@
       },
       add: function(data) {
         var that;
+
         that = this;
         if (!data || this.options.disabled) {
           return;
@@ -773,6 +804,7 @@
       },
       send: function(data) {
         var aborted, dfd, jqXHR, promise, that;
+
         if (data && !this.options.disabled) {
           if (data.fileInput && !data.files) {
             that = this;

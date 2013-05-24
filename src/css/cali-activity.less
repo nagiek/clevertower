@@ -4,3 +4,33 @@
     border-bottom: solid 1px @grayLight;
   }
 }
+
+.activity {
+  background-color: white;
+  position: relative;
+  &:hover {
+    text-decoration: none;
+  }
+  &.active {
+    border-color: @blue;
+    .box-shadow(0 1px 4px rgba(0, 105, 214, 0.25))
+  }
+  .rent {
+  	font-size: 16px;
+  }
+  .activity-info {
+    position: absolute;
+    right:9px;
+    bottom:9px;
+  }
+  .position {
+    padding: 4px;
+    line-height: 9px;
+    font-size: 9px;
+    background-color: @orange;
+    color: @white;
+  }
+  &.property-linked .position {
+    background-color: @green;
+  }
+}

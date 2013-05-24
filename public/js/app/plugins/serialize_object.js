@@ -1,9 +1,9 @@
 (function() {
-
   define(["jquery"], function($) {
     return $.fn.serializeObject = function() {
       var json, patterns, push_counters,
         _this = this;
+
       json = {};
       push_counters = {};
       patterns = {
@@ -25,6 +25,7 @@
       };
       $.each($(this).serializeArray(), function(i, elem) {
         var k, keys, merge, re, reverse_key;
+
         if (!patterns.validate.test(elem.name)) {
           return;
         }

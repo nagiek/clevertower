@@ -1,5 +1,3 @@
-define(function(){
-
 this["JST"] = this["JST"] || {};
 
 this["JST"]["src/js/templates/todo/item.jst"] = function(obj) {
@@ -19,6 +17,3 @@ __p += '<li class="' +
 }
 return __p
 };
-
-  return this["JST"];
-});

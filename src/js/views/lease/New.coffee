@@ -13,7 +13,7 @@ define [
   "i18n!nls/lease"
   "templates/lease/new"
   "templates/lease/new-modal"
-  "templates/lease/_form"
+  "templates/lease/form"
   "templates/helper/field/unit"
   "templates/helper/field/property"
   "templates/helper/field/tenant"
@@ -216,7 +216,7 @@ define [
           
       @$startDate = @$('.start-date')
       @$endDate = @$('.end-date')
-      $('.datepicker').datepicker()
+      @$('.datepicker').datepicker()
       
       if @units.length is 0 then @units.fetch() else @addAll()
 

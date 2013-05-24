@@ -4,32 +4,23 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(["jquery", "underscore", "backbone", 'collections/UnitList', 'models/Property', 'models/Unit', 'views/helper/Alert', 'views/unit/Summary', "i18n!nls/common", "i18n!nls/property", "i18n!nls/unit", "i18n!nls/lease", 'templates/property/sub/units', 'datepicker'], function($, _, Parse, UnitList, Property, Unit, Alert, UnitView, i18nCommon, i18nProperty, i18nUnit, i18nLease) {
-    var PropertyUnitsView;
-    return PropertyUnitsView = (function(_super) {
+    var PropertyUnitsView, _ref;
 
+    return PropertyUnitsView = (function(_super) {
       __extends(PropertyUnitsView, _super);
 
       function PropertyUnitsView() {
         this.save = __bind(this.save, this);
-
         this.undo = __bind(this.undo, this);
-
         this.addX = __bind(this.addX, this);
-
         this.addOne = __bind(this.addOne, this);
-
         this.addAll = __bind(this.addAll, this);
-
         this.switchToEdit = __bind(this.switchToEdit, this);
-
         this.switchToShow = __bind(this.switchToShow, this);
-
         this.switchMode = __bind(this.switchMode, this);
-
         this.clear = __bind(this.clear, this);
-
-        this.render = __bind(this.render, this);
-        return PropertyUnitsView.__super__.constructor.apply(this, arguments);
+        this.render = __bind(this.render, this);        _ref = PropertyUnitsView.__super__.constructor.apply(this, arguments);
+        return _ref;
       }
 
       PropertyUnitsView.prototype.el = ".content";
@@ -50,6 +41,7 @@
 
       PropertyUnitsView.prototype.render = function() {
         var today, vars;
+
         today = moment(new Date).format('L');
         vars = {
           i18nProperty: i18nProperty,
@@ -108,6 +100,7 @@
 
       PropertyUnitsView.prototype.addOne = function(unit) {
         var view;
+
         this.$('p.empty').hide();
         view = new UnitView({
           model: unit
@@ -121,6 +114,7 @@
 
       PropertyUnitsView.prototype.addX = function(e) {
         var x;
+
         e.preventDefault();
         x = Number($('#x').val());
         if (x == null) {
@@ -136,6 +130,7 @@
 
       PropertyUnitsView.prototype.undo = function(e) {
         var x;
+
         e.preventDefault();
         x = Number($('#x').val());
         if (x == null) {
@@ -154,6 +149,7 @@
 
       PropertyUnitsView.prototype.save = function(e) {
         var _this = this;
+
         e.preventDefault();
         if (this.$('.error')) {
           this.$('.error').removeClass('error');

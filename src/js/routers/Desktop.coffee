@@ -37,7 +37,7 @@ define [
                 fade:     true
                 heading:  i18nProperty.errors.network_not_set
               Parse.history.navigate "/network/set"
-              @view = new NewNetworkView(model: Parse.User.current().get("network")) if !@view or @view !instanceof NetworkFormView
+              @view = new NewNetworkView(model: Parse.User.current().get("network")) if !@view or @view !instanceof NewNetworkView
               @view.render()
           else
             # Reload the current path. Don't use navigate, as it will fail.
@@ -63,6 +63,7 @@ define [
             @oldConstructor = @view.constructor
             @view.trigger("view:change")
             @view.undelegateEvents()
+            @view.stopListening()
             delete @view
   
       
@@ -89,10 +90,10 @@ define [
 
     search: (splat) ->
       view = @view
-      require ["views/listing/index"], (ListingIndexView) =>
-        if !view or view !instanceof ListingIndexView
+      require ["views/activity/index"], (ActivityIndexView) =>
+        if !view or view !instanceof ActivityIndexView
           vars = @deparamAction splat
-          @view = new ListingIndexView(location: vars.path, params: vars.params).render()
+          @view = new ActivityIndexView(location: vars.path, params: vars.params)
 
     propertiesPublic: (country, region, city, id, slug) =>
       place = "#{city}--#{region}--#{country}"

@@ -3,13 +3,14 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(["jquery", "underscore", "backbone", 'collections/TodoList', 'models/AppState', 'models/Todo', 'views/todo/Todo', 'templates/todo/stats', 'templates/todo/manage'], function($, _, Parse, TodoList, AppState, Todo, TodoView, StatsTemplate, ManageTemplate) {
-    var ManageTodosView;
-    return ManageTodosView = (function(_super) {
+    var ManageTodosView, _ref;
 
+    return ManageTodosView = (function(_super) {
       __extends(ManageTodosView, _super);
 
       function ManageTodosView() {
-        return ManageTodosView.__super__.constructor.apply(this, arguments);
+        _ref = ManageTodosView.__super__.constructor.apply(this, arguments);
+        return _ref;
       }
 
       ManageTodosView.prototype.statsTemplate = JST["src/js/templates/todo/stats.jst"];
@@ -25,6 +26,7 @@
 
       ManageTodosView.prototype.initialize = function() {
         var self;
+
         self = this;
         this.state = new AppState;
         this.state.set({
@@ -46,6 +48,7 @@
 
       ManageTodosView.prototype.render = function() {
         var done, remaining;
+
         done = this.todos.done().length;
         remaining = this.todos.remaining().length;
         this.$("#todo-stats").html(this.statsTemplate({
@@ -59,6 +62,7 @@
 
       ManageTodosView.prototype.selectFilter = function(e) {
         var el, filterValue;
+
         el = $(e.target);
         filterValue = el.attr("id");
         return this.state.set({
@@ -68,6 +72,7 @@
 
       ManageTodosView.prototype.filter = function() {
         var filterValue;
+
         filterValue = this.state.get("filter");
         this.$("ul#filters a").removeClass("selected");
         this.$("ul#filters a#" + filterValue).addClass("selected");
@@ -92,6 +97,7 @@
 
       ManageTodosView.prototype.addOne = function(todo) {
         var view;
+
         view = new TodoView({
           model: todo
         });
@@ -105,6 +111,7 @@
 
       ManageTodosView.prototype.addSome = function(filter) {
         var self;
+
         self = this;
         this.$("#todo-list").html("");
         return this.todos.chain().filter(filter).each(function(item) {
@@ -114,6 +121,7 @@
 
       ManageTodosView.prototype.createOnEnter = function(e) {
         var self;
+
         self = this;
         if (e.keyCode !== 13) {
           return;
@@ -138,6 +146,7 @@
 
       ManageTodosView.prototype.toggleAllComplete = function() {
         var done;
+
         done = this.allCheckbox.checked;
         return this.todos.each(function(todo) {
           return todo.save({

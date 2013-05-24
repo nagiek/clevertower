@@ -3,13 +3,14 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(["jquery", "underscore", "backbone", "models/Property", "views/helper/Alert", "views/property/new/Map", "i18n!nls/property", "i18n!nls/common", "templates/property/new/map", "templates/property/new/wizard"], function($, _, Parse, Property, Alert, GMapView, i18nProperty, i18nCommon) {
-    var PropertyWizardView;
-    return PropertyWizardView = (function(_super) {
+    var PropertyWizardView, _ref;
 
+    return PropertyWizardView = (function(_super) {
       __extends(PropertyWizardView, _super);
 
       function PropertyWizardView() {
-        return PropertyWizardView.__super__.constructor.apply(this, arguments);
+        _ref = PropertyWizardView.__super__.constructor.apply(this, arguments);
+        return _ref;
       }
 
       PropertyWizardView.prototype.el = '.wizard';
@@ -24,10 +25,12 @@
 
       PropertyWizardView.prototype.initialize = function() {
         var _this = this;
+
         _.bindAll(this, 'next', 'back', 'cancel', 'render');
         this.model = new Property;
         this.model.on("invalid", function(error) {
           var args, fn, msg;
+
           _this.state = 'address';
           msg = error.message.indexOf(":") > 0 ? (args = error.message.split(":"), fn = args.pop(), i18nProperty.errors[fn](args[0])) : i18nProperty.errors[error.message];
           switch (error.message) {
@@ -93,6 +96,7 @@
       PropertyWizardView.prototype.next = function(e) {
         var center,
           _this = this;
+
         this.$('.error').removeClass('error');
         switch (this.state) {
           case 'address':
@@ -127,6 +131,7 @@
 
       PropertyWizardView.prototype.back = function(e) {
         var _this = this;
+
         if (this.state === 'address') {
           return;
         }

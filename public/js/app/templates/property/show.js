@@ -1,5 +1,3 @@
-define(function(){
-
 this["JST"] = this["JST"] || {};
 
 this["JST"]["src/js/templates/property/show.jst"] = function(obj) {
@@ -47,6 +45,3 @@ __p += '<div class="container">\n  <div class="page-header clearfix">    \n    <
 }
 return __p
 };
-
-  return this["JST"];
-});

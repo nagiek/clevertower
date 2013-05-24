@@ -6,6 +6,8 @@ define
     setup_property:                   "Setup Property"
     edit_picture:                     "Change Picture"
     go_to_network:                    "Go to network"
+    add_to_start:                     "Add a property to get started"
+    join_or_create_to_start:          "Join or create a property to get started"
   menu:                                 
     dashboard:                        "Dashboard"
     day_to_day:                       "Day to Day"

@@ -1,4 +1,9 @@
-<%= content %>
-<footer>
-  <%= i18nCommon.fields.posted %> <%= createdAt %>
-</footer>
+<a href="<%= publicUrl %>" class="thumbnail clearfix activity <%= type %><% if (linkedToProperty) { %><%= " property-linked property-" + propertyId %><% } %>">
+  <div class="content"><%= content %></div>
+  <ul class="activity-info inline inline-condensed">
+    <li class="position"><%= pos %></li>
+    <li><i class="icon icon-<%= icon %>"></i></li>
+  </ul>
+</a>
+
+

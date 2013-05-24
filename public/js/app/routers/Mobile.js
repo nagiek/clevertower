@@ -3,13 +3,14 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(["jquery", "backbone", "views/user/User"], function($, Parse, UserView) {
-    var DesktopRouter;
-    return DesktopRouter = (function(_super) {
+    var DesktopRouter, _ref;
 
+    return DesktopRouter = (function(_super) {
       __extends(DesktopRouter, _super);
 
       function DesktopRouter() {
-        return DesktopRouter.__super__.constructor.apply(this, arguments);
+        _ref = DesktopRouter.__super__.constructor.apply(this, arguments);
+        return _ref;
       }
 
       DesktopRouter.prototype.routes = {
@@ -33,8 +34,10 @@
 
       DesktopRouter.prototype.propertiesNew = function() {
         var _this = this;
+
         return require(["views/property/Manage"], function(ManagePropertiesView) {
           var managePropertiesView;
+
           managePropertiesView = new ManagePropertiesView;
           return managePropertiesView.$el.find('#new-property').click();
         });
@@ -42,6 +45,7 @@
 
       DesktopRouter.prototype.propertiesShow = function(id, action) {
         var _this = this;
+
         action || (action = 'units');
         return require(["models/Property", "views/property/Show"], function(Property, PropertyView) {
           $('#main').html('<div id="property"></div>');

@@ -3,11 +3,11 @@ define [
   "underscore"
   "backbone"
   "views/home/anon"
-  "views/user/home"
+  "views/activity/index"
   "i18n!nls/listing"
   "i18n!nls/common"
   "templates/home/index"
-], ($, _, Parse, AnonHomeView, UserHomeView, i18nListing, i18nCommon) ->
+], ($, _, Parse, AnonHomeView, ActivityIndexView, i18nListing, i18nCommon) ->
 
   class HomeIndexView extends Parse.View
 
@@ -20,21 +20,19 @@ define [
 
       @on "view:change", =>
         @anonView.clear() if @anonView
-        @userView.clear() if @userView
+        @searchView.clear() if @searchView
         @undelegateEvents()
         delete this
 
       Parse.Dispatcher.on "user:login", =>
         @anonView.clear() if @anonView
-        @userView = new UserHomeView().render()
+        @searchView = new ActivityIndexView(params: {})
 
       Parse.Dispatcher.on "user:logout", =>
-        @userView.clear() if @userView
+        @searchView.clear() if @searchView
         @anonView = new AnonHomeView().render()
 
     # Re-render the contents of the property item.
     render: =>
-      if Parse.User.current() then @userView = new UserHomeView().render() else @anonView = new AnonHomeView().render()
+      if Parse.User.current() then @searchView = new ActivityIndexView(params: {}) else @anonView = new AnonHomeView().render()
       @
-
-

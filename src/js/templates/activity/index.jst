@@ -1,0 +1,55 @@
+<div class="container">
+  <div class="row">
+    <div class="span4 pull-right">
+      <div id="user-container"></div>
+      <div id="map-container">
+        <label class="checkbox" style="background: lightGray; ">
+          <input id="redo-search" type="checkbox" checked="checked" /><%= i18nListing.map.redo_search_in_area %>
+        </label>
+        <div id="mapCanvas"></div>
+      </div>
+    </div>
+    <div class="span8 content">
+      <div class="well well-small form-inline">
+        <div id="general-controls" class="inline-block">
+          <div id="filters" class="btn-group" data-toggle="buttons-radio">
+            <button type="button" class="btn active"><%= i18nCommon.adjectives.all %></button>
+
+            <button data-filter="new_listing" type="button" class="btn" rel="tooltip" data-original-title="<%= i18nCommon.classes.Listing %>">
+              <i class="icon icon-listing"></i>
+            </button>
+            <button data-filter="new_photo" type="button" class="btn" rel="tooltip" data-original-title="<%= i18nCommon.classes.Photos %>">
+              <i class="icon icon-photo"></i>
+            </button>
+            <button data-filter="new_post" type="button" class="btn" rel="tooltip" data-original-title="<%= i18nCommon.classes.Posts %>">
+              <i class="icon icon-status"></i>
+            </button>
+          </div>
+<!--           <div class="control-group">
+            <div class="controls">
+              <input type="text" class="input-small posted-date datepicker" name="createdAt" maxlength="12" value="<%= today %>" data-date="<%= today %>" data-date-format="<%= i18nCommon.dates.datepicker_format %>"  />
+            </div>
+          </div> -->
+          <div id="displays" class="btn-group inline-block" data-toggle="buttons-radio">
+            <button data-display="small" class="btn display active" rel="tooltip" data-original-title="<%= i18nCommon.adjectives.small %>">
+              <i class="icon icon-th-list"></i>
+            </button>
+            <button data-display="big" class="btn display" rel="tooltip" data-original-title="<%= i18nCommon.adjectives.big %>">
+              <i class="icon icon-th-large"></i>
+            </button>
+          </div>
+        </div>
+        <div id="specific-controls" class="inline-block"></div>
+      </div>
+      
+
+      <ul class="thumbnails">
+        <li class="offset4 span4 loading"><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" /></li>
+      </ul>
+
+      <div class="pagination">
+        <ul></ul>
+      </div>
+    </div>
+  </div>
+</div>

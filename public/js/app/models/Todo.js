@@ -1,7 +1,7 @@
 (function() {
-
   define(['underscore', 'backbone'], function(_, Parse) {
     var Todo;
+
     return Todo = Parse.Object.extend("Todo", {
       defaults: {
         content: "empty todo...",

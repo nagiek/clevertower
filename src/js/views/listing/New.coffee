@@ -14,7 +14,7 @@ define [
   "i18n!nls/listing"
   "templates/listing/new"
   "templates/listing/edit"
-  "templates/listing/_form"
+  "templates/listing/form"
   "templates/helper/field/unit"
   "templates/helper/field/property"
   "templates/helper/field/tenant"

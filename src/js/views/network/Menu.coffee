@@ -34,7 +34,7 @@ define [
         # On main domain
         if Parse.User.current()
           # Set the link to the network subdomain.
-          href = if @model then "#{location.protocol}//#{@model.get("name")}.#{location.host}" else "/network/set"
+          href = if @model then @model.privateUrl() else "/network/set"
           @$el.html "<a href='#{href}'>#{i18nCommon.classes.Network}</a>"
         else
           @$el.html ""

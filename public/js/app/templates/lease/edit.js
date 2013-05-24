@@ -1,5 +1,3 @@
-define(function(){
-
 this["JST"] = this["JST"] || {};
 
 this["JST"]["src/js/templates/lease/edit.jst"] = function(obj) {
@@ -9,7 +7,7 @@ with (obj) {
 __p += '<h2>' +
 ((__t = ( i18nLease.headers.edit_lease )) == null ? '' : __t) +
 '</h2>\n<form class="lease-form" enctype="multipart/form-data" method="post">\n  ' +
-((__t = ( JST["src/js/templates/lease/_form.jst"]({isNew: false, lease: lease, dates: dates, moment: moment, i18nCommon: i18nCommon, i18nUnit: i18nUnit, i18nLease: i18nLease}) )) == null ? '' : __t) +
+((__t = ( JST["src/js/templates/lease/form.jst"]({isNew: false, lease: lease, dates: dates, moment: moment, i18nCommon: i18nCommon, i18nUnit: i18nUnit, i18nLease: i18nLease}) )) == null ? '' : __t) +
 '\n  \n  <div class="form-actions">\n    <button class="save btn btn-primary">' +
 ((__t = ( i18nCommon.actions.save )) == null ? '' : __t) +
 '</button>\n    <a href="' +
@@ -23,6 +21,3 @@ __p += '<h2>' +
 }
 return __p
 };
-
-  return this["JST"];
-});

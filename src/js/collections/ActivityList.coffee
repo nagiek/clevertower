@@ -11,9 +11,14 @@ define [
     model: Activity
 
     initialize: (models, attrs) ->
-      @profile = attrs.profile
-      @query = new Parse.Query(Activity).descending("createdAt")
+      @query = new Parse.Query(Activity).descending("createdAt").include("profile")
 
       # Activity List is very personal to the user.
-      if Parse.User.current().get("property") then @query.equalTo("property", Parse.User.current().get("property"))
-      else if Parse.User.current().get("network") then @query.equalTo("network", Parse.User.current().get("network"))
+      if attrs.property then @query.equalTo("property", attrs.property)
+      else if attrs.network then @query.equalTo("network", attrs.network)
+      else if attrs.center and attrs.radius 
+        @query
+        .withinKilometers("center", attrs.center, attrs.radius)
+        .equalTo("public", true)
+
+    setBounds: (sw, ne) -> @query.withinGeoBox('center', sw, ne)

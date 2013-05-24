@@ -1,5 +1,4 @@
 (function() {
-
   define({
     actions: {
       add_lease: "add a new lease",

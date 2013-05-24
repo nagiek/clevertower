@@ -1,5 +1,4 @@
 (function() {
-
   define({
     headers: {
       add_lease: "Add Lease",

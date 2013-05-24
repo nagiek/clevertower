@@ -80,7 +80,50 @@
   router = onNetwork ? "routers/Network" : "routers/Desktop";
 
   require(["jquery", "underscore", "backbone", "facebook", "models/Profile", "collections/ListingFeaturedList", "collections/ActivityList", router, "underscore.string", "json2", "bootstrap", "serializeObject", "typeahead", "masonry"], function($, _, Parse, FB, Profile, FeaturedListingList, ActivityList, AppRouter, _String) {
-    var listenEvents, listenMethods;
+    var eventSplitter, eventsApi, listenEvents, listenMethods;
+
+    Parse.onNetwork = onNetwork;
+    eventSplitter = /\s+/;
+    eventsApi = function(obj, action, name, rest) {
+      var i, key, l, names;
+
+      if (!name) {
+        return true;
+      }
+      if (typeof name === "object") {
+        for (key in name) {
+          obj[action].apply(obj, [key, name[key]].concat(rest));
+        }
+        return false;
+      }
+      if (eventSplitter.test(name)) {
+        names = name.split(eventSplitter);
+        i = 0;
+        l = names.length;
+        while (i < l) {
+          obj[action].apply(obj, [names[i]].concat(rest));
+          i++;
+        }
+        return false;
+      }
+      return true;
+    };
+    Parse.Events.once = function(name, callback, context) {
+      var once, self;
+
+      if (!eventsApi(this, "once", name, [callback, context]) || !callback) {
+        return this;
+      }
+      self = this;
+      once = _.once(function() {
+        self.off(name, once);
+        return callback.apply(this, arguments);
+      });
+      once._callback = callback;
+      return this.on(name, once, context);
+    };
+    Parse.View.prototype.once = Parse.Events.once;
+    Parse.Collection.prototype.once = Parse.Events.once;
     listenMethods = {
       listenTo: "on",
       listenToOnce: "once"
@@ -89,6 +132,7 @@
     _.each(listenMethods, function(implementation, method) {
       return listenEvents[method] = function(obj, name, callback) {
         var id, listeners;
+
         listeners = this._listeners || (this._listeners = {});
         id = obj._listenerId || (obj._listenerId = _.uniqueId("l"));
         listeners[id] = obj;
@@ -101,6 +145,7 @@
     });
     listenEvents.stopListening = function(obj, name, callback) {
       var deleteListener, id, listeners;
+
       listeners = this._listeners;
       if (!listeners) {
         return this;
@@ -141,7 +186,6 @@
         return jqXhr.setRequestHeader("X-Parse-REST-API-Key", window.RESTAPIKEY);
       }
     });
-    Parse.onNetwork = onNetwork;
     Parse.FacebookUtils.init({
       appId: '387187337995318',
       channelUrl: '//clevertower.dev:3000/fb-channel',
@@ -158,6 +202,7 @@
       }
       return this[first ? 'find' : 'filter'](function(model) {
         var key, _i, _len;
+
         for (_i = 0, _len = attrs.length; _i < _len; _i++) {
           key = attrs[_i];
           if (attrs[key] !== model.get(key)) {
@@ -191,19 +236,17 @@
     Parse.User.prototype.setup = function() {
       var networkPromise, profilePromise,
         _this = this;
+
       profilePromise = (new Parse.Query(Profile)).equalTo("user", this).first();
       networkPromise = (new Parse.Query("_User")).include('network.role').equalTo("objectId", this.id).first();
       return Parse.Promise.when(profilePromise, networkPromise).then(function(profile, user) {
         var network, property;
+
         profile.prep("applicants").fetch();
         _this.profile = profile;
         network = user.get("network");
         property = user.get("property");
         if (network) {
-          _this.activity = new ActivityList([], {
-            network: network
-          });
-          _this.activity.fetch();
           network.prep("properties").fetch();
           network.prep("managers").fetch();
           network.prep("tenants").fetch();
@@ -211,11 +254,6 @@
           network.prep("applicants").fetch();
           network.prep("inquiries").fetch();
           return _this.set("network", network);
-        } else if (property) {
-          _this.activity = new ActivityList([], {
-            property: property
-          });
-          return _this.activity.fetch();
         }
       });
     };

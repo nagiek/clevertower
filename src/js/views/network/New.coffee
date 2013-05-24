@@ -7,7 +7,6 @@ define [
   "i18n!nls/common"
   "i18n!nls/property"
   "templates/network/new"
-  "templates/network/edit"
   "templates/network/_form"
 ], ($, _, Parse, Network, Alert, i18nCommon, i18nProperty) ->
 

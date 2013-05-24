@@ -1,5 +1,3 @@
-define(function(){
-
 this["JST"] = this["JST"] || {};
 
 this["JST"]["src/js/templates/photo/pending.jst"] = function(obj) {
@@ -20,6 +18,3 @@ __p += '\n  <div class="photo template-upload span4">\n    <div class="preview r
 }
 return __p
 };
-
-  return this["JST"];
-});

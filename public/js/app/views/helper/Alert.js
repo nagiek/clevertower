@@ -3,13 +3,14 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(["jquery", "underscore", "backbone", "templates/helper/alert"], function($, _, Parse) {
-    var AlertView;
-    return AlertView = (function(_super) {
+    var AlertView, _ref;
 
+    return AlertView = (function(_super) {
       __extends(AlertView, _super);
 
       function AlertView() {
-        return AlertView.__super__.constructor.apply(this, arguments);
+        _ref = AlertView.__super__.constructor.apply(this, arguments);
+        return _ref;
       }
 
       AlertView.prototype.tagName = 'div';
@@ -46,6 +47,7 @@
 
       AlertView.prototype.render = function() {
         var alert;
+
         if (this.event !== '' && this.container.find("#alert-" + this.event).length === 0) {
           alert = this.container.append(JST['src/js/templates/helper/alert.jst'](this.vars));
           if (this.fade) {

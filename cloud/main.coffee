@@ -807,7 +807,10 @@ Parse.Cloud.afterSave "Listing", (req) ->
       activityACL = new Parse.ACL
       activityACL.setPublicReadAccess true
       activity.save
-        activityType: "new_listing"
+        activity_type: "new_listing"
+        public: true
+        rent: req.object.get "rent"
+        center: req.object.get "center"
         listing: req.object
         unit: req.object.get "unit"
         property: req.object.get "property"
@@ -896,11 +899,13 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
               activityACL.setRoleReadAccess propRole, true if propRole
 
               activity.save
-                activityType: "new_tenant"
+                activity_type: "new_tenant"
+                public: false
+                center: property.get "center"
                 lease: req.object
                 unit: req.object.get "unit"
-                property: req.object.get "property"
-                network: req.object.get "network"
+                property: property
+                network: property.get "network"
                 profile: profile
                 ACL: activityACL
 
@@ -943,11 +948,13 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
               activityACL.setRoleReadAccess propRole, true if propRole
 
               activity.save
-                activityType: "new_tenant"
+                activity_type: "new_tenant"
+                public: false
+                center: property.get "center"
                 lease: req.object
                 unit: req.object.get "unit"
-                property: req.object.get "property"
-                network: req.object.get "network"
+                property: property
+                network: property.get "network"
                 profile: profile
                 ACL: activityACL
 
@@ -1193,35 +1200,105 @@ Parse.Cloud.beforeSave "Search", (req, res) ->
     ACL: new Parse.ACL() # Set to private
   res.success()
 
-# Search validation
+# Post validation
 Parse.Cloud.beforeSave "Post", (req, res) ->
-  req.object.set "user", req.user
-  res.success()
+
+  return res.success() unless req.object.existed()
+
+  (new Parse.Query "Profile").equalTo("user", req.user).first()
+  .then (profile) ->
+
+    req.object.set "profile", profile
+
+    isPublic = if req.object.get "post_type" is "building" then false else true
+
+    # Create activity
+    postACL = new Parse.ACL
+    postACL.setReadAccess req.user, true
+    postACL.setWriteAccess req.user, true
+
+    if req.object.get("property")
+      # Query for the property
+      (new Parse.Query "Property").include("network").get req.object.get("property").id,
+      success: (property) ->
+        network = property.get "network"
+        req.object.set "center", property.get("center")
+
+        if isPublic
+          postACL.setPublicReadAccess true
+        else
+          tntRole = property.get("role")
+          mgrRole = network.get("role")
+          postACL.setRoleReadAccess tntRole, true if tntRole
+          postACL.setRoleReadAccess mgrRole, true if tntRole
+        req.object.set "ACL", postACL
+        res.success(req.object)
+      error: -> res.error "bad_query"
+
+    else 
+      if isPublic
+        postACL.setPublicReadAccess true
+        req.object.set "ACL", postACL
+      res.success()
+  , -> res.error "bad_query"
 
 # Post afterSave
 Parse.Cloud.afterSave "Post", (req, res) ->
   
   unless req.object.existed()
 
-    (new Parse.Query "Property").include('role').include('network.role').get req.object.get("property").id,
-    success: (property) ->
+    # Query for the profile and include the user to add to roles
+    (new Parse.Query "Profile").equalTo("user", req.user).first()
+    .then (profile) ->
+          
+      if req.object.get("property")
 
-      tntRole = property.get "role"
-      network = property.get "network"
-      mgrRole = network.get "role"
+        (new Parse.Query "Property").include('role').include('network.role').get req.object.get("property").id,
+        success: (property) ->
 
-      # Create activity
-      activity = new Parse.Object "Activity"
-      activityACL = new Parse.ACL
-      activityACL.setRoleReadAccess tntRole, true
-      activityACL.setRoleReadAccess mgrRole, true
-      activityACL.setWriteAccess req.user, true
+            tntRole = property.get "role"
+            network = property.get "network"
+            mgrRole = network.get "role"
 
-      activity.save
-        post: req.object
-        ACL: activityACL
+            # Create activity
+            activity = new Parse.Object "Activity"
+            activityACL = new Parse.ACL
+            activityACL.setRoleReadAccess tntRole, true if tntRole
+            activityACL.setRoleReadAccess mgrRole, true if mgrRole
+            activityACL.setReadAccess req.user, true
+            activityACL.setPublicReadAccess true if req.object.get "public"
 
-    error: -> req.error "bad_query"
+            activity.save
+              activity_type: "new_post"
+              post_type: req.object.get "post_type"
+              title: req.object.get "title"
+              body: req.object.get "body"
+              public: req.object.get "public"
+              center: property.get "center"
+              property: property
+              network: property.get "network"
+              profile: profile
+              lease: req.user.get "lease" 
+              unit: req.user.get "unit"
+              post: req.object
+              ACL: activityACL
+
+      else
+        # Create activity
+        activity = new Parse.Object "Activity"
+        activityACL = new Parse.ACL
+        activityACL.setPublicReadAccess true
+
+        activity.save
+          activity_type: "new_post"
+          post_type: req.object.get "post_type"
+          title: req.object.get "title"
+          body: req.object.get "body"
+          public: true
+          center: req.object.get "center"
+          profile: profile
+          post: req.object
+          ACL: activityACL
 
 # # Task validation
 # Parse.Cloud.beforeSave "Task", (req, res) ->

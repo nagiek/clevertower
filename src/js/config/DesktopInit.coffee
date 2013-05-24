@@ -112,7 +112,66 @@ define "gmaps", ["async!//maps.googleapis.com/maps/api/js?v=3.11&libraries=place
 # This will bug out on "www" subdomain.
 onNetwork = window.location.host.split(".").length > 2
 router = if onNetwork then "routers/Network" else "routers/Desktop"
-require ["jquery", "underscore", "backbone", "facebook", "models/Profile", "collections/ListingFeaturedList", "collections/ActivityList", router, "underscore.string", "json2", "bootstrap", "serializeObject", "typeahead", "masonry"], ($, _, Parse, FB, Profile, FeaturedListingList, ActivityList, AppRouter, _String) ->
+require [
+  "jquery"
+  "underscore"
+  "backbone"
+  "facebook"
+  "models/Profile"
+  "collections/ListingFeaturedList"
+  "collections/ActivityList"
+  router,
+  "underscore.string"
+  "json2"
+  "bootstrap"
+  "serializeObject"
+  "typeahead"
+  "masonry"
+], ($, _, Parse, FB, Profile, FeaturedListingList, ActivityList, AppRouter, _String) ->
+
+  Parse.onNetwork = onNetwork
+
+  # # Regular expression used to split event strings.
+  eventSplitter = /\s+/
+
+  # Implement fancy features of the Events API such as multiple event
+  # names `"change blur"` and jQuery-style event maps `{change: action}`
+  # in terms of the existing API.
+  eventsApi = (obj, action, name, rest) ->
+    return true  unless name
+    
+    # Handle event maps.
+    if typeof name is "object"
+      for key of name
+        obj[action].apply obj, [key, name[key]].concat(rest)
+      return false
+    
+    # Handle space separated event names.
+    if eventSplitter.test(name)
+      names = name.split(eventSplitter)
+      i = 0
+      l = names.length
+
+      while i < l
+        obj[action].apply obj, [names[i]].concat(rest)
+        i++
+      return false
+    true
+
+
+  # Add missing Parse Events
+  Parse.Events.once = (name, callback, context) ->
+    return this  if not eventsApi(this, "once", name, [callback, context]) or not callback
+    self = this
+    once = _.once(->
+      self.off name, once
+      callback.apply this, arguments
+    )
+    once._callback = callback
+    @on name, once, context
+
+  Parse.View::once = Parse.Events.once
+  Parse.Collection::once = Parse.Events.once
 
   # Add Listen functionality.
 
@@ -154,10 +213,6 @@ require ["jquery", "underscore", "backbone", "facebook", "models/Profile", "coll
     @stopListening()
     @
 
-
-
-
-
   Parse.initialize window.APPID, window.JSKEY
   Parse.App = {}
 
@@ -176,8 +231,6 @@ require ["jquery", "underscore", "backbone", "facebook", "models/Profile", "coll
   $.ajaxSetup beforeSend: (jqXhr, settings) ->
     jqXhr.setRequestHeader "X-Parse-Application-Id", window.APPID
     jqXhr.setRequestHeader "X-Parse-REST-API-Key", window.RESTAPIKEY
-
-  Parse.onNetwork = onNetwork
 
   # init the FB JS SDK
   Parse.FacebookUtils.init
@@ -198,9 +251,6 @@ require ["jquery", "underscore", "backbone", "facebook", "models/Profile", "coll
       true
 
   Parse.Collection::findWhere = (attrs) -> @where attrs, true
-
-
-
 
   # Extend Parse User
   Parse.User::defaults = 
@@ -236,9 +286,6 @@ require ["jquery", "underscore", "backbone", "facebook", "models/Profile", "coll
       property = user.get "property"
 
       if network
-        # Activity list for *network*
-        @activity = new ActivityList [], network: network
-        @activity.fetch()
 
         # Create & fill our collections
         # Can't use a Promise here, as fetch does not return a promise.
@@ -251,13 +298,6 @@ require ["jquery", "underscore", "backbone", "facebook", "models/Profile", "coll
         
         # Set the network and the role on the user.
         @set "network", network
-      else if property
-        # Activity list for *property*
-        @activity = new ActivityList [], property: property
-        @activity.fetch()
-
-
-
 
   # Set up Dispatcher for global events
   Parse.Dispatcher = {}

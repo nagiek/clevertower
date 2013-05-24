@@ -1,5 +1,3 @@
-define(function(){
-
 this["JST"] = this["JST"] || {};
 
 this["JST"]["src/js/templates/lease/show.jst"] = function(obj) {
@@ -112,6 +110,3 @@ __p += '\n  </div>\n</div>';
 }
 return __p
 };
-
-  return this["JST"];
-});

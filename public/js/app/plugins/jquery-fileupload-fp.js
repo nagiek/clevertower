@@ -1,15 +1,12 @@
 (function() {
-
   (function(factory) {
-    "use strict";
-    if (typeof define === "function" && define.amd) {
+    "use strict";    if (typeof define === "function" && define.amd) {
       return define(["jquery", "load-image", "canvas-to-blob", "./jquery.fileupload"], factory);
     } else {
       return factory(window.jQuery, window.loadImage);
     }
   })(function($, loadImage) {
-    "use strict";
-    return $.widget("blueimp.fileupload", $.blueimp.fileupload, {
+    "use strict";    return $.widget("blueimp.fileupload", $.blueimp.fileupload, {
       options: {
         process: [],
         add: function(e, data) {
@@ -21,6 +18,7 @@
       processActions: {
         load: function(data, options) {
           var dfd, file, that;
+
           that = this;
           file = data.files[data.index];
           dfd = $.Deferred();
@@ -39,6 +37,7 @@
         },
         resize: function(data, options) {
           var canvas, img;
+
           img = data.img;
           canvas = void 0;
           options = $.extend({
@@ -54,6 +53,7 @@
         },
         save: function(data, options) {
           var callback, dfd, file, name, that;
+
           if (!data.canvas) {
             return data;
           }
@@ -84,6 +84,7 @@
       },
       _processFile: function(files, index, options) {
         var chain, dfd, that;
+
         that = this;
         dfd = $.Deferred().resolveWith(that, [
           {
@@ -111,12 +112,14 @@
       },
       process: function(data) {
         var options, that;
+
         that = this;
         options = $.extend({}, this.options, data);
         if (options.process && options.process.length && this._isXHRUpload(options)) {
           $.each(data.files, function(index, file) {
             return that._processingQueue = that._processingQueue.pipe(function() {
               var dfd;
+
               dfd = $.Deferred();
               that._processFile(data.files, index, options).always(function() {
                 return dfd.resolveWith(that);

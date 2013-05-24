@@ -13,7 +13,7 @@ define [
   "underscore.inflection"
 ], (_, Parse, UnitList, LeaseList, InquiryList, TenantList, ApplicantList, ListingList, PhotoList, Unit, Lease, Listing, inflection) ->
 
-  Property = Parse.Object.extend "Property"
+  Property = Parse.Object.extend "Property",
   # class Property extends Parse.Object
     
     className: "Property"
@@ -85,8 +85,12 @@ define [
       init                : false
       public              : false
 
-    GPoint : ->
-      new google.maps.LatLng @get("center")._latitude, @get("center")._longitude
+
+    # Index of model in its collection.
+    pos : -> @collection.indexOf(@)
+
+    # Helper function
+    GPoint : -> new google.maps.LatLng @get("center")._latitude, @get("center")._longitude
 
     # Backbone default, as Parse function does not exist.
     url: -> "/#{@collection.url}/#{@id}"

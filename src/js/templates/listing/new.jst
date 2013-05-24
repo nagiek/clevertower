@@ -1,6 +1,6 @@
 <h2><%= i18nListing.headers.add_listing %></h2>
 <form class="listing-form" enctype="multipart/form-data" method="post">
-  <%= JST["src/js/templates/listing/_form.jst"]({title_placeholder: title_placeholder, isNew: true, listing: listing, dates: dates, unit: unit, moment: moment, i18nCommon: i18nCommon, i18nUnit: i18nUnit, i18nListing: i18nListing}) %>
+  <%= JST["src/js/templates/listing/form.jst"]({title_placeholder: title_placeholder, isNew: true, listing: listing, dates: dates, unit: unit, moment: moment, i18nCommon: i18nCommon, i18nUnit: i18nUnit, i18nListing: i18nListing}) %>
   
   <div class="form-actions">
     <button class="save btn btn-primary"><%= i18nCommon.actions.save %></button>

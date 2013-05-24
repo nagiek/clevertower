@@ -4,18 +4,16 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(["jquery", "underscore", "backbone", "models/Property", "models/Photo", "collections/PhotoList", "views/photo/Show", "i18n!nls/property", "i18n!nls/common", "templates/property/sub/photos", 'jqueryuiwidget', 'jquery.fileupload', 'jquery.fileupload-fp', 'jquery.fileupload-ui'], function($, _, Parse, Property, Photo, PhotoList, PhotoView, i18nProperty, i18nCommon) {
-    var PropertyPhotosView;
-    return PropertyPhotosView = (function(_super) {
+    var PropertyPhotosView, _ref;
 
+    return PropertyPhotosView = (function(_super) {
       __extends(PropertyPhotosView, _super);
 
       function PropertyPhotosView() {
         this.addAll = __bind(this.addAll, this);
-
         this.addOne = __bind(this.addOne, this);
-
-        this.clear = __bind(this.clear, this);
-        return PropertyPhotosView.__super__.constructor.apply(this, arguments);
+        this.clear = __bind(this.clear, this);        _ref = PropertyPhotosView.__super__.constructor.apply(this, arguments);
+        return _ref;
       }
 
       PropertyPhotosView.prototype.el = ".content";
@@ -33,6 +31,7 @@
 
       PropertyPhotosView.prototype.render = function() {
         var _this;
+
         _this = this;
         this.$el.html(JST["src/js/templates/property/sub/photos.jst"](_.merge({
           property: this.model,
@@ -69,6 +68,7 @@
           },
           done: function(e, data) {
             var file, that;
+
             that = $(this).data("blueimp-fileupload") || $(this).data("fileupload");
             that._transition(data.context);
             file = data.result;
@@ -81,6 +81,7 @@
             $('.empty').remove();
             return data.context.each(function(index) {
               var node;
+
               node = $(this);
               return that._transition(node).done(function() {
                 return node.remove();
@@ -100,6 +101,7 @@
 
       PropertyPhotosView.prototype.addOne = function(photo) {
         var view;
+
         view = new PhotoView({
           model: photo
         });

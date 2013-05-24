@@ -1,7 +1,7 @@
 (function() {
-
   define(['underscore', 'backbone', "collections/UnitList", "collections/LeaseList", "collections/InquiryList", "collections/TenantList", "collections/ApplicantList", "collections/ListingList", "collections/PhotoList", "models/Unit", "models/Lease", "underscore.inflection"], function(_, Parse, UnitList, LeaseList, InquiryList, TenantList, ApplicantList, ListingList, PhotoList, Unit, Lease, Listing, inflection) {
     var Property;
+
     return Property = Parse.Object.extend("Property", {
       className: "Property",
       initialize: function() {
@@ -56,6 +56,9 @@
         init: false,
         "public": false
       },
+      pos: function() {
+        return this.collection.indexOf(this);
+      },
       GPoint: function() {
         return new google.maps.LatLng(this.get("center")._latitude, this.get("center")._longitude);
       },
@@ -73,14 +76,16 @@
       },
       cover: function(format) {
         var img;
+
         img = this.get("image_" + format);
-        if (img === '' || !(img != null)) {
+        if (img === '' || (img == null)) {
           img = "/img/fallback/property-" + format + ".png";
         }
         return img;
       },
       prep: function(collectionName, options) {
         var basedOnNetwork, network, user;
+
         if (this[collectionName]) {
           return this[collectionName];
         }

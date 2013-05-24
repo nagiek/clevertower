@@ -14,10 +14,9 @@ define [
       bathrooms       : 0
       bedrooms        : 0
       rent            : 0
-      description     : ""
-      square_feet     : ""
+      square_feet     : 0
       title           : ""
-      appliances      : ""
+      description     : ""
 
       # References
       # Will conflict with Parse.com schema.

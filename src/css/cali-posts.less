@@ -1,0 +1,27 @@
+#post-input-caret {
+  .transition(~"left ease .15s");
+  &:before { left: 20px; }
+  &:after  { left: 18px; }
+  &.phase-0 { left: 0; }
+  &.phase-1 { left: 40px; }
+  &.phase-2 { left: 80px; }
+  &.phase-3 { left: 120px; }
+}
+
+@media (max-width: 480px) {
+  #post-input-caret {
+    &.phase-0 { left: 0; }
+    &.phase-1 { left: 40px; }
+    &.phase-2 { left: 80px; }
+    &.phase-3 { left: 120px; }
+  }
+}
+
+@media (min-width: 1200px) {
+  #post-input-caret {
+    &.phase-0 { left: 5px; }
+    &.phase-1 { left: 90px; }
+    &.phase-2 { left: 175px; }
+    &.phase-3 { left: 260px; }
+  }
+}

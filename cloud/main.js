@@ -1,7 +1,7 @@
 (function() {
-
   Parse.Cloud.define("AddTenants", function(req, res) {
     var Mandrill, className, emails, status, _;
+
     emails = req.params.emails;
     className = req.params.className;
     if (!emails) {
@@ -14,12 +14,14 @@
     return (new Parse.Query("Property")).include('network.role').get(req.params.propertyId, {
       success: function(property) {
         var mgrRole, network, title;
+
         network = property.get("network");
         mgrRole = network.get("role");
         title = property.get("thoroughfare");
         return (new Parse.Query(className)).include('role').get(req.params.objectId, {
           success: function(obj) {
             var joinClassACL, joinClassName, profileACL, tntRole, tntRoleUsers;
+
             tntRole = obj.get("role");
             joinClassName = className === "Lease" ? "Tenant" : "Applicant";
             joinClassACL = new Parse.ACL;
@@ -36,9 +38,11 @@
             }
             return (new Parse.Query("Profile")).include("user").containedIn("email", emails).find().then(function(profiles) {
               var newProfileSaves;
+
               newProfileSaves = new Array();
               _.each(emails, function(email) {
                 var found_profile, joinClass, newProfile, notification, notificationACL, user, vars;
+
                 found_profile = false;
                 found_profile = _.find(profiles, function(profile) {
                   if (email === profile.get("email")) {
@@ -94,6 +98,7 @@
                 return Parse.Promise.when(newProfileSaves).then(function() {
                   _.each(arguments, function(profile) {
                     var joinClass, vars;
+
                     joinClass = new Parse.Object(joinClassName);
                     vars = {
                       property: property,
@@ -164,6 +169,7 @@
 
   Parse.Cloud.define("AddManagers", function(req, res) {
     var Mandrill, emails, status, _;
+
     emails = req.params.emails;
     if (!emails) {
       return res.error("emails_missing");
@@ -175,6 +181,7 @@
     (new Parse.Query("Network")).include('role').get(req.params.networkId, {
       success: function(network) {
         var managerACL, mgrRole, mgrRoleUsers, profileACL, title;
+
         mgrRole = network.get("role");
         managerACL = new Parse.ACL;
         title = network.get("title");
@@ -188,10 +195,12 @@
         }
         return (new Parse.Query("Profile")).include("user").containedIn("email", emails).find().then(function(profiles) {
           var newManagerSaves, newProfileSaves;
+
           newProfileSaves = new Array();
           newManagerSaves = new Array();
           _.each(emails, function(email) {
             var found_profile, manager, newProfile, notification, user;
+
             found_profile = false;
             found_profile = _.find(profiles, function(profile) {
               if (email === profile.get("email")) {
@@ -238,6 +247,7 @@
             return Parse.Promise.when(newProfileSaves).then(function() {
               _.each(arguments, function(profile) {
                 var manager;
+
                 manager = new Parse.Object("Manager");
                 newManagerSaves.push(manager.save({
                   network: network,
@@ -312,6 +322,7 @@
 
   Parse.Cloud.define("CheckForUniqueProperty", function(req, res) {
     var network, networkAddressQuery, userAddressQuery;
+
     userAddressQuery = (new Parse.Query("Property")).equalTo("user", req.user).withinKilometers("center", req.params.center, 0.001).first();
     network = {
       id: req.params.networkId,
@@ -341,12 +352,14 @@
 
   Parse.Cloud.afterSave("_User", function(req, res) {
     var email;
+
     if (req.object.existed()) {
       return;
     }
     email = req.object.get("email");
     return (new Parse.Query("Profile")).equalTo('email', email).first().then(function(profile) {
       var profileACL, _;
+
       profileACL = new Parse.ACL();
       profileACL.setPublicReadAccess(true);
       profileACL.setWriteAccess(req.object, true);
@@ -362,6 +375,7 @@
         return (new Parse.Query("Manager")).include('network.role').equalTo('profile', profile).find().then(function(objs) {
           _.each(objs, function(obj) {
             var role;
+
             role = obj.get("network").get("role");
             if (role) {
               role.getUsers().add(req.obj);
@@ -371,6 +385,7 @@
           return (new Parse.Query("Tenant")).include('lease.role').equalTo('profile', profile).find().then(function(objs) {
             return _.each(objs, function(obj) {
               var role;
+
               role = obj.get("lease").get("role");
               if (role) {
                 role.getUsers().add(req.obj);
@@ -398,6 +413,7 @@
 
   Parse.Cloud.beforeSave("Network", function(req, res) {
     var name, query;
+
     name = req.object.get("name");
     if (!name) {
       return res.error('name_missing');
@@ -420,6 +436,7 @@
     }
     return query.first().then(function(obj) {
       var current, networkACL, possible, randomId, role, _i;
+
       if (obj) {
         return res.error("" + obj.id + ":name_taken");
       }
@@ -455,6 +472,7 @@
         return (new Parse.Query("_Role")).get(req.object.get("role").id, {
           success: function(role) {
             var manager, managerACL;
+
             manager = new Parse.Object("Manager");
             managerACL = new Parse.ACL;
             managerACL.setRoleReadAccess(role, true);
@@ -478,6 +496,7 @@
 
   Parse.Cloud.beforeSave("Property", function(req, res) {
     var isPublic, propertyACL, query;
+
     if (!(+req.object.get("center") !== +Parse.GeoPoint())) {
       return res.error('invalid_address');
     } else if (req.object.get("thoroughfare") === '' || req.object.get("locality") === '' || req.object.get("administrative_area_level_1") === '' || req.object.get("country") === '' || req.object.get("postal_code") === '') {
@@ -510,10 +529,12 @@
         req.object.setACL(propertyACL);
         return (new Parse.Query("Listing")).equalTo('property', req.object).find().then(function(objs) {
           var _;
+
           if (objs) {
             _ = require("underscore");
             _.each(objs, function(l) {
               var listingACL;
+
               if (l.get("public" !== isPublic)) {
                 listingACL = l.getACL();
                 listingACL.setPublicReadAccess(isPublic);
@@ -534,6 +555,7 @@
 
   Parse.Cloud.beforeSave("Unit", function(req, res) {
     var propertyId;
+
     if (!req.object.get("property")) {
       res.error('no_property');
     }
@@ -559,6 +581,7 @@
 
   Parse.Cloud.beforeSave("Inquiry", function(req, res) {
     var end_date, existed, listing, start_date;
+
     existed = req.object.existed();
     start_date = req.object.get("start_date");
     end_date = req.object.get("end_date");
@@ -581,6 +604,7 @@
     return (new Parse.Query("Listing")).include('network.role').get(listing.id, {
       success: function(obj) {
         var emails, leaseACL, name, network, notification, notificationACL, property, role;
+
         property = obj.get("property");
         network = obj.get("network");
         role = network.get("role");
@@ -637,6 +661,7 @@
 
   Parse.Cloud.beforeSave("Lease", function(req, res) {
     var end_date, existed, start_date, unit_date_query;
+
     existed = req.object.existed();
     if (!req.object.get("unit")) {
       return res.error('unit_missing');
@@ -658,9 +683,11 @@
     }
     return unit_date_query.find().then(function(objs) {
       var propertyId, _;
+
       _ = require('underscore');
       _.each(objs, function(obj) {
         var ed, sd;
+
         sd = obj.get("start_date");
         if (start_date <= sd && sd <= end_date) {
           return res.error("" + obj.id + ":overlapping_dates");
@@ -681,6 +708,7 @@
       return (new Parse.Query("Property")).include('network.role').get(propertyId, {
         success: function(property) {
           var mgrRole, network, users;
+
           network = property.get("network");
           mgrRole = network.get("role");
           if (mgrRole) {
@@ -688,6 +716,7 @@
             return users.query().get(req.user.id, {
               success: function(obj) {
                 var current, emails, leaseACL, possible, randomId, role, _i;
+
                 if (obj != null) {
                   req.object.set("confirmed", true);
                 } else {
@@ -734,6 +763,7 @@
 
   Parse.Cloud.afterSave("Lease", function(req) {
     var end_date, start_date, today;
+
     today = new Date;
     start_date = req.object.get("start_date");
     end_date = req.object.get("end_date");
@@ -758,6 +788,7 @@
 
   Parse.Cloud.beforeSave("Listing", function(req, res) {
     var end_date, start_date;
+
     if (!req.object.get("unit")) {
       return res.error('unit_missing');
     }
@@ -781,6 +812,7 @@
     return (new Parse.Query("Unit")).include('property.network.role').get(req.object.get("unit").id, {
       success: function(unit) {
         var isPublic, listingACL, mgrRole, network, property, propertyIsPublic;
+
         property = unit.get("property");
         propertyIsPublic = property.getACL().getPublicReadAccess();
         if (!req.object.existed()) {
@@ -821,11 +853,15 @@
     if (!req.object.existed() && req.object.get("public")) {
       return (new Parse.Query("Profile")).equalTo('user', req.user).first().then(function(profile) {
         var activity, activityACL;
+
         activity = new Parse.Object("Activity");
         activityACL = new Parse.ACL;
         activityACL.setPublicReadAccess(true);
         return activity.save({
-          activityType: "new_listing",
+          activity_type: "new_listing",
+          "public": true,
+          rent: req.object.get("rent"),
+          center: req.object.get("center"),
           listing: req.object,
           unit: req.object.get("unit"),
           property: req.object.get("property"),
@@ -846,6 +882,7 @@
     return (new Parse.Query("Lease")).include('role').get(req.object.get("lease").id, {
       success: function(obj) {
         var profile, propertyId, status, tntRole, user;
+
         propertyId = obj.get("property").id;
         profile = req.object.get("profile");
         user = profile.get("user");
@@ -854,6 +891,7 @@
         return (new Parse.Query("Property")).include('role').include('network.role').get(propertyId, {
           success: function(property) {
             var mgrRole, network, propRole, tenantACL, users;
+
             propRole = property.get("role");
             network = property.get("network");
             mgrRole = network.get("role");
@@ -879,6 +917,7 @@
               return users.query().get(req.user.id, {
                 success: function(obj) {
                   var activity, activityACL, newStatus, notification, notificationACL, profileACL, title;
+
                   if (obj) {
                     if (user) {
                       if (tntRole) {
@@ -901,11 +940,13 @@
                         activityACL.setRoleReadAccess(propRole, true);
                       }
                       activity.save({
-                        activityType: "new_tenant",
+                        activity_type: "new_tenant",
+                        "public": false,
+                        center: property.get("center"),
                         lease: req.object,
                         unit: req.object.get("unit"),
-                        property: req.object.get("property"),
-                        network: req.object.get("network"),
+                        property: property,
+                        network: property.get("network"),
                         profile: profile,
                         ACL: activityACL
                       });
@@ -947,11 +988,13 @@
                         activityACL.setRoleReadAccess(propRole, true);
                       }
                       activity.save({
-                        activityType: "new_tenant",
+                        activity_type: "new_tenant",
+                        "public": false,
+                        center: property.get("center"),
                         lease: req.object,
                         unit: req.object.get("unit"),
-                        property: req.object.get("property"),
-                        network: req.object.get("network"),
+                        property: property,
+                        network: property.get("network"),
                         profile: profile,
                         ACL: activityACL
                       });
@@ -1007,6 +1050,7 @@
     return (new Parse.Query("Network")).include('role').get(req.object.get("network").id, {
       success: function(network) {
         var managerACL, mgrRole, profile, status, user, users;
+
         profile = req.object.get("profile");
         user = profile.get("user");
         status = req.object.get("status");
@@ -1026,6 +1070,7 @@
           return users.query().get(req.user.id, {
             success: function(obj) {
               var newStatus, notification, notificationACL, title;
+
               if (obj) {
                 users.add(user);
                 mgrRole.save();
@@ -1066,6 +1111,7 @@
                 (new Parse.Query("_User")).get(user.id, {
                   success: function(user) {
                     var userACL;
+
                     userACL = user.getACL;
                     userACL.setRoleReadAccess(mgrRole, true);
                     return user.save({
@@ -1101,6 +1147,7 @@
 
   Parse.Cloud.afterSave("Notification", function(req) {
     var C, Mandrill, addedUrl, body, body_md5, channels, key, method, name, profile, push_text, secret, serverUrl, signature, string_to_sign, text, timestamp, version;
+
     Mandrill = require('mandrill');
     Mandrill.initialize('rE7-kYdcFOw7SxRfCfkVzQ');
     if (req.object.get("error")) {
@@ -1174,30 +1221,112 @@
   });
 
   Parse.Cloud.beforeSave("Post", function(req, res) {
-    req.object.set("user", req.user);
-    return res.success();
+    if (!req.object.existed()) {
+      return res.success();
+    }
+    return (new Parse.Query("Profile")).equalTo("user", req.user).first().then(function(profile) {
+      var isPublic, postACL;
+
+      req.object.set("profile", profile);
+      isPublic = req.object.get("post_type" === "building") ? false : true;
+      postACL = new Parse.ACL;
+      postACL.setReadAccess(req.user, true);
+      postACL.setWriteAccess(req.user, true);
+      if (req.object.get("property")) {
+        return (new Parse.Query("Property")).include("network").get(req.object.get("property").id, {
+          success: function(property) {
+            var mgrRole, network, tntRole;
+
+            network = property.get("network");
+            req.object.set("center", property.get("center"));
+            if (isPublic) {
+              postACL.setPublicReadAccess(true);
+            } else {
+              tntRole = property.get("role");
+              mgrRole = network.get("role");
+              if (tntRole) {
+                postACL.setRoleReadAccess(tntRole, true);
+              }
+              if (tntRole) {
+                postACL.setRoleReadAccess(mgrRole, true);
+              }
+            }
+            req.object.set("ACL", postACL);
+            return res.success(req.object);
+          },
+          error: function() {
+            return res.error("bad_query");
+          }
+        });
+      } else {
+        if (isPublic) {
+          postACL.setPublicReadAccess(true);
+          req.object.set("ACL", postACL);
+        }
+        return res.success();
+      }
+    }, function() {
+      return res.error("bad_query");
+    });
   });
 
   Parse.Cloud.afterSave("Post", function(req, res) {
     if (!req.object.existed()) {
-      return (new Parse.Query("Property")).include('role').include('network.role').get(req.object.get("property").id, {
-        success: function(property) {
-          var activity, activityACL, mgrRole, network, tntRole;
-          tntRole = property.get("role");
-          network = property.get("network");
-          mgrRole = network.get("role");
+      return (new Parse.Query("Profile")).equalTo("user", req.user).first().then(function(profile) {
+        var activity, activityACL;
+
+        if (req.object.get("property")) {
+          return (new Parse.Query("Property")).include('role').include('network.role').get(req.object.get("property").id, {
+            success: function(property) {
+              var activity, activityACL, mgrRole, network, tntRole;
+
+              tntRole = property.get("role");
+              network = property.get("network");
+              mgrRole = network.get("role");
+              activity = new Parse.Object("Activity");
+              activityACL = new Parse.ACL;
+              if (tntRole) {
+                activityACL.setRoleReadAccess(tntRole, true);
+              }
+              if (mgrRole) {
+                activityACL.setRoleReadAccess(mgrRole, true);
+              }
+              activityACL.setReadAccess(req.user, true);
+              if (req.object.get("public")) {
+                activityACL.setPublicReadAccess(true);
+              }
+              return activity.save({
+                activity_type: "new_post",
+                post_type: req.object.get("post_type"),
+                title: req.object.get("title"),
+                body: req.object.get("body"),
+                "public": req.object.get("public"),
+                center: property.get("center"),
+                property: property,
+                network: property.get("network"),
+                profile: profile,
+                lease: req.user.get("lease"),
+                unit: req.user.get("unit"),
+                post: req.object,
+                ACL: activityACL
+              });
+            }
+          });
+        } else {
           activity = new Parse.Object("Activity");
           activityACL = new Parse.ACL;
-          activityACL.setRoleReadAccess(tntRole, true);
-          activityACL.setRoleReadAccess(mgrRole, true);
-          activityACL.setWriteAccess(req.user, true);
+          activityACL.setPublicReadAccess(true);
           return activity.save({
+            activity_type: "new_post",
+            post_type: req.object.get("post_type"),
+            title: req.object.get("title"),
+            body: req.object.get("body"),
+            "public": true,
+            center: req.object.get("center"),
+            profile: profile,
             post: req.object,
             ACL: activityACL
           });
-        },
-        error: function() {
-          return req.error("bad_query");
         }
       });
     }

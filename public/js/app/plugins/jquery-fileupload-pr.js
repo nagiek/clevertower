@@ -1,15 +1,12 @@
 (function() {
-
   (function(factory) {
-    "use strict";
-    if (typeof define === "function" && define.amd) {
+    "use strict";    if (typeof define === "function" && define.amd) {
       return define(["jquery", "load-image", "i18n!nls/common", "./jquery.fileupload-fp"], factory);
     } else {
       return factory(window.jQuery, window.loadImage);
     }
   })(function($, loadImage, i18nCommon) {
-    "use strict";
-    return $.widget("blueimp.fileupload", $.blueimp.fileupload, {
+    "use strict";    return $.widget("blueimp.fileupload", $.blueimp.fileupload, {
       options: {
         autoUpload: false,
         maxNumberOfFiles: 9,
@@ -26,6 +23,7 @@
         dataType: "json",
         add: function(e, data) {
           var files, options, that;
+
           that = $(this).data("blueimp-fileupload") || $(this).data("fileupload");
           that._trigger("photo:add", e, data);
           options = that.options;
@@ -47,6 +45,7 @@
         },
         send: function(e, data) {
           var that;
+
           that = $(this).data("blueimp-fileupload") || $(this).data("fileupload");
           if (!data.isValidated) {
             if (!data.maxNumberOfFilesAdjusted) {
@@ -64,6 +63,7 @@
         },
         done: function(e, data) {
           var deferred, files, template, that;
+
           that = $(this).data("blueimp-fileupload") || $(this).data("fileupload");
           files = that._getFilesFromResponse(data);
           template = void 0;
@@ -71,6 +71,7 @@
           if (data.context) {
             return data.context.each(function(index) {
               var file;
+
               file = files[index] || {
                 error: "Empty file upload result"
               };
@@ -80,6 +81,7 @@
               }
               return that._transition($(this)).done(function() {
                 var node;
+
                 node = $(this);
                 template = that._renderDownload([file]).replaceAll(node);
                 that._forceReflow(template);
@@ -117,6 +119,7 @@
         },
         fail: function(e, data) {
           var deferred, template, that;
+
           that = $(this).data("blueimp-fileupload") || $(this).data("fileupload");
           template = void 0;
           deferred = void 0;
@@ -126,12 +129,14 @@
           if (data.context) {
             return data.context.each(function(index) {
               var file;
+
               if (data.errorThrown !== "abort") {
                 file = data.files[index];
                 file.error = file.error || data.errorThrown || true;
                 deferred = that._addFinishedDeferreds();
                 return that._transition($(this)).done(function() {
                   var node;
+
                   node = $(this);
                   template = that._renderDownload([file]).replaceAll(node);
                   that._forceReflow(template);
@@ -170,6 +175,7 @@
         },
         progress: function(e, data) {
           var progress;
+
           if (data.context) {
             progress = parseInt(data.loaded / data.total * 100, 10);
             return data.context.find(".progress").attr("aria-valuenow", progress).find(".bar").css("width", progress + "%");
@@ -177,6 +183,7 @@
         },
         progressall: function(e, data) {
           var $this, extendedProgressNode, globalProgressNode, progress;
+
           $this = $(this);
           progress = parseInt(data.loaded / data.total * 100, 10);
           globalProgressNode = $this.find(".fileupload-progress");
@@ -188,6 +195,7 @@
         },
         start: function(e) {
           var that;
+
           that = $(this).data("blueimp-fileupload") || $(this).data("fileupload");
           that._resetFinishedDeferreds();
           return that._transition($(this).find(".fileupload-progress").removeClass('hide')).done(function() {
@@ -196,6 +204,7 @@
         },
         stop: function(e) {
           var deferred, that;
+
           that = $(this).data("blueimp-fileupload") || $(this).data("fileupload");
           deferred = that._addFinishedDeferreds();
           $.when.apply($, that._getFinishedDeferreds()).done(function() {
@@ -211,6 +220,7 @@
         },
         destroy: function(e, data) {
           var that;
+
           that = $(this).data("blueimp-fileupload") || $(this).data("fileupload");
           if (data.url) {
             $.ajax(data);
@@ -244,6 +254,7 @@
       },
       _enableDragToDesktop: function() {
         var link, name, type, url;
+
         link = $(this);
         url = link.prop("href");
         name = link.prop("download");
@@ -293,6 +304,7 @@
       },
       _formatTime: function(seconds) {
         var date, days;
+
         date = new Date(seconds * 1000);
         days = parseInt(seconds / 86400, 10);
         days = (days ? days + "d " : "");
@@ -324,6 +336,7 @@
       },
       _validate: function(files) {
         var that, valid;
+
         that = this;
         valid = !!files.length;
         $.each(files, function(index, file) {
@@ -336,6 +349,7 @@
       },
       _renderTemplate: function(func, files) {
         var result;
+
         if (!func) {
           return $();
         }
@@ -352,6 +366,7 @@
       },
       _renderPreview: function(file, node) {
         var dfd, options, that;
+
         that = this;
         options = this.options;
         dfd = $.Deferred();
@@ -376,6 +391,7 @@
       },
       _renderPreviews: function(data) {
         var element, file, options, that;
+
         that = this;
         options = this.options;
         element = data.context;
@@ -383,6 +399,7 @@
         if (options.previewSourceFileTypes.test(file.type) && ($.type(options.previewSourceMaxFileSize) !== "number" || file.size < options.previewSourceMaxFileSize)) {
           that._processingQueue = that._processingQueue.pipe(function() {
             var dfd, ev;
+
             dfd = $.Deferred();
             ev = $.Event("previewdone", {
               target: element
@@ -404,6 +421,7 @@
       },
       _startHandler: function(e) {
         var button, data, template;
+
         e.preventDefault();
         button = $(e.currentTarget);
         template = $('#preview-profile-picture');
@@ -414,6 +432,7 @@
       },
       _cancelHandler: function(e) {
         var data, template;
+
         e.preventDefault();
         template = $(e.currentTarget).closest(".template-upload");
         data = template.data("data") || {};
@@ -426,6 +445,7 @@
       },
       _deleteHandler: function(e) {
         var button;
+
         e.preventDefault();
         button = $(e.currentTarget);
         return this._trigger("destroy", e, $.extend({
@@ -439,6 +459,7 @@
       },
       _transition: function(node) {
         var dfd;
+
         dfd = $.Deferred();
         if ($.support.transition && node.hasClass("fade")) {
           node.bind($.support.transition.end, function(e) {
@@ -455,6 +476,7 @@
       },
       _initButtonBarEventHandlers: function() {
         var fileUploadButtonBar, filesList;
+
         fileUploadButtonBar = this.element.find(".fileupload-buttonbar");
         filesList = this.options.filesContainer;
         this._on(fileUploadButtonBar.find(".start"), {
@@ -506,6 +528,7 @@
       },
       _initTemplates: function() {
         var options;
+
         options = this.options;
         options.templatesContainer = this.document[0].createElement(options.filesContainer.prop("nodeName"));
         options.uploadTemplate = JST["src/js/templates/photo/pending.jst"];
@@ -513,6 +536,7 @@
       },
       _initFilesContainer: function() {
         var options;
+
         options = this.options;
         if (options.filesContainer === undefined) {
           return options.filesContainer = this.element.find(".files");
@@ -524,6 +548,7 @@
       },
       _stringToRegExp: function(str) {
         var modifiers, parts;
+
         parts = str.split("/");
         modifiers = parts.pop();
         parts.shift();
@@ -531,6 +556,7 @@
       },
       _initRegExpOptions: function() {
         var options;
+
         options = this.options;
         if ($.type(options.acceptFileTypes) === "string") {
           options.acceptFileTypes = this._stringToRegExp(options.acceptFileTypes);
@@ -564,6 +590,7 @@
       },
       enable: function() {
         var wasDisabled;
+
         wasDisabled = false;
         if (this.options.disabled) {
           wasDisabled = true;

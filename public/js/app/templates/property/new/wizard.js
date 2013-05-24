@@ -1,5 +1,3 @@
-define(function(){
-
 this["JST"] = this["JST"] || {};
 
 this["JST"]["src/js/templates/property/new/wizard.jst"] = function(obj) {
@@ -17,6 +15,3 @@ __p += '<div class="wizard-forms">\n  <form class="address-form span8"></form>\n
 }
 return __p
 };
-
-  return this["JST"];
-});

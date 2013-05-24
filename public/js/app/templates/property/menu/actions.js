@@ -1,5 +1,3 @@
-define(function(){
-
 this["JST"] = this["JST"] || {};
 
 this["JST"]["src/js/templates/property/menu/actions.jst"] = function(obj) {
@@ -23,6 +21,3 @@ __p += '<ul class="dropdown-menu">\n  <li><a href="/properties/' +
 }
 return __p
 };
-
-  return this["JST"];
-});

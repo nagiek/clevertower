@@ -3,19 +3,17 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", "moment", "models/Property", "models/Unit", "models/Lease", "models/Tenant", "views/helper/Alert", "i18n!nls/common", "i18n!nls/unit", "i18n!nls/lease", "templates/lease/new", "templates/lease/new-modal", "templates/lease/_form", "templates/helper/field/unit", "templates/helper/field/property", "templates/helper/field/tenant", "datepicker"], function($, _, Parse, moment, Property, Unit, Lease, Tenant, Alert, i18nCommon, i18nUnit, i18nLease) {
-    var NewLeaseView;
-    return NewLeaseView = (function(_super) {
+  define(["jquery", "underscore", "backbone", "moment", "models/Property", "models/Unit", "models/Lease", "models/Tenant", "views/helper/Alert", "i18n!nls/common", "i18n!nls/unit", "i18n!nls/lease", "templates/lease/new", "templates/lease/new-modal", "templates/lease/form", "templates/helper/field/unit", "templates/helper/field/property", "templates/helper/field/tenant", "datepicker"], function($, _, Parse, moment, Property, Unit, Lease, Tenant, Alert, i18nCommon, i18nUnit, i18nLease) {
+    var NewLeaseView, _ref;
 
+    return NewLeaseView = (function(_super) {
       __extends(NewLeaseView, _super);
 
       function NewLeaseView() {
         this.showUnitIfNew = __bind(this.showUnitIfNew, this);
-
         this.addAll = __bind(this.addAll, this);
-
-        this.addOne = __bind(this.addOne, this);
-        return NewLeaseView.__super__.constructor.apply(this, arguments);
+        this.addOne = __bind(this.addOne, this);        _ref = NewLeaseView.__super__.constructor.apply(this, arguments);
+        return _ref;
       }
 
       NewLeaseView.prototype.el = '.content';
@@ -32,6 +30,7 @@
       NewLeaseView.prototype.initialize = function(attrs) {
         var tmpl,
           _this = this;
+
         _.bindAll(this, 'addOne', 'addAll', 'save', 'setThisMonth', 'setNextMonth', 'setJulyJune');
         this.property = attrs.property;
         if (!this.model) {
@@ -47,6 +46,7 @@
         this.cancel_path = ("/properties/" + this.property.id) + (!this.model.isNew() ? "/leases/" + this.model.id : "");
         this.model.on('invalid', function(error) {
           var args, fn, msg;
+
           _this.$('.error').removeClass('error');
           _this.$('button.save').removeProp("disabled");
           msg = (function() {
@@ -80,6 +80,7 @@
         });
         this.on("save:success", function(model) {
           var network, user;
+
           new Alert({
             event: 'model-save',
             fade: true,
@@ -125,6 +126,7 @@
 
       NewLeaseView.prototype.addOne = function(u) {
         var HTML;
+
         HTML = ("<option value='" + u.id + "'") + (this.model.get("unit") && this.model.get("unit").id === u.id ? "selected='selected'" : "") + (">" + (u.get('title')) + "</option>");
         return this.$unitSelect.append(HTML);
       };
@@ -139,6 +141,7 @@
       NewLeaseView.prototype.save = function(e) {
         var attrs, data, unit, userValid,
           _this = this;
+
         if (e) {
           e.preventDefault();
         }
@@ -229,6 +232,7 @@
 
       NewLeaseView.prototype.render = function() {
         var vars;
+
         vars = {
           lease: _.defaults(this.model.attributes, Lease.prototype.defaults),
           unit: this.model.get("unit") ? this.model.get("unit") : false,
@@ -245,7 +249,7 @@
         this.$unitSelect = this.$('.unit-select');
         this.$startDate = this.$('.start-date');
         this.$endDate = this.$('.end-date');
-        $('.datepicker').datepicker();
+        this.$('.datepicker').datepicker();
         if (this.units.length === 0) {
           this.units.fetch();
         } else {

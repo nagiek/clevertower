@@ -3,13 +3,14 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(["jquery", "underscore", "backbone", 'models/Property', "i18n!nls/property", "i18n!nls/common", 'templates/property/_form'], function($, _, Parse, Property, i18nProperty, i18nCommon) {
-    var NewPropertyView;
-    return NewPropertyView = (function(_super) {
+    var NewPropertyView, _ref;
 
+    return NewPropertyView = (function(_super) {
       __extends(NewPropertyView, _super);
 
       function NewPropertyView() {
-        return NewPropertyView.__super__.constructor.apply(this, arguments);
+        _ref = NewPropertyView.__super__.constructor.apply(this, arguments);
+        return _ref;
       }
 
       NewPropertyView.prototype.tagName = "form";
@@ -18,6 +19,7 @@
 
       NewPropertyView.prototype.initialize = function(attrs) {
         var _this = this;
+
         this.wizard = attrs.wizard;
         this.wizard.on("wizard:cancel", function() {
           _this.undelegateEvents();
@@ -35,6 +37,7 @@
 
       NewPropertyView.prototype.render = function() {
         var networkVars, vars;
+
         networkVars = {
           email: Parse.User.current().get("network").get("email"),
           phone: Parse.User.current().get("network").get("phone"),

@@ -4,20 +4,17 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(["jquery", "underscore", "backbone", 'collections/LeaseList', 'models/Property', 'models/Lease', 'views/helper/Alert', 'views/lease/Summary', "i18n!nls/common", "i18n!nls/property", "i18n!nls/unit", "i18n!nls/lease", 'templates/property/sub/leases'], function($, _, Parse, LeaseList, Property, Lease, Alert, LeaseView, i18nCommon, i18nProperty, i18nUnit, i18nLease) {
-    var PropertyLeasesView;
-    return PropertyLeasesView = (function(_super) {
+    var PropertyLeasesView, _ref;
 
+    return PropertyLeasesView = (function(_super) {
       __extends(PropertyLeasesView, _super);
 
       function PropertyLeasesView() {
         this.addOne = __bind(this.addOne, this);
-
         this.addAll = __bind(this.addAll, this);
-
         this.clear = __bind(this.clear, this);
-
-        this.render = __bind(this.render, this);
-        return PropertyLeasesView.__super__.constructor.apply(this, arguments);
+        this.render = __bind(this.render, this);        _ref = PropertyLeasesView.__super__.constructor.apply(this, arguments);
+        return _ref;
       }
 
       PropertyLeasesView.prototype.el = ".content";
@@ -31,6 +28,7 @@
 
       PropertyLeasesView.prototype.render = function() {
         var vars;
+
         vars = _.merge({
           i18nProperty: i18nProperty,
           i18nCommon: i18nCommon,
@@ -66,6 +64,7 @@
 
       PropertyLeasesView.prototype.addOne = function(lease) {
         var view;
+
         this.$('p.empty').hide();
         view = new LeaseView({
           model: lease

@@ -1,5 +1,3 @@
-define(function(){
-
 this["JST"] = this["JST"] || {};
 
 this["JST"]["src/js/templates/file/download.jst"] = function(obj) {
@@ -36,6 +34,3 @@ __p += '\n    <td class="delete">\n      <button class="btn btn-danger">\n      
 }
 return __p
 };
-
-  return this["JST"];
-});

@@ -1,5 +1,3 @@
-define(function(){
-
 this["JST"] = this["JST"] || {};
 
 this["JST"]["src/js/templates/helper/field/unit.jst"] = function(obj) {
@@ -19,6 +17,3 @@ __p += '<input type="hidden" name="unit[__type]" value="Pointer">\n<input type="
 }
 return __p
 };
-
-  return this["JST"];
-});

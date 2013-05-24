@@ -1,5 +1,3 @@
-define(function(){
-
 this["JST"] = this["JST"] || {};
 
 this["JST"]["src/js/templates/property/sub/photos.jst"] = function(obj) {
@@ -19,6 +17,3 @@ __p += '<div id="photos">\n  <form id="fileupload" method="POST">\n    <div clas
 }
 return __p
 };
-
-  return this["JST"];
-});

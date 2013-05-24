@@ -32,20 +32,12 @@ define [
           @userView.render()
           @networkView.render()
 
-          network = user.get("network")
-          network.prep("properties").fetch()
-          network.prep("managers").fetch()
-          network.prep("tenants").fetch()
-          network.prep("listings").fetch()
-          network.prep("applicants").fetch()
-          network.prep("inquiries").fetch()
-          
           # Remove the Signup or Login callback
           Parse.history.off "route", @signupOrLogin
           
           # Go to the dashboard.
-          @index()
           Parse.history.navigate "/"
+          @index()
       
       # Clean up after views
       Parse.history.on "route", (route) =>
@@ -81,17 +73,16 @@ define [
           
       # If user is not a part of the network, return access denied.      
       if Parse.User.current()
-        @network = Parse.User.current().get("network")
-        if @network
-          role = @network.get("role")
+        if Parse.User.current().get("network")
+          role = Parse.User.current().get("network").get("role")
           role.getUsers().query().get Parse.User.current().id,
             success: (user) -> @accessDenied() unless user
         else
-          Parse.history.on "route", (route) => @accessDenied
+          Parse.history.on "route", @accessDenied
           @accessDenied()
 
       else
-        Parse.history.on "route", (route) => @signupOrLogin
+        Parse.history.on "route", @signupOrLogin
         @signupOrLogin()
 
 
@@ -127,7 +118,7 @@ define [
       view = @view
       require ["views/network/Manage"], (NetworkView) => 
         if !view or view !instanceof NetworkView
-          @view = new NetworkView(model: @network, path: "properties/new/wizard", params: {})
+          @view = new NetworkView(model: Parse.User.current().get("network"), path: "properties/new/wizard", params: {})
         else
           @view.changeSubView path: "properties/new/wizard", params: {}
     
@@ -137,7 +128,7 @@ define [
         vars = @deparamAction splat
         if !view or view !instanceof PropertyView
           $('#main').html '<div id="property"></div>'
-          if model = @network.properties.get id
+          if model = Parse.User.current().get("network").properties.get id
             vars.model = model
             @view = new PropertyView(vars)
           else
@@ -146,7 +137,7 @@ define [
               # Network properties are being fetched. Might return before query finishes. 
               # Can't add to collection without introducing possibility of duplicate add.
               # @network.properties.add model
-              model.collection = @network.properties
+              model.collection = Parse.User.current().get("network").properties
               vars.model = model
               @view = new PropertyView(vars)
             error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
@@ -161,7 +152,7 @@ define [
       require ["views/network/Manage"], (NetworkView) => 
         vars = @deparamAction splat
         if !view or view !instanceof NetworkView
-          vars.model = @network
+          vars.model = Parse.User.current().get("network")
           @view = new NetworkView(vars)
         else
           view.changeSubView(vars.path, vars.params)

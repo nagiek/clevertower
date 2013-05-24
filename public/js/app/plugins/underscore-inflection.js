@@ -1,5 +1,4 @@
 (function() {
-
   define({
     singularize: {
       listings: "listing",

@@ -1,5 +1,4 @@
 (function() {
-
   define({
     manager_menu: {
       properties: "Propriétés",

@@ -1,10 +1,11 @@
 (function() {
-
   define(["jquery", "underscore", "backbone", "gmaps"], function($, _, Parse) {
     var Map;
+
     return Map = Parse.Object.extend("Map", {
       initialize: function(attrs) {
         var opts;
+
         this.geocoder = new google.maps.Geocoder();
         this.marker = attrs.marker;
         opts = {
@@ -26,6 +27,7 @@
       },
       geocode: function(inputHash) {
         var _this = this;
+
         return this.geocoder.geocode(inputHash, function(results, status) {
           if (status === google.maps.GeocoderStatus.OK) {
             _this.marker.set(_this.parse(results[0]));
@@ -40,6 +42,7 @@
       },
       parse: function(res) {
         var components, route, street_number;
+
         components = {
           'formatted_address': res.formatted_address,
           'center': new Parse.GeoPoint(res.geometry.location.lat(), res.geometry.location.lng()),
@@ -49,6 +52,7 @@
         route = '';
         _.each(res.address_components, function(c) {
           var neighborhood;
+
           switch (c.types[0]) {
             case 'street_number':
               street_number = c.long_name;
@@ -81,6 +85,7 @@
       },
       geolocate: function(e) {
         var _this = this;
+
         if (navigator.geolocation) {
           return navigator.geolocation.getCurrentPosition(function(position) {
             _this.marker.set("center", new Parse.GeoPoint(position.coords));

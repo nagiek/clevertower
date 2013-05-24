@@ -1,6 +1,6 @@
 <h2><%= i18nLease.headers.edit_lease %></h2>
 <form class="lease-form" enctype="multipart/form-data" method="post">
-  <%= JST["src/js/templates/lease/_form.jst"]({isNew: false, lease: lease, dates: dates, moment: moment, i18nCommon: i18nCommon, i18nUnit: i18nUnit, i18nLease: i18nLease}) %>
+  <%= JST["src/js/templates/lease/form.jst"]({isNew: false, lease: lease, dates: dates, moment: moment, i18nCommon: i18nCommon, i18nUnit: i18nUnit, i18nLease: i18nLease}) %>
   
   <div class="form-actions">
     <button class="save btn btn-primary"><%= i18nCommon.actions.save %></button>

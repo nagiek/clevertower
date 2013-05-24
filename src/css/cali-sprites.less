@@ -24,21 +24,55 @@
   background-image: url("@{iconBigSpritePath}");
 }
 
+.icon-post {
+  display: block;
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  margin: 0 auto;
+  background-image: url("@{iconPostSpritePath}");
+}
 
-.icon-riflescope      { background-position: 0      -144px; }
-.icon-google-maps     { background-position: -24px  -144px; }
-.icon-eye             { background-position: -48px  -144px; }
-.icon-ellipsis        { background-position: -72px  -144px; }
-.icon-plus            { background-position: -96px  -144px; } // Duplicate... oops...
-.icon-lightning       { background-position: -120px -144px; }
+
+// These overlap with existing icons
+.icon-listing         { background-position: -72px  -144px; } // icon-certificate
+.icon-photo           { background-position: -456px -48px;  } // icon-picture
+.icon-status          { background-position: -240px -120px; } // icon-comment
+.icon-tip             { background-position: -96px  -144px; } // icon-thumbs-up
+
+// Originals
+.icon-question        { background-position: 0      -168px; }
+.icon-riflescope      { background-position: -24px  -168px; }
+.icon-lightning       { background-position: -48px  -168px; }
+.icon-plus            { background-position: -72px  -168px; }
+.icon-ellipsis        { background-position: -96px  -168px; }
+.icon-building        { background-position: -120px -168px; }
 
 .icon-big {
-  &.icon-people             { background-position: 0      0; }
-  &.icon-search             { background-position: -272px -74px; }
-  &.icon-keys               { background-position: -46px  0; }  
-  &.icon-chat               { background-position: -142px 0; }
-  &.icon-clevertower        { background-position: -225px 0; }
+  &.icon-status       { background-position: -192px -930px }
+  &.icon-people       { background-position: 0      0; }
+  &.icon-search       { background-position: -272px -74px; }
+  &.icon-keys         { background-position: -46px  0; }  
+  &.icon-chat         { background-position: -142px 0; }
+  &.icon-building     { background-position: -225px 0; }
 }
+
+.icon-post {
+  &.icon-status       { background-position: 0      0; }
+  &.icon-question     { background-position: -40px  0; }
+  &.icon-tip          { background-position: -80px  0; }
+  &.icon-building     { background-position: -120px 0; }
+  &:hover,
+  &:active,
+  &.active {
+    &.icon-status     { background-position: 0      -40px; }
+    &.icon-question   { background-position: -40px  -40px; }
+    &.icon-tip        { background-position: -80px  -40px; }
+    &.icon-building   { background-position: -120px -40px; }
+  }
+}
+
+
 
 /*.icon-big {
   &.icon-gears              { background-position: -138px -87px;  }

@@ -4,16 +4,15 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(["jquery", "underscore", "backbone", "pusher", 'collections/PropertyList', 'models/Profile', 'views/notification/Index', "i18n!nls/devise", "i18n!nls/user", "templates/user/logged_in_menu"], function($, _, Parse, Pusher, PropertyList, Profile, NotificationsView, i18nDevise, i18nUser) {
-    var LoggedInView;
-    return LoggedInView = (function(_super) {
+    var LoggedInView, _ref;
 
+    return LoggedInView = (function(_super) {
       __extends(LoggedInView, _super);
 
       function LoggedInView() {
         this.subscribeProperty = __bind(this.subscribeProperty, this);
-
-        this.registerUser = __bind(this.registerUser, this);
-        return LoggedInView.__super__.constructor.apply(this, arguments);
+        this.registerUser = __bind(this.registerUser, this);        _ref = LoggedInView.__super__.constructor.apply(this, arguments);
+        return _ref;
       }
 
       LoggedInView.prototype.el = "#user-menu";
@@ -24,6 +23,7 @@
 
       LoggedInView.prototype.initialize = function(attrs) {
         var network;
+
         _.bindAll(this, "render", "updateNav", "logOut");
         network = Parse.User.current().get("network");
         this.pusher = new Pusher('dee5c4022be4432d7152');
@@ -58,6 +58,7 @@
 
       LoggedInView.prototype.render = function() {
         var name, vars;
+
         name = Parse.User.current().profile.name();
         vars = {
           src: Parse.User.current().profile.cover('micro'),

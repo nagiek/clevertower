@@ -4,14 +4,14 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(["jquery", "underscore", "backbone", 'models/Unit', "i18n!nls/Unit", "i18n!nls/common", 'templates/unit/new', 'templates/unit/edit', 'templates/unit/status'], function($, _, Parse, Unit, i18nUnit, i18nCommon) {
-    var UnitEditView;
-    return UnitEditView = (function(_super) {
+    var UnitEditView, _ref;
 
+    return UnitEditView = (function(_super) {
       __extends(UnitEditView, _super);
 
       function UnitEditView() {
-        this.render = __bind(this.render, this);
-        return UnitEditView.__super__.constructor.apply(this, arguments);
+        this.render = __bind(this.render, this);        _ref = UnitEditView.__super__.constructor.apply(this, arguments);
+        return _ref;
       }
 
       UnitEditView.prototype.tagName = "tr";
@@ -28,6 +28,7 @@
 
       UnitEditView.prototype.render = function() {
         var template;
+
         template = this.model.isNew() ? "src/js/templates/unit/new.jst" : "src/js/templates/unit/edit.jst";
         $(this.el).html(JST[template](_.merge(this.model.toJSON(), {
           propertyId: this.model.get("property").id,
@@ -39,6 +40,7 @@
 
       UnitEditView.prototype.update = function(e) {
         var name, value;
+
         name = e.currentTarget.name;
         value = e.currentTarget.value;
         this.model.set(name, value);
@@ -47,6 +49,7 @@
 
       UnitEditView.prototype.kill = function(e) {
         var id;
+
         e.preventDefault();
         if (confirm(i18nCommon.actions.confirm + " " + i18nCommon.warnings.no_undo)) {
           id = this.model.get("property").id;

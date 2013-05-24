@@ -4,7 +4,7 @@
     <h3 id="edit-profile-picture-modal-label"><%= i18nCommon.actions.live_at %> <em><%= title %></em></h3>
   </div>
   <div class="modal-body">
-    <%= JST["src/js/templates/lease/_form.jst"]({emails: emails, isNew: true, lease: lease, dates: dates, unit: unit, moment: moment, i18nCommon: i18nCommon, i18nUnit: i18nUnit, i18nLease: i18nLease}) %>
+    <%= JST["src/js/templates/lease/form.jst"]({emails: emails, isNew: true, lease: lease, dates: dates, unit: unit, moment: moment, i18nCommon: i18nCommon, i18nUnit: i18nUnit, i18nLease: i18nLease}) %>
   </div>
   <div class="modal-footer">
     <button id="apply" class="btn btn-primary"><%= i18nCommon.actions.apply %></button>

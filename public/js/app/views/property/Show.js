@@ -4,18 +4,16 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(["jquery", "underscore", "backbone", 'models/Property', 'models/Unit', 'models/Lease', 'models/Inquiry', "i18n!nls/property", "i18n!nls/common", "underscore.inflection", 'templates/property/show', "templates/property/menu/show", "templates/property/menu/reports", "templates/property/menu/building", "templates/property/menu/actions"], function($, _, Parse, Property, Unit, Lease, Inquiry, i18nProperty, i18nCommon, inflection) {
-    var ShowPropertyView;
-    return ShowPropertyView = (function(_super) {
+    var ShowPropertyView, _ref;
 
+    return ShowPropertyView = (function(_super) {
       __extends(ShowPropertyView, _super);
 
       function ShowPropertyView() {
         this.clear = __bind(this.clear, this);
-
         this.renderSubView = __bind(this.renderSubView, this);
-
-        this.changeSubView = __bind(this.changeSubView, this);
-        return ShowPropertyView.__super__.constructor.apply(this, arguments);
+        this.changeSubView = __bind(this.changeSubView, this);        _ref = ShowPropertyView.__super__.constructor.apply(this, arguments);
+        return _ref;
       }
 
       ShowPropertyView.prototype.el = '#property';
@@ -26,6 +24,7 @@
 
       ShowPropertyView.prototype.initialize = function(attrs) {
         var _this = this;
+
         this.$form = $("#profile-picture-upload");
         this.model.prep('units');
         this.model.prep('leases');
@@ -41,6 +40,7 @@
 
       ShowPropertyView.prototype.render = function() {
         var vars;
+
         vars = _.merge(this.model.toJSON(), {
           publicUrl: this.model.publicUrl(),
           cover: this.model.cover('profile'),
@@ -54,6 +54,7 @@
       ShowPropertyView.prototype.changeSubView = function(path, params) {
         var action, name, node, nodeType, propertyCentric, subaction, subid, submodel,
           _this = this;
+
         action = path ? path.split("/") : Array('units');
         if (action.length === 1 || action[0] === "add") {
           name = "views/property/sub/" + (action.join("/"));
@@ -98,6 +99,7 @@
 
       ShowPropertyView.prototype.renderSubView = function(name, vars) {
         var _this = this;
+
         if (this.subView) {
           this.subView.trigger("view:change");
         }
@@ -121,6 +123,7 @@
 
       ShowPropertyView.prototype.editProfilePicture = function() {
         var _this = this;
+
         _this = this;
         return require(['jquery.fileupload', 'jquery.fileupload-fp', 'jquery.fileupload-pr'], function() {
           _this.$form.fileupload({
@@ -139,6 +142,7 @@
             },
             done: function(e, data) {
               var file;
+
               file = data.result;
               _this.model.save({
                 image_thumb: file.url,

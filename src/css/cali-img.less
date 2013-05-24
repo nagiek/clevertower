@@ -37,7 +37,7 @@ img[class*="span"] {
   img {
     height:@thumbnailImgLength;
     min-width:@thumbnailImgLength;
-    max-width:@profileImgLength;
+    max-width:@profileImgLength + 28px;
   }
 }
 
@@ -63,22 +63,18 @@ img[class*="span"] {
 }
 
 .photo-span4 {
-  height:300px - 10px;
+  height:100px;
   width:300px - 10px;
   img {
-    min-height:300px - 10px - 100;
-    max-height:300px - 10px + 100;
     width:300px - 10px;
   }
 }
 
 @media (min-width: 1200px) {
   .photo-span4 {
-    height:370px - 10px;
+    height:130px;
     width:370px - 10px;
     img {
-      min-height:370px - 10px - 100;
-      max-height:370px - 10px + 100;
       width:370px - 10px;
     }
   }
@@ -87,11 +83,9 @@ img[class*="span"] {
 
 @media (max-width: 979px) and (min-width: 768px) {
   .photo-span4 {
-    height:228px - 10px;
+    height:80px;
     width:228px - 10px;
     img {
-      min-height:228px - 10px - 100;
-      max-height:228px - 10px + 100;
       width:228px - 10px;
     }
   }
@@ -102,8 +96,6 @@ img[class*="span"] {
     height:350px; // Take a guess, but must be fixed height.
     width:100%;
     img {
-      min-height:0;
-      max-height:none;
       width:auto;
     }
   }

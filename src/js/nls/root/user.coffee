@@ -48,6 +48,25 @@ define
       index:                    "Nothing's happened so far."
       other:         (name) -> "#{_.escape(name)} has no activity."
   form:                         
+    share: [
+      [ # status:
+                                "Share your thoughts."
+                                "What's on your mind?"
+      ]
+      [ # question:
+                                "Curious? Ask!"
+                                "Anything you want to know?"
+      ]
+      [ # tip:
+                                "Let people know about a good neighbourhood."
+                                "Share why you like your area."
+      ]
+      [ # building:
+                                "Tell your building something nice."
+                                "Share something with your building."
+      ]
+    ]
+
     bulk_edit:                  "Edit users"
     building:                   
       label:                    "Visibility: Building"

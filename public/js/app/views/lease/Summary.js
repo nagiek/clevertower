@@ -3,13 +3,14 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(["jquery", "underscore", "backbone", "moment", 'models/Unit', 'models/Lease', 'views/helper/Alert', "i18n!nls/lease", "i18n!nls/unit", "i18n!nls/common", 'templates/lease/summary'], function($, _, Parse, moment, Unit, Lease, Alert, i18nLease, i18nUnit, i18nCommon) {
-    var LeaseSummaryView;
-    return LeaseSummaryView = (function(_super) {
+    var LeaseSummaryView, _ref;
 
+    return LeaseSummaryView = (function(_super) {
       __extends(LeaseSummaryView, _super);
 
       function LeaseSummaryView() {
-        return LeaseSummaryView.__super__.constructor.apply(this, arguments);
+        _ref = LeaseSummaryView.__super__.constructor.apply(this, arguments);
+        return _ref;
       }
 
       LeaseSummaryView.prototype.tagName = "tr";
@@ -24,6 +25,7 @@
 
       LeaseSummaryView.prototype.initialize = function(attrs) {
         var _this = this;
+
         this.onUnit = attrs.onUnit ? true : false;
         this.link_text = this.onUnit ? i18nCommon.nouns.link : i18nCommon.classes.lease;
         this.model.on("save:success", function() {
@@ -36,6 +38,7 @@
         });
         return this.model.on("invalid", function(unit, error) {
           var msg;
+
           _this.$el.addClass('error');
           switch (error.message) {
             case 'title_missing':
@@ -53,6 +56,7 @@
 
       LeaseSummaryView.prototype.render = function() {
         var modelVars, vars;
+
         modelVars = this.model.toJSON();
         modelVars.start_date = moment(this.model.get("start_date")).format("LL");
         modelVars.end_date = moment(this.model.get("end_date")).format("LL");
@@ -76,6 +80,7 @@
 
       LeaseSummaryView.prototype.update = function(e) {
         var name, value;
+
         name = e.currentTarget.name;
         value = e.currentTarget.value;
         this.model.set(name, value);
@@ -84,6 +89,7 @@
 
       LeaseSummaryView.prototype.updateS = function(e) {
         var name, value;
+
         name = e.currentTarget.name;
         value = Number(e.currentTarget.value);
         this.model.set(name, value);
@@ -92,6 +98,7 @@
 
       LeaseSummaryView.prototype.kill = function(e) {
         var id;
+
         e.preventDefault();
         if (confirm(i18nCommon.actions.confirm + " " + i18nCommon.warnings.no_undo)) {
           id = this.model.get("property").id;

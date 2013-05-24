@@ -9,7 +9,7 @@ define [
   'collections/ManagerList'
 ], (_, Parse, PropertyList, ListingList, InquiryList, TenantList, ApplicantList, ManagerList) ->
 
-  Network = Parse.Object.extend "Network"
+  Network = Parse.Object.extend "Network",
   # class Property extends Parse.Object
     
     className: "Network"
@@ -43,3 +43,5 @@ define [
         when "inquiries"    then new InquiryList [], network: @
 
       @[collectionName]
+
+    privateUrl: -> "#{location.protocol}//#{@get("name")}.#{location.host}"

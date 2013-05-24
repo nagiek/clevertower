@@ -1,18 +1,20 @@
 (function() {
-
   define(["jquery", "underscore"], function($, _) {
     return $.fn.filePicker = function() {
       var file, fileSelectHandler, previewFile, upload,
         _this = this;
+
       file = void 0;
       fileSelectHandler = function(e) {
         var files;
+
         files = e.target.files || e.dataTransfer.files;
         file = files[0];
         return previewFile();
       };
       upload = function(e) {
         var serverUrl;
+
         e.preventDefault();
         if (file == null) {
           return;
@@ -37,6 +39,7 @@
           },
           error: function(data) {
             var obj;
+
             obj = jQuery.parseJSON(data);
             return alert(obj.error);
           }
@@ -44,6 +47,7 @@
       };
       previewFile = function() {
         var fileName, previewContainer, reader;
+
         previewContainer = $(_this.prop("data-preview"));
         previewContainer.toggle();
         fileName = $("[name=fileName]");
@@ -53,6 +57,7 @@
             reader = new FileReader();
             reader.onload = function(e) {
               var image;
+
               image = $("[name=image]");
               image.attr("src", e.target.result);
               return $("[class=mobileimage1_div]").show();

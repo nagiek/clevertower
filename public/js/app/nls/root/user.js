@@ -1,5 +1,4 @@
 (function() {
-
   define({
     actions: {
       back_to_profile: "Back to profile"
@@ -66,6 +65,7 @@
       }
     },
     form: {
+      share: [["Share your thoughts.", "What's on your mind?"], ["Curious? Ask!", "Anything you want to know?"], ["Let people know about a good neighbourhood.", "Share why you like your area."], ["Tell your building something nice.", "Share something with your building."]],
       bulk_edit: "Edit users",
       building: {
         label: "Visibility: Building",

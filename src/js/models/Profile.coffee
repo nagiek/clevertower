@@ -5,7 +5,7 @@ define [
   'collections/ApplicantList'
 ], (_, Parse, ActivityList, ApplicantList) ->
 
-  Profile = Parse.Object.extend "Profile"
+  Profile = Parse.Object.extend "Profile",
     
     className: "Profile"
       

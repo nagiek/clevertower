@@ -5,67 +5,205 @@ define [
   "moment"
   'models/Activity'
   "i18n!nls/property"
+  "i18n!nls/listing"
   "i18n!nls/user"
   "i18n!nls/common"
   'templates/activity/summary'
   'gmaps'
-], ($, _, Parse, moment, Activity, i18nProperty, i18nUser, i18nCommon) ->
+], ($, _, Parse, moment, Activity, i18nProperty, i18nListing, i18nUser, i18nCommon) ->
 
   class ActivitySummaryView extends Parse.View
     
     tagName: "li"
+    className: "span4"
+
+    events:
+      "mouseover > a" : "highlightMarker"
+      "mouseout > a"  : "unHighlightMarker"
+      "click a" : "goToProperty"
 
     initialize: (attrs) ->
-      @property = attrs.property
+      
+      @linkedToProperty = if attrs.linkedToProperty then true else false
+      @marker = attrs.marker
+      @view = attrs.view
+
+      @listenTo @model, "remove", @clear
+      @listenTo @model.collection, "reset", @clear
+      @listenTo @view, "view:changeDisplay", @setDisplay
+      @listenTo @view, "model:viewDetails", @clear
+
+      @id = "activity-#{@model.id}"
       
     # Re-render the contents of the Unit item.
     render: ->
+      title = @model.get("title")
+      rent = "$" + @model.get("rent")
+      profilePic = @model.get('profile').cover("thumb")
+      name = @model.get('profile').name()
+      footer = """
+              <footer>
+                <div class="photo photo-micro stay-left">
+                  <img src="#{profilePic}" alt="#{name}" width="23" height="23">
+                </div>
+                <small class="photo-float micro-float">#{i18nCommon.fields.posted} #{moment(@model.createdAt).fromNow()}</small>   
+              </footer>
+               """
 
       vars =
-        createdAt: moment(@model.createdAt).format("LL")
+        pos: @pos()
+        linkedToProperty: @linkedToProperty
+        publicUrl: "#"
+        type: @model.get("activity_type")
         i18nCommon: i18nCommon
+        i18nListing: i18nListing
         i18nProperty: i18nProperty
         i18nUser: i18nUser
-      switch @model.get("type")
-      when "new_listing"
-        vars.content = """
-                      <div class="photo">
-                        <img src="#{@property.cover("span6")}">
-                        <div class="caption">
-                          <h4>#{@model.get('title')}</h4>
+
+      if @linkedToProperty
+        vars.propertyId = @model.get("property").id
+        vars.publicUrl = @model.get("property").publicUrl()
+
+      switch @model.get("activity_type")
+        when "new_listing"
+          cover = @model.get('property').cover("span6")
+          vars.icon = 'listing'
+          if @view.display is "small"
+            vars.content = """
+                          <div class="photo photo-thumbnail stay-left">
+                            <img class="" src="#{cover}" alt="#{i18nCommon.nouns.cover_photo}">
+                          </div>
+                          <div class="photo-float thumbnail-float caption">
+                            <strong>#{title}</strong>
+                            <div class="rent stay-right">#{rent}</div>
+                            #{footer}
+                          </div>
+              """
+          else
+            vars.content = """
+                          <div class="row">
+                            <div class="photo photo-span4">
+                              <img src="#{cover}" alt="#{i18nCommon.nouns.cover_photo}">
+                            </div>
+                          </div>
+                          <div class="caption">
+                            <strong>#{title}</strong>
+                            <div class="rent stay-right">#{rent}</div>
+                            #{footer}
+                          </div>
+                          """
+          
+        when "new_post"
+
+          vars.icon = @model.get('post_type')
+          # switch @model.get('post_type')
+          #   when 'status'
+          #   when 'question'
+          #   when 'tip'
+          #   when 'building'
+
+          vars.content = """
+                        <blockquote>
+                          #{title}
+                        </blockquote>
+                        """
+          if @model.get("body") then vars.content += @model.get("body")
+          vars.content += """
+                        
+                        #{footer}
+                        """
+
+        when "new_photo"
+          vars.icon = 'photo'
+          vars.content = """
+                        <div class="photo">
+                          <img src="#{@model.get('profile').cover("span6")}">
+                          <div class="caption">
+                            <h4>#{@model.get('profile').name()}</h4>
+                          </div>
                         </div>
-                      </div>
-                      """
-        
-      when "new_tenant"
-        vars.content = """
-                      <div class="photo">
-                        <img src="#{@model.get('profile').cover("span6")}">
-                        <div class="caption">
-                          <h4>#{@model.get('profile').name()}</h4>
+                        """
+        when "new_tenant"
+          vars.icon = 'person'
+          vars.content = """
+                        <div class="photo">
+                          <img src="#{@model.get('profile').cover("span6")}">
+                          <div class="caption">
+                            <h4>#{@model.get('profile').name()}</h4>
+                          </div>
                         </div>
-                      </div>
-                      """
-      when "new_manager"
-        vars.content = """
-                      <div class="photo">
-                        <img src="#{@model.get('profile').cover("span6")}">
-                        <div class="caption">
-                          <h4>#{@model.get('profile').name()}</h4>
+                        """
+        when "new_manager"
+          vars.icon = 'plus'
+          vars.content = """
+                        <div class="photo">
+                          <img src="#{@model.get('profile').cover("span6")}">
+                          <div class="caption">
+                            <h4>#{@model.get('profile').name()}</h4>
+                          </div>
                         </div>
-                      </div>
-                      """
-      when "new_post"
-        vars.content = """
-                      <div class="photo">
-                        <img src="#{@model.get('profile').cover("span6")}">
-                        <div class="caption">
-                          <h4>#{@model.get('profile').name()}</h4>
-                        </div>
-                      </div>
-                      """
-      when "new_photo"
+                        """
+        else
+          vars.icon = ''
+          vars.content = ""
       
       @$el.html JST["src/js/templates/activity/summary.jst"](vars)
 
+      unless @marker
+        @marker = new google.maps.Marker
+          position: @model.GPoint()
+          map: @view.map
+          ZIndex: 1
+          icon: 
+            url: "/img/icon/pins-sprite.png"
+            size: new google.maps.Size(25, 32, "px", "px")
+            origin: new google.maps.Point(0, @model.pos() * 32)
+            anchor: null
+            scaledSize: null
+
+      @highlightListener = google.maps.event.addListener @marker, "mouseover", @highlightMarker
+      @unHighlightListener = google.maps.event.addListener @marker, "mouseout", @unHighlightMarker
+      @clickListener = google.maps.event.addListener @marker, "click", @goToProperty
+
       @
+
+    # This fn needed to correctly set this attribute from within an event.
+    setDisplay: (display) => @display = display; @render()
+
+    undelegateEvents: =>
+      google.maps.event.removeListener @highlightListener
+      google.maps.event.removeListener @unHighlightListener
+      super
+
+    goToProperty: (e) =>
+      e.preventDefault()
+      require ["views/property/Public"], (PublicPropertyView) => 
+        p = @model.get("property")
+        # Could assign a place from last search, but we don't know for sure.
+        new PublicPropertyView(model: p).render()
+        Parse.history.navigate p.publicUrl()
+        @view.trigger "model:viewDetails"
+
+    highlightMarker : =>
+      @$('> a').addClass('active')
+      icon = @marker.icon
+      icon.origin = new google.maps.Point(icon.origin.x + 25, icon.origin.y)
+      @marker.setIcon icon
+      # @marker.setZIndex 100
+      
+
+    unHighlightMarker : =>
+      @$('> a').removeClass('active')
+      icon = @marker.icon
+      icon.origin = new google.maps.Point(icon.origin.x - 25, icon.origin.y)
+      @marker.setIcon icon
+      # @marker.setZIndex 1
+
+    clear : => 
+      @marker.setMap null
+      @remove()
+      @undelegateEvents()
+      delete this
+
+    pos : ->
+      if @linkedToProperty then @model.get("property").pos() + 1 else @model.pos() + 1

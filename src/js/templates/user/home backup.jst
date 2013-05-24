@@ -1,0 +1,28 @@
+<form class="well">
+  <div class="title-group control-group form-large">
+    <label for="post-title" class="control-label element-invisible"><%= i18nCommon.fields.title %></label>
+    <div class="controls">
+      <input type="text" class="input-block-level" name="post[title]" id="post-title" maxlength="140" placeholder="<%= share_placeholder %>" />
+    </div>
+  </div>
+  <div class="body-group control-group hide">
+    <label for="post-body" class="control-label element-invisible"><%= i18nCommon.fields.body %></label>
+    <div class="controls">
+      <textarea class="input-block-level" name="post[body]" id="post-body" placeholder="<%= i18nCommon.nouns.extra_details %>"></textarea>
+    </div>
+  </div>
+  <div id="post-options" class="form-inline hide">
+    <label for="show-body" class="checkbox">
+      <input type="checkbox" id="show-body"><%= i18nCommon.actions.add_extra_details %>
+    </label>
+    <div class="btn-group" data-toggle="buttons-radio">
+      <button type="button" class="btn active"><i class="icon icon-post"></i><%= i18nCommon.classes.status %></button>
+      <button type="button" class="btn"><i class="icon icon-question"></i><%= i18nCommon.classes.question %></button>
+    </div>
+    <!-- Implied
+    <label for="center-on-map" class="checkbox">
+      <input type="checkbox" id="center-on-map"><%= i18nCommon.form.add_details %>
+    </label> -->
+    <button class="btn btn-primary stay-right"><%= i18nCommon.actions.post %></button>
+  </div>
+</form>

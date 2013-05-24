@@ -16,7 +16,11 @@ legend {
 .form-condensed {
   .control-group,
   .control-label,
-  .controls {
+  .controls,
+  select, 
+  textarea, 
+  input,
+  .uneditable-input {
     margin-bottom: 0;
   }
 }
@@ -45,10 +49,7 @@ legend {
   .control-label,
   .controls {
     display: inline-block;
-  }
-  .form-type-textfield {
-    display: inline-block;
-    margin-bottom: 0;  
+    margin-bottom:0;
   }
 }
 
@@ -67,6 +68,63 @@ input {
   &:-ms-input-placeholder      { color:@grayLight; }
 }
 
+.input-caret {
+  position: absolute;
+  z-index: @zindexDropdown;
+  &:before {
+    content: '';
+    display: inline-block;
+    border-left:   7px solid transparent;
+    border-right:  7px solid transparent;
+    border-bottom: 7px solid #ccc;
+    border-bottom-color: @inputBorder;
+    position: absolute;
+    top: -7px;
+    left: 10px;
+      // border: 1px solid @inputBorder;
+    .box-shadow(inset 0 1px 1px rgba(0,0,0,.075));
+    // .transition(~"border linear .2s, box-shadow linear .2s");
+  }
+  &:after {
+    content: '';
+    display: inline-block;
+    border-left:   9px solid transparent;
+    border-right:  9px solid transparent;
+    border-bottom: 9px solid @inputBackground;
+    position: absolute;
+    top: -5px;
+    left: 9px;
+    .box-shadow(inset 0 1px 1px rgba(0,0,0,.075));
+    // .transition(~"border linear .2s, box-shadow linear .2s");
+  }
+}
+
+.radio-icons {
+  input[type="radio"] {
+      /* hide the inputs */
+      opacity: 0;
+      display:none;
+  }
+
+  input[type="radio"] {
+    /* keep pointer so that you get the little hand showing when you are on a button */
+     + label {
+      cursor: pointer;
+      padding: 4px 10px;
+      i {
+      }
+    }
+    &:checked + label {
+      /* style for the checked/selected state */
+      .icon-post {
+        &.icon-status     { background-position: 0      -40px; }
+        &.icon-question   { background-position: -40px  -40px; }
+        &.icon-tip        { background-position: -80px  -40px; }
+        &.icon-building   { background-position: -120px -40px; }
+      }
+    }
+  }
+}
 
 /**
  * jQuery File Upload UI Plugin CSS 6.10
@@ -299,7 +357,7 @@ input {
     }
     .add-on {    
       font-size: 14px;
-      line-height: 26px;
+      line-height: 24px;
       height: 24px;
       padding: 6px 9px;
     }
@@ -333,8 +391,8 @@ input {
   }
   .form-large {
     .add-on {    
-      height: 18px;
-      padding: 6px 112px;
+      height: 24px;
+      padding: 5px 6px;
     }
   }
 }
@@ -366,11 +424,6 @@ input, textarea, select, .uneditable-input {
 
 .controls-text {
   text-align: center;
-}
-
-input.span1 {
-  min-width:40px;
-  max-width: 60px;
 }
 
 form {
@@ -409,3 +462,6 @@ form {
     vertical-align:middle;
   }
 }
+
+
+

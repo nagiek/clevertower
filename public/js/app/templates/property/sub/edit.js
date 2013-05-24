@@ -1,5 +1,3 @@
-define(function(){
-
 this["JST"] = this["JST"] || {};
 
 this["JST"]["src/js/templates/property/sub/edit.jst"] = function(obj) {
@@ -27,6 +25,3 @@ __p += '<form class="property-form" enctype="multipart/form-data" method="post" 
 }
 return __p
 };
-
-  return this["JST"];
-});

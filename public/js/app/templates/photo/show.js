@@ -1,5 +1,3 @@
-define(function(){
-
 this["JST"] = this["JST"] || {};
 
 this["JST"]["src/js/templates/photo/show.jst"] = function(obj) {
@@ -15,6 +13,3 @@ __p += '<div class="photo template-download row fade in">\n  <img src="' +
 }
 return __p
 };
-
-  return this["JST"];
-});

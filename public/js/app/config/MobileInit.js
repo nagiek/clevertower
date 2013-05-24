@@ -1,5 +1,4 @@
 (function() {
-
   require.config({
     baseUrl: "/js",
     paths: {

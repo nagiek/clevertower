@@ -1,5 +1,3 @@
-define(function(){
-
 this["JST"] = this["JST"] || {};
 
 this["JST"]["src/js/templates/todo/manage.jst"] = function(obj) {
@@ -11,6 +9,3 @@ __p += '<section class="section">\n  <header id="header">\n    <input id="new-to
 }
 return __p
 };
-
-  return this["JST"];
-});

@@ -4,14 +4,14 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(["jquery", "underscore", "backbone", 'models/Map', "i18n!nls/common", "i18n!nls/property", "templates/property/new/map", "gmaps"], function($, _, Parse, Map, i18nCommon, i18nProperty) {
-    var GMapView;
-    return GMapView = (function(_super) {
+    var GMapView, _ref;
 
+    return GMapView = (function(_super) {
       __extends(GMapView, _super);
 
       function GMapView() {
-        this.setMapZoom = __bind(this.setMapZoom, this);
-        return GMapView.__super__.constructor.apply(this, arguments);
+        this.setMapZoom = __bind(this.setMapZoom, this);        _ref = GMapView.__super__.constructor.apply(this, arguments);
+        return _ref;
       }
 
       GMapView.prototype.el = ".address-form";
@@ -24,6 +24,7 @@
 
       GMapView.prototype.initialize = function(attrs) {
         var _this = this;
+
         _.bindAll(this, 'checkForSubmit', 'geocode', 'geolocate');
         this.mapId = "mapCanvas";
         this.wizard = attrs.wizard;
@@ -45,6 +46,7 @@
         });
         this.marker.on("change", function(updatedPoint) {
           var center;
+
           _this.$searchInput.val(updatedPoint.get('formatted_address'));
           center = _this.model.GPoint(updatedPoint.get("center"));
           _this.gmap.setCenter(center);

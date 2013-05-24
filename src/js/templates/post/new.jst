@@ -1,0 +1,58 @@
+<form id="post-form" class="well">
+  <ul id="post-type" class="radio-icons inline">
+    <li>
+      <input id="post-type-status" name="post-type" type="radio" value="status">
+      <label for="post-type-status">
+        <i class="icon icon-post icon-status" rel="tooltip" data-original-title="<%= i18nCommon.classes.status %>"></i>
+      </label>
+    </li>
+    <li>
+      <input id="post-type-question" name="post-type" type="radio" value="question">
+      <label for="post-type-question">
+        <i class="icon icon-post icon-question" rel="tooltip" data-original-title="<%= i18nCommon.classes.question %>"></i>
+      </label>
+    </li>
+    <li>
+      <input id="post-type-tip" name="post-type" type="radio" value="tip">
+      <label for="post-type-tip">
+        <i class="icon icon-post icon-tip" rel="tooltip" data-original-title="<%= i18nCommon.classes.tip %>"></i>
+      </label>
+    </li>
+    <li>
+      <input id="post-type-building" name="post-type" type="radio" value="building">
+      <label for="post-type-building">
+        <i class="icon icon-post icon-building" rel="tooltip" data-original-title="<%= i18nCommon.nouns.building %>"></i>
+      </label>
+    </li>
+  </ul>
+  <div class="content">
+    <div class="title-group control-group form-large form-condensed">
+      <label for="post-title" class="control-label element-invisible"><%= i18nCommon.fields.title %></label>
+      <div class="controls position-relative">
+        <b id="post-input-caret" class="input-caret"></b>
+        <input type="text" class="input-block-level" name="post[title]" id="post-title" maxlength="140" />
+      </div>
+    </div>
+    <div class="body-group control-group hide">
+      <label for="post-body" class="control-label element-invisible"><%= i18nCommon.fields.body %></label>
+      <div class="controls">
+        <textarea class="input-block-level" name="post[body]" id="post-body" placeholder="<%= i18nCommon.nouns.extra_details %>"></textarea>
+      </div>
+    </div>
+    <div id="post-options" class="hide clearfix">
+      <div class="pull-left">
+        <label for="show-body" class="checkbox">
+          <input type="checkbox" id="show-body"><%= i18nCommon.actions.add_extra_details %>
+        </label>
+        <label for="centered-on-property" class="checkbox">
+          <input type="checkbox" id="centered-on-property"><%= i18nCommon.form.center_on_property %>
+        </label>
+        <div id="property-options" class="hide"></div>
+      </div>
+      <div class="pull-right">
+        <button class="btn btn-primary stay-right"><%= i18nCommon.actions.post %></button>
+      </div>
+    </div>
+  </div>
+  <div class="empty hide"></div>
+</form>

@@ -1,5 +1,3 @@
-define(function(){
-
 this["JST"] = this["JST"] || {};
 
 this["JST"]["src/js/templates/helper/field/tenant.jst"] = function(obj) {
@@ -25,6 +23,3 @@ __p += '</textarea>\n    <p class="help-block">' +
 }
 return __p
 };
-
-  return this["JST"];
-});

@@ -4,16 +4,15 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(["jquery", "underscore", "backbone", "models/Property", 'views/helper/Alert', "i18n!nls/property", "i18n!nls/common", "plugins/toggler", "templates/property/sub/edit", 'templates/property/_form'], function($, _, Parse, Property, Alert, i18nProperty, i18nCommon) {
-    var PropertyEditView;
-    return PropertyEditView = (function(_super) {
+    var PropertyEditView, _ref;
 
+    return PropertyEditView = (function(_super) {
       __extends(PropertyEditView, _super);
 
       function PropertyEditView() {
         this.render = __bind(this.render, this);
-
-        this.clear = __bind(this.clear, this);
-        return PropertyEditView.__super__.constructor.apply(this, arguments);
+        this.clear = __bind(this.clear, this);        _ref = PropertyEditView.__super__.constructor.apply(this, arguments);
+        return _ref;
       }
 
       PropertyEditView.prototype.el = ".content";
@@ -58,6 +57,7 @@
 
       PropertyEditView.prototype.render = function() {
         var vars;
+
         vars = {
           property: _.defaults(this.model.attributes, Property.prototype.defaults),
           i18nProperty: i18nProperty,
@@ -72,6 +72,7 @@
       PropertyEditView.prototype.save = function(e) {
         var attrs, bools,
           _this = this;
+
         e.preventDefault();
         this.$('.error').removeClass('error');
         this.$('button.save').prop('disabled', 'disabled');

@@ -3,19 +3,21 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(["jquery", "underscore", "backbone", "collections/UnitList", "models/Property", "models/Unit", "models/Lease", "views/lease/New"], function($, _, Parse, UnitList, Property, Unit, Lease, NewLeaseView, i18nCommon, i18nLease) {
-    var AddLeaseToPropertyView;
-    return AddLeaseToPropertyView = (function(_super) {
+    var AddLeaseToPropertyView, _ref;
 
+    return AddLeaseToPropertyView = (function(_super) {
       __extends(AddLeaseToPropertyView, _super);
 
       function AddLeaseToPropertyView() {
-        return AddLeaseToPropertyView.__super__.constructor.apply(this, arguments);
+        _ref = AddLeaseToPropertyView.__super__.constructor.apply(this, arguments);
+        return _ref;
       }
 
       AddLeaseToPropertyView.prototype.el = ".content";
 
       AddLeaseToPropertyView.prototype.initialize = function(attrs) {
         var vars;
+
         this.on("view:change", this.clear);
         vars = {
           property: this.model,

@@ -23,8 +23,6 @@ define [
 
     initialize: (attrs) ->
 
-      _.bindAll @, 'showTab', 'render', 'addOne', 'addAll', 'addOneListing', 'addAllListings', 'showModal'
-
       @place = if attrs.place then attrs.place else @model.get("locality") + "--" + @model.get("administrative_area_level_1") + "--" + Parse.App.countryCodes[@model.get("country")]
 
       @mapId = "mapCanvas"
@@ -32,8 +30,8 @@ define [
       @model.prep "photos"
       @model.prep "listings"
 
-      @model.photos.on "add", @addOne
-      @model.photos.on "reset", @addAll
+      @model.photos.on "add", @addOnePhoto
+      @model.photos.on "reset", @addAllPhotos
 
       @model.listings.title = @model.get "title"
       @model.listings.on "add", @addOneListing
@@ -80,17 +78,17 @@ define [
     # Photos
     # ------
 
-    addOne : (photo) =>
+    addOnePhoto : (photo) =>
       view = new PhotoView(model: photo)
       @$list.append view.render().el
       
-    addAll: (collection, filter) =>
+    addAllPhotos: (collection, filter) =>
 
-      $('#photos-link .count').html @model.listings.length
+      $('#photos-link .count').html @model.photos.length
 
       @$list.html ""
       unless @model.photos.length is 0
-        @model.photos.each @addOne
+        @model.photos.each @addOnePhoto
       else
         @$list.before '<p class="empty">' + i18nProperty.collection.empty.photos + '</p>'
 

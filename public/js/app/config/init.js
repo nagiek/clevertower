@@ -1,13 +1,15 @@
 (function() {
-
   (function(ua, w, d, undefined_) {
     var config, production;
+
     production = false;
     config = {};
     return w.addEventListener("DOMContentLoaded", (function() {
       var loadCSS, loadFiles, loadJS;
+
       loadCSS = function(urls, callback) {
         var link, x;
+
         x = void 0;
         link = void 0;
         x = 0;
@@ -25,6 +27,7 @@
       };
       loadJS = function(files, callback) {
         var file, script, x;
+
         x = void 0;
         script = void 0;
         file = void 0;

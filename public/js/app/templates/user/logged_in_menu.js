@@ -1,5 +1,3 @@
-define(function(){
-
 this["JST"] = this["JST"] || {};
 
 this["JST"]["src/js/templates/user/logged_in_menu.jst"] = function(obj) {
@@ -27,6 +25,3 @@ __p += '<li>\n  <a id="profile-link" class="clearfix" href="/users/' +
 }
 return __p
 };
-
-  return this["JST"];
-});

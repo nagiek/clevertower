@@ -1,5 +1,3 @@
-define(function(){
-
 this["JST"] = this["JST"] || {};
 
 this["JST"]["src/js/templates/file/upload.jst"] = function(obj) {
@@ -38,6 +36,3 @@ __p += '</td>\n  </tr>\n';
 }
 return __p
 };
-
-  return this["JST"];
-});

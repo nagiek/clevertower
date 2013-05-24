@@ -1,5 +1,4 @@
 (function() {
-
   define({
     fields: {
       title: "Title",
@@ -28,12 +27,17 @@
       listings: "listings",
       Listing: "Listing",
       Listings: "Listings",
-      Photos: "Photos"
+      Photos: "Photos",
+      Posts: "Posts",
+      status: "status",
+      question: "question",
+      tip: "tip"
     },
     actions: {
       go: "Go",
       go_to: "Go to",
       show: "Show",
+      post: "Post",
       search: "Search",
       destroy: "Destroy",
       upload: "Upload",
@@ -58,6 +62,7 @@
       add_another: "Add another",
       add_files: "Add files",
       add_photos: "Add photos",
+      add_extra_details: "Add extra details",
       choose_file: "Choose file",
       choose_photo: "Choose photo",
       add_x_more: "Add <strong>x</strong> more",
@@ -116,19 +121,23 @@
       home: "Home",
       cover_photo: "Cover Photo",
       link: "link",
+      building: "building",
       you: "You",
       people: "People",
       places: "Places",
       sample_email: "keigan@example.com",
       comments: "Comments",
       activity: "Activity",
-      optional_description: "Optional description"
+      optional_description: "Optional description",
+      extra_details: "Extra details"
     },
     order: {
       first: "First",
       last: "Last"
     },
     adjectives: {
+      small: "Big",
+      big: "Small",
       "new": "new",
       unsaved: "Unsaved",
       linked: "Linked",
@@ -145,6 +154,7 @@
       not_specified: "Not specified"
     },
     form: {
+      center_on_property: "Center on property",
       operations: "Operations",
       info: "Info",
       required: "Required",

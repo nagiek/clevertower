@@ -3,13 +3,14 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(["jquery", "underscore", "backbone", 'models/Lease', 'models/Profile', "i18n!nls/common", "i18n!nls/group", 'templates/profile/summary'], function($, _, Parse, Lease, Profile, i18nCommon, i18nGroup) {
-    var TenantSummaryView;
-    return TenantSummaryView = (function(_super) {
+    var TenantSummaryView, _ref;
 
+    return TenantSummaryView = (function(_super) {
       __extends(TenantSummaryView, _super);
 
       function TenantSummaryView() {
-        return TenantSummaryView.__super__.constructor.apply(this, arguments);
+        _ref = TenantSummaryView.__super__.constructor.apply(this, arguments);
+        return _ref;
       }
 
       TenantSummaryView.prototype.tagName = "li";
@@ -22,6 +23,7 @@
 
       TenantSummaryView.prototype.initialize = function(attrs) {
         var _this = this;
+
         _.bindAll('this', 'render');
         this.profile = this.model.get("profile");
         return this.model.on("destroy", function() {
@@ -33,6 +35,7 @@
 
       TenantSummaryView.prototype.render = function() {
         var status, vars;
+
         status = this.model.get('status');
         vars = _.merge(this.profile.toJSON(), {
           i_status: i18nGroup.fields.status[status],

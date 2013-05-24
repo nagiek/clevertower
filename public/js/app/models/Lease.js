@@ -1,7 +1,7 @@
 (function() {
-
   define(['underscore', 'backbone', "collections/TenantList", "models/Property", "models/Unit", "moment"], function(_, Parse, TenantList, Property, Unit, moment) {
     var Lease;
+
     return Lease = Parse.Object.extend("Lease", {
       className: "Lease",
       defaults: {
@@ -20,6 +20,7 @@
       },
       isActive: function() {
         var ed, sd, today;
+
         sd = this.get("start_date");
         ed = this.get("end_date");
         if (!(sd && ed)) {
@@ -30,6 +31,7 @@
       },
       validate: function(attrs, options) {
         var error;
+
         if (attrs == null) {
           attrs = {};
         }
@@ -63,6 +65,7 @@
       },
       prep: function(collectionName, options) {
         var network, user;
+
         if (this[collectionName]) {
           return this[collectionName];
         }

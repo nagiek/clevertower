@@ -1,5 +1,4 @@
 (function() {
-
   define({
     actions: {
       signin: "Se connecter",

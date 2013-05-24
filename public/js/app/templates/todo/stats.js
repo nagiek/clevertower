@@ -1,5 +1,3 @@
-define(function(){
-
 this["JST"] = this["JST"] || {};
 
 this["JST"]["src/js/templates/todo/stats.jst"] = function(obj) {
@@ -17,6 +15,3 @@ __p += '<footer id="footer">\n  <span id="todo-count">\n    <strong>' +
 }
 return __p
 };
-
-  return this["JST"];
-});
