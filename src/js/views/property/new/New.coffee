@@ -5,7 +5,7 @@ define [
   'models/Property'
   "i18n!nls/property"
   "i18n!nls/common"
-  'templates/property/_form'
+  'templates/property/form'
 ], ($, _, Parse, Property, i18nProperty, i18nCommon) ->
 
   # GMapView
@@ -45,5 +45,5 @@ define [
         property: @model.attributes
         i18nProperty: i18nProperty
         i18nCommon: i18nCommon
-      @$el.html JST["src/js/templates/property/_form.jst"](vars)
+      @$el.html JST["src/js/templates/property/form.jst"](vars)
       @

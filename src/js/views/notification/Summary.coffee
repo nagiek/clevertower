@@ -17,12 +17,13 @@ define [
       'click > a' : 'markAsClicked'
         
     initialize: ->
-      @model.on "change", @render
+      @listenTo Parse.Dispatcher, "user:logout", @clear
         
     markAsClicked: (e) =>
 
       @model.add(clicked: [Parse.User.current()])
       @model.save null, patch: true
+      @$("> a").removeClass "unclicked"
   
     # Re-render the contents of the property item.
     render: =>
@@ -66,3 +67,8 @@ define [
 
       @$el.html JST["src/js/templates/notification/summary.jst"](vars)
       @
+
+    clear: =>
+      @remove()
+      @undelegateEvents()
+      delete this

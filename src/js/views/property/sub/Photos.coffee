@@ -23,16 +23,14 @@ define [
     
     initialize : ->
       
-      _.bindAll this, 'save', 'render'
-      
       @on "view:change", @clear
       
       @unUploadedPhotos = 0
           
       @photos = new PhotoList [], property: @model
 
-      @photos.bind "add", @addOne
-      @photos.bind "reset", @addAll
+      @listenTo @photos, "add", @addOne
+      @listenTo @photos, "reset", @addAll
 
       # @on 'added', (e, data) =>
       #   @unUploadedPhotos++
@@ -45,9 +43,11 @@ define [
 
     render : ->
       _this = this
-      @$el.html JST["src/js/templates/property/sub/photos.jst"](_.merge(property: @model, i18nProperty: i18nProperty, i18nCommon: i18nCommon))
+      @$el.html JST["src/js/templates/property/sub/photos.jst"](property: @model, i18nProperty: i18nProperty, i18nCommon: i18nCommon)
       @$list = $("#photo-list")
       @$fileForm = $("#fileupload")
+
+      uploads = []
 
       # Initiate the file upload.
       @$fileForm.fileupload
@@ -76,26 +76,48 @@ define [
         ]
         submit: (e, data) ->
           data.url = "https://api.parse.com/1/files/" + data.files[0].name
-        send: (e, data) ->
+        send: (e, data) =>
+          @$('.empty').remove()
           delete data.headers['Content-Disposition']; # Parse does not accept this header.
         done: (e, data) ->
-          
-          # Defer to our photo rendering method.
-          that = $(this).data("blueimp-fileupload") or $(this).data("fileupload")
-          that._transition(data.context)
+
           file = data.result
 
-          _this.photos.create 
+          photo = new Photo
             network: _this.model.get("network")
             property: _this.model
             url: file.url
             name: file.name
-          $('.empty').remove()
+
+          # Defer to our photo rendering method.
+          that = $(this).data("blueimp-fileupload") or $(this).data("fileupload")
+          that._transition(data.context)
           
           data.context.each (index) ->
             node = $(this)
             that._transition(node).done ->
               node.remove()
+
+          uploads.push photo.save()
+
+        stop: (e, data) =>
+
+          Parse.Promise.when(uploads).then =>
+            @photos.add arguments
+            Parse.Cloud.run 'AddPhotoActivity', { 
+              photoUrl: arguments[0].get "name"
+              length: arguments.length
+              propertyId: @model.id
+              # center: _this.model.get("center")
+              # networkId: _this.model.get("network").id
+            },
+              success: (model) => Parse.App.activity.add model if Parse.App.activity
+              error: (error) => console.log error
+
+            # Reset for next photos
+            uploads = []
+
+          @$(".fileupload-progress").addClass("hide")
       
       # Fetch all the property items for this user
       @photos.fetch()

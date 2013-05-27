@@ -25,24 +25,23 @@ define [
       @networkView = new NetworkMenuView().render()
       Parse.App.search = new SearchView().render()
             
-      Parse.Dispatcher.on "user:login", (user) =>
-        Parse.User.current().setup().then =>
-          @userView.render()
-          @networkView.render()
-          if Parse.User.current().get("type") is "manager" and !Parse.User.current().get("network")
-            require ["views/helper/Alert", 'i18n!nls/property', "views/network/New"], (Alert, i18nProperty, NewNetworkView) =>
-              new Alert
-                event:    'no_network'
-                type:     'warning'
-                fade:     true
-                heading:  i18nProperty.errors.network_not_set
-              Parse.history.navigate "/network/set"
-              @view = new NewNetworkView(model: Parse.User.current().get("network")) if !@view or @view !instanceof NewNetworkView
-              @view.render()
-          else
-            # Reload the current path. Don't use navigate, as it will fail.
-            # The route functions themselves are responsible for altering content.
-            Parse.history.loadUrl location.pathname
+      Parse.Dispatcher.on "user:login", (user) =>      
+        @userView.render()
+        @networkView.render()
+        if Parse.User.current().get("type") is "manager" and !Parse.User.current().get("network")
+          require ["views/helper/Alert", 'i18n!nls/property', "views/network/New"], (Alert, i18nProperty, NewNetworkView) =>
+            new Alert
+              event:    'no_network'
+              type:     'warning'
+              fade:     true
+              heading:  i18nProperty.errors.network_not_set
+            Parse.history.navigate "/network/set"
+            @view = new NewNetworkView(model: Parse.User.current().get("network")) if !@view or @view !instanceof NewNetworkView
+            @view.render()
+        else
+          # Reload the current path. Don't use navigate, as it will fail.
+          # The route functions themselves are responsible for altering content.
+          Parse.history.loadUrl location.pathname
           
       Parse.Dispatcher.on "user:logout", =>
         @userView.render()

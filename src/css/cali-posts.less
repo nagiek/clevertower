@@ -1,27 +1,59 @@
+#post-type {
+  li {
+    padding:0;
+    width:24%;
+  }
+  input[type="radio"] {
+    &:checked + label {
+      /* style for the checked/selected state */
+      .icon-post {
+        &.icon-status     { background-position: 0      -40px; }
+        &.icon-question   { background-position: -40px  -40px; }
+        &.icon-tip        { background-position: -80px  -40px; }
+        &.icon-building   { background-position: -120px -40px; }
+      }
+    }
+  }
+}
+
 #post-input-caret {
   .transition(~"left ease .15s");
   &:before { left: 20px; }
-  &:after  { left: 18px; }
+  &:after  { left: 20px - 2px; }
   &.phase-0 { left: 0; }
-  &.phase-1 { left: 40px; }
-  &.phase-2 { left: 80px; }
-  &.phase-3 { left: 120px; }
+  &.phase-1 { left: 25%; }
+  &.phase-2 { left: 50%; }
+  &.phase-3 { left: 75%; }
 }
 
-@media (max-width: 480px) {
+
+@media (min-width: 767px) and (max-width: 979px) {
+  #post-type {
+    li {
+      width:23%;
+    }
+  }
   #post-input-caret {
-    &.phase-0 { left: 0; }
-    &.phase-1 { left: 40px; }
-    &.phase-2 { left: 80px; }
-    &.phase-3 { left: 120px; }
+    &:before { left: 5px; }
+    &:after  { left: 5px - 2px; }
+  }
+}
+
+@media (min-width: 979px) and (max-width: 1200px) {
+  #post-type {
+    li {
+      width:23%;
+    }
+  }
+  #post-input-caret {
+    &:before { left: 20px; }
+    &:after  { left: 20px - 2px; }
   }
 }
 
 @media (min-width: 1200px) {
   #post-input-caret {
-    &.phase-0 { left: 5px; }
-    &.phase-1 { left: 90px; }
-    &.phase-2 { left: 175px; }
-    &.phase-3 { left: 260px; }
+    &:before { left: 35px; }
+    &:after  { left: 35px - 2px; }
   }
 }

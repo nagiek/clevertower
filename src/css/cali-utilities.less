@@ -38,16 +38,28 @@
 // LISTS
 // -----
 
+a > .badge {
+  margin-left:4px; /* LTR */
+}
+
+/**
+ * Lists
+ */
+ul.inline {
+  // li + li {
+  //   margin-left:10px;
+  // }
+  &.inline-condensed {
+    li + li { padding-left: 1px; padding-right: 1px; }
+  }
+}
+
 .half-in {
   .opacity(50);
 }
 
 .no-bullet {
   list-style: none;
-}
-
-.inline-condensed {
-  li + li { margin-left: 1px; }
 }
 
 .three-column {

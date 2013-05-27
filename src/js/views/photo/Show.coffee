@@ -25,7 +25,7 @@ define [
       @model.on "change", @render
       @model.on "destroy", =>
         @remove()
-        @undeletegateEvents()
+        @undelegateEvents()
         delete this
 
   

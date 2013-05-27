@@ -343,6 +343,38 @@
     });
   });
 
+  Parse.Cloud.define("AddPhotoActivity", function(req, res) {
+    return (new Parse.Query("Property")).get(req.params.propertyId, {
+      success: function(property) {
+        var Activity, activity, activityACL;
+
+        Activity = Parse.Object.extend("Activity");
+        activity = new Activity;
+        activityACL = new Parse.ACL;
+        activityACL.setPublicReadAccess(true);
+        return activity.save({
+          activity_type: "new_photo",
+          "public": true,
+          photoUrl: req.params.photoUrl,
+          center: property.get("center"),
+          property: property,
+          network: property.get("network"),
+          ACL: activityACL
+        }, {
+          success: function() {
+            return res.success(activity);
+          },
+          error: function() {
+            return res.error("bad_save");
+          }
+        });
+      },
+      error: function() {
+        return res.error("bad_query");
+      }
+    });
+  });
+
   Parse.Cloud.beforeSave("Profile", function(req, res) {
     if (!req.object.existed()) {
       req.object.set("createdBy", req.user);
@@ -550,6 +582,28 @@
           }
         });
       }
+    }
+  });
+
+  Parse.Cloud.afterSave("Property", function(req) {
+    if (!req.object.existed() && req.object.get("public")) {
+      return (new Parse.Query("Profile")).equalTo('user', req.user).first().then(function(profile) {
+        var activity, activityACL;
+
+        activity = new Parse.Object("Activity");
+        activityACL = new Parse.ACL;
+        activityACL.setPublicReadAccess(true);
+        return activity.save({
+          activity_type: "new_property",
+          "public": true,
+          center: req.object.get("center"),
+          property: req.object,
+          network: req.object.get("network"),
+          title: req.object.get("title"),
+          profile: profile,
+          ACL: activityACL
+        });
+      });
     }
   });
 

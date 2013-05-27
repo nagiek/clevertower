@@ -101,27 +101,12 @@ input {
 
 .radio-icons {
   input[type="radio"] {
-      /* hide the inputs */
-      opacity: 0;
-      display:none;
-  }
-
-  input[type="radio"] {
+    /* hide the inputs */
+    opacity: 0;
+    display:none;
     /* keep pointer so that you get the little hand showing when you are on a button */
      + label {
       cursor: pointer;
-      padding: 4px 10px;
-      i {
-      }
-    }
-    &:checked + label {
-      /* style for the checked/selected state */
-      .icon-post {
-        &.icon-status     { background-position: 0      -40px; }
-        &.icon-question   { background-position: -40px  -40px; }
-        &.icon-tip        { background-position: -80px  -40px; }
-        &.icon-building   { background-position: -120px -40px; }
-      }
     }
   }
 }

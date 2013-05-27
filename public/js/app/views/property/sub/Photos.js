@@ -19,27 +19,28 @@
       PropertyPhotosView.prototype.el = ".content";
 
       PropertyPhotosView.prototype.initialize = function() {
-        _.bindAll(this, 'save', 'render');
         this.on("view:change", this.clear);
         this.unUploadedPhotos = 0;
         this.photos = new PhotoList([], {
           property: this.model
         });
-        this.photos.bind("add", this.addOne);
-        return this.photos.bind("reset", this.addAll);
+        this.listenTo(this.photos, "add", this.addOne);
+        return this.listenTo(this.photos, "reset", this.addAll);
       };
 
       PropertyPhotosView.prototype.render = function() {
-        var _this;
+        var uploads,
+          _this = this;
 
         _this = this;
-        this.$el.html(JST["src/js/templates/property/sub/photos.jst"](_.merge({
+        this.$el.html(JST["src/js/templates/property/sub/photos.jst"]({
           property: this.model,
           i18nProperty: i18nProperty,
           i18nCommon: i18nCommon
-        })));
+        }));
         this.$list = $("#photo-list");
         this.$fileForm = $("#fileupload");
+        uploads = [];
         this.$fileForm.fileupload({
           autoUpload: false,
           type: "POST",
@@ -64,22 +65,22 @@
             return data.url = "https://api.parse.com/1/files/" + data.files[0].name;
           },
           send: function(e, data) {
+            _this.$('.empty').remove();
             return delete data.headers['Content-Disposition'];
           },
           done: function(e, data) {
-            var file, that;
+            var file, photo, that;
 
-            that = $(this).data("blueimp-fileupload") || $(this).data("fileupload");
-            that._transition(data.context);
             file = data.result;
-            _this.photos.create({
+            photo = new Photo({
               network: _this.model.get("network"),
               property: _this.model,
               url: file.url,
               name: file.name
             });
-            $('.empty').remove();
-            return data.context.each(function(index) {
+            that = $(this).data("blueimp-fileupload") || $(this).data("fileupload");
+            that._transition(data.context);
+            data.context.each(function(index) {
               var node;
 
               node = $(this);
@@ -87,6 +88,28 @@
                 return node.remove();
               });
             });
+            return uploads.push(photo.save());
+          },
+          stop: function(e, data) {
+            Parse.Promise.when(uploads).then(function() {
+              _this.photos.add(arguments);
+              Parse.Cloud.run('AddPhotoActivity', {
+                photoUrl: arguments[0].get("name"),
+                length: arguments.length,
+                propertyId: _this.model.id
+              }, {
+                success: function(model) {
+                  if (Parse.App.activity) {
+                    return Parse.App.activity.add(model);
+                  }
+                },
+                error: function(error) {
+                  return console.log(error);
+                }
+              });
+              return uploads = [];
+            });
+            return _this.$(".fileupload-progress").addClass("hide");
           }
         });
         this.photos.fetch();

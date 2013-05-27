@@ -58,7 +58,7 @@ define
                                 "Anything you want to know?"
       ]
       [ # tip:
-                                "Let people know about a good neighbourhood."
+                                "What defines your neighbourhood?"
                                 "Share why you like your area."
       ]
       [ # building:

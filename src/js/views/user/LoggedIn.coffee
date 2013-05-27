@@ -19,12 +19,12 @@ define [
       "click #logout": "logOut"
 
     initialize: (attrs) ->
-      _.bindAll this, "render", "updateNav", "logOut"
-      network = Parse.User.current().get("network")
             
       @pusher = new Pusher 'dee5c4022be4432d7152'
-      @pusher.subscribe "networks-#{network.id}" if network      
-      network.properties.on "add", @subscribeProperty if Parse.onNetwork
+
+      if Parse.User.current().get("network")
+        @pusher.subscribe "networks-#{Parse.User.current().get("network").id}" 
+        @listenTo Parse.User.current().get("network").properties, "add", @subscribeProperty
 
       Parse.User.current().profile.on "sync", @updateNav
       @render()

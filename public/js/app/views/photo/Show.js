@@ -28,7 +28,7 @@
         this.model.on("change", this.render);
         return this.model.on("destroy", function() {
           _this.remove();
-          _this.undeletegateEvents();
+          _this.undelegateEvents();
           return delete _this;
         });
       };

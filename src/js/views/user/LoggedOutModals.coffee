@@ -25,19 +25,24 @@ define [
 
     initialize: ->
 
-      Parse.Dispatcher.on "user:login", (user) =>
-        @$('#reset-password-modal').remove()
-        @$('#signup-modal').remove()
-        @$('#login-modal').remove()
+      @listenToOnce Parse.Dispatcher, "user:loginStart", (user) =>
+        Parse.User.current().setup().then =>
+          Parse.Dispatcher.trigger "user:login", user
+          Parse.Dispatcher.trigger "user:change", user
+          @$('#reset-password-modal').remove()
+          @$('#signup-modal').remove()
+          @$('#login-modal').remove()
 
-        @undelegateEvents()
-        delete this
+          @undelegateEvents()
+          delete this
+
+
 
     render: =>
       @$el.append JST["src/js/templates/user/logged_out_modals.jst"](i18nCommon: i18nCommon, i18nDevise: i18nDevise)
       
       # Make toggles
-      @$('.toggle').toggler()
+      @$('#signup-modal .toggle').toggler()
       @
 
     resetPassword: (e) =>
@@ -46,7 +51,7 @@ define [
         success: ->
           new Alert(event: 'reset-password', message: i18nDevise.messages.password_reset)
           @$('> #reset-password-modal').find('.error').removeClass('error')
-          @$('> #reset-password-modal').modal('close')
+          @$('> #reset-password-modal').modal('hide')
         error: (error) ->
           msg = switch error.code
             when 125 then i18nDevise.errors.invalid_email_format
@@ -63,9 +68,8 @@ define [
       password = @$("#login-password").val()
       Parse.User.logIn email, password,
         success: (user) =>
-          Parse.Dispatcher.trigger "user:login", user
-          Parse.Dispatcher.trigger "user:change", user
-          @$('> #login-modal').modal('close')
+          @$('> #login-modal').modal('hide')
+          Parse.Dispatcher.trigger "user:loginStart", user
 
         error: (user, error) =>
           @$('> #login-modal #login-form .username-group').addClass('error')
@@ -82,9 +86,8 @@ define [
       e.preventDefault()
       Parse.FacebookUtils.logIn "user_likes,email",
         success: (user) ->
-          Parse.Dispatcher.trigger "user:login", user
-          Parse.Dispatcher.trigger "user:change", user
-          @$('> .modal.in').modal('close')
+          @$('> .modal.in').modal('hide')
+          Parse.Dispatcher.trigger "user:loginStart", user
         error: (user, error) ->
             
     signUp: (e) =>
@@ -95,9 +98,9 @@ define [
       type = if @$(".type-group :selected").prop('id') is 'signup-tenant' then 'tenant' else 'manager'
       Parse.User.signUp email, password, { type: type, email: email, ACL: new Parse.ACL() },
         success: (user) =>
+          @$('> #signup-modal').modal('hide')
           Parse.Dispatcher.trigger "user:login", user
           Parse.Dispatcher.trigger "user:change", user
-          @$('> #signup-modal').modal('close')
 
         error: (user, error) =>
           @$("> #signup-modal #signup-form .error").removeClass('error')

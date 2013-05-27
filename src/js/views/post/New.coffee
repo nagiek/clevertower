@@ -199,7 +199,7 @@ define [
             Parse.User.current().add new Activity(model.attributes)
           else Parse.App.activity.add new Activity(model.attributes)
 
-          @view.$list.masonry 'reload'
+          @view.refreshDisplay()
 
           # Reset
           @model = new Post
@@ -210,7 +210,7 @@ define [
         error: (model, error) => console.log error
 
     clear: (e) =>
-      @el.html ""
+      @$el.html ""
       @stopListening()
       @undelegateEvents()
       delete this

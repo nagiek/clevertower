@@ -67,6 +67,12 @@ define [
 
       if Parse.User.current() then @getUserActivity() else @render()
 
+    refreshDisplay : ->
+      Parse.App.activity.each (a) -> a.trigger "refresh"
+      if Parse.User.current()
+        Parse.User.current().activity.each (a) -> a.trigger "refresh" 
+      @$list.masonry 'reload'
+
     changeType: (e) ->
       e.preventDefault()
       
@@ -94,7 +100,7 @@ define [
           userActivityToRemove = userActivityToRemove.concat Parse.User.current().activity.select(@specificSearchControls.filter) if @specificSearchControls 
           if userActivityToRemove.length > 0
             _.each userActivityToRemove, (a) => a.trigger('remove') 
-            @$list.masonry 'reload'
+            @refreshDisplay()
           @handleUserActivity() 
 
         Parse.App.activity.query.notContainedIn("objectId", Parse.App.activity.map((l) -> l.id))
@@ -104,7 +110,7 @@ define [
           Parse.User.current().activity.query.notContainedIn("objectId", Parse.User.current().activity.map((l) -> l.id)).find() if Parse.User.current()
         .then (objs) =>
           Parse.App.activity.add objs if Parse.User.current() and objs
-          @$list.masonry 'reload'
+          @refreshDisplay()
 
       else
         # "All" filter
@@ -117,7 +123,6 @@ define [
 
         Parse.App.activity.query.containedIn "activity_type", ["new_photo", "new_listing", "new_post"]
         Parse.App.activity.fetch()
-        @$list.masonry 'reload'
 
     changeDisplay: (e) =>
       e.preventDefault()
@@ -146,7 +151,7 @@ define [
         unless Parse.User.current().activity
           Parse.User.current().activity = new ActivityList [], property: Parse.User.current().get("property") 
           @listenTo Parse.User.current().activity, 'add', @addOnePropertyActivity
-        Parse.App.activity.query.notEqualTo "property", Parse.User.current().get("property")
+          Parse.App.activity.query.notEqualTo "property", Parse.User.current().get("property")
 
         # Render immediately, as we already have the center & radius from the property
         @render()
@@ -157,7 +162,7 @@ define [
         unless Parse.User.current().activity
           Parse.User.current().activity = new ActivityList [], network: Parse.User.current().get("network")
           @listenTo Parse.User.current().activity, 'add', @addOnePropertyActivity
-        Parse.App.activity.query.notEqualTo "network", Parse.User.current().get("network")
+          Parse.App.activity.query.notEqualTo "network", Parse.User.current().get("network")
 
         # Render asynchronously, while we wait for the property info to come in so we can determine our center & radius
         if Parse.User.current().get("network").properties.length is 0
@@ -326,11 +331,11 @@ define [
       if Parse.User.current().get("property") 
         p = Parse.User.current().get("property") 
         if @withinBounds p then @showPropertyActivity p else @hidePropertyActivity p
-        @$list.masonry 'reload'
+        @refreshDisplay()
       else if Parse.User.current().get("network")
         Parse.User.current().get("network").properties.each (p) => 
           if @withinBounds p.get("center") then @showPropertyActivity p else @hidePropertyActivity p
-        @$list.masonry 'reload'
+        @refreshDisplay()
 
     handleMapActivity : ->
 
@@ -362,7 +367,7 @@ define [
           .then (objs) =>
             if objs
               Parse.App.activity.add objs
-              @$list.masonry 'reload'
+              @refreshDisplay()
 
     addOne: (a) =>
       view = new ActivitySummaryView
@@ -390,7 +395,7 @@ define [
         Parse.App.activity.each @addOne
       else
         @$list.append '<li class="general empty">' + i18nListing.listings.empty.index + '</li>'
-      @$list.masonry 'reload'
+      @refreshDisplay()
     
     # Show activity where we have already loaded the property
     showPropertyActivity: (property) =>
@@ -485,9 +490,9 @@ define [
       # @@@K Hack
       # trigger = 58
       if vOffset > @$block.original_position.top
-        @$block.addClass "float-block-fixed offset8"
+        @$block.addClass "float-block-fixed"
       else
-        @$block.removeClass "float-block-fixed offset8"
+        @$block.removeClass "float-block-fixed"
   
     # Track resizing.
     resize : =>

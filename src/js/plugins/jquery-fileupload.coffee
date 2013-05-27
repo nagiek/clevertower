@@ -780,7 +780,7 @@
       $.when.apply($, $.map(entries, (entry) ->
         that._handleFileTreeEntry entry, path
       )).pipe ->
-        Array::concat.apply [], arguments_
+        Array::concat.apply [], arguments
 
 
     _getDroppedFiles: (dataTransfer) ->
@@ -826,7 +826,7 @@
     _getFileInputFiles: (fileInput) ->
       return @_getSingleFileInputFiles(fileInput)  if (fileInput not instanceof $) or fileInput.length is 1
       $.when.apply($, $.map(fileInput, @_getSingleFileInputFiles)).pipe ->
-        Array::concat.apply [], arguments_
+        Array::concat.apply [], arguments
 
 
     _onChange: (e) ->

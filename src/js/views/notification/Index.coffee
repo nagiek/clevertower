@@ -16,42 +16,43 @@ define [
       'click #nLabel' : 'markAllAsRead'
         
     initialize: (attrs) ->
-      @editing = false
-      
-      Parse.Dispatcher.on "user:logout", @clear
 
-      @notifications = new NotificationList
-      @notifications.on "add", @addOne
-      @notifications.on "reset", @addAll
-      @notifications.on "all", @render
-      
-      @notifications.fetch()
-        
-      @$list = @$('ul')
-      @$count = @$('#notifications-count')
+      Parse.User.current().notifications = new NotificationList unless Parse.User.current().notifications
 
+      @listenTo Parse.Dispatcher, "user:logout", @clear
+      @listenTo Parse.User.current().notifications, "add", @addOne
+      @listenTo Parse.User.current().notifications, "reset", @addAll
+      
+      
     markAllAsRead: =>
-      _.each @notifications.unread(), (n) -> 
+      _.each Parse.User.current().notifications.unread(), (n) -> 
         n.add(read: [Parse.User.current()])
         n.save null, patch: true
 
     # Re-rendering the App just means refreshing the statistics -- the rest
     # of the app doesn't change.
     render: =>
-      size = @notifications.unread().length
-      @$count.html size
-      if size > 0 then @$count.addClass("badge-important") else @$count.removeClass("badge-important")
+      Parse.User.current().notifications.fetch()
+        
+      @$list = @$('ul')
+      @$count = @$('#notifications-count')
+
       @
     
     clear: (e) =>
+      @stopListening()
       @undelegateEvents()
       delete this
     
     # Add all items in the notifications collection at once.
     addAll: (collection, filter) =>
       @$list.html ''
-      @notifications.each @addOne
-      if @notifications.length is 0 then @$list.html '<li class="empty">' + i18nCommon.notifications.empty + '</li>'
+      Parse.User.current().notifications.each @addOne
+      if Parse.User.current().notifications.length is 0 then @$list.html '<li class="empty">' + i18nCommon.notifications.empty + '</li>'
+
+      size = Parse.User.current().notifications.unread().length
+      @$count.html size
+      if size > 0 then @$count.addClass("badge-important") else @$count.removeClass("badge-important")
 
     # Add a single todo item to the list by creating a view for it, and
     # appending its element to the `<ul>`.

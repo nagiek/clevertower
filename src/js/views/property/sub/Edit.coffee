@@ -8,7 +8,7 @@ define [
   "i18n!nls/common"
   "plugins/toggler"
   "templates/property/sub/edit"
-  'templates/property/_form'
+  'templates/property/form'
 ], ($, _, Parse, Property, Alert, i18nProperty, i18nCommon) ->
 
   class PropertyEditView extends Parse.View
@@ -22,7 +22,6 @@ define [
       'click .remove'       : 'kill'
     
     initialize : ->
-      _.bindAll this, 'save'
 
       @on "property:save", ->
         new Alert(event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success')
@@ -52,7 +51,7 @@ define [
       @$('.toggle').toggler()
       @
         
-    save : (e) ->
+    save : (e) =>
       e.preventDefault()
       @$('.error').removeClass('error')
       @$('button.save').prop('disabled', 'disabled')

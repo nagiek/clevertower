@@ -593,7 +593,7 @@
         return $.when.apply($, $.map(entries, function(entry) {
           return that._handleFileTreeEntry(entry, path);
         })).pipe(function() {
-          return Array.prototype.concat.apply([], arguments_);
+          return Array.prototype.concat.apply([], arguments);
         });
       },
       _getDroppedFiles: function(dataTransfer) {
@@ -652,7 +652,7 @@
           return this._getSingleFileInputFiles(fileInput);
         }
         return $.when.apply($, $.map(fileInput, this._getSingleFileInputFiles)).pipe(function() {
-          return Array.prototype.concat.apply([], arguments_);
+          return Array.prototype.concat.apply([], arguments);
         });
       },
       _onChange: function(e) {

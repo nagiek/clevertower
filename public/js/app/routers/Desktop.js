@@ -37,29 +37,27 @@
         this.networkView = new NetworkMenuView().render();
         Parse.App.search = new SearchView().render();
         Parse.Dispatcher.on("user:login", function(user) {
-          return Parse.User.current().setup().then(function() {
-            _this.userView.render();
-            _this.networkView.render();
-            if (Parse.User.current().get("type") === "manager" && !Parse.User.current().get("network")) {
-              return require(["views/helper/Alert", 'i18n!nls/property', "views/network/New"], function(Alert, i18nProperty, NewNetworkView) {
-                new Alert({
-                  event: 'no_network',
-                  type: 'warning',
-                  fade: true,
-                  heading: i18nProperty.errors.network_not_set
-                });
-                Parse.history.navigate("/network/set");
-                if (!_this.view || !(_this.view instanceof NewNetworkView)) {
-                  _this.view = new NewNetworkView({
-                    model: Parse.User.current().get("network")
-                  });
-                }
-                return _this.view.render();
+          _this.userView.render();
+          _this.networkView.render();
+          if (Parse.User.current().get("type") === "manager" && !Parse.User.current().get("network")) {
+            return require(["views/helper/Alert", 'i18n!nls/property', "views/network/New"], function(Alert, i18nProperty, NewNetworkView) {
+              new Alert({
+                event: 'no_network',
+                type: 'warning',
+                fade: true,
+                heading: i18nProperty.errors.network_not_set
               });
-            } else {
-              return Parse.history.loadUrl(location.pathname);
-            }
-          });
+              Parse.history.navigate("/network/set");
+              if (!_this.view || !(_this.view instanceof NewNetworkView)) {
+                _this.view = new NewNetworkView({
+                  model: Parse.User.current().get("network")
+                });
+              }
+              return _this.view.render();
+            });
+          } else {
+            return Parse.history.loadUrl(location.pathname);
+          }
         });
         Parse.Dispatcher.on("user:logout", function() {
           _this.userView.render();

@@ -3,13 +3,14 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", "models/Property", 'views/helper/Alert', "i18n!nls/property", "i18n!nls/common", "plugins/toggler", "templates/property/sub/edit", 'templates/property/_form'], function($, _, Parse, Property, Alert, i18nProperty, i18nCommon) {
+  define(["jquery", "underscore", "backbone", "models/Property", 'views/helper/Alert', "i18n!nls/property", "i18n!nls/common", "plugins/toggler", "templates/property/sub/edit", 'templates/property/form'], function($, _, Parse, Property, Alert, i18nProperty, i18nCommon) {
     var PropertyEditView, _ref;
 
     return PropertyEditView = (function(_super) {
       __extends(PropertyEditView, _super);
 
       function PropertyEditView() {
+        this.save = __bind(this.save, this);
         this.render = __bind(this.render, this);
         this.clear = __bind(this.clear, this);        _ref = PropertyEditView.__super__.constructor.apply(this, arguments);
         return _ref;
@@ -23,7 +24,6 @@
       };
 
       PropertyEditView.prototype.initialize = function() {
-        _.bindAll(this, 'save');
         this.on("property:save", function() {
           return new Alert({
             event: 'model-save',
