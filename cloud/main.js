@@ -321,23 +321,24 @@
   });
 
   Parse.Cloud.define("CheckForUniqueProperty", function(req, res) {
-    var network, networkAddressQuery, userAddressQuery;
+    return (new Parse.Query("Property")).near("center", req.params.center).find().then(function(properties) {
+      var property, _i, _len;
 
-    userAddressQuery = (new Parse.Query("Property")).equalTo("user", req.user).withinKilometers("center", req.params.center, 0.001).first();
-    network = {
-      id: req.params.networkId,
-      __type: "Pointer",
-      className: "_Role"
-    };
-    networkAddressQuery = (new Parse.Query("Property")).equalTo("network", network).withinKilometers("center", req.params.center, 0.001).first();
-    return Parse.Promise.when(userAddressQuery, networkAddressQuery).then(function(obj1, obj2) {
-      if (obj1) {
-        return res.error("" + obj1.id + ":taken_by_user");
+      console.log('check');
+      console.log(req.params.center);
+      for (_i = 0, _len = properties.length; _i < _len; _i++) {
+        property = properties[_i];
+        console.log(property.get("center"));
+        if (req.params.center._latitude === property.get("center")._latitude && req.params.center._longitude === property.get("center")._longitude) {
+          if (property.get("network").id === req.params.networkId) {
+            return res.error("" + property.id + ":taken_by_user");
+          }
+          if (property.get("user").id === req.user.id) {
+            return res.error("" + property.id + ":taken_by_network");
+          }
+        }
       }
-      if (obj2) {
-        return res.error("" + obj2.id + ":taken_by_network");
-      }
-      return res.success();
+      return res.success(properties);
     }, function() {
       return res.error('bad_query');
     });
@@ -390,7 +391,7 @@
     }
     email = req.object.get("email");
     return (new Parse.Query("Profile")).equalTo('email', email).first().then(function(profile) {
-      var profileACL, _;
+      var profileACL;
 
       profileACL = new Parse.ACL();
       profileACL.setPublicReadAccess(true);
@@ -403,40 +404,46 @@
           user: req.object
         });
       } else {
-        _ = require("underscore");
         return (new Parse.Query("Manager")).include('network.role').equalTo('profile', profile).find().then(function(objs) {
-          _.each(objs, function(obj) {
-            var role;
+          var obj, role, _i, _len;
 
+          for (_i = 0, _len = objs.length; _i < _len; _i++) {
+            obj = objs[_i];
             role = obj.get("network").get("role");
             if (role) {
               role.getUsers().add(req.obj);
-              return role.save();
+              role.save();
             }
-          });
+          }
           return (new Parse.Query("Tenant")).include('lease.role').equalTo('profile', profile).find().then(function(objs) {
-            return _.each(objs, function(obj) {
-              var role;
+            var _j, _len1, _results;
 
+            _results = [];
+            for (_j = 0, _len1 = objs.length; _j < _len1; _j++) {
+              obj = objs[_j];
               role = obj.get("lease").get("role");
               if (role) {
                 role.getUsers().add(req.obj);
                 role.save();
               }
-              return (new Parse.Query("Notification")).equalTo('channel', "profiles-" + profile.id).find().then(function(objs) {
-                _.each(objs, function(obj) {
+              _results.push((new Parse.Query("Notification")).equalTo('channel', "profiles-" + profile.id).find().then(function(objs) {
+                var _k, _len2;
+
+                for (_k = 0, _len2 = objs.length; _k < _len2; _k++) {
+                  obj = objs[_k];
                   role = obj.get("lease").get("role");
                   if (role) {
                     role.getUsers().add(req.obj);
-                    return role.save();
+                    role.save();
                   }
-                });
+                }
                 return profile.save({
                   email: req.object.get("email"),
                   user: req.object
                 }, ACL(profileACL));
-              });
-            });
+              }));
+            }
+            return _results;
           });
         });
       }
@@ -539,20 +546,33 @@
       }
     }
     if (!req.object.existed()) {
-      return query = (new Parse.Query("Network")).get(req.user.get("network").id, {
-        success: function(network) {
-          req.object.set({
-            "public": true,
-            user: req.user,
-            network: network,
-            ACL: network.getACL()
-          });
-          return res.success();
-        },
-        error: function() {
-          return res.error('bad_query');
-        }
-      });
+      if (req.user.get("network")) {
+        return query = (new Parse.Query("Network")).get(req.user.get("network").id, {
+          success: function(network) {
+            req.object.set({
+              "public": true,
+              user: req.user,
+              network: network,
+              ACL: network.getACL()
+            });
+            return res.success();
+          },
+          error: function() {
+            return res.error('bad_query');
+          }
+        });
+      } else {
+        propertyACL = new Parse.ACL;
+        property.setPublicReadAccess(true);
+        property.setReadAccess(req.user, true);
+        property.setWriteAccess(req.user, true);
+        req.object.set({
+          "public": true,
+          user: req.user,
+          ACL: propertyACL
+        });
+        return res.success();
+      }
     } else {
       isPublic = req.object.get("public");
       propertyACL = req.object.getACL();
@@ -560,22 +580,20 @@
         propertyACL.setPublicReadAccess(isPublic);
         req.object.setACL(propertyACL);
         return (new Parse.Query("Listing")).equalTo('property', req.object).find().then(function(objs) {
-          var _;
+          var l, listingACL, _i, _len;
 
           if (objs) {
-            _ = require("underscore");
-            _.each(objs, function(l) {
-              var listingACL;
-
+            for (_i = 0, _len = objs.length; _i < _len; _i++) {
+              l = objs[_i];
               if (l.get("public" !== isPublic)) {
                 listingACL = l.getACL();
                 listingACL.setPublicReadAccess(isPublic);
-                return l.save({
+                l.save({
                   "public": isPublic,
                   ACL: listingACL
                 });
               }
-            });
+            }
             return res.success();
           } else {
             return res.success();
@@ -736,21 +754,21 @@
       unit_date_query.notEqualTo("id", req.object.get("unit"));
     }
     return unit_date_query.find().then(function(objs) {
-      var propertyId, _;
+      var ed, obj, propertyId, sd, _i, _len;
 
-      _ = require('underscore');
-      _.each(objs, function(obj) {
-        var ed, sd;
-
-        sd = obj.get("start_date");
-        if (start_date <= sd && sd <= end_date) {
-          return res.error("" + obj.id + ":overlapping_dates");
+      if (objs) {
+        for (_i = 0, _len = objs.length; _i < _len; _i++) {
+          obj = objs[_i];
+          sd = obj.get("start_date");
+          if (start_date <= sd && sd <= end_date) {
+            return res.error("" + obj.id + ":overlapping_dates");
+          }
+          ed = obj.get("end_date");
+          if (start_date <= ed && ed <= end_date) {
+            return res.error("" + obj.id + ":overlapping_dates");
+          }
         }
-        ed = obj.get("end_date");
-        if (start_date <= ed && ed <= end_date) {
-          return res.error("" + obj.id + ":overlapping_dates");
-        }
-      });
+      }
       if (existed) {
         return res.success();
       }
@@ -769,7 +787,7 @@
             users = mgrRole.getUsers();
             return users.query().get(req.user.id, {
               success: function(obj) {
-                var current, emails, leaseACL, possible, randomId, role, _i;
+                var current, emails, leaseACL, possible, randomId, role, _j;
 
                 if (obj != null) {
                   req.object.set("confirmed", true);
@@ -780,7 +798,7 @@
                 }
                 randomId = "";
                 possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-                for (_i = 1; _i < 16; _i++) {
+                for (_j = 1; _j < 16; _j++) {
                   randomId += possible.charAt(Math.floor(Math.random() * possible.length));
                 }
                 current = "tnt-current-" + randomId;

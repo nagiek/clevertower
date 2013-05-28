@@ -25,11 +25,13 @@
         <a href="/account/edit" class="btn pull-right"><%= i18nUser.menu.edit_my_profile %></a>
       <% } %>
       <ul class="nav nav-tabs">
-        <li class="active"><a id="activities-link" href="/users/<%= objectId %>" data-target="#activities"><%= i18nCommon.nouns.activity %></a></li>
+        <li class="active"><a id="activities-link" href="/users/<%= objectId %>" data-target="#activities"><%= i18nCommon.nouns.public_activity %></a></li>
         <% if (current) { %>
           <li><a id="inquiries-link" href="/users/<%= objectId %>/inquiries" data-target="#inquiries">
             <%= i18nCommon.classes.Inquiries %>
-            <span class="label label-info"><%= i18nCommon.adjectives.private %></span>
+          </a></li>
+          <li><a id="accommodation-link" href="/users/<%= objectId %>/accommodation" data-target="#accommodation">
+            <%= i18nCommon.nouns.accommodation %>
           </a></li>
         <% } %>
       </ul>
@@ -42,6 +44,11 @@
         </div>
         <% if (current) { %>
           <div id="inquiries" class="tab-pane">
+            <ul class="unstyled">
+              <li><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" /></li>
+            </ul>
+          </div>
+          <div id="accommodation" class="tab-pane">
             <ul class="unstyled">
               <li><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" /></li>
             </ul>

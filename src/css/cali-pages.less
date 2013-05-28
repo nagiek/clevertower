@@ -14,10 +14,10 @@ hgroup {
   }
 }
 
-#main {
+.main {
   margin-top: @navbarHeight;
   margin-bottom:18px;
-  .container {
+  > .container {
     padding-top: 20px;
   }
 }
@@ -41,12 +41,12 @@ hgroup {
 @media (max-width:767px) {
   body {
     &.logged-in {
-	    #main {
+	    .main {
 	      padding-top: 0 !important;
 	    }
     } 
   }
-  #main {
+  .main {
     .container {
       margin-top: 0;
     }

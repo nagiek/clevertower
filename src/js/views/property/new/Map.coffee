@@ -23,8 +23,6 @@ define [
 
     initialize: (attrs) ->
       
-      _.bindAll this, 'checkForSubmit', 'geocode', 'geolocate'
-      
       @mapId = "mapCanvas"
       
       @wizard = attrs.wizard
@@ -35,26 +33,18 @@ define [
       # Geolocation
       @browserGeoSupport = if navigator.geolocation or google.loader.ClientLocation then true else false
 
-      # object.listenTo(other, event, callback)   # Parse doesn't yet support this function
-      @wizard.on "wizard:cancel", =>
-        @undelegateEvents()
-        @remove()
-        delete this
-      
-      @wizard.on "property:save", =>
-        @undelegateEvents()
-        @remove()
-        delete this
+      @listenTo @wizard, "wizard:cancel", @clear
+      @listenTo @wizard, "property:save", @clear
 
       # update the center when the point changes
-      @marker.on "change", (updatedPoint) =>
+      @listenTo @marker, "change", (updatedPoint) =>
         @$searchInput.val updatedPoint.get('formatted_address')
         center = @model.GPoint updatedPoint.get "center"
         @gmap.setCenter center        
         @setMapZoom updatedPoint
         if @gmarker then @gmarker.setPosition center else @gmarker = new google.maps.Marker position: center, map: @gmap
 
-      @model.on "marker:remove", (removedPoint) ->
+      @listenTo @model, "marker:remove", (removedPoint) ->
         # map the model remove to a Marker remove
         @gmarker.setMap null
         delete @marker
@@ -67,20 +57,25 @@ define [
       @gmap = new google.maps.Map document.getElementById(@mapId), @model.get "opts"
       @
 
-    checkForSubmit : (e) ->
+    checkForSubmit : (e) =>
       return unless e.keyCode is 13
       @geocode(e)
 
-    geocode : (e) ->
+    geocode : (e) =>
       e.preventDefault()
       @model.geocode address: @$searchInput.val()
 
-    geolocate : (e) ->
+    geolocate : (e) =>
       e.preventDefault()
       if @browserGeoSupport
         @model.geolocate()
       else
         alert i18nProperty.errors.messages.no_geolocation
+
+    clear : =>
+      @undelegateEvents()
+      @remove()
+      delete this
 
     setMapZoom : (marker) =>
       switch marker.get "location_type"

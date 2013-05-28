@@ -15,7 +15,8 @@
           mapTypeControl: false,
           streetViewControl: false,
           draggable: false,
-          disableDoubleClickZoom: true
+          disableDoubleClickZoom: true,
+          scrollwheel: false
         };
         return this.set({
           "point_exists": false,

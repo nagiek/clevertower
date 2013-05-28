@@ -17,21 +17,15 @@ define [
 ], ($, _, Parse, PropertyList, Network, Property, SummaryPropertyView, i18nProperty, i18nCommon) ->
 
   class ManagePropertiesView extends Parse.View
-  
-    # Instead of generating a new element, bind to the existing skeleton of
-    # the App already present in the HTML.
-    el: ".content"
     
-    events:
-      'click #new-property' : "newProperty"
+    # events:
+    #   'click #new-property-link' : "newProperty"
     
     initialize : (attrs) ->
       
-      _.bindAll this, 'newProperty'
-      
       # Setup the query for the collection to look for properties from the current user
-      Parse.User.current().get("network").properties.on "add", @addOne
-      Parse.User.current().get("network").properties.on "reset", @addAll
+      @listenTo Parse.User.current().get("network").properties, "add", @addOne
+      @listenTo Parse.User.current().get("network").properties, "reset", @addAll
             
       @render()
       
@@ -63,6 +57,7 @@ define [
       #     #         property.unitsLength = number
       # else
       @addAll()
+      @
 
     
     # Add a single property item to the list by creating a view for it, and
@@ -87,25 +82,34 @@ define [
     #   require ["views/property/Show"], (PropertyView) =>
     #     propertyView = new PropertyView
 
-    newProperty : ->
+    # newProperty : =>
 
-      require ["views/property/new/Wizard"], (PropertyWizard) =>
-        @$("#new-property").prop disabled: "disabled"
-        @$("section").hide()
-        propertyWizard = (new PropertyWizard).render()
-        Parse.history.navigate "/properties/new"
-
-        propertyWizard.on "wizard:cancel", =>
-          
-          # Reset form
-          @$("#new-property").removeProp "disabled"
-          @$("section").show()
+    #   require ["views/property/new/Wizard"], (PropertyWizard) =>
+    #     @$("#new-property-link").prop disabled: "disabled"
+    #     # $("#main").addClass 'hide'
+    #     $("#main > .container > .section").addClass 'hide'
+    #     propertyWizard = new PropertyWizard
+    #     propertyWizard.setElement "#full-modal"
+    #     propertyWizard.render()
+    #     Parse.history.navigate "/properties/new"
+    #     $("#main > .container > #full-modal").removeClass 'hide'
         
-        propertyWizard.on "property:save", (property) =>
+
+    #     @listenTo propertyWizard, "wizard:cancel", =>
           
-          # Add new property to collection
-          Parse.User.current().get("network").properties.add property
+    #       # Reset form
+    #       @$("#new-property-link").removeProp "disabled"
+    #       $("#main > .container > #full-modal").addClass 'hide'
+    #       $("#main > .container > .section").removeClass 'hide'
+    #       Parse.history.navigate '/'
+        
+    #     @listenTo propertyWizard, "property:save", (property) =>
           
-          # Reset form
-          @$("#new-property").removeProp "disabled"
-          @$("section").show()
+    #       # Add new property to collection
+    #       Parse.User.current().get("network").properties.add property
+          
+    #       # Reset form
+    #       @$("#new-property-link").removeProp "disabled"
+    #       $("#main > .container > #full-modal").addClass 'hide'
+    #       $("#main > .container > .section").removeClass 'hide'
+    #       Parse.history.navigate '/'

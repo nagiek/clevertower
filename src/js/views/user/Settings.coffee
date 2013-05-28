@@ -18,12 +18,8 @@ define [
       "click #reset-password" : 'resetPassword'
     
     initialize : (attrs) ->
-      
-      _.bindAll this, 'save', 'resetPassword'
-
-      @model.on 'change', @render
                   
-      @model.on 'invalid', (error) =>
+      @listenTo @model, 'invalid', (error) =>
         @$('.error').removeClass('error')
         @$('button.save').removeProp "disabled"
         
@@ -43,7 +39,7 @@ define [
         @$('button.save').removeProp "disabled"
         new Alert(event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success')
 
-    resetPassword: (e) ->
+    resetPassword: (e) =>
     
       Parse.User.requestPasswordReset @model.getEmail(),
         success: ->
@@ -51,7 +47,7 @@ define [
     
     # Save is broken into two saves: User and profile.
     # Profile is always available, but user may be hidden.
-    save : (e) ->
+    save : (e) =>
       e.preventDefault()
       @$('button.save').prop "disabled", "disabled"
       data = @$('form').serializeObject()

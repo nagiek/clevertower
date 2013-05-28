@@ -1,7 +1,8 @@
 (function() {
   define({
     actions: {
-      back_to_profile: "Back to profile"
+      back_to_profile: "Back to profile",
+      setup: "Welcome to CleverTower"
     },
     manager_menu: {
       properties: "Properties",
@@ -27,6 +28,9 @@
       photo: function(name) {
         return "" + (_.escape(name)) + "'s photo";
       }
+    },
+    setup: {
+      performing_setup_for: "Performing setup for"
     },
     fields: {
       name: "Name",

@@ -10,11 +10,11 @@ define [
     routes:
       ""                            : "index"
       "places/:country/:region/:city/:id/:slug" : "propertiesPublic"
-      "network/set"                 : "networkSet"
       "network/:name"               : "networkShow"
       "search/*splat"               : "search"
       "users/:id"                   : "profileShow"
       "users/:id/*splat"            : "profileShow"
+      "account/setup"               : "accountSetup"
       "account/:category"           : "accountSettings"
       "*actions"                    : "index"
 
@@ -28,16 +28,14 @@ define [
       Parse.Dispatcher.on "user:login", (user) =>      
         @userView.render()
         @networkView.render()
-        if Parse.User.current().get("type") is "manager" and !Parse.User.current().get("network")
-          require ["views/helper/Alert", 'i18n!nls/property', "views/network/New"], (Alert, i18nProperty, NewNetworkView) =>
-            new Alert
-              event:    'no_network'
-              type:     'warning'
-              fade:     true
-              heading:  i18nProperty.errors.network_not_set
-            Parse.history.navigate "/network/set"
-            @view = new NewNetworkView(model: Parse.User.current().get("network")) if !@view or @view !instanceof NewNetworkView
-            @view.render()
+        unless Parse.User.current().get("network") or Parse.User.current().get("property")
+          # require ["views/helper/Alert", 'i18n!nls/property'], (Alert, i18nProperty) =>
+          #   new Alert
+          #     event:    'no_network'
+          #     type:     'warning'
+          #     fade:     true
+          #     heading:  i18nProperty.errors.network_not_set
+          @accountSetup()
         else
           # Reload the current path. Don't use navigate, as it will fail.
           # The route functions themselves are responsible for altering content.
@@ -104,22 +102,13 @@ define [
 
     # User
     # --------------
-    
-    networkSet : ->
-      if Parse.User.current()
-        require ["views/network/New"], (NewNetworkView) =>              
-          @view = new NewNetworkView(model: Parse.User.current().get("network")) # if !@view or @view !instanceof NewNetworkView
-          @view.render()
-      else
-        @signupOrLogin()
-    
 
     profileShow : (id, splat) =>
       view = @view
       require ["models/Profile", "views/profile/Show"], (Profile, ShowProfileView) =>
         vars = @deparamAction splat
         if !view or view !instanceof ShowProfileView
-          if Parse.User.current().profile and id is Parse.User.current().profile.id
+          if Parse.User.current() and Parse.User.current().profile and id is Parse.User.current().profile.id
             @view = new ShowProfileView path: vars.path, params: vars.params, model: Parse.User.current().profile, current: true
           else
             (new Parse.Query(Profile)).get id,
@@ -128,6 +117,13 @@ define [
         else
           view.changeSubView(vars.path, vars.params)
 
+    accountSetup : ->
+      if Parse.User.current()
+        require ["views/user/Setup"], (NewNetworkView) =>              
+          @view = new NewNetworkView(model: Parse.User.current().get("network")) # if !@view or @view !instanceof NewNetworkView
+          @view.render()
+      else
+        @signupOrLogin()
             
     accountSettings : (category) ->
       if Parse.User.current()

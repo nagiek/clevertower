@@ -27,7 +27,7 @@
           this.pusher.subscribe("networks-" + (Parse.User.current().get("network").id));
           this.listenTo(Parse.User.current().get("network").properties, "add", this.subscribeProperty);
         }
-        Parse.User.current().profile.on("sync", this.updateNav);
+        this.listenTo(Parse.User.current().profile, "sync", this.updateNav);
         return this.render();
       };
 

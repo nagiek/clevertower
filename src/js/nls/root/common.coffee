@@ -99,17 +99,21 @@ define
     and:                  "and"
   verbs:             
     loading:              "Loading"
+    explore:              "Explore"
+    manage:               "Manage"
   nouns:
     home:                 "Home"
     cover_photo:          "Cover Photo"
     link:                 "link"
-    building:             "building"
+    Building:             "Building"
+    tenants:              "Tenants"
     you:                  "You"
     people:               "People"
     places:               "Places"
     sample_email:         "keigan@example.com"
     comments:             "Comments"
-    activity:             "Activity"
+    public_activity:      "Public Activity"
+    accommodation:        "Accommodation"
     optional_description: "Optional description"
     extra_details:        "Extra details"
   order:

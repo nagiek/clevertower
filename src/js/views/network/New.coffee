@@ -7,19 +7,15 @@ define [
   "i18n!nls/common"
   "i18n!nls/property"
   "templates/network/new"
-  "templates/network/_form"
+  "templates/network/form"
 ], ($, _, Parse, Network, Alert, i18nCommon, i18nProperty) ->
 
   class NewNetworkView extends Parse.View
-    
-    el: '#main'
     
     events:
       'submit form'        : 'save'
     
     initialize : (attrs) ->
-      
-      _.bindAll this, 'save'
       
       @first = unless @model then true else false
       @model = new Network if @first
@@ -58,7 +54,7 @@ define [
         #   @view.render()
         #   delete this
     
-    save : (e) ->
+    save : (e) =>
       e.preventDefault()
       data = @$('form').serializeObject()
       @$('button.save').prop "disabled", "disabled"
@@ -79,3 +75,4 @@ define [
         i18nProperty: i18nProperty
       
       @$el.html JST["src/js/templates/network/new.jst"](vars)
+      @

@@ -307,24 +307,20 @@ Parse.Cloud.define "AddManagers", (req, res) ->
 
 # Address validation
 Parse.Cloud.define "CheckForUniqueProperty", (req, res) ->
-  
-  userAddressQuery = (new Parse.Query("Property"))
-  .equalTo("user",            req.user  )
-  .withinKilometers("center", req.params.center, 0.001)
-  .first()
-  
-  network = id: req.params.networkId, __type: "Pointer", className: "_Role"
-  networkAddressQuery = (new Parse.Query("Property"))
-  .equalTo("network",         network  )
-  .withinKilometers("center", req.params.center, 0.001)
-  .first()
-  
-  Parse.Promise
-  .when(userAddressQuery, networkAddressQuery)
-  .then (obj1, obj2) ->
-    if obj1 then return res.error "#{obj1.id}:taken_by_user"
-    if obj2 then return res.error "#{obj2.id}:taken_by_network" 
-    res.success()
+
+  (new Parse.Query("Property")).near("center", req.params.center)
+  .find()
+  .then (properties) ->
+
+    console.log 'check'
+    console.log req.params.center
+    for property in properties 
+      console.log property.get("center")
+      if req.params.center._latitude is property.get("center")._latitude and 
+      req.params.center._longitude is property.get("center")._longitude
+        if property.get("network").id is req.params.networkId then return res.error "#{property.id}:taken_by_user"
+        if property.get("user").id is req.user.id             then return res.error "#{property.id}:taken_by_network" 
+    res.success properties
   , -> res.error 'bad_query'
 
 
@@ -390,19 +386,18 @@ Parse.Cloud.afterSave "_User", (req, res) ->
         user: req.object
       
     else
-      _ = require "underscore"
       
       # Include the user into any properties they have been invited to.
       (new Parse.Query "Manager").include('network.role').equalTo('profile', profile).find()
       .then (objs) ->
-        _.each objs, (obj) ->
+        for obj in objs
           role = obj.get("network").get("role")
           if role
             role.getUsers().add req.obj
             role.save()
         (new Parse.Query "Tenant").include('lease.role').equalTo('profile', profile).find()
         .then (objs) ->
-          _.each objs, (obj) ->
+          for obj in objs
             role = obj.get("lease").get("role")
             if role
               role.getUsers().add req.obj
@@ -410,7 +405,7 @@ Parse.Cloud.afterSave "_User", (req, res) ->
               
             (new Parse.Query "Notification").equalTo('channel', "profiles-#{profile.id}").find()
             .then (objs) ->
-              _.each objs, (obj) ->
+              for obj in objs
                 role = obj.get("lease").get("role")
                 if role
                   role.getUsers().add req.obj
@@ -514,19 +509,32 @@ Parse.Cloud.beforeSave "Property", (req, res) ->
     return res.error 'title_missing' unless req.object.get("title")
     
   unless req.object.existed()
-    query = (new Parse.Query "Network").get req.user.get("network").id,
-    success : (network) ->
+    if req.user.get("network")
+      query = (new Parse.Query "Network").get req.user.get("network").id,
+      success : (network) ->
+
+        req.object.set
+          public: true
+          user: req.user
+          network: network
+          ACL: network.getACL()
+
+        res.success()
+
+      error : -> 
+        res.error 'bad_query'
+    else
+
+      propertyACL = new Parse.ACL
+      property.setPublicReadAccess true
+      property.setReadAccess req.user, true
+      property.setWriteAccess req.user, true
 
       req.object.set
         public: true
         user: req.user
-        network: network
-        ACL: network.getACL()
-
+        ACL: propertyACL
       res.success()
-
-    error : -> 
-      res.error 'bad_query'
       
   else
     isPublic = req.object.get "public"
@@ -539,8 +547,7 @@ Parse.Cloud.beforeSave "Property", (req, res) ->
       (new Parse.Query "Listing").equalTo('property', req.object).find()
       .then (objs) ->
         if objs
-          _ = require "underscore"
-          _.each objs, (l) ->
+          for l in objs
             if l.get "public" isnt isPublic
               listingACL = l.getACL()
               listingACL.setPublicReadAccess isPublic
@@ -688,8 +695,7 @@ Parse.Cloud.beforeSave "Lease", (req, res) ->
   if existed then unit_date_query.notEqualTo "id", req.object.get("unit")
   unit_date_query.find()
   .then (objs) ->
-    _ = require 'underscore'
-    _.each objs, (obj) ->
+    if objs then for obj in objs
       sd = obj.get "start_date"
       if start_date <= sd and sd <= end_date then return res.error "#{obj.id}:overlapping_dates"
       ed = obj.get "end_date"

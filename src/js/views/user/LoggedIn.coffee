@@ -26,7 +26,7 @@ define [
         @pusher.subscribe "networks-#{Parse.User.current().get("network").id}" 
         @listenTo Parse.User.current().get("network").properties, "add", @subscribeProperty
 
-      Parse.User.current().profile.on "sync", @updateNav
+      @listenTo Parse.User.current().profile, "sync", @updateNav
       @render()
           
     registerUser : =>

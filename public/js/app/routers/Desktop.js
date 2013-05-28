@@ -18,11 +18,11 @@
       DesktopRouter.prototype.routes = {
         "": "index",
         "places/:country/:region/:city/:id/:slug": "propertiesPublic",
-        "network/set": "networkSet",
         "network/:name": "networkShow",
         "search/*splat": "search",
         "users/:id": "profileShow",
         "users/:id/*splat": "profileShow",
+        "account/setup": "accountSetup",
         "account/:category": "accountSettings",
         "*actions": "index"
       };
@@ -39,22 +39,8 @@
         Parse.Dispatcher.on("user:login", function(user) {
           _this.userView.render();
           _this.networkView.render();
-          if (Parse.User.current().get("type") === "manager" && !Parse.User.current().get("network")) {
-            return require(["views/helper/Alert", 'i18n!nls/property', "views/network/New"], function(Alert, i18nProperty, NewNetworkView) {
-              new Alert({
-                event: 'no_network',
-                type: 'warning',
-                fade: true,
-                heading: i18nProperty.errors.network_not_set
-              });
-              Parse.history.navigate("/network/set");
-              if (!_this.view || !(_this.view instanceof NewNetworkView)) {
-                _this.view = new NewNetworkView({
-                  model: Parse.User.current().get("network")
-                });
-              }
-              return _this.view.render();
-            });
+          if (!(Parse.User.current().get("network") || Parse.User.current().get("property"))) {
+            return _this.accountSetup();
           } else {
             return Parse.history.loadUrl(location.pathname);
           }
@@ -144,21 +130,6 @@
         });
       };
 
-      DesktopRouter.prototype.networkSet = function() {
-        var _this = this;
-
-        if (Parse.User.current()) {
-          return require(["views/network/New"], function(NewNetworkView) {
-            _this.view = new NewNetworkView({
-              model: Parse.User.current().get("network")
-            });
-            return _this.view.render();
-          });
-        } else {
-          return this.signupOrLogin();
-        }
-      };
-
       DesktopRouter.prototype.profileShow = function(id, splat) {
         var view,
           _this = this;
@@ -169,7 +140,7 @@
 
           vars = _this.deparamAction(splat);
           if (!view || !(view instanceof ShowProfileView)) {
-            if (Parse.User.current().profile && id === Parse.User.current().profile.id) {
+            if (Parse.User.current() && Parse.User.current().profile && id === Parse.User.current().profile.id) {
               return _this.view = new ShowProfileView({
                 path: vars.path,
                 params: vars.params,
@@ -192,6 +163,21 @@
             return view.changeSubView(vars.path, vars.params);
           }
         });
+      };
+
+      DesktopRouter.prototype.accountSetup = function() {
+        var _this = this;
+
+        if (Parse.User.current()) {
+          return require(["views/user/Setup"], function(NewNetworkView) {
+            _this.view = new NewNetworkView({
+              model: Parse.User.current().get("network")
+            });
+            return _this.view.render();
+          });
+        } else {
+          return this.signupOrLogin();
+        }
       };
 
       DesktopRouter.prototype.accountSettings = function(category) {

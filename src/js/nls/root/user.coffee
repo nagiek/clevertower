@@ -1,6 +1,7 @@
 define
   actions:
     back_to_profile:            "Back to profile"
+    setup:                      "Welcome to CleverTower"
   manager_menu:     
     properties:                 "Properties"
     tenants:                    "Tenants"
@@ -20,6 +21,8 @@ define
     facebook:                   "Connect with friends and the world around you on Facebook."
   show:                         
     photo:      (name) ->       "#{_.escape(name)}'s photo"
+  setup:
+    performing_setup_for:       "Performing setup for"
   fields:                       
     name:                       "Name"
     first_name:                 "First Name"

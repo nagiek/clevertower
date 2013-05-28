@@ -62,7 +62,8 @@
       building: "Building",
       features: "Features",
       amenities: "Amenities",
-      included: "Included"
+      included: "Included",
+      map_instructions: "Find your building on the map. If the building is on CleverTower, you'll have the chance to join."
     },
     collection: {
       empty: {

@@ -116,11 +116,18 @@ define [
 
     propertiesNew: =>
       view = @view
-      require ["views/network/Manage"], (NetworkView) => 
-        if !view or view !instanceof NetworkView
-          @view = new NetworkView(model: Parse.User.current().get("network"), path: "properties/new/wizard", params: {})
-        else
-          @view.changeSubView path: "properties/new/wizard", params: {}
+      require ["views/property/new/Wizard"], (PropertyWizard) =>
+        if !view or view !instanceof PropertyWizard
+          @view = new PropertyWizard
+          @view.setElement "#main"
+          @view.render()
+
+
+      # require ["views/network/Manage"], (NetworkView) => 
+      #   if !view or view !instanceof NetworkView
+      #     @view = new NetworkView(model: Parse.User.current().get("network"), path: "properties/new/wizard", params: {})
+      #   else
+      #     @view.changeSubView path: "properties/new/wizard", params: {}
     
     propertiesShow: (id, splat) =>
       view = @view
@@ -166,7 +173,7 @@ define [
       require ["models/Profile", "views/profile/Show"], (Profile, ShowProfileView) =>
         vars = @deparamAction splat
         if !view or view !instanceof ShowProfileView
-          if Parse.User.current().profile and id is Parse.User.current().profile.id
+          if Parse.User.current() and Parse.User.current().profile and id is Parse.User.current().profile.id
             @view = new ShowProfileView path: vars.path, params: vars.params, model: Parse.User.current().profile, current: true
           else
             (new Parse.Query(Profile)).get id,

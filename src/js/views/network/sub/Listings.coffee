@@ -13,8 +13,6 @@ define [
 ], ($, _, Parse, ListingList, Listing, Alert, ListingView, i18nCommon, i18nUnit, i18nListing) ->
 
   class NetworkListingsView extends Parse.View
-  
-    el: ".content"
         
     initialize: (attrs) ->
       @editing = false

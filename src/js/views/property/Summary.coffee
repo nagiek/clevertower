@@ -6,7 +6,7 @@ define [
   "views/property/Show"
   "i18n!nls/property"
   "i18n!nls/common"
-  'templates/property/summary',
+  'templates/property/summary'
 ], ($, _, Parse, Property, ShowPropertyView, i18nProperty, i18nCommon) ->
 
   class PropertySummaryView extends Parse.View
@@ -16,18 +16,16 @@ define [
   
     initialize: ->
       
-      _.bindAll this, 'render'
-      
       # @model.collection.on 'show', => @undelegateEvents()
       # @model.collection.on 'close', => @delegateEvents()
-      @model.on "change", @render
+      @listenTo @model, "change", @render
       
     # show: (e) =>
     #   $('#main').append new ShowPropertyView(model:@model, e: e).render().el
     #   @model.collection.trigger 'show'
   
     # Re-render the contents of the property item.
-    render: ->
+    render: =>
       details = 
         cover        : @model.cover('profile')
         publicUrl    : @model.publicUrl()
@@ -47,4 +45,5 @@ define [
       )
       
       @$el.html JST["src/js/templates/property/summary.jst"](vars)
+      @$("[rel=tooltip]").tooltip()
       @

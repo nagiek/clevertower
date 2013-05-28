@@ -13,8 +13,6 @@ define [
 ], ($, _, Parse, TenantList, Tenant, Profile, Alert, TenantView, i18nGroup, i18nCommon) ->
 
   class NetworkTenantsView extends Parse.View
-  
-    el: ".content"
     
     events:
       'click .nav a' : 'filter'

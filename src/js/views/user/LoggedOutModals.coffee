@@ -99,7 +99,7 @@ define [
       Parse.User.signUp email, password, { type: type, email: email, ACL: new Parse.ACL() },
         success: (user) =>
           @$('> #signup-modal').modal('hide')
-          Parse.Dispatcher.trigger "user:login", user
+          Parse.Dispatcher.trigger "user:loginStart", user
           Parse.Dispatcher.trigger "user:change", user
 
         error: (user, error) =>

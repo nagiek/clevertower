@@ -45,7 +45,7 @@ html(lang="en")
               img(src="/img/logos/logo.png", alt="logo")
             ul.nav#domain-menu
               li#home-nav
-                a(href="/") Home
+                a(href="/") Explore
               li#network-nav
             .nav-collapse.collapse
               ul.nav#search-menu
@@ -63,8 +63,11 @@ html(lang="en")
     #page.page(data-role='page')      
 
       // Main
-      #main
+      #main.main
         block content
+
+      // Full-page modal, for wizards
+      // #full-modal.hide.main
           
       // Footer
       footer.footer(data-role='footer')

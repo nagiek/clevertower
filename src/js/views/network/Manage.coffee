@@ -17,16 +17,14 @@ define [
     
     initialize: (attrs) ->
 
-      _.bindAll this, 'updatePropertyCount', 'updateManagerCount', 'updateListingCount', 'updateTenantCount', 'changeSubView', 'renderSubView'
-
       @model = Parse.User.current().get("network")
 
-      @model.properties.on 'add reset', @updatePropertyCount
-      @model.listings.on 'add reset', @updateListingCount
-      @model.managers.on 'add reset', @updateManagerCount
-      @model.tenants.on 'add reset', @updateTenantCount
+      @listenTo @model.properties, 'add reset', @updatePropertyCount
+      @listenTo @model.listings, 'add reset', @updateListingCount
+      @listenTo @model.managers, 'add reset', @updateManagerCount
+      @listenTo @model.tenants, 'add reset', @updateTenantCount
       
-      @model.on 'destroy', -> Parse.Dispatcher.trigger "user:logout"
+      @listenTo @model, 'destroy', -> Parse.Dispatcher.trigger "user:logout"
       
       # Render immediately, as we will display a subview
       @render()
@@ -52,12 +50,12 @@ define [
 
       @
 
-    updatePropertyCount: -> @$("#properties-link .count").html @model.properties.length
-    updateManagerCount: -> @$("#managers-link .count").html @model.managers.length
-    updateTenantCount: -> @$("#tenants-link .count").html @model.tenants.length
-    updateListingCount: -> @$("#listings-link .count").html @model.properties.length
+    updatePropertyCount: => @$("#properties-link .count").html @model.properties.length
+    updateManagerCount: => @$("#managers-link .count").html @model.managers.length
+    updateTenantCount: => @$("#tenants-link .count").html @model.tenants.length
+    updateListingCount: => @$("#listings-link .count").html @model.properties.length
 
-    changeSubView: (path, params) ->
+    changeSubView: (path, params) =>
 
       # Remove the leading "/" and split into components
       # urlComponents = e.currentTarget.pathname.substring(1).split("/")
@@ -71,9 +69,9 @@ define [
       # Load the model if it exists.
       @renderSubView name, vars
 
-    renderSubView: (name, vars) ->
+    renderSubView: (name, vars) =>
       @subView.trigger "view:change" if @subView
-      @$('.content').removeClass 'in'
+      @$('.content').removeClass('in').empty()
       require [name], (PropertySubView) =>
         @subView = new PropertySubView(vars)
-        @$('.content').addClass 'in'
+        @$('.content').addClass('in').html @subView.render().el

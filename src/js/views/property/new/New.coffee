@@ -6,6 +6,7 @@ define [
   "i18n!nls/property"
   "i18n!nls/common"
   'templates/property/form'
+  'templates/property/form_tenant'
 ], ($, _, Parse, Property, i18nProperty, i18nCommon) ->
 
   # GMapView
@@ -14,36 +15,39 @@ define [
   class NewPropertyView extends Parse.View
 
     tagName : "form"
-    className: "property-form span8"
+    className: "property-form span12"
 
     initialize: (attrs) ->
       
       @wizard = attrs.wizard
       
-      # object.listenTo(other, event, callback)   # Should be using this form
-      @wizard.on "wizard:cancel", =>
-        @undelegateEvents()
-        @remove()
-        delete @model
-        delete this
-      
-      # object.listenTo(other, event, callback) 
-      @wizard.on "property:save", =>
-        @undelegateEvents()
-        @remove()
-        delete @model
-        delete this
+      @listenTo @wizard, "wizard:cancel", @clear
+      @listenTo @wizard, "property:save", @clear
+
         
     render : ->
-      networkVars = 
-        email: Parse.User.current().get("network").get("email")
-        phone: Parse.User.current().get("network").get("phone")
-        website: Parse.User.current().get("network").get("website")
       _.defaults(@model.attributes, Property::defaults)
-      _.defaults(@model.attributes, networkVars)
+
+      if Parse.User.current() and Parse.User.current().get("network")
+        networkVars = 
+          email: Parse.User.current().get("network").get("email")
+          phone: Parse.User.current().get("network").get("phone")
+          website: Parse.User.current().get("network").get("website")
+        _.defaults(@model.attributes, networkVars)
+        template = "src/js/templates/property/form.jst"
+      else 
+        template = "src/js/templates/property/form_tenant.jst"
+
       vars = 
         property: @model.attributes
         i18nProperty: i18nProperty
         i18nCommon: i18nCommon
-      @$el.html JST["src/js/templates/property/form.jst"](vars)
+
+
+      @$el.html JST[template](vars)
       @
+
+    clear : =>
+      @undelegateEvents()
+      @remove()
+      delete this

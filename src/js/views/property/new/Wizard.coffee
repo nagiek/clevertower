@@ -16,22 +16,21 @@ define [
     # Instead of generating a new element, bind to the existing skeleton of
     # the App already present in the HTML.
     
-    el: '.wizard'
+    className: 'wizard'
     
     state: 'address'
     
     events:
       'click .back'         : 'back'
       'click .next'         : 'next'
-      'click .cancel'       : 'cancel'
+      # 'click .cancel'       : 'cancel'
     
     initialize : ->
 
-      _.bindAll this, 'next', 'back', 'cancel', 'render'
-
       @model = new Property
 
-      @model.on "invalid", (error) =>
+      @listenTo @model, "invalid", (error) =>
+        console.log error
         @state = 'address'
         msg = if error.message.indexOf(":") > 0  
           args = error.message.split ":"
@@ -49,7 +48,7 @@ define [
       @on "address:validated", =>
         @state = 'property'
         @model.set 'title', @model.get('thoroughfare')
-        require ["views/property/new/New", "templates/property/_form"], (NewPropertyView) =>
+        require ["views/property/new/New", "templates/property/form"], (NewPropertyView) =>
 
           @form = new NewPropertyView(wizard: @, model: @model)
           @map.$el.after @form.render().el
@@ -60,24 +59,17 @@ define [
           @$('.back').prop disabled: false
           @$('.next').html(i18nCommon.actions.save)
 
-      @on "property:save", =>
-        @remove()
-        @undelegateEvents()
-        delete this
-        Parse.history.navigate '/'
-
-      @on "wizard:cancel", =>
-        @remove()
-        @undelegateEvents()
-        delete this
-        Parse.history.navigate '/'
+      @on "property:save", @clear
 
     render : ->
-      @$el.html(JST['src/js/templates/property/new/wizard.jst'](i18nCommon: i18nCommon))
+      vars = 
+        i18nCommon: i18nCommon
+        setup: !Parse.User.current() or (!Parse.User.current().get("property") and !Parse.User.current().get("network"))
+      @$el.html JST['src/js/templates/property/new/wizard.jst'](vars)
       @map = new GMapView(wizard: this, marker: @model).render()
       @
 
-    next : (e) ->
+    next : (e) =>
       @$('.error').removeClass('error')
       switch @state
         when 'address'
@@ -93,7 +85,7 @@ define [
             success: (property) =>        @trigger "property:save", property, this
             error: (property, error) =>   @model.trigger "invalid", error
 
-    back : (e) ->
+    back : (e) =>
       return if @state is 'address'
       @state = 'address'
       @map.$el.animate left: "0%", 500
@@ -104,12 +96,12 @@ define [
       @$('.back').prop disabled: 'disabled'
       @$('.next').html(i18nCommon.actions.next)
 
-    cancel : (e) ->
-      @trigger "wizard:cancel", this
+    # cancel : (e) =>
+    #   @trigger "wizard:cancel", this
+    #   @clear()
+
+    clear : =>
+      @$el.empty()
+      @stopListening()
       @undelegateEvents()
-      @$el.parent().find("section").show
       delete this
-
-    remove : ->
-      @$el.html ''
-

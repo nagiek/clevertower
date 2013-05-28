@@ -2,14 +2,12 @@ define [
   "jquery"
   "underscore"
   "backbone"
-  "collections/ActivityList"
   "models/Profile"
-  "views/activity/Summary"
-  "views/inquiry/own"
+  "views/profile/sub/Activities"
   "i18n!nls/user"
   "i18n!nls/common"
   'templates/profile/show'
-], ($, _, Parse, ActivityList, Profile, ActivityView, InquiryView, i18nUser, i18nCommon) ->
+], ($, _, Parse, Profile, ActivityView, i18nUser, i18nCommon) ->
 
   class ShowProfileView extends Parse.View
   
@@ -19,10 +17,19 @@ define [
 
       @current = attrs.current
 
+      @listenTo Parse.Dispatcher, "user:logout", @switchToPublic
+
       # Render immediately, as we will display a subview
       @render()
       @changeSubView attrs.path, attrs.params
     
+    switchToPublic: =>
+      if @subView !instanceof ActivityView
+        @current = false
+        Parse.history.navigate "/users/#{@model.id}"
+        @changeSubView()
+
+
     render: ->      
       vars = _.merge @model.toJSON(),
         cover: @model.cover 'profile'

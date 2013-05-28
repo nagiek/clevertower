@@ -11,8 +11,6 @@ define [
 ], ($, _, Parse, Network, Alert, i18nCommon, i18nProperty) ->
 
   class EditNetworkView extends Parse.View
-      
-    el: '.content'
     
     events:
       'submit form'        : 'save'
@@ -70,3 +68,4 @@ define [
         i18nProperty: i18nProperty
       
       @$el.html JST["src/js/templates/network/sub/edit.jst"](vars)
+      @

@@ -25,6 +25,7 @@ define [
         streetViewControl : false
         draggable         : false
         disableDoubleClickZoom : true
+        scrollwheel       : false
       
       # @opts = _.defaults(attrs.mapOpts, mapDefaults)
       

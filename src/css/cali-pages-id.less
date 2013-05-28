@@ -38,7 +38,7 @@
     margin-top:9px;
     margin-bottom:18px;
   }
-  #main {
+  .main {
     padding-top: @anonNavbarHeight;
   }
   #header {
@@ -58,12 +58,12 @@
 body {
   &.logged-in {
     &.page-tour {
-      #main {
+      .main {
         padding-top: @navbarHeight;
       }
     }
     .page-branding {
-      #main {
+      .main {
         padding-top: @brandStripHeight + @navbarHeight + 15px;
       }
     }
@@ -72,7 +72,7 @@ body {
 
 
 .page-branding {
-  #main {
+  .main {
     padding-top: @anonNavbarHeight + @brandStripHeight + 15px;
   }
   .brand-strip {
@@ -100,13 +100,13 @@ body {
 @media (max-width:767px) {
   .page-tour,
   .page-find-nojs-property-no-results {
-    #main {
+    .main {
       padding-top:0;
     }
   }
 
   .page-tour {
-    #main,
+    .main,
     #header,
     .page-header {
       margin-left: -20px;

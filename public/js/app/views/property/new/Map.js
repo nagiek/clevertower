@@ -10,7 +10,11 @@
       __extends(GMapView, _super);
 
       function GMapView() {
-        this.setMapZoom = __bind(this.setMapZoom, this);        _ref = GMapView.__super__.constructor.apply(this, arguments);
+        this.setMapZoom = __bind(this.setMapZoom, this);
+        this.clear = __bind(this.clear, this);
+        this.geolocate = __bind(this.geolocate, this);
+        this.geocode = __bind(this.geocode, this);
+        this.checkForSubmit = __bind(this.checkForSubmit, this);        _ref = GMapView.__super__.constructor.apply(this, arguments);
         return _ref;
       }
 
@@ -25,7 +29,6 @@
       GMapView.prototype.initialize = function(attrs) {
         var _this = this;
 
-        _.bindAll(this, 'checkForSubmit', 'geocode', 'geolocate');
         this.mapId = "mapCanvas";
         this.wizard = attrs.wizard;
         this.marker = attrs.marker;
@@ -34,17 +37,9 @@
           marker: this.marker
         });
         this.browserGeoSupport = navigator.geolocation || google.loader.ClientLocation ? true : false;
-        this.wizard.on("wizard:cancel", function() {
-          _this.undelegateEvents();
-          _this.remove();
-          return delete _this;
-        });
-        this.wizard.on("property:save", function() {
-          _this.undelegateEvents();
-          _this.remove();
-          return delete _this;
-        });
-        this.marker.on("change", function(updatedPoint) {
+        this.listenTo(this.wizard, "wizard:cancel", this.clear);
+        this.listenTo(this.wizard, "property:save", this.clear);
+        this.listenTo(this.marker, "change", function(updatedPoint) {
           var center;
 
           _this.$searchInput.val(updatedPoint.get('formatted_address'));
@@ -60,7 +55,7 @@
             });
           }
         });
-        return this.model.on("marker:remove", function(removedPoint) {
+        return this.listenTo(this.model, "marker:remove", function(removedPoint) {
           this.gmarker.setMap(null);
           return delete this.marker;
         });
@@ -100,6 +95,12 @@
         } else {
           return alert(i18nProperty.errors.messages.no_geolocation);
         }
+      };
+
+      GMapView.prototype.clear = function() {
+        this.undelegateEvents();
+        this.remove();
+        return delete this;
       };
 
       GMapView.prototype.setMapZoom = function(marker) {

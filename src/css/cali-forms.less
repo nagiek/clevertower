@@ -204,6 +204,7 @@ input {
  * Animated Form Wizards
  */
 .wizard {
+  overflow-x: hidden;
   .wizard-forms {
     position: relative;
     // overflow-x: hidden;
@@ -227,6 +228,7 @@ input {
   .wizard {
     height:auto;
     position:relative;
+    overflow-x: visible;
     .wizard-forms {
       height:auto;
     }
@@ -249,7 +251,6 @@ input {
     }
   }
 }
-
 
 .navbar-search {
   .form-type-textfield {
@@ -364,6 +365,32 @@ input {
   }
 }
 
+// Large controls
+@media (min-width: 767px) {
+  .form-large {
+    // Automatically adjust icons and buttons
+    .btn {
+      padding: @paddingLarge;
+      font-size: @fontSizeLarge;
+      line-height: 10px;
+      .border-radius(@borderRadiusLarge);
+      [class^="icon-"],
+      [class*=" icon-"] {
+        margin: -6px 0;
+      }
+    }
+
+    [class^="icon-"], [class*=" icon-"] {
+      background-image: url(@iconBigSpritePath);
+      width: 21px;
+      height: 25px;
+      line-height: 25px;
+    }
+    .icon-search { background-position: -274px -75px; }
+    .icon-map-marker { background-position: -82px -930px; }
+    .icon-white { background-image: url(@iconBigWhiteSpritePath); }
+  }
+}
 
 
 

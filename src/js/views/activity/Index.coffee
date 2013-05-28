@@ -5,6 +5,7 @@ define [
   'collections/ActivityList'
   "views/listing/Search"
   "views/post/New"
+  "views/property/Prompt"
   "views/activity/summary"
   "i18n!nls/listing"
   "i18n!nls/common"
@@ -12,7 +13,7 @@ define [
   'masonry'
   'jqueryui'
   "gmaps"
-], ($, _, Parse, ActivityList, ListingSearchView, NewPostView, ActivitySummaryView, i18nListing, i18nCommon) ->
+], ($, _, Parse, ActivityList, ListingSearchView, NewPostView, PromptPropertyView, ActivitySummaryView, i18nListing, i18nCommon) ->
 
   class ActivityIndexView extends Parse.View
   
@@ -35,6 +36,8 @@ define [
       @listenTo Parse.Dispatcher, "user:login", => 
         @getUserActivity()
         @userView = new NewPostView(map: @map).render()
+        @promptView = new PromptPropertyView
+        
 
       @listenTo Parse.App.search, "google:search", (data) =>
         @location = data.location
@@ -69,7 +72,7 @@ define [
 
     refreshDisplay : ->
       Parse.App.activity.each (a) -> a.trigger "refresh"
-      if Parse.User.current()
+      if Parse.User.current() and Parse.User.current().activity
         Parse.User.current().activity.each (a) -> a.trigger "refresh" 
       @$list.masonry 'reload'
 
@@ -247,8 +250,9 @@ define [
         streetViewControl : false
 
       if Parse.User.current()
-        Parse.User.current().activity.fetch()
+        Parse.User.current().activity.fetch() if Parse.User.current().activity
         @userView = new NewPostView(view: @).render()
+        @promptView = new PromptPropertyView
 
         if Parse.User.current().get("property")
           Parse.User.current().get("property").marker = new google.maps.Marker

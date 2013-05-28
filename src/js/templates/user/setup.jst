@@ -1,0 +1,20 @@
+<div class="container">
+  <header class="row">
+    <h1 class="offset1 span6"><%= i18nUser.actions.setup %></h1>
+
+    <form class="span5 form-inline" method="post" id="settings-form">      
+      <div id="user-type-group" class="control-group">
+        <label for="user-type" class="control-label"><%= i18nUser.setup.performing_setup_for %>:</label>
+        <div class="controls">
+          <div class="toggle">
+          <label class="toggle-radio" for="typeOption1"><%= i18nDevise.form.type.tenant %></label>
+          <input type="radio" name="user-type" id="typeOption1" value="tenant" <%= type == 'tenant' ? checked="checked" : '' %>>
+          <input type="radio" name="user-type" id="typeOption2" value="manager" <%= type == 'manager' ? checked="checked" : '' %>>
+          <label class="toggle-radio" for="typeOption2"><%= i18nDevise.form.type.manager %></label>
+        </div>
+      </div>
+    </form>
+  </header>
+
+  <div class="content fade in"></div>
+</div>

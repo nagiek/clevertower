@@ -8,13 +8,13 @@ define [
   'templates/profile/show'
 ], ($, _, Parse, InquiryView, i18nUser, i18nCommon) ->
 
-  class InquiriesProfileView extends Parse.View
+  class ProfileInquiriesView extends Parse.View
   
     el: "#inquiries"
     
     initialize: (attrs) ->
 
-      @current = attrs.current
+      @listenTo Parse.Dispatcher, "user:logout", @clear
 
       @model.prep('applicants')
       @model.applicants.on "reset", @addAllInquiries
@@ -25,7 +25,10 @@ define [
       if @model.applicants.length > 0 then @addAllInquiries else @model.applicants.fetch()
       @
 
-
+    clear: ->
+      @remove()
+      @undelegateEvents()
+      delete this
 
     # Inquiries
     # ---------

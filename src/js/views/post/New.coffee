@@ -16,7 +16,7 @@ define [
   
     # Instead of generating a new element, bind to the existing skeleton of
     # the App already present in the HTML.
-    el: "#user-container"
+    el: "#new-post"
 
     events:
       "submit form"                     : "post"
@@ -136,7 +136,7 @@ define [
                           """
       else 
         @$('.empty').html """
-                    <a href='/network/set'>
+                    <a href='/account/setup'>
                       #{i18nProperty.actions.join_or_create_a_property_to_start}
                     </a>
                     """

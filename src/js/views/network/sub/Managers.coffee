@@ -13,8 +13,6 @@ define [
 ], ($, _, Parse, ManagerList, Manager, Profile, Alert, ManagerView, i18nGroup, i18nCommon) ->
 
   class NetworkManagersView extends Parse.View
-  
-    el: ".content"
     
     events:
       'submit form' : 'save'

@@ -8,34 +8,35 @@ define [
 
   class NetworkMenuView extends Parse.View
 
-    el: "#network-nav"
+    el: "#domain-menu"
     
     initialize: ->
-      _.bindAll this, "render"
 
       Parse.Dispatcher.on "user:logout", ->
         delete @model
     
-    initModel :->
+    initModel : ->
       @model = Parse.User.current().get("network")
-      @model.on "change", @render
+      @listenTo @model, "change", @render
       
-    render: ->  
+    render: =>  
       if Parse.User.current() and Parse.User.current().get("network")
         @initModel()
         
+      @$('#home-nav a').html i18nCommon.verbs.explore
+
       hostArray = location.host.split(".")
       if hostArray.length > 2
         # On a subdomain
         hostArray.shift()
-        $('#home-nav a').prop "href", '//' + hostArray.join(".")
-        @$el.html if Parse.User.current() then "<a href='/'>#{i18nCommon.classes.Network}</a>" else ''
+        @$('#home-nav a').prop "href", '//' + hostArray.join(".")
+        @$('#network-nav').html if Parse.User.current() then "<a href='/'>#{i18nCommon.verbs.manage}</a>" else ''
       else
         # On main domain
         if Parse.User.current()
           # Set the link to the network subdomain.
-          href = if @model then @model.privateUrl() else "/network/set"
-          @$el.html "<a href='#{href}'>#{i18nCommon.classes.Network}</a>"
+          href = if @model then @model.privateUrl() else "/account/setup"
+          @$('#network-nav').html "<a href='#{href}'>#{i18nCommon.verbs.manage}</a>"
         else
-          @$el.html ""
+          @$('#network-nav').html ""
       @
