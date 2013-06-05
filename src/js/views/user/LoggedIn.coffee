@@ -8,8 +8,9 @@ define [
   'views/notification/Index'
   "i18n!nls/devise"
   "i18n!nls/user"
+  "i18n!nls/common"
   "templates/user/logged_in_menu"
-], ($, _, Parse, Pusher, PropertyList, Profile, NotificationsView, i18nDevise, i18nUser) ->
+], ($, _, Parse, Pusher, PropertyList, Profile, NotificationsView, i18nDevise, i18nUser, i18nCommon) ->
 
   class LoggedInView extends Parse.View
 
@@ -26,7 +27,7 @@ define [
         @pusher.subscribe "networks-#{Parse.User.current().get("network").id}" 
         @listenTo Parse.User.current().get("network").properties, "add", @subscribeProperty
 
-      @listenTo Parse.User.current().profile, "sync", @updateNav
+      @listenTo Parse.User.current().get("profile"), "sync", @updateNav
       @render()
           
     registerUser : =>
@@ -52,14 +53,15 @@ define [
       delete this
 
     render: ->
-      name = Parse.User.current().profile.name()
+      name = Parse.User.current().get("profile").name()
       vars = 
-        src: Parse.User.current().profile.cover('micro')
+        src: Parse.User.current().get("profile").cover('micro')
         photo_alt: i18nUser.show.photo(name)
         name: name
-        objectId: Parse.User.current().profile.id
+        objectId: Parse.User.current().get("profile").id
         i18nUser: i18nUser
         i18nDevise: i18nDevise
+        i18nCommon: i18nCommon
 
       @$el.html JST["src/js/templates/user/logged_in_menu.jst"](vars)
       @notificationsView = new NotificationsView
@@ -68,5 +70,5 @@ define [
 
 
     updateNav: ->
-      @$('#profile-link img').prop "src", Parse.User.current().profile.cover("micro")
-      @$('#profile-link span').html Parse.User.current().profile.name()
+      @$('#profile-link img').prop "src", Parse.User.current().get("profile").cover("micro")
+      @$('#profile-link span').html Parse.User.current().get("profile").name()

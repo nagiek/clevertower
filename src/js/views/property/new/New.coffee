@@ -6,7 +6,6 @@ define [
   "i18n!nls/property"
   "i18n!nls/common"
   'templates/property/form'
-  'templates/property/form_tenant'
 ], ($, _, Parse, Property, i18nProperty, i18nCommon) ->
 
   # GMapView
@@ -26,25 +25,21 @@ define [
 
         
     render : ->
-      _.defaults(@model.attributes, Property::defaults)
 
+      # Merge in defaults.
+      _.defaults @model.attributes, Property::defaults
       if Parse.User.current() and Parse.User.current().get("network")
-        networkVars = 
+        _.defaults @model.attributes,
           email: Parse.User.current().get("network").get("email")
           phone: Parse.User.current().get("network").get("phone")
           website: Parse.User.current().get("network").get("website")
-        _.defaults(@model.attributes, networkVars)
-        template = "src/js/templates/property/form.jst"
-      else 
-        template = "src/js/templates/property/form_tenant.jst"
 
       vars = 
         property: @model.attributes
         i18nProperty: i18nProperty
         i18nCommon: i18nCommon
 
-
-      @$el.html JST[template](vars)
+      @$el.html JST["src/js/templates/property/form.jst"](vars)
       @
 
     clear : =>

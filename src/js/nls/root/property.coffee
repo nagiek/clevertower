@@ -6,8 +6,10 @@ define
     setup_property:                   "Setup Property"
     edit_picture:                     "Change Picture"
     go_to_network:                    "Go to network"
-    add_to_start:                     "Add a property to get started"
+    # add_to_start:                     "Add a property to get started"
+    add_a_property:                   "Add a property"
     join_or_create_to_start:          "Join or create a property to get started"
+    join_property_at:      (title) -> "Create your lease at <em>#{_.escape(title)}</em>"
   menu:                                 
     dashboard:                        "Dashboard"
     day_to_day:                       "Day to Day"
@@ -62,7 +64,10 @@ define
     features:                         "Features"
     amenities:                        "Amenities"
     included:                         "Included"
+  search:
     map_instructions:                 "Find your building on the map. If the building is on CleverTower, you'll have the chance to join."
+    awaiting_search:                  "Awaiting search."
+    no_results:                       "No nearby buildings."
   collection:                         
     empty:                            
       properties:                     "You don't have any properties yet."
@@ -117,7 +122,7 @@ define
     name_taken:             (id) ->   """
                                       <p>This name has been taken by an existing network.</p>
                                       <p>
-                                        <a href="/network/#{id}" class="btn btn-warning">View network</a>
+                                        <a href="/network/#{_.escape(id)}" class="btn btn-warning">View network</a>
                                         <a class="btn close">Close</a>
                                       </p>
                                       """

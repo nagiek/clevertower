@@ -20,7 +20,7 @@
         'blur input': 'update',
         'blur textarea': 'update',
         'blur select': 'updateS',
-        'click .remove': 'clear',
+        'click .remove': 'kill',
         'click .delete': 'delete',
         "keypress .title": "newOnEnter"
       };
@@ -28,32 +28,21 @@
       UnitSummaryView.prototype.initialize = function() {
         var _this = this;
 
-        this.model.on("change:title", function() {
+        this.listenTo(this.model, "change:title", function() {
           return _this.$('.unit-link').html(_this.model.get("title"));
         });
-        this.model.on("save:success", function() {
-          return _this.render();
-        });
-        this.model.on("destroy", function() {
-          _this.remove();
-          _this.undelegateEvents();
-          return delete _this;
-        });
-        return this.model.on("invalid", function(unit, error) {
-          var msg;
-
+        this.listenTo(this.model.collection, "save:success", this.render);
+        this.listenTo(this.model, "invalid", function(error) {
           _this.$el.addClass('error');
           switch (error.message) {
             case 'title_missing':
-              _this.$('.title-group .control-group').addClass('error');
+              return _this.$('.title-group .control-group').addClass('error');
           }
-          msg = (typeof error.code === "function" ? error.code(i18nCommon.errors[error.message]) : void 0) ? void 0 : i18nUnit.errors[error.message];
-          return new Alert({
-            event: 'unit-invalid',
-            fade: false,
-            message: msg,
-            type: 'error'
-          });
+        });
+        return this.listenTo(this.model, "destroy", function() {
+          _this.remove();
+          _this.undelegateEvents();
+          return delete _this;
         });
       };
 
@@ -75,7 +64,8 @@
         } else {
           vars.activeLease = false;
         }
-        $(this.el).html(JST["src/js/templates/unit/summary.jst"](vars));
+        this.$el.html(JST["src/js/templates/unit/summary.jst"](vars));
+        this.$('[rel=tooltip]').tooltip();
         return this;
       };
 
@@ -97,7 +87,7 @@
         return e;
       };
 
-      UnitSummaryView.prototype.clear = function(e) {
+      UnitSummaryView.prototype.kill = function(e) {
         e.preventDefault();
         return this.model.destroy();
       };

@@ -4,7 +4,7 @@ this["JST"]["src/js/templates/property/show.jst"] = function(obj) {
 obj || (obj = {});
 var __t, __p = '', __e = _.escape;
 with (obj) {
-__p += '<div class="container">\n  <div class="page-header clearfix">    \n    <div class="photo photo-thumbnail photo-elastic pull-left tablet-left">\n      <a href="/properties/' +
+__p += '<div id="property" class="container">\n  <div class="page-header clearfix">    \n    <div class="photo photo-thumbnail photo-elastic pull-left tablet-left">\n      <a href="/properties/' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '">\n        <img src="' +
 ((__t = ( cover )) == null ? '' : __t) +

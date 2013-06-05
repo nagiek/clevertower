@@ -93,7 +93,7 @@ define [
       
       vars = _.merge @model.toJSON(),
         email: @model.getEmail()
-        cancel_path: "/users/#{Parse.User.current().profile.id}"
+        cancel_path: "/users/#{Parse.User.current().get('profile').id}"
         i18nCommon: i18nCommon
         i18nDevise: i18nDevise
       vars.type = 'tenant' unless vars.type

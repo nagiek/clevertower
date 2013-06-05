@@ -18,9 +18,9 @@
       rent_this_month: "Rent this month"
     },
     dates: {
-      starting_this_month: "Starting This Month",
-      starting_next_month: "Starting Next Month",
-      july_to_june: "July 1st to June 30th",
+      this_month: "This Month",
+      next_month: "Next Month",
+      july: "July 1st",
       active: "active",
       inactive: "inactive"
     },
@@ -36,6 +36,7 @@
       empty: "You haven't added any tenants to the lease yet."
     },
     errors: {
+      no_title: "You must enter a title for the unit",
       unit_missing: "You must enter a unit",
       dates_missing: "You must enter a start and end date",
       dates_incorrect: "The start date cannot be after the end date",

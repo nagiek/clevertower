@@ -4,12 +4,25 @@
     <span class="photo-float micro-float"><%= name %></span>
   </a>
 </li>
-<li id="notifications" class="dropdown">
-  <a id="nLabel" data-target="#" data-toggle="dropdown" role="menu" class="dropdown-toggle">
+<li id="memos" class="dropdown">
+  <a id="mLabel" data-target="#" data-toggle="dropdown" role="menu" class="dropdown-toggle">
     <i class="icon icon-flag"></i>
-    <span id="notifications-count" class="badge">0</span>
+    <span id="memos-count" class="badge">0</span>
   </a>
-  <ul aria-labelledby="nLabel" role="menu" class="dropdown-menu pull-right"></ul>
+  <div aria-labelledby="mLabel" role="menu" class="dropdown-menu pull-right">
+    <ul class="notifications-menu"></ul>
+    <a href="/notifications" class="dropdown-bottom"><%= i18nCommon.expressions.see_all %></a>
+  </div>
+</li>
+<li id="friend-requests" class="dropdown">
+  <a id="fLabel" data-target="#" data-toggle="dropdown" role="menu" class="dropdown-toggle">
+    <i class="icon icon-user"></i>
+    <span id="friend-requests-count" class="badge">0</span>
+  </a>
+  <div aria-labelledby="fLabel" role="menu" class="dropdown-menu pull-right">
+    <ul class="notifications-menu"></ul>
+    <a href="/notifications" class="dropdown-bottom"><%= i18nCommon.expressions.see_all %></a>
+  </div>
 </li>
 <li class="dropdown">
   <a id="pLabel" data-target="#" data-toggle="dropdown" role="menu" class="dropdown-toggle">

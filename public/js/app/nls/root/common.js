@@ -22,6 +22,7 @@
       Managers: "Managers",
       tasks: "tasks",
       finances: "finances",
+      notifications: "Notifications",
       Applicants: "Applicants",
       Inquiries: "Inquiries",
       listings: "listings",
@@ -38,6 +39,7 @@
       go_to: "Go to",
       show: "Show",
       post: "Post",
+      join: "Join",
       search: "Search",
       destroy: "Destroy",
       upload: "Upload",
@@ -49,6 +51,7 @@
       close: "Close",
       save: "Save",
       update: "Update",
+      create: "Create",
       back: "Back",
       edit: "Edit",
       undo: "Undo",
@@ -57,7 +60,8 @@
       apply: "Apply",
       live_at: "Live at",
       revoke_access: "Revoke access",
-      confirm: "Are you sure?",
+      confirm: "Confirm",
+      ignore: "Ignore",
       add_more: "Add more",
       add_another: "Add another",
       add_files: "Add files",
@@ -82,16 +86,45 @@
     },
     notifications: {
       img: "Notification Image",
-      empty: "No new notifications",
-      text: {
-        new_inquiry: function(person, property) {
-          return "<strong>" + (_.escape(person)) + "</strong> has applied to join <strong>" + (_.escape(property)) + "</strong>";
+      empty: {
+        memo: "No new notifications",
+        withAction: "No new requests or invitations",
+        all: "No notifications, requests or invitations"
+      },
+      new_inquiry: function(person, property) {
+        return "<strong>" + (_.escape(person)) + "</strong> has applied to join <strong>" + (_.escape(property)) + "</strong>";
+      },
+      inquiry_invitation: {
+        invited: function(person, property) {
+          return "<strong>" + (_.escape(person)) + "</strong> has indicated you are applying to join <strong>" + (_.escape(property)) + "</strong>";
         },
-        lease_invitation: function(person) {
+        accept: function(property) {
+          return "You have accepted the invitation to join <strong>" + (_.escape(property)) + "</strong>";
+        },
+        ignore: function(property) {
+          return "You have ignored the invitation to join <strong>" + (_.escape(property)) + "</strong>";
+        }
+      },
+      lease_invitation: {
+        invited: function(person, property) {
           return "You have been invited to a lease at <strong>" + (_.escape(property)) + "</strong>";
         },
-        inquiry_invitation: function(person, property) {
-          return "<strong>" + (_.escape(person)) + "</strong> has indicated you are applying to join <strong>" + (_.escape(property)) + "</strong>";
+        accept: function(property) {
+          return "You have accepted the invitation at <strong>" + (_.escape(property)) + "</strong>";
+        },
+        ignore: function(property) {
+          return "You have ignored the invitation at <strong>" + (_.escape(property)) + "</strong>";
+        }
+      },
+      network_invitation: {
+        invited: function(person, network) {
+          return "<strong>" + (_.escape(person)) + "</strong> invited you to join their network <strong>" + (_.escape(network)) + "</strong>";
+        },
+        accept: function(network) {
+          return "You have accepted the invitation to join <strong>" + (_.escape(network)) + "</strong>";
+        },
+        ignore: function(network) {
+          return "You have ignored the invitation to join <strong>" + (_.escape(network)) + "</strong>";
         }
       }
     },
@@ -103,6 +136,8 @@
       confirmed: "Confirmed"
     },
     prepositions: {
+      where: "Where",
+      when: "When",
       about: "About",
       of: "of",
       on: "on",
@@ -115,15 +150,23 @@
       and: "and"
     },
     verbs: {
+      beginning: "Beginning",
       loading: "Loading",
       explore: "Explore",
       manage: "Manage"
+    },
+    expressions: {
+      delete_forever: "Delete forever",
+      are_you_sure: "Are you sure?",
+      get_started: "Get started",
+      skip_this_step: "Skip this step",
+      see_all: "See all"
     },
     nouns: {
       home: "Home",
       cover_photo: "Cover Photo",
       link: "link",
-      Building: "Building",
+      building: "building",
       tenants: "Tenants",
       you: "You",
       people: "People",
@@ -142,6 +185,7 @@
     adjectives: {
       small: "Big",
       big: "Small",
+      done: "Done",
       "new": "new",
       unsaved: "Unsaved",
       linked: "Linked",
@@ -158,6 +202,7 @@
       not_specified: "Not specified"
     },
     form: {
+      find_people_using: 'Find people using',
       center_on_property: "Center on property",
       operations: "Operations",
       info: "Info",

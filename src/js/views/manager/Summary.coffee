@@ -27,7 +27,7 @@ define [
     # Re-render the contents of the property item.
     render: ->
       status = @model.get 'status'
-      current_user = @model.get("profile").id is Parse.User.current().profile.id
+      current_user = @model.get("profile").id is Parse.User.current().get("profile").id
       vars = _.merge @model.get("profile").toJSON(),
         i_status: i18nGroup.fields.status[status]
         status: status

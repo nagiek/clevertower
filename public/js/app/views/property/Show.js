@@ -16,7 +16,7 @@
         return _ref;
       }
 
-      ShowPropertyView.prototype.el = '#property';
+      ShowPropertyView.prototype.el = '#main';
 
       ShowPropertyView.prototype.events = {
         'click .edit-profile-picture': 'editProfilePicture'

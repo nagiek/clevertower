@@ -42,7 +42,7 @@ define [
     render: ->
       vars =
         fbLinked:     Parse.FacebookUtils.isLinked(Parse.User.current())
-        cancel_path:  "/users/#{Parse.User.current().profile.id}"
+        cancel_path:  "/users/#{Parse.User.current().get('profile').id}"
         i18nCommon:   i18nCommon
         i18nUser:     i18nUser
       

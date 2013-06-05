@@ -18,7 +18,7 @@ define [
 
   class ShowPropertyView extends Parse.View
 
-    el: '#property'
+    el: '#main'
     
     events:
       'click .edit-profile-picture': 'editProfilePicture'

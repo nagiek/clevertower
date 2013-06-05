@@ -655,7 +655,6 @@
 
   "use strict"; // jshint ;_;
 
-
  /* DROPDOWN CLASS DEFINITION
   * ========================= */
 

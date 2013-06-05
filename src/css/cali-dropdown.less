@@ -5,9 +5,37 @@
   cursor: pointer;
 }
 
+.dropdown-bottom {
+  text-align: center;
+  display: block;
+  margin-top:5px;
+  padding:5px 0;
+  position:relative;
+  top:6px;
+  background-color: @grayLighter;
+  color:@grayLight;
+  .border-radius(0 0 6px 6px);
+  &:hover {
+    color:@gray;
+    text-decoration: none;
+  }
+}
+
 // The dropdown menu (ul)
 // ----------------------
 .dropdown-menu {
+
+  li {
+    &.empty {
+      padding: 8px 8px 4px;
+      text-align:center;
+    }
+  }
+
+  // Apply to lists within the dropdown.
+  ul {
+    list-style: none;
+  }
   
   form {
     margin-bottom:0;
@@ -43,6 +71,19 @@
         float:right;
         margin-right:5px;
       }
+    }
+  }
+  
+  // Allow dropdown menu style to be applied to form/div tags as well
+  > li {
+    > div,
+    > form {
+      padding: 3px 20px;
+      clear: both;
+      // font-weight: normal;
+      // line-height: @baseLineHeight;
+      // color: @dropdownLinkColor;
+      // white-space: nowrap;
     }
   }
 }

@@ -36,8 +36,6 @@ define [
       @listenTo Parse.Dispatcher, "user:login", => 
         @getUserActivity()
         @userView = new NewPostView(map: @map).render()
-        @promptView = new PromptPropertyView
-        
 
       @listenTo Parse.App.search, "google:search", (data) =>
         @location = data.location
@@ -146,15 +144,15 @@ define [
 
     getUserActivity : =>
       # Get the property from what we've already loaded.
+      Parse.User.current().activity = new ActivityList [], {} unless Parse.User.current().activity
       if Parse.User.current().get("property")
         @center = @GPoint Parse.User.current().get("property").get("center") unless @center
         @radius = 15000
 
-        # Activity list for *property*
-        unless Parse.User.current().activity
-          Parse.User.current().activity = new ActivityList [], property: Parse.User.current().get("property") 
-          @listenTo Parse.User.current().activity, 'add', @addOnePropertyActivity
-          Parse.App.activity.query.notEqualTo "property", Parse.User.current().get("property")
+        # Activity list for *property*        
+        Parse.User.current().activity.query.equalTo "property", Parse.User.current().get("property")
+        @listenTo Parse.User.current().activity, 'add', @addOnePropertyActivity
+        Parse.App.activity.query.notEqualTo "property", Parse.User.current().get("property")
 
         # Render immediately, as we already have the center & radius from the property
         @render()
@@ -163,7 +161,7 @@ define [
 
         # Activity list for *network*
         unless Parse.User.current().activity
-          Parse.User.current().activity = new ActivityList [], network: Parse.User.current().get("network")
+          Parse.User.current().activity.query.equalTo "network", Parse.User.current().get("network")
           @listenTo Parse.User.current().activity, 'add', @addOnePropertyActivity
           Parse.App.activity.query.notEqualTo "network", Parse.User.current().get("network")
 
@@ -252,7 +250,6 @@ define [
       if Parse.User.current()
         Parse.User.current().activity.fetch() if Parse.User.current().activity
         @userView = new NewPostView(view: @).render()
-        @promptView = new PromptPropertyView
 
         if Parse.User.current().get("property")
           Parse.User.current().get("property").marker = new google.maps.Marker

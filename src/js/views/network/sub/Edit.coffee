@@ -7,7 +7,7 @@ define [
   "i18n!nls/common"
   "i18n!nls/property"
   "templates/network/sub/edit"
-  "templates/network/_form"
+  "templates/network/form"
 ], ($, _, Parse, Network, Alert, i18nCommon, i18nProperty) ->
 
   class EditNetworkView extends Parse.View

@@ -19,8 +19,6 @@ define [
     
     initialize: (attrs) ->
       
-      _.bindAll this, 'addOne', 'addAll', 'render'
-      
       @on "submit:success", (models) -> 
         @model.managers.add models
         new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
@@ -34,13 +32,13 @@ define [
       
       @model.prep('managers')
       
-      @model.managers.on "add",   @addOne
-      @model.managers.on "reset", @addAll
+      @listenTo @model.managers, "add",   @addOne
+      @listenTo @model.managers, "reset", @addAll
       
       @render()
       
     # Re-render the contents of the Unit item.
-    render: ->
+    render: =>
       
       vars = _.merge(i18nGroup: i18nGroup, i18nCommon: i18nCommon)
       @$el.html JST["src/js/templates/network/sub/managers.jst"](vars)
@@ -50,10 +48,10 @@ define [
       if @model.managers.length is 0 then @model.managers.fetch() else @addAll()
       @
       
-    addOne : (manager) ->
+    addOne : (manager) =>
       @$list.append (new ManagerView(model: manager)).render().el
 
-    addAll : ->
+    addAll : =>
       @$list.html ''
       @model.managers.each @addOne
             

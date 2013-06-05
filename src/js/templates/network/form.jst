@@ -1,9 +1,9 @@
 <div class="row">
-  <fieldset class="form-xlarge offset1 span6">
+  <fieldset class="form-xlarge <% if (isNew) { %>offset1 <% } %>span6">
     <div class="title-group control-group">
       <label for="network-title" class="control-label "><%= i18nProperty.network.give_network_a_title %> <span class="required">*</span></label>
       <div class="controls">
-        <input type="text" class="span5" name="network[title]" maxlength="127" value="<%= network.title %>" required="required" />
+        <input type="text" id="network-title" class="span5" name="network[title]" maxlength="127" value="<%= network.title %>" required="required" />
         <p class="help-block"><%= i18nProperty.network.can_be_anything %></p>
       </div>
     </div>
@@ -11,13 +11,14 @@
       <label for="network-name" class="control-label"><%= i18nProperty.network.claim_domain %> <span class="required">*</span></label>
       <div class="controls">
         <div class="input-append">
-          <input type="text" class="input-block input-large text-right" name="network[name]" maxlength="32" value="<%= network.name %>" required="required" />
+          <input type="text" id="network-name" class="input-block input-large text-right" name="network[name]" maxlength="32" value="<%= network.name %>" required="required" />
           <span class="add-on">.clevertower.com</span>
         </div>
         <p class="help-block"><%= i18nCommon.form.lowercase_only %></p>
       </div>
     </div>
   </fieldset>
+<% if (!isNew) { %></div><div class="row"><% } %>
   <fieldset class="span5 form-large">
     <div class="control-group">
       <label for="network-phone" class="control-label"><%= i18nProperty.fields.phone %></label>

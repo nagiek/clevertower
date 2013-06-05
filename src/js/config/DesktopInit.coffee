@@ -120,6 +120,7 @@ require [
   "models/Profile"
   "collections/ListingFeaturedList"
   "collections/ActivityList"
+  "collections/NotificationList"
   router,
   "underscore.string"
   "json2"
@@ -127,9 +128,11 @@ require [
   "serializeObject"
   "typeahead"
   "masonry"
-], ($, _, Parse, FB, Profile, FeaturedListingList, ActivityList, AppRouter, _String) ->
+], ($, _, Parse, FB, Profile, FeaturedListingList, ActivityList, NotificationList, AppRouter, _String) ->
 
-  Parse.onNetwork = onNetwork
+
+  # Events
+  # ---------
 
   # # Regular expression used to split event strings.
   eventSplitter = /\s+/
@@ -170,6 +173,7 @@ require [
     once._callback = callback
     @on name, once, context
 
+  Parse.Object::once = Parse.Events.once
   Parse.View::once = Parse.Events.once
   Parse.Collection::once = Parse.Events.once
 
@@ -213,7 +217,12 @@ require [
     @stopListening()
     @
 
+
+  # App
+  # ---------
+
   Parse.initialize window.APPID, window.JSKEY
+  Parse.onNetwork = onNetwork
   Parse.App = {}
 
   Parse.App.featuredListings = new FeaturedListingList 
@@ -223,6 +232,15 @@ require [
     US: "United States"
 
 
+  # Bootstrap
+  # ---------
+
+  # When we click a button in a dropdown, keep dropdown alive.
+  # $(document).on 'click.dropdown.data-api', '.dropdown form button', (e) -> e.stopPropagation()
+
+
+  # Underscore
+  # ---------
 
   # Import Underscore.string to separate object, because there are conflict functions (include, reverse, contains)
   _.str = _String
@@ -272,19 +290,23 @@ require [
   # Load all the stuff
   Parse.User::setup = ->
     profilePromise = (new Parse.Query(Profile)).equalTo("user", @).first()
-    networkPromise = (new Parse.Query("_User")).include('network.role').equalTo("objectId", @id).first()
-    Parse.Promise.when(profilePromise, networkPromise).then (profile, user) => 
+    userPromise = (new Parse.Query("_User")).include('property.role').include('network.role').equalTo("objectId", @id).first()
+    @notifications = new NotificationList
+
+    Parse.Promise.when(profilePromise, userPromise, @notifications.query.find()).then (profile, user, notifs) => 
+
+      @notifications.add notifs
 
       # Find where the user has applied
       profile.prep("applicants").fetch()
-      @profile = profile
+      @set "profile", profile
+
+      @set "property", user.get("property")
 
       # Load the network regardless if we are on a subdomain or not, as we need the link.
       # Should query for network when loading user... this is weird.
       # Set network on current user from loaded user.
       network = user.get "network"
-      property = user.get "property"
-
       if network
 
         # Create & fill our collections

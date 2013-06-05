@@ -14,16 +14,45 @@ define [
     tagName: "li"
   
     events:
-      'click > a' : 'markAsClicked'
+      'click a.unclicked' : 'handleClick'
+      'click .accept' : 'accept'
+      'click .ignore' : 'ignore'
+      'click .undo' : 'undo'
         
     initialize: ->
       @listenTo Parse.Dispatcher, "user:logout", @clear
-        
-    markAsClicked: (e) =>
 
-      @model.add(clicked: [Parse.User.current()])
-      @model.save null, patch: true
+    handleClick : =>
       @$("> a").removeClass "unclicked"
+      @markAsClicked()
+
+    accept: (e) =>
+      actionItem = if @model.get("tenant") then @model.get("tenant") else @model.get("manager")
+      return unless actionItem
+      @model.add hidden: [Parse.User.current().id]
+      @markAsClicked()
+      @$el.html "<div>" + @model.accepted() + "</div>"
+
+      # Until req.object.original lands for Cloud Code, have to pass in new status.
+      actionItem.save(newStatus: "current").then ->
+        if @model.className is "Tenant" then Parse.User.current().set("property", @model.get("property"))
+        else if @model.className is "Manager" then Parse.User.current().set("network", @model.get("network"))
+
+    ignore: (e) =>
+      # Don't modify the action item, just hide the request.
+      @$el.html "<div>" + @model.ignored() + "</div><small>(<a href='#' class='undo'>" + i18nCommon.actions.undo + "</a>)</small>"
+      @model.add hidden: [Parse.User.current().id]
+      @model.save null, patch: true
+
+    undo: (e) =>
+      # Don't modify the action item, just hide the request.
+      @model.remove hidden: [Parse.User.current().id]
+      @model.save null, patch: true
+      @render()
+  
+    markAsClicked: (e) =>
+      @model.add clicked: [Parse.User.current().id]
+      @model.save null, patch: true
   
     # Re-render the contents of the property item.
     render: =>
@@ -31,9 +60,7 @@ define [
       network = @model.get "network"
       property = @model.get "property"
       profile = @model.get "profile"
-      event = @model.get "name" 
-      name = profile.name()
-      
+
       if @model.get "forMgr"
         url = ""
         url += "//#{Parse.User.current().get("network").get("name")}.#{location.host}" if location.host.split(".").length is 2
@@ -52,18 +79,16 @@ define [
         else 
           icon = 'calendar'
           photo_src = profile.cover("thumb")
-      
-
-      text = i18nCommon.notifications.text[event](name, property.get("title"))
 
       vars = 
-        age: moment(@model.createdAt).fromNow()
-        text: text
+        timeAgo: moment(@model.createdAt).fromNow()
+        text: @model.text()
         url: url
         clicked: _.contains @model.get("clicked"), Parse.User.current()
         icon: icon
         photo_src: photo_src
         i18nCommon: i18nCommon
+        withAction: !@model.isMemo()
 
       @$el.html JST["src/js/templates/notification/summary.jst"](vars)
       @

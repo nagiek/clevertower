@@ -7,51 +7,82 @@
  * ul.links, .pager, .more-link, etc.
  */
 
-
 /**
  * Search Form
  */
+#search-results,
 #mapCanvas {
   width:100%;
   height:350px;
+}
+
+#search-results {
+  background-color: @grayLighter;
+  overflow-y: scroll;
+  .empty {
+    padding-top: 40%;
+    color: @grayLight;
+  }
+  .result {
+    margin: 5px 10px;
+    background-color: @white;
+  }
+  h3 {
+    margin-bottom:0;
+  }
+  .property-info {
+    position: absolute;
+    right:9px;
+    bottom:9px;
+  }
+  .position {
+    padding: 4px;
+    line-height: 9px;
+    font-size: 9px;
+    background-color: @orange;
+    color: @white;
+  }
+}
+
+#mapCanvas {
   img {
     // Don't let Google map controls be broken
     max-width: none; 
   }
 }
 
-.geolocation-client-location {
-  margin-left:5px;
-}
+// .field-widget-geolocation-googlemap .controls {
+//   display:inline-block;
+// }
 
-.field-widget-geolocation-googlemap .controls {
-  display:inline-block;
-}
-
-.ctools-modal-content {
-  #geolocation-search {
-    width:300px;
-  }
-  #mapCanvas {
-    height:200px;
-  }
-}
+// .ctools-modal-content {
+//   #geolocation-search {
+//     width:300px;
+//   }
+//   #mapCanvas {
+//     height:200px;
+//   }
+// }
 
 
 
-#geolocation-search {
-  .control-group {
-    margin-bottom:0;    
-  }
-}
+// #geolocation-search {
+//   .control-group {
+//     margin-bottom:0;    
+//   }
+// }
 
 @media (max-width: 767px) {
-  html {
-    .ctools-modal-content {
-      #geolocation-search {
-        width:300px;
-      }
-    }
+  // html {
+  //   .ctools-modal-content {
+  //     #geolocation-search {
+  //       width:300px;
+  //     }
+  //   }
+  // }
+  #search-results {
+    min-height:100px;
+    height:auto;
   }
   #mapCanvas {
     height:300px;
@@ -59,13 +90,13 @@
 }
 
 @media (max-width: 320px) {
-  html {
-    .ctools-modal-content {
-      #geolocation-search {
-        width:165px;
-      }
-    }
-  }
+  // html {
+  //   .ctools-modal-content {
+  //     #geolocation-search {
+  //       width:165px;
+  //     }
+  //   }
+  // }
   #mapCanvas {
     height:150px;
   }

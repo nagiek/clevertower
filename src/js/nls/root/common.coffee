@@ -20,6 +20,7 @@ define
     Managers:             "Managers"
     tasks:                "tasks"
     finances:             "finances"
+    notifications:        "Notifications"
     Applicants:           "Applicants"
     Inquiries:            "Inquiries"
     listings:             "listings"
@@ -35,6 +36,7 @@ define
     go_to:                "Go to"
     show:                 "Show"
     post:                 "Post"
+    join:                 "Join"
     search:               "Search"
     destroy:              "Destroy"
     upload:               "Upload"
@@ -46,6 +48,7 @@ define
     close:                "Close"
     save:                 "Save"
     update:               "Update"
+    create:               "Create"
     back:                 "Back"
     edit:                 "Edit"
     undo:                 "Undo"
@@ -54,7 +57,8 @@ define
     apply:                "Apply"
     live_at:              "Live at"
     revoke_access:        "Revoke access"
-    confirm:              "Are you sure?"
+    confirm:              "Confirm"
+    ignore:               "Ignore"
     add_more:             "Add more"
     add_another:          "Add another"
     add_files:            "Add files"
@@ -76,18 +80,32 @@ define
       short:                ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
   notifications:
     img:                  "Notification Image"
-    empty:                "No new notifications"
-    text:
-      new_inquiry:        (person, property) -> "<strong>#{_.escape(person)}</strong> has applied to join <strong>#{_.escape(property)}</strong>"
-      lease_invitation:   (person) -> "You have been invited to a lease at <strong>#{_.escape(property)}</strong>"
-      inquiry_invitation: (person, property) -> "<strong>#{_.escape(person)}</strong> has indicated you are applying to join <strong>#{_.escape(property)}</strong>"
+    empty:
+      memo:               "No new notifications"
+      withAction:         "No new requests or invitations"
+      all:                "No notifications, requests or invitations"
+    new_inquiry: (person, property) -> "<strong>#{_.escape(person)}</strong> has applied to join <strong>#{_.escape(property)}</strong>"
+    inquiry_invitation:
+      invited: (person, property) -> "<strong>#{_.escape(person)}</strong> has indicated you are applying to join <strong>#{_.escape(property)}</strong>"
+      accept: (property) -> "You have accepted the invitation to join <strong>#{_.escape(property)}</strong>"
+      ignore: (property) -> "You have ignored the invitation to join <strong>#{_.escape(property)}</strong>"
+    lease_invitation:
+      invited: (person, property) -> "You have been invited to a lease at <strong>#{_.escape(property)}</strong>"
+      accept: (property) -> "You have accepted the invitation at <strong>#{_.escape(property)}</strong>"
+      ignore: (property) -> "You have ignored the invitation at <strong>#{_.escape(property)}</strong>"
+    network_invitation:
+      invited: (person, network) -> "<strong>#{_.escape(person)}</strong> invited you to join their network <strong>#{_.escape(network)}</strong>"
+      accept: (network) -> "You have accepted the invitation to join <strong>#{_.escape(network)}</strong>"
+      ignore: (network) -> "You have ignored the invitation to join <strong>#{_.escape(network)}</strong>"
   status:
     ok:                   "OK"
     unsaved:              "Unsaved"
     vacant:               "Vacant"
     pending:              "Pending"
     confirmed:            "Confirmed"
-  prepositions:           
+  prepositions:
+    where:                "Where"
+    when:                 "When"
     about:                "About"
     of:                   "of"
     on:                   "on"
@@ -98,14 +116,21 @@ define
     or:                   "or"
     and:                  "and"
   verbs:             
+    beginning:            "Beginning"
     loading:              "Loading"
     explore:              "Explore"
     manage:               "Manage"
+  expressions:
+    delete_forever:       "Delete forever"
+    are_you_sure:         "Are you sure?"
+    get_started:          "Get started"
+    skip_this_step:       "Skip this step"
+    see_all:              "See all"
   nouns:
     home:                 "Home"
     cover_photo:          "Cover Photo"
     link:                 "link"
-    Building:             "Building"
+    building:             "building"
     tenants:              "Tenants"
     you:                  "You"
     people:               "People"
@@ -122,6 +147,7 @@ define
   adjectives:
     small:                "Big"
     big:                  "Small"
+    done:                 "Done"
     new:                  "new"
     unsaved:              "Unsaved"
     linked:               "Linked"
@@ -137,6 +163,7 @@ define
     admin:                "admin"
     not_specified:        "Not specified"
   form:                   
+    find_people_using:    'Find people using'
     center_on_property:   "Center on property"
     operations:           "Operations"
     info:                 "Info"

@@ -1,22 +1,16 @@
-#notifications {
-  > ul {
-    width: 330px;    
-    > li {
-      &.empty {
-        padding: 4px 8px;
-        text-align:center;
+.notifications-menu {
+  width: 330px;    
+  > li {
+    > a {
+      &.unclicked,
+      &:hover {
+        #gradient > .vertical(lighten(@blueLight, 5%), @blueLight);
+        background-color:@blueLight;
+        color:@black;
       }
-      > a {
-        &.unclicked,
-        &:hover {
-          #gradient > .vertical(lighten(@blueLight, 5%), @blueLight);
-          background-color:@blueLight;
-          color:@black;
-        }
-        &.unclicked:hover {
-          #gradient > .vertical(@blueLight, darken(@blueLight, 5%));
-          background-color:darken(@blueLight, 5%);
-        }
+      &.unclicked:hover {
+        #gradient > .vertical(@blueLight, darken(@blueLight, 5%));
+        background-color:darken(@blueLight, 5%);
       }
     }
   }

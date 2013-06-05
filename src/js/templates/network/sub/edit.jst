@@ -1,13 +1,9 @@
-<header class="row">
-  <h1 class="offset1 span6"><%= i18nProperty.network.edit %></h1>
+<header>
+  <h1><%= i18nProperty.network.edit %></h1>
 </header>
-<form>
-  <%= JST["src/js/templates/network/form.jst"]({network: network, i18nCommon: i18nCommon, i18nProperty: i18nProperty}) %>
+<form id="network-form" class="form-horizontal">
+  <%= JST["src/js/templates/network/form.jst"]({network: network, i18nCommon: i18nCommon, i18nProperty: i18nProperty, isNew: false}) %>
   <div class="form-actions">
-    <div class="row">
-      <div class="offset1 span">
-        <button class="save btn btn-primary"><%= i18nCommon.actions.save %></button>
-      </div>
-    </div>
+    <button class="save btn btn-primary"><%= i18nCommon.actions.save %></button>
   </div>
 </form>

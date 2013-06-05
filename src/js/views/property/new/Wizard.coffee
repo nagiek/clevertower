@@ -3,13 +3,15 @@ define [
   "underscore"
   "backbone"
   "models/Property"
+  "models/Unit"
+  "models/Lease"
   "views/helper/Alert"
   "views/property/new/Map"
   "i18n!nls/property"
   "i18n!nls/common"
   "templates/property/new/map"
   "templates/property/new/wizard"
-], ($, _, Parse, Property, Alert, GMapView, i18nProperty, i18nCommon) ->
+], ($, _, Parse, Property, Unit, Lease, Alert, GMapView, i18nProperty, i18nCommon) ->
 
   class PropertyWizardView extends Parse.View
   
@@ -23,15 +25,18 @@ define [
     events:
       'click .back'         : 'back'
       'click .next'         : 'next'
+      'click .join'         : 'join'
       # 'click .cancel'       : 'cancel'
     
-    initialize : ->
+    initialize : (attrs) ->
 
       @model = new Property
 
+      @forNetwork = if attrs and attrs.forNetwork then true else false
+
       @listenTo @model, "invalid", (error) =>
-        console.log error
-        @state = 'address'
+        @$('button.next').removeProp "disabled"
+
         msg = if error.message.indexOf(":") > 0  
           args = error.message.split ":"
           fn = args.pop()
@@ -45,60 +50,169 @@ define [
         
         new Alert event: 'model-save', fade: false, message: msg, type: 'error'
 
-      @on "address:validated", =>
-        @state = 'property'
-        @model.set 'title', @model.get('thoroughfare')
-        require ["views/property/new/New", "templates/property/form"], (NewPropertyView) =>
+      @on "property:save", (property) ->
+        if Parse.User.current() and Parse.User.current().get("network")
+          Parse.User.current().get("network").properties.add property
+        Parse.history.navigate "/", trigger: true
+        @clear()
 
-          @form = new NewPropertyView(wizard: @, model: @model)
-          @map.$el.after @form.render().el
-          
-          # Animate
-          @map.$el.animate left: "-150%", 500
-          @form.$el.animate left: "0", 500
-          @$('.back').prop disabled: false
-          @$('.next').html(i18nCommon.actions.save)
 
-      @on "property:save", @clear
+      @on "property:join", (property) ->
+        Parse.User.current().save property: property
+        Parse.history.navigate "/", trigger: true
+        @clear()
 
     render : ->
       vars = 
         i18nCommon: i18nCommon
         setup: !Parse.User.current() or (!Parse.User.current().get("property") and !Parse.User.current().get("network"))
       @$el.html JST['src/js/templates/property/new/wizard.jst'](vars)
-      @map = new GMapView(wizard: this, marker: @model).render()
+      @map = new GMapView(wizard: @, model: @model).render()
       @
+
+    join : (e) =>
+      return if @state is 'join'
+      @$('.error').removeClass('error')
+      @$('button.next').prop "disabled", "disabled"
+      @$('button.join').prop "disabled", "disabled"
+      @state = 'join'
+
+      require ["views/property/Join"], (JoinPropertyView) =>
+        btn = $(e.currentTarget)
+        @existingProperty = @map.results.get btn.data("property-id")
+
+        @form = new JoinPropertyView wizard: @, property: @existingProperty
+        @map.$el.after @form.render().el
+        @animate 'forward'
+
 
     next : (e) =>
       @$('.error').removeClass('error')
+      @$('button.next').prop "disabled", "disabled"
+      @$('button.join').prop "disabled", "disabled"
       switch @state
         when 'address'
           center = @model.get "center"
           return @model.trigger "invalid", {message: 'invalid_address'} if center._latitude is 0 and center._longitude is 0
-          Parse.Cloud.run 'CheckForUniqueProperty', 
-            { objectId: @model.id, center: center },
-            success: =>       @trigger "address:validated"
-            error: (error) => @model.trigger "invalid", error
+          if @model.get("thoroughfare"                ) is '' or 
+             @model.get("locality"                    ) is '' or
+             @model.get("administrative_area_level_1" ) is '' or
+             @model.get("country"                     ) is '' or
+             @model.get("postal_code"                 ) is ''
+            return @model.trigger "invalid", {message: 'insufficient_data'}
+
+          @state = 'property'
+          @model.set 'title', @model.get('thoroughfare')
+
+          if @forNetwork
+            require ["views/property/new/New"], (NewPropertyView) =>
+              @form = new NewPropertyView wizard: @, model: @model
+              @map.$el.after @form.render().el
+              @animate 'forward'
+          else        
+            require ["views/property/Join"], (JoinPropertyView) =>
+              @form = new JoinPropertyView wizard: @, property: @model
+              @map.$el.after @form.render().el
+              @animate 'forward'
               
         when 'property'
-          @model.save @form.$el.serializeObject().property,
-            success: (property) =>        @trigger "property:save", property, this
-            error: (property, error) =>   @model.trigger "invalid", error
+          data = @form.$el.serializeObject()
+          if data.lease
+            attrs = @form.model.scrub data.lease
+            attrs = @assignAdditionalToLease data, attrs
+            console.log attrs
+            @form.model.save attrs,
+              success: (lease) =>        @trigger "property:join", @model
+              error: (lease, error) =>   @form.model.trigger "invalid", error; console.log error
+
+          else 
+            attrs = @model.scrub data.property
+            @model.save attrs,
+              success: (property) =>        @trigger "property:save", property
+              error: (property, error) =>   @model.trigger "invalid", error; console.log error
+
+        when 'join'
+          data = @form.$el.serializeObject()
+          attrs = @form.model.scrub data.lease
+          attrs = @assignAdditionalToLease data, attrs
+          
+          @form.model.save attrs,
+              success: (lease) =>      @trigger "property:join", @model
+              error: (lease, error) => @form.model.trigger "invalid", error; console.log error
 
     back : (e) =>
       return if @state is 'address'
+      delete @existingProperty
+      @$('button.join').removeProp "disabled"
       @state = 'address'
-      @map.$el.animate left: "0%", 500
-      @form.$el.animate left: "150%", 500, 'swing', =>
-        @form.remove()
-        @form.undelegateEvents()
-        delete @form
-      @$('.back').prop disabled: 'disabled'
-      @$('.next').html(i18nCommon.actions.next)
+      @animate 'backward'
+      
 
     # cancel : (e) =>
     #   @trigger "wizard:cancel", this
     #   @clear()
+
+    assignAdditionalToLease : (data, attrs) -> 
+
+      # Assign the lease to the property.
+      # 
+      # If the property is new and we are creating a lease, we cannot assign it
+      # to both the unit AND the property. Therefore we will assign it to the
+      # lease and come back for it later, if we ever do a mass transfer or somthing.
+
+      if @existingProperty
+
+        # Set pointers to the property, as we will not have write access if we are joining.
+        unit = new Unit data.unit.attributes
+        unit.set "property", @existingProperty
+        attrs.unit = unit
+        attrs.property = @existingProperty
+      else 
+        # We are creating a new property.
+        property = @model
+        property.set @model.scrub(data.property)
+
+        unit = new Unit data.unit.attributes
+        unit.set "property", property
+        attrs.unit = unit
+        attrs.property = property
+      
+      # Validate tenants (assignment done in Cloud)
+      userValid = true
+      if data.emails and data.emails isnt ''
+        # Create a temporary array to temporarily hold accounts unvalidated users.
+        attrs.emails = []
+        # _.each data.emails.split(","), (email) =>
+        for email in data.emails.split(",")
+          email = _.str.trim email
+          # validate is a backwards function.
+          userValid = unless Parse.User::validate(email: email) then true else false
+          break unless userValid
+          attrs.emails.push email
+      
+      unless userValid
+        @$('.emails-group').addClass('error')
+        @model.trigger "invalid", {message: 'tenants_incorrect'}
+        false
+      else
+        attrs
+
+    animate : (dir) ->
+      switch dir
+        when 'forward'
+          @map.$el.animate left: "-150%", 500
+          @form.$el.animate left: "0", 500, 'swing', =>
+            @$('.next').removeProp "disabled"
+            @$('.next').html(i18nCommon.actions.save)
+            @$('.back').prop disabled: false
+        when 'backward'
+          @map.$el.animate left: "0%", 500
+          @form.$el.animate left: "150%", 500, 'swing', =>
+            @form.remove()
+            @form.undelegateEvents()
+            delete @form
+          @$('.back').prop disabled: 'disabled'
+          @$('.next').html(i18nCommon.actions.create)
 
     clear : =>
       @$el.empty()

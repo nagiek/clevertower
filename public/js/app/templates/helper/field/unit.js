@@ -11,8 +11,8 @@ __p += '<input type="hidden" name="unit[__type]" value="Pointer">\n<input type="
 '</option>\n  <option value="-1">' +
 ((__t = ( i18nUnit.constants.new_unit )) == null ? '' : __t) +
 '</option>\n</select>\n\n<input type="text" name="unit[attributes][title]" placeholder="' +
-((__t = ( i18nCommon.fields.title )) == null ? '' : __t) +
-'" class="new-unit hide span1" maxlength="16">';
+((__t = ( i18nUnit.form.unit_number )) == null ? '' : __t) +
+'" class="new-unit input-xsmall" maxlength="16" style="display:none;">';
 
 }
 return __p

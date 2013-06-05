@@ -8,7 +8,7 @@
   <% if (current_user) { %><strong><small>(<%= i18nCommon.nouns.you %>)</small></strong><% } %>
 </td>
 <td>
-  <span class="label label-large label-<%= status == 'accepted' ? 'success' : 'warning' %>"><%= status %></span>
+  <span class="label label-large label-<%= status == 'current' ? 'success' : 'warning' %>"><%= status %></span>
   <% if (admin) { %><small>(<%= i18nCommon.adjectives.admin %>)</small><% } %>
 </td>
 <td>

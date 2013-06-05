@@ -36,20 +36,16 @@ define [
       'change .unit-select'         : 'showUnitIfNew'
     
     initialize : (attrs) ->
-      
-      _.bindAll this, 'addOne', 'addAll', 'save', 'setThisMonth', 'setNextMonth', 'setJulyJune'
 
       @property = attrs.property
 
-      @model = new Lease(network: Parse.User.current().get("network")) unless @model
+      @model = new Lease(network: Parse.User.current().get("network")) unless @model or !Parse.User.current()
 
-      @setElement '#apply-modal' if attrs.modal
+      @modal = attrs.modal
 
-      tmpl = (if @model.isNew() then 'new' else 'edit') + if attrs.modal then "-modal" else ""
-      @template = "src/js/templates/lease/#{tmpl}.jst"
-      @cancel_path = "/properties/#{@property.id}" + unless @model.isNew() then "/leases/#{@model.id}" else ""
+      @setElement '#apply-modal' if @modal
             
-      @model.on 'invalid', (error) =>
+      @listenTo @model, 'invalid', (error) =>
         @$('.error').removeClass('error')
         @$('button.save').removeProp "disabled"
 
@@ -66,7 +62,7 @@ define [
           else
             i18nCommon.errors.unknown
             
-        new Alert(event: 'model-save', fade: false, message: msg, type: 'error')
+        new Alert event: 'model-save', fade: false, message: msg, type: 'error'
         switch error.message
           when 'unit_missing'
             @$('.unit-group').addClass('error')
@@ -93,14 +89,12 @@ define [
           @undelegateEvents()
           delete this
                 
-      @model.on 'destroy', =>
-        @undelegateEvents()
-        delete this
+      @listenTo @model, 'destroy', @close
       
       @units = @property.prep("units") if @property # We may on public page instead of network.
 
-      @units.bind "add", @addOne
-      @units.bind "reset", @addAll
+      @listenTo @units, "add", @addOne
+      @listenTo @units, "reset", @addAll
               
       @current = new Date().setDate(1)
       @dates =
@@ -120,26 +114,15 @@ define [
         """
       @units.each @addOne
 
-    save : (e) ->
-      e.preventDefault() if e
-      
+
+    # Split into separate functions for other uses, such as joining.
+    save : (e) =>
+      e.preventDefault()      
       @$('button.save').prop "disabled", "disabled"
       data = @$('form').serializeObject()
       @$('.error').removeClass('error')
-      
-      # Massage the Only-String data from serializeObject()
-      _.each ['rent', 'keys', 'garage_remotes', 'security_deposit', 'parking_fee'], (attr) ->
-        data.lease[attr] = 0 if data.lease[attr] is '' or data.lease[attr] is '0'
-        data.lease[attr] = Number data.lease[attr] if data.lease[attr]
 
-      _.each ['start_date', 'end_date'], (attr) ->
-        data.lease[attr] = moment(data.lease[attr], i18nCommon.dates.moment_format).toDate() unless data.lease[attr] is ''
-        data.lease[attr] = new Date if typeof data.lease[attr] is 'string'
-      
-      _.each ['checks_received', 'first_month_paid', 'last_month_paid'], (attr) ->
-        data.lease[attr] = if data.lease[attr] isnt "" then true else false
-
-      attrs = data.lease
+      attrs = @model.scrub data.lease
 
       # Set unit
       if data.unit and data.unit.id isnt ""
@@ -155,11 +138,13 @@ define [
       if data.emails and data.emails isnt ''
         # Create a temporary array to temporarily hold accounts unvalidated users.
         attrs.emails = []
-        _.each data.emails.split(","), (email) =>
+        # _.each data.emails.split(","), (email) =>
+        for email in data.emails.split(",")
           email = $.trim(email)
           # validate is a backwards function.
           userValid = unless Parse.User::validate(email: email) then true else false
-          attrs.emails.push email if userValid
+          break unless userValid
+          attrs.emails.push email
       
       unless userValid
         @$('.emails-group').addClass('error')
@@ -173,7 +158,8 @@ define [
         
 
     showUnitIfNew : (e) =>
-      if e.target.value is "-1" then @$('.new-unit').removeClass 'hide' else @$('.new-unit').addClass 'hide'
+      # Use show() and hide(), because default input->display:inline-block overrides 'hide' class
+      if e.target.value is "-1" then @$('.new-unit').show() else @$('.new-unit').hide()
 
     # adjustEndDate : ->
     #   console.log e
@@ -182,33 +168,40 @@ define [
     #   diff = end.diff(start, 'days')
     #   @$endDate.val start.add(diff, 'days').format("L")
 
-    setThisMonth : ->
+    setThisMonth : (e) =>
+      e.preventDefault()
       @$startDate.val moment(@current).format("L")
       @$endDate.val moment(@current).add(1, 'year').subtract(1, 'day').format("L")
       
-    setNextMonth : ->
+    setNextMonth : (e) =>
+      e.preventDefault()
       @$startDate.val moment(@current).add(1, 'month').format("L")
       @$endDate.val moment(@current).add(1, 'month').add(1, 'year').subtract(1, 'day').format("L")
       
-    setJulyJune : ->
+    setJulyJune : (e) =>
+      e.preventDefault()
       @$startDate.val moment(@current).month(6).format("L")
       @$endDate.val moment(@current).month(6).add(1, 'year').subtract(1, 'day').format("L")
 
-    render: ->
+    render: =>
+
+      tmpl = (if @model.isNew() then 'new' else 'edit') + if @modal then "-modal" else ""
+      template = "src/js/templates/lease/#{tmpl}.jst"
+      cancel_path = "/properties/#{@property.id}" + unless @model.isNew() then "/leases/#{@model.id}" else ""
+
       vars =
         lease: _.defaults @model.attributes, Lease::defaults
         unit: if @model.get "unit" then @model.get "unit" else false
         dates: @dates
-        cancel_path: @cancel_path
+        cancel_path: cancel_path
         title: if @property then @property.get "title" else false
         # units: @units
-        moment: moment
         i18nCommon: i18nCommon
         i18nUnit: i18nUnit
         i18nLease: i18nLease
         emails: if @model.get "emails" then @model.get "emails" else ""
 
-      @$el.html JST[@template](vars)
+      @$el.html JST[template](vars)
       
       # @el = "form.lease-form"
       # @$el = $("#content form.lease-form")

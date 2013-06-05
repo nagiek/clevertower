@@ -32,6 +32,10 @@ define [
       @view = attrs.view
       @listenTo Parse.Dispatcher, "user:logout", @clear
 
+      @listenTo Parse.User.current(), "change:property change:network", @handlePossiblePropertyAdd
+      if Parse.User.current().get("network")
+        @listenToOnce Parse.User.current().get("network"), "add", @handlePropertyAdd
+
       @listenTo @view, "dragend", @updateCenter
       @updateCenter()
 
@@ -54,16 +58,26 @@ define [
         @checkMarkerVisibility()
 
     changePostType : ->
-
-      rand = Math.floor Math.random() * i18nUser.form.share[0].length
-
-      index = @getTypeIndex()
+      
+      newPos = @getTypeIndex()
       pos = @$("#post-input-caret").data "position"
-
-      @$("#post-input-caret").addClass "phase-#{index}"
+      rand = Math.floor Math.random() * i18nUser.form.share[0].length
+      @$("#post-input-caret").addClass "phase-#{newPos}"
       @$("#post-input-caret").removeClass "phase-#{pos}"
-      @$("#post-input-caret").data "position", index
-      @$("#post-title").prop 'placeholder', i18nUser.form.share[index][rand]
+      @$("#post-input-caret").data "position", newPos
+
+      if newPos is 3 and @empty
+        # @$("#post-title").prop "disabled", true
+        @$(".title-group").addClass "hide"
+        @$("#post-options").addClass "hide"
+        @$(".no-property").removeClass "hide"
+
+      else 
+        @$(".no-property").addClass "hide"
+        @$(".title-group").removeClass "hide"
+        # @$("#post-title").removeProp 'disabled'
+        # @$("#post-options").removeClass "hide"
+        @$("#post-title").prop 'placeholder', i18nUser.form.share[newPos][rand]
 
     checkMarkerVisibility: ->
       if @getTypeIndex() is 3
@@ -74,7 +88,9 @@ define [
         @marker.setVisible true
         @$("#centered-on-property").removeProp("disabled")
 
-    getTypeIndex: -> @$("#post-type :checked").parent().index()
+    getTypeIndex: -> 
+      index = @$("#post-type :checked").parent().index()
+      return if index then index else 3
 
     render: =>
 
@@ -92,26 +108,28 @@ define [
         i18nProperty: i18nProperty
 
       @$el.html JST["src/js/templates/post/new.jst"](vars)
-
-      rand = Math.floor Math.random() * i18nUser.form.share.length
-      @$("#post-type :nth-child(#{rand + 1}) input").prop('checked', true)
-      @changePostType()
       @$('[rel=tooltip]').tooltip()
 
       if Parse.User.current().get("property")
         @$("#property-options").html "<strong>#{Parse.User.current().get("property").get("title")}</strong>"
+        rand = Math.floor Math.random() * i18nUser.form.share.length
+        @$("#post-type :nth-child(#{rand + 1}) input").prop('checked', true)
+        @changePostType()
 
       else if Parse.User.current().get("network")
 
         # Render asynchronously, while we wait for the property
         # info to come in so we can determine our center & radius
         @$("#property-options").html "<select></select>"
-        if Parse.User.current().get("network").properties.length is 0
-          @handleNoProperty()
-          @listenToOnce Parse.User.current().get("network").properties, "reset", @populatePropertySelect
-        else
-          @populatePropertySelect()
-          
+        if Parse.User.current().get("network")
+          @listenTo Parse.User.current().get("network").properties, "add reset", @populatePropertySelectFromNetwork
+          if Parse.User.current().get("network").properties.length is 0 
+            @handleNoProperty()
+          else
+            @populatePropertySelectFromNetwork()
+            rand = Math.floor Math.random() * i18nUser.form.share.length
+            @$("#post-type :nth-child(#{rand + 1}) input").prop('checked', true)
+            @changePostType()
       else
         @handleNoProperty()
        
@@ -128,21 +146,41 @@ define [
 
     handleNoProperty : ->
       @empty = true
+      # Set to building-type, to show the user that they still need to join/add a property
+      @$("#post-type :nth-child(4) input").prop('checked', true)
+      @$("#post-input-caret").data "position", 4
       if Parse.User.current().get("network")
-        @$('.empty').html """
-                          <a href='#{Parse.User.current().get("network").privateUrl()}'>
-                            #{i18nProperty.actions.add_a_property_to_start}
+        @$('.no-property').html """
+                          <p>CleverTower is more fun when you're connected, but you haven't added any property yet.</p>
+                          <a class="btn btn-primary btn-block" href='#{Parse.User.current().get("network").privateUrl()}'>
+                            #{i18nProperty.actions.add_a_property}
                           </a>
                           """
       else 
-        @$('.empty').html """
-                    <a href='/account/setup'>
-                      #{i18nProperty.actions.join_or_create_a_property_to_start}
+        @$('.no-property').html """
+                    <p>CleverTower is more fun when you're connected, but you haven't joined a property yet.</p>
+                    <a class="btn btn-primary btn-block" href='/account/setup'>
+                      #{i18nCommon.expressions.get_started}
                     </a>
                     """
+      @changePostType()
+
+    handlePossiblePropertyAdd : =>
+      if Parse.User.current().get("network")
+        if Parse.User.current().get("network").properties.length > 0 then @handlePropertyAdd()
+        else 
+          @handleNoProperty()
+          @listenToOnce Parse.User.current().get("network"), "add", @handlePropertyAdd
+      else if Parse.User.current().get("property")
+        @handlePropertyAdd()
+
+    handlePropertyAdd : ->
+      @empty = false
+      @changePostType()
 
     showPostForm : (e) => 
-      return if @shown
+      newPos = @getTypeIndex()
+      return if @shown or newPos is 3 and @empty
       @shown = true
       @$('#post-options').removeClass 'hide'
       @marker.bindTo 'position', @view.map, 'center' 
@@ -184,7 +222,7 @@ define [
     post : (e) ->
       e.preventDefault() if e
 
-      @$('button.save').prop "disabled", "disabled"
+      @$('button.save').prop "disabled", true
       data = @$('form').serializeObject()
       @$('.error').removeClass('error')
 
@@ -193,7 +231,7 @@ define [
         success: (model) => 
           model.set 
             activity_type: "new_post"
-            profile: Parse.User.current().profile
+            profile: Parse.User.current().get("profile")
           # Add to appropriate collection
           if model.get("property")
             Parse.User.current().add new Activity(model.attributes)

@@ -21,8 +21,8 @@
       ShowLeaseView.prototype.initialize = function(attrs) {
         this.property = attrs.property;
         this.model.prep('tenants');
-        this.model.tenants.on("add", this.addOne);
-        return this.model.tenants.on("reset", this.addAll);
+        this.listenTo(this.model.tenants, "add", this.addOne);
+        return this.listenTo(this.model.tenants, "reset", this.addAll);
       };
 
       ShowLeaseView.prototype.render = function() {

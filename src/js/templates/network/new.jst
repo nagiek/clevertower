@@ -1,7 +1,7 @@
 
-<div class="row"><p class="help-block offset1 span9"><%= i18nProperty.network.must_be_done %></p></div>
-<form>
-  <%= JST["src/js/templates/network/form.jst"]({network: network, i18nCommon: i18nCommon, i18nProperty: i18nProperty}) %>
+<div class="row"><p class="help-general offset1 span9"><%= i18nProperty.network.must_be_done %></p></div>
+<form id="network-form">
+  <%= JST["src/js/templates/network/form.jst"]({network: network, i18nCommon: i18nCommon, i18nProperty: i18nProperty, isNew: true}) %>
   <div class="form-actions">
     <div class="row">
       <div class="offset1 span">

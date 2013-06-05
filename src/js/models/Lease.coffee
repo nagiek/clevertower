@@ -5,7 +5,8 @@ define [
   "models/Property"
   "models/Unit"
   "moment"
-], (_, Parse, TenantList, Property, Unit, moment) ->
+  "i18n!nls/common"
+], (_, Parse, TenantList, Property, Unit, moment, i18nCommon) ->
 
   Lease = Parse.Object.extend "Lease",
   
@@ -38,6 +39,21 @@ define [
       today = new Date
       return sd < today and today < ed
     
+    scrub: (lease) ->
+      # Massage the Only-String data from serializeObject()
+      for attr in ['rent', 'keys', 'garage_remotes', 'security_deposit', 'parking_fee']
+        lease[attr] = 0 if lease[attr] is '' or lease[attr] is '0'
+        lease[attr] = Number lease[attr] if lease[attr]
+
+      for attr in ['start_date', 'end_date']
+        lease[attr] = moment(lease[attr], i18nCommon.dates.moment_format).toDate() unless lease[attr] is ''
+        lease[attr] = new Date if typeof lease[attr] is 'string'
+      
+      for attr in ['checks_received', 'first_month_paid', 'last_month_paid']
+        lease[attr] = if lease[attr] isnt "" then true else false
+
+      lease
+
     validate: (attrs = {}, options = {}) ->
       # Check all attribute existence, as validate is called on set
       # and save, and may not have the attributes in question.

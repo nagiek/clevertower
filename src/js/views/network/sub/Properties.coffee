@@ -28,8 +28,6 @@ define [
       @listenTo Parse.User.current().get("network").properties, "reset", @addAll
             
       @render()
-      
-      if attrs.subaction then @newProperty()
 
     render: =>
       network = Parse.User.current().get("network")

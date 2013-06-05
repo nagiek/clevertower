@@ -7,8 +7,11 @@
       setup_property: "Setup Property",
       edit_picture: "Change Picture",
       go_to_network: "Go to network",
-      add_to_start: "Add a property to get started",
-      join_or_create_to_start: "Join or create a property to get started"
+      add_a_property: "Add a property",
+      join_or_create_to_start: "Join or create a property to get started",
+      join_property_at: function(title) {
+        return "Create your lease at <em>" + (_.escape(title)) + "</em>";
+      }
     },
     menu: {
       dashboard: "Dashboard",
@@ -62,8 +65,12 @@
       building: "Building",
       features: "Features",
       amenities: "Amenities",
-      included: "Included",
-      map_instructions: "Find your building on the map. If the building is on CleverTower, you'll have the chance to join."
+      included: "Included"
+    },
+    search: {
+      map_instructions: "Find your building on the map. If the building is on CleverTower, you'll have the chance to join.",
+      awaiting_search: "Awaiting search.",
+      no_results: "No nearby buildings."
     },
     collection: {
       empty: {
@@ -119,7 +126,7 @@
       name_too_short: "The name cannot be longer than 31 characters.",
       name_missing: "You must enter a name.",
       name_taken: function(id) {
-        return "<p>This name has been taken by an existing network.</p>\n<p>\n  <a href=\"/network/" + id + "\" class=\"btn btn-warning\">View network</a>\n  <a class=\"btn close\">Close</a>\n</p>";
+        return "<p>This name has been taken by an existing network.</p>\n<p>\n  <a href=\"/network/" + (_.escape(id)) + "\" class=\"btn btn-warning\">View network</a>\n  <a class=\"btn close\">Close</a>\n</p>";
       },
       network_not_set: "You have not joined a network yet.",
       invalid_address: "You must add an address.",

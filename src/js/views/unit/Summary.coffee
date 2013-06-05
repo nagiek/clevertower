@@ -21,31 +21,27 @@ define [
       'blur input'        : 'update'
       'blur textarea'     : 'update'
       'blur select'       : 'updateS'
-      'click .remove'     : 'clear'
+      'click .remove'     : 'kill'
       'click .delete'     : 'delete'
       "keypress .title"   : "newOnEnter"
       
     initialize: () ->
-      @model.on "change:title", =>
+      @listenTo @model, "change:title", =>
         @$('.unit-link').html @model.get "title"
       
-      @model.on "save:success", =>
-        @render()
-        
-      @model.on "destroy", =>
-        @remove()
-        @undelegateEvents()
-        delete this
+      @listenTo @model.collection, "save:success", @render
       
-      @model.on "invalid", (unit, error) =>
+      @listenTo @model, "invalid", (error) =>
         # Mark up form
         @$el.addClass('error')
         switch error.message
           when 'title_missing'
             @$('.title-group .control-group').addClass('error')
 
-        msg = if error.code? i18nCommon.errors[error.message] else i18nUnit.errors[error.message]
-        new Alert(event: 'unit-invalid', fade: false, message: msg, type: 'error')
+      @listenTo @model, "destroy", =>
+        @remove()
+        @undelegateEvents()
+        delete this
 
     # Re-render the contents of the Unit item.
     render: ->
@@ -65,7 +61,8 @@ define [
       else
         vars.activeLease = false
         
-      $(@el).html JST["src/js/templates/unit/summary.jst"](vars)
+      @$el.html JST["src/js/templates/unit/summary.jst"](vars)
+      @$('[rel=tooltip]').tooltip()
       @
 
     update: (e) ->
@@ -80,7 +77,7 @@ define [
       @model.set name, value
       e
 
-    clear : (e) ->
+    kill : (e) ->
       e.preventDefault() 
       @model.destroy()
 

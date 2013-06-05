@@ -10,11 +10,11 @@ define [
     # Reference to this collection's model.
     model: Property
 
-    url: "/properties"
+    query: new Parse.Query("Property")
 
     initialize: (models, attrs) ->
       # We load PropertyList before Parse is initialized, so we cannot pre-load the query.
-      @query = new Parse.Query("Property").equalTo("network", attrs.network)
+      @query.equalTo("network", attrs.network) if attrs and attrs.network
 
     getSetting: ->
       centers = @map (p) -> p.get("center")

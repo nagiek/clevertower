@@ -3,7 +3,7 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", "pusher", 'collections/PropertyList', 'models/Profile', 'views/notification/Index', "i18n!nls/devise", "i18n!nls/user", "templates/user/logged_in_menu"], function($, _, Parse, Pusher, PropertyList, Profile, NotificationsView, i18nDevise, i18nUser) {
+  define(["jquery", "underscore", "backbone", "pusher", 'collections/PropertyList', 'models/Profile', 'views/notification/Index', "i18n!nls/devise", "i18n!nls/user", "i18n!nls/common", "templates/user/logged_in_menu"], function($, _, Parse, Pusher, PropertyList, Profile, NotificationsView, i18nDevise, i18nUser, i18nCommon) {
     var LoggedInView, _ref;
 
     return LoggedInView = (function(_super) {
@@ -27,7 +27,7 @@
           this.pusher.subscribe("networks-" + (Parse.User.current().get("network").id));
           this.listenTo(Parse.User.current().get("network").properties, "add", this.subscribeProperty);
         }
-        this.listenTo(Parse.User.current().profile, "sync", this.updateNav);
+        this.listenTo(Parse.User.current().get("profile"), "sync", this.updateNav);
         return this.render();
       };
 
@@ -53,14 +53,15 @@
       LoggedInView.prototype.render = function() {
         var name, vars;
 
-        name = Parse.User.current().profile.name();
+        name = Parse.User.current().get("profile").name();
         vars = {
-          src: Parse.User.current().profile.cover('micro'),
+          src: Parse.User.current().get("profile").cover('micro'),
           photo_alt: i18nUser.show.photo(name),
           name: name,
-          objectId: Parse.User.current().profile.id,
+          objectId: Parse.User.current().get("profile").id,
           i18nUser: i18nUser,
-          i18nDevise: i18nDevise
+          i18nDevise: i18nDevise,
+          i18nCommon: i18nCommon
         };
         this.$el.html(JST["src/js/templates/user/logged_in_menu.jst"](vars));
         this.notificationsView = new NotificationsView;
@@ -69,8 +70,8 @@
       };
 
       LoggedInView.prototype.updateNav = function() {
-        this.$('#profile-link img').prop("src", Parse.User.current().profile.cover("micro"));
-        return this.$('#profile-link span').html(Parse.User.current().profile.name());
+        this.$('#profile-link img').prop("src", Parse.User.current().get("profile").cover("micro"));
+        return this.$('#profile-link span').html(Parse.User.current().get("profile").name());
       };
 
       return LoggedInView;

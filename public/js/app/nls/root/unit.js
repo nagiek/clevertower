@@ -20,6 +20,7 @@
     form: {
       increment: "Increment",
       unit_info: "unit info",
+      unit_number: "Unit #",
       squarefeetsymbol: "ft<sup>2</sup>",
       bedrooms: {
         zero: "Studio",

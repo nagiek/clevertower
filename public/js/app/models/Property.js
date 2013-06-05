@@ -4,9 +4,6 @@
 
     return Property = Parse.Object.extend("Property", {
       className: "Property",
-      initialize: function() {
-        return _.bindAll(this, "cover", "prep");
-      },
       defaults: {
         center: new Parse.GeoPoint,
         formatted_address: '',
@@ -57,7 +54,11 @@
         "public": false
       },
       pos: function() {
-        return this.collection.indexOf(this);
+        if (this.collection) {
+          return this.collection.indexOf(this);
+        } else {
+          return 0;
+        }
       },
       GPoint: function() {
         return new google.maps.LatLng(this.get("center")._latitude, this.get("center")._longitude);
@@ -82,6 +83,16 @@
           img = "/img/fallback/property-" + format + ".png";
         }
         return img;
+      },
+      scrub: function(attrs) {
+        var attr, bools, _i, _len;
+
+        bools = ['electricity', 'furniture', 'gas', 'heat', 'hot_water', 'air_conditioning', 'back_yard', 'balcony', 'cats_allowed', 'concierge', 'dogs_allowed', 'doorman', 'elevator', 'exposed_brick', 'fireplace', 'front_yard', 'gym', 'laundry', 'indoor_parking', 'outdoor_parking', 'pool', 'sauna', 'wheelchair', 'public', 'anon'];
+        for (_i = 0, _len = bools.length; _i < _len; _i++) {
+          attr = bools[_i];
+          attrs[attr] = attrs[attr] === "on" || attrs[attr] === "1" ? true : false;
+        }
+        return attrs;
       },
       prep: function(collectionName, options) {
         var basedOnNetwork, network, user;

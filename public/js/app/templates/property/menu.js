@@ -11,7 +11,7 @@ __p += '<!-- Day-to-day -->\n<div class="btn-group">\n  <a href="#" class="btn b
 '</h4>\n  ' +
 ((__t = ( JST["src/js/templates/property/menu/show.jst"]({objectId: objectId, i18nProperty: i18nProperty}) )) == null ? '' : __t) +
 '\n</div>\n\n<div class="btn-group">\n  <a href="#" class="btn btn-small dropdown-toggle" rel="tooltip" data-toggle="dropdown" data-original-title="' +
-((__t = ( i18nProperty.menu.other )) == null ? '' : __t) +
+((__t = ( i18nProperty.menu.building )) == null ? '' : __t) +
 '">\n    <i class="icon icon-building"></i>\n    <b class="caret"></b>\n  </a>\n  <h4 class="element-invisible">' +
 ((__t = ( i18nProperty.menu.building )) == null ? '' : __t) +
 '</h4>\n  ' +

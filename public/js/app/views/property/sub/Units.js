@@ -33,9 +33,26 @@
       };
 
       PropertyUnitsView.prototype.initialize = function(attrs) {
+        var _this = this;
+
         this.on("view:change", this.clear);
-        this.model.units.on("add", this.addOne);
-        this.model.units.on("reset", this.addAll);
+        this.listenTo(this.model.units, "add", this.addOne);
+        this.listenTo(this.model.units, "reset", this.addAll);
+        this.listenTo(this.model.units, "invalid", function(error) {
+          var msg;
+
+          switch (error.message) {
+            case 'title_missing':
+              _this.$('.title-group .control-group').addClass('error');
+          }
+          msg = (typeof error.code === "function" ? error.code(i18nCommon.errors[error.message]) : void 0) ? void 0 : i18nUnit.errors[error.message];
+          return new Alert({
+            event: 'unit-invalid',
+            fade: false,
+            message: msg,
+            type: 'error'
+          });
+        });
         return this.editing = false;
       };
 
@@ -154,23 +171,19 @@
         if (this.$('.error')) {
           this.$('.error').removeClass('error');
         }
-        return this.model.units.each(function(unit) {
-          return unit.save(null, {
-            success: function(unit) {
-              new Alert({
-                event: 'units-save',
-                fade: true,
-                message: i18nCommon.actions.changes_saved,
-                type: 'success'
-              });
-              if (unit.changed) {
-                return unit.trigger("save:success");
-              }
-            },
-            error: function(unit, error) {
-              return unit.trigger("invalid", unit, error);
-            }
-          });
+        return Parse.Object.saveAll(this.model.units, {
+          success: function(units) {
+            new Alert({
+              event: 'units-save',
+              fade: true,
+              message: i18nCommon.actions.changes_saved,
+              type: 'success'
+            });
+            return _this.model.units.trigger("save:success");
+          },
+          error: function(error) {
+            return _this.model.units.trigger("invalid", unit, error);
+          }
         });
       };
 

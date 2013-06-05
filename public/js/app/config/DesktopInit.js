@@ -79,10 +79,9 @@
 
   router = onNetwork ? "routers/Network" : "routers/Desktop";
 
-  require(["jquery", "underscore", "backbone", "facebook", "models/Profile", "collections/ListingFeaturedList", "collections/ActivityList", router, "underscore.string", "json2", "bootstrap", "serializeObject", "typeahead", "masonry"], function($, _, Parse, FB, Profile, FeaturedListingList, ActivityList, AppRouter, _String) {
+  require(["jquery", "underscore", "backbone", "facebook", "models/Profile", "collections/ListingFeaturedList", "collections/ActivityList", "collections/NotificationList", router, "underscore.string", "json2", "bootstrap", "serializeObject", "typeahead", "masonry"], function($, _, Parse, FB, Profile, FeaturedListingList, ActivityList, NotificationList, AppRouter, _String) {
     var eventSplitter, eventsApi, listenEvents, listenMethods;
 
-    Parse.onNetwork = onNetwork;
     eventSplitter = /\s+/;
     eventsApi = function(obj, action, name, rest) {
       var i, key, l, names;
@@ -122,6 +121,7 @@
       once._callback = callback;
       return this.on(name, once, context);
     };
+    Parse.Object.prototype.once = Parse.Events.once;
     Parse.View.prototype.once = Parse.Events.once;
     Parse.Collection.prototype.once = Parse.Events.once;
     listenMethods = {
@@ -173,6 +173,7 @@
       return this;
     };
     Parse.initialize(window.APPID, window.JSKEY);
+    Parse.onNetwork = onNetwork;
     Parse.App = {};
     Parse.App.featuredListings = new FeaturedListingList;
     Parse.App.countryCodes = {
@@ -234,18 +235,20 @@
       return false;
     };
     Parse.User.prototype.setup = function() {
-      var networkPromise, profilePromise,
+      var profilePromise, userPromise,
         _this = this;
 
       profilePromise = (new Parse.Query(Profile)).equalTo("user", this).first();
-      networkPromise = (new Parse.Query("_User")).include('network.role').equalTo("objectId", this.id).first();
-      return Parse.Promise.when(profilePromise, networkPromise).then(function(profile, user) {
-        var network, property;
+      userPromise = (new Parse.Query("_User")).include('property.role').include('network.role').equalTo("objectId", this.id).first();
+      this.notifications = new NotificationList;
+      return Parse.Promise.when(profilePromise, userPromise, this.notifications.query.find()).then(function(profile, user, notifs) {
+        var network;
 
+        _this.notifications.add(notifs);
         profile.prep("applicants").fetch();
-        _this.profile = profile;
+        _this.set("profile", profile);
+        _this.set("property", user.get("property"));
         network = user.get("network");
-        property = user.get("property");
         if (network) {
           network.prep("properties").fetch();
           network.prep("managers").fetch();

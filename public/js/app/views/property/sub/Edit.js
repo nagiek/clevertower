@@ -70,20 +70,13 @@
       };
 
       PropertyEditView.prototype.save = function(e) {
-        var attrs, bools,
+        var attrs,
           _this = this;
 
         e.preventDefault();
         this.$('.error').removeClass('error');
         this.$('button.save').prop('disabled', 'disabled');
-        attrs = this.$('form').serializeObject().property;
-        bools = ['electricity', 'furniture', 'gas', 'heat', 'hot_water', 'air_conditioning', 'back_yard', 'balcony', 'cats_allowed', 'concierge', 'dogs_allowed', 'doorman', 'elevator', 'exposed_brick', 'fireplace', 'front_yard', 'gym', 'laundry', 'indoor_parking', 'outdoor_parking', 'pool', 'sauna', 'wheelchair', 'public', 'anon'];
-        console.log(attrs);
-        debugger;
-        _.each(bools, function(attr) {
-          attrs[attr] = attrs[attr] === "on" || attrs[attr] === "1" ? true : false;
-          return true;
-        });
+        attrs = this.model.scrub(this.$('form').serializeObject().property);
         return this.model.save(attrs, {
           success: function(property) {
             _this.trigger("property:sync", property, _this);

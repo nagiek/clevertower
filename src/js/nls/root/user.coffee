@@ -23,6 +23,7 @@ define
     photo:      (name) ->       "#{_.escape(name)}'s photo"
   setup:
     performing_setup_for:       "Performing setup for"
+    existing_notifications:     "You have existing offers to join or manage properties. Please select from the list below."
   fields:                       
     name:                       "Name"
     first_name:                 "First Name"

@@ -13,11 +13,11 @@ __p += '<header class="row">\n  <hgroup class="span">\n    <h2>' +
 ((__t = ( unitId )) == null ? '' : __t) +
 '">' +
 ((__t = (title )) == null ? '' : __t) +
-'</a></h2>\n    <h3>' +
+'</a></h2>\n    <h4>' +
 ((__t = ( start_date )) == null ? '' : __t) +
 ' - ' +
 ((__t = ( end_date )) == null ? '' : __t) +
-'</h3>\n  </hgroup>\n  <ul class="span offset1 inline">\n    <li>\n      <a href="/properties/' +
+'</h4>\n  </hgroup>\n  <ul class="span offset1 inline">\n    <li>\n      <a href="/properties/' +
 ((__t = ( property.objectId )) == null ? '' : __t) +
 '/leases/' +
 ((__t = ( objectId )) == null ? '' : __t) +

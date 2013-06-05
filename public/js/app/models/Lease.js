@@ -1,5 +1,5 @@
 (function() {
-  define(['underscore', 'backbone', "collections/TenantList", "models/Property", "models/Unit", "moment"], function(_, Parse, TenantList, Property, Unit, moment) {
+  define(['underscore', 'backbone', "collections/TenantList", "models/Property", "models/Unit", "moment", "i18n!nls/common"], function(_, Parse, TenantList, Property, Unit, moment, i18nCommon) {
     var Lease;
 
     return Lease = Parse.Object.extend("Lease", {
@@ -28,6 +28,36 @@
         }
         today = new Date;
         return sd < today && today < ed;
+      },
+      scrub: function(lease) {
+        var attr, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2;
+
+        _ref = ['rent', 'keys', 'garage_remotes', 'security_deposit', 'parking_fee'];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          attr = _ref[_i];
+          if (lease[attr] === '' || lease[attr] === '0') {
+            lease[attr] = 0;
+          }
+          if (lease[attr]) {
+            lease[attr] = Number(lease[attr]);
+          }
+        }
+        _ref1 = ['start_date', 'end_date'];
+        for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+          attr = _ref1[_j];
+          if (lease[attr] !== '') {
+            lease[attr] = moment(lease[attr], i18nCommon.dates.moment_format).toDate();
+          }
+          if (typeof lease[attr] === 'string') {
+            lease[attr] = new Date;
+          }
+        }
+        _ref2 = ['checks_received', 'first_month_paid', 'last_month_paid'];
+        for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
+          attr = _ref2[_k];
+          lease[attr] = lease[attr] !== "" ? true : false;
+        }
+        return lease;
       },
       validate: function(attrs, options) {
         var error;

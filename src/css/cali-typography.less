@@ -6,14 +6,14 @@
 // HEADERS
 // -------
 
-h1 { font-size: 30px + 5px; }
-h2 { font-size: 24px + 4px; }
-h3 { font-size: 18px + 4px; }
-h4 { font-size: 14px + 4px; }
-h5 { font-size: 12px + 4px; }
-h6 {
-  font-family: @sansFontFamily;
-}
+h1 { font-size: 30px + 5px; font-family: "Rokkitt", @sansFontFamily;}
+h2 { font-size: 24px + 5px; font-family: "Rokkitt", @sansFontFamily;}
+// h3 { font-size: 18px + 5px; line-height: 30px; }
+// h4 { font-size: 14px + 5px; }
+// h5 { font-size: 12px + 5px; }
+// h6 {
+  // font-family: @sansFontFamily;
+// }
 
 h1 {
   &.soften {
@@ -41,10 +41,23 @@ h2,
 h3 {
   margin: 0 0 15px;
 }
+
+
 h4,
 h5,
 h6 {
   margin: 0 0 9px;
+}
+
+form {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin: 4px 0;
+  }
 }
 
 h3 {
@@ -55,40 +68,11 @@ h3 {
   text-align:center;
 }
 
-.node-page {
-  text-align:justify;
-}
-
-.node .submitted a,
-.node .terms a {
-  border: none;
-}
-
-.node .terms {
-  text-transform: uppercase;
-}
-
-/**
- * Autocomplete
- */
-#autocomplete {
-  text-align:left;
-}
-
-
-.tips /* Tips for Drupal's input formats */ {
-  font-size: 0.9em;
-}
-
-
-
-/**
- * Blocks
- */
-.block-title /* Block title */ {
-  text-transform:uppercase;
-}
-
 .strong {
   font-weight:bold;
+}
+
+.font-large {
+  font-size: @largeFontSize;
+  line-height: @largeLineHeight;
 }

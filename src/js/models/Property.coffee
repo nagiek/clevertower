@@ -17,9 +17,6 @@ define [
   # class Property extends Parse.Object
     
     className: "Property"
-      
-    initialize: ->
-      _.bindAll @, "cover", "prep"
           
     defaults:
       # Location
@@ -87,7 +84,7 @@ define [
 
 
     # Index of model in its collection.
-    pos : -> @collection.indexOf(@)
+    pos : -> if @collection then @collection.indexOf(@) else 0
 
     # Helper function
     GPoint : -> new google.maps.LatLng @get("center")._latitude, @get("center")._longitude
@@ -106,6 +103,41 @@ define [
       img = @get "image_#{format}"
       img = "/img/fallback/property-#{format}.png" if img is '' or !img?
       img 
+
+    scrub: (attrs) ->
+      bools = ['electricity'
+        'furniture'
+        'gas'
+        'heat'
+        'hot_water'
+        # Included
+        'air_conditioning'
+        'back_yard'
+        'balcony'
+        'cats_allowed'
+        'concierge'
+        'dogs_allowed'
+        'doorman'
+        'elevator'
+        'exposed_brick'
+        'fireplace'
+        'front_yard'
+        'gym'
+        'laundry'
+        'indoor_parking'
+        'outdoor_parking'
+        'pool'
+        'sauna'
+        'wheelchair'
+        # Private
+        'public'
+        'anon'
+      ]
+
+      for attr in bools
+        attrs[attr] = if attrs[attr] is "on" or attrs[attr] is "1" then true else false
+      
+      attrs
 
     prep: (collectionName, options) ->
       return @[collectionName] if @[collectionName]

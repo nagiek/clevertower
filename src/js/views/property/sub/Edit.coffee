@@ -56,44 +56,7 @@ define [
       @$('.error').removeClass('error')
       @$('button.save').prop('disabled', 'disabled')
       
-      attrs = @$('form').serializeObject().property
-
-      bools = ['electricity'
-        'furniture'
-        'gas'
-        'heat'
-        'hot_water'
-        # Included
-        'air_conditioning'
-        'back_yard'
-        'balcony'
-        'cats_allowed'
-        'concierge'
-        'dogs_allowed'
-        'doorman'
-        'elevator'
-        'exposed_brick'
-        'fireplace'
-        'front_yard'
-        'gym'
-        'laundry'
-        'indoor_parking'
-        'outdoor_parking'
-        'pool'
-        'sauna'
-        'wheelchair'
-        # Private
-        'public'
-        'anon'
-      ]
-
-      console.log attrs
-      debugger
-
-      _.each bools, (attr) -> 
-        # Have to return true because returning false breaks the _.each loop.
-        attrs[attr] = if attrs[attr] is "on" or attrs[attr] is "1" then true else false
-        true
+      attrs = @model.scrub @$('form').serializeObject().property
 
       @model.save attrs,
         success: (property) =>

@@ -127,3 +127,4 @@ define [
       @$leaseSelect = @$('.lease-select')
       
       @leases.fetch() if @leases.length is 0
+      @

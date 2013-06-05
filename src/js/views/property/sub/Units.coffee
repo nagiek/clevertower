@@ -30,8 +30,17 @@ define [
       @on "view:change", @clear
       
       # Fetch all the property items for this user
-      @model.units.on "add", @addOne
-      @model.units.on "reset", @addAll
+      @listenTo @model.units, "add", @addOne
+      @listenTo @model.units, "reset", @addAll
+
+      @listenTo @model.units, "invalid", (error) =>
+        # Mark up form
+        switch error.message
+          when 'title_missing'
+            @$('.title-group .control-group').addClass('error')
+
+        msg = if error.code? i18nCommon.errors[error.message] else i18nUnit.errors[error.message]
+        new Alert(event: 'unit-invalid', fade: false, message: msg, type: 'error')
       
       @editing = false
                 
@@ -117,11 +126,9 @@ define [
     save: (e) =>
       e.preventDefault()
       @$('.error').removeClass('error') if @$('.error')
-      @model.units.each (unit) =>
-        # if unit.changed
-        unit.save null,
-          success: (unit) =>
-            new Alert(event: 'units-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success')
-            unit.trigger "save:success" if unit.changed
-          error: (unit, error) =>
-            unit.trigger "invalid", unit, error
+      Parse.Object.saveAll @model.units, 
+        success: (units) =>
+          new Alert(event: 'units-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success')
+          @model.units.trigger "save:success"
+        error: (error) =>
+          @model.units.trigger "invalid", unit, error

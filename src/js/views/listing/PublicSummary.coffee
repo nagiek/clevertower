@@ -23,11 +23,11 @@ define [
         Parse.Dispatcher.on "user:login", @markAsApplied
 
     markAsApplied: ->
-      Parse.User.current().profile.applicants.on "add", (model) => if model.id is @model.id then @render()
+      Parse.User.current().get("profile").applicants.on "add", (model) => if model.id is @model.id then @render()
 
     # Re-render the contents of the Unit item.
     render: ->
-      applied = if Parse.User.current() then Parse.User.current().profile.applicants.find (model) => model.get("listing").id is @model.id else false
+      applied = if Parse.User.current() then Parse.User.current().get("profile").applicants.find (model) => model.get("listing").id is @model.id else false
       vars = 
         applied: applied
         rent: @model.get("rent")

@@ -10,7 +10,12 @@
       __extends(NewLeaseView, _super);
 
       function NewLeaseView() {
+        this.render = __bind(this.render, this);
+        this.setJulyJune = __bind(this.setJulyJune, this);
+        this.setNextMonth = __bind(this.setNextMonth, this);
+        this.setThisMonth = __bind(this.setThisMonth, this);
         this.showUnitIfNew = __bind(this.showUnitIfNew, this);
+        this.save = __bind(this.save, this);
         this.addAll = __bind(this.addAll, this);
         this.addOne = __bind(this.addOne, this);        _ref = NewLeaseView.__super__.constructor.apply(this, arguments);
         return _ref;
@@ -28,23 +33,19 @@
       };
 
       NewLeaseView.prototype.initialize = function(attrs) {
-        var tmpl,
-          _this = this;
+        var _this = this;
 
-        _.bindAll(this, 'addOne', 'addAll', 'save', 'setThisMonth', 'setNextMonth', 'setJulyJune');
         this.property = attrs.property;
-        if (!this.model) {
+        if (!(this.model || !Parse.User.current())) {
           this.model = new Lease({
             network: Parse.User.current().get("network")
           });
         }
-        if (attrs.modal) {
+        this.modal = attrs.modal;
+        if (this.modal) {
           this.setElement('#apply-modal');
         }
-        tmpl = (this.model.isNew() ? 'new' : 'edit') + (attrs.modal ? "-modal" : "");
-        this.template = "src/js/templates/lease/" + tmpl + ".jst";
-        this.cancel_path = ("/properties/" + this.property.id) + (!this.model.isNew() ? "/leases/" + this.model.id : "");
-        this.model.on('invalid', function(error) {
+        this.listenTo(this.model, 'invalid', function(error) {
           var args, fn, msg;
 
           _this.$('.error').removeClass('error');
@@ -108,15 +109,12 @@
             return delete _this;
           });
         });
-        this.model.on('destroy', function() {
-          _this.undelegateEvents();
-          return delete _this;
-        });
+        this.listenTo(this.model, 'destroy', this.close);
         if (this.property) {
           this.units = this.property.prep("units");
         }
-        this.units.bind("add", this.addOne);
-        this.units.bind("reset", this.addAll);
+        this.listenTo(this.units, "add", this.addOne);
+        this.listenTo(this.units, "reset", this.addAll);
         this.current = new Date().setDate(1);
         return this.dates = {
           start: this.model.get("start_date") ? moment(this.model.get("start_date")).format("L") : moment(this.current).format("L"),
@@ -139,35 +137,14 @@
       };
 
       NewLeaseView.prototype.save = function(e) {
-        var attrs, data, unit, userValid,
+        var attrs, data, email, unit, userValid, _i, _len, _ref1,
           _this = this;
 
-        if (e) {
-          e.preventDefault();
-        }
+        e.preventDefault();
         this.$('button.save').prop("disabled", "disabled");
         data = this.$('form').serializeObject();
         this.$('.error').removeClass('error');
-        _.each(['rent', 'keys', 'garage_remotes', 'security_deposit', 'parking_fee'], function(attr) {
-          if (data.lease[attr] === '' || data.lease[attr] === '0') {
-            data.lease[attr] = 0;
-          }
-          if (data.lease[attr]) {
-            return data.lease[attr] = Number(data.lease[attr]);
-          }
-        });
-        _.each(['start_date', 'end_date'], function(attr) {
-          if (data.lease[attr] !== '') {
-            data.lease[attr] = moment(data.lease[attr], i18nCommon.dates.moment_format).toDate();
-          }
-          if (typeof data.lease[attr] === 'string') {
-            return data.lease[attr] = new Date;
-          }
-        });
-        _.each(['checks_received', 'first_month_paid', 'last_month_paid'], function(attr) {
-          return data.lease[attr] = data.lease[attr] !== "" ? true : false;
-        });
-        attrs = data.lease;
+        attrs = this.model.scrub(data.lease);
         if (data.unit && data.unit.id !== "") {
           if (data.unit.id === "-1") {
             unit = new Unit(data.unit.attributes);
@@ -180,15 +157,18 @@
         userValid = true;
         if (data.emails && data.emails !== '') {
           attrs.emails = [];
-          _.each(data.emails.split(","), function(email) {
+          _ref1 = data.emails.split(",");
+          for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+            email = _ref1[_i];
             email = $.trim(email);
             userValid = !Parse.User.prototype.validate({
               email: email
             }) ? true : false;
-            if (userValid) {
-              return attrs.emails.push(email);
+            if (!userValid) {
+              break;
             }
-          });
+            attrs.emails.push(email);
+          }
         }
         if (!userValid) {
           this.$('.emails-group').addClass('error');
@@ -209,43 +189,48 @@
 
       NewLeaseView.prototype.showUnitIfNew = function(e) {
         if (e.target.value === "-1") {
-          return this.$('.new-unit').removeClass('hide');
+          return this.$('.new-unit').show();
         } else {
-          return this.$('.new-unit').addClass('hide');
+          return this.$('.new-unit').hide();
         }
       };
 
-      NewLeaseView.prototype.setThisMonth = function() {
+      NewLeaseView.prototype.setThisMonth = function(e) {
+        e.preventDefault();
         this.$startDate.val(moment(this.current).format("L"));
         return this.$endDate.val(moment(this.current).add(1, 'year').subtract(1, 'day').format("L"));
       };
 
-      NewLeaseView.prototype.setNextMonth = function() {
+      NewLeaseView.prototype.setNextMonth = function(e) {
+        e.preventDefault();
         this.$startDate.val(moment(this.current).add(1, 'month').format("L"));
         return this.$endDate.val(moment(this.current).add(1, 'month').add(1, 'year').subtract(1, 'day').format("L"));
       };
 
-      NewLeaseView.prototype.setJulyJune = function() {
+      NewLeaseView.prototype.setJulyJune = function(e) {
+        e.preventDefault();
         this.$startDate.val(moment(this.current).month(6).format("L"));
         return this.$endDate.val(moment(this.current).month(6).add(1, 'year').subtract(1, 'day').format("L"));
       };
 
       NewLeaseView.prototype.render = function() {
-        var vars;
+        var cancel_path, template, tmpl, vars;
 
+        tmpl = (this.model.isNew() ? 'new' : 'edit') + (this.modal ? "-modal" : "");
+        template = "src/js/templates/lease/" + tmpl + ".jst";
+        cancel_path = ("/properties/" + this.property.id) + (!this.model.isNew() ? "/leases/" + this.model.id : "");
         vars = {
           lease: _.defaults(this.model.attributes, Lease.prototype.defaults),
           unit: this.model.get("unit") ? this.model.get("unit") : false,
           dates: this.dates,
-          cancel_path: this.cancel_path,
+          cancel_path: cancel_path,
           title: this.property ? this.property.get("title") : false,
-          moment: moment,
           i18nCommon: i18nCommon,
           i18nUnit: i18nUnit,
           i18nLease: i18nLease,
           emails: this.model.get("emails") ? this.model.get("emails") : ""
         };
-        this.$el.html(JST[this.template](vars));
+        this.$el.html(JST[template](vars));
         this.$unitSelect = this.$('.unit-select');
         this.$startDate = this.$('.start-date');
         this.$endDate = this.$('.end-date');

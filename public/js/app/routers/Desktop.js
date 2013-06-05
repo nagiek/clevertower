@@ -22,6 +22,7 @@
         "search/*splat": "search",
         "users/:id": "profileShow",
         "users/:id/*splat": "profileShow",
+        "notifications": "notifications",
         "account/setup": "accountSetup",
         "account/:category": "accountSettings",
         "*actions": "index"
@@ -140,11 +141,11 @@
 
           vars = _this.deparamAction(splat);
           if (!view || !(view instanceof ShowProfileView)) {
-            if (Parse.User.current() && Parse.User.current().profile && id === Parse.User.current().profile.id) {
+            if (Parse.User.current() && Parse.User.current().get("profile") && id === Parse.User.current().get("profile").id) {
               return _this.view = new ShowProfileView({
                 path: vars.path,
                 params: vars.params,
-                model: Parse.User.current().profile,
+                model: Parse.User.current().get("profile"),
                 current: true
               });
             } else {
@@ -187,7 +188,7 @@
           if (category === 'edit') {
             return require(["views/profile/edit"], function(UserSettingsView) {
               return _this.view = new UserSettingsView({
-                model: Parse.User.current().profile,
+                model: Parse.User.current().get("profile"),
                 current: true
               }).render();
             });
@@ -198,6 +199,18 @@
               }).render();
             });
           }
+        } else {
+          return this.signupOrLogin();
+        }
+      };
+
+      DesktopRouter.prototype.notifications = function() {
+        var _this = this;
+
+        if (Parse.User.current()) {
+          return require(["views/notification/All"], function(AllNotificationsView) {
+            return _this.view = new AllNotificationsView().render();
+          });
         } else {
           return this.signupOrLogin();
         }

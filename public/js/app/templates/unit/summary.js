@@ -137,7 +137,7 @@ __p += '\n    <a class="btn btn-mini add-lease view-specific view-show"\n       
 ((__t = ( objectId )) == null ? '' : __t) +
 '"\n       rel="tooltip" \n       data-original-title="' +
 ((__t = ( i18nUnit.actions.add_listing )) == null ? '' : __t) +
-'">\n      <i class="icon-plus"></i>\n    </a>\n    ';
+'">\n      <i class="icon-listing"></i>\n    </a>\n    ';
  if (activeLease) { ;
 __p += '\n      <a class="btn btn-mini add-tenants view-specific view-show"\n         href="/properties/' +
 ((__t = ( property.objectId )) == null ? '' : __t) +

@@ -18,6 +18,7 @@ define [
       "users/:id"                           : "profileShow"
       "users/:id/*splat"                    : "profileShow"
       "account/:category"                   : "accountSettings"
+      "notifications"                       : "notifications"
       "*actions"                            : "index"
 
     initialize: (options) ->
@@ -118,7 +119,7 @@ define [
       view = @view
       require ["views/property/new/Wizard"], (PropertyWizard) =>
         if !view or view !instanceof PropertyWizard
-          @view = new PropertyWizard
+          @view = new PropertyWizard forNetwork: true
           @view.setElement "#main"
           @view.render()
 
@@ -134,7 +135,6 @@ define [
       require ["views/property/Show"], (PropertyView) =>
         vars = @deparamAction splat
         if !view or view !instanceof PropertyView
-          $('#main').html '<div id="property"></div>'
           if model = Parse.User.current().get("network").properties.get id
             vars.model = model
             @view = new PropertyView(vars)
@@ -173,8 +173,8 @@ define [
       require ["models/Profile", "views/profile/Show"], (Profile, ShowProfileView) =>
         vars = @deparamAction splat
         if !view or view !instanceof ShowProfileView
-          if Parse.User.current() and Parse.User.current().profile and id is Parse.User.current().profile.id
-            @view = new ShowProfileView path: vars.path, params: vars.params, model: Parse.User.current().profile, current: true
+          if Parse.User.current() and Parse.User.current().get("profile") and id is Parse.User.current().get("profile").id
+            @view = new ShowProfileView path: vars.path, params: vars.params, model: Parse.User.current().get("profile"), current: true
           else
             (new Parse.Query(Profile)).get id,
             success: (obj) => 
@@ -185,12 +185,17 @@ define [
     accountSettings : (category) ->
       if category is 'edit'
         require ["views/profile/edit"], (UserSettingsView) =>
-          @view = new UserSettingsView(model: Parse.User.current().profile, current: true).render()
+          @view = new UserSettingsView(model: Parse.User.current().get("profile"), current: true).render()
       else
         require ["views/user/#{category}"], (UserSettingsView) =>
           @view = new UserSettingsView(model: Parse.User.current()).render()
-  
-  
+    
+    notifications : ->
+      if Parse.User.current()
+        require ["views/notification/All"], (AllNotificationsView) =>
+            @view = new AllNotificationsView().render()
+      else
+        @signupOrLogin()
   
 
     # Utilities
