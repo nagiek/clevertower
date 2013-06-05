@@ -168,12 +168,14 @@ define [
         # Render asynchronously, while we wait for the property info to come in so we can determine our center & radius
         if Parse.User.current().get("network").properties.length is 0
           @listenToOnce Parse.User.current().get("network").properties, "reset", @getSetting
-        else
-          @getSetting()
+
+        @getSetting()
+        @render()
       else
         @render()
 
     render: ->
+      console.log @center
       vars = 
         today: moment().format("L")
         i18nListing: i18nListing
@@ -513,10 +515,10 @@ define [
       , 250
 
     getSetting : =>
-      Parse.User.current().get("network").properties.getSetting()
-      @center = @GPoint Parse.User.current().get("network").properties.center
-      @radius = Parse.User.current().get("network").properties.radius
-      @render()
+      if Parse.User.current().get("network").properties.length > 0
+        Parse.User.current().get("network").properties.getSetting()
+        @center = @GPoint Parse.User.current().get("network").properties.center
+        @radius = Parse.User.current().get("network").properties.radius
 
     GPoint : (GeoPoint) -> new google.maps.LatLng GeoPoint._latitude, GeoPoint._longitude
 

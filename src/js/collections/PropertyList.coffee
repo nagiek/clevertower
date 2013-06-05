@@ -17,9 +17,9 @@ define [
       @query.equalTo("network", attrs.network) if attrs and attrs.network
 
     getSetting: ->
-      centers = @map (p) -> p.get("center")
-
-      if centers.length > 0
+      
+      if @length > 0
+        centers = @map (p) -> p.get("center")
         hiLat = loLat = centers[0]._latitude
         hiLng = loLng = centers[0]._longitude
         _.each centers, (c) ->       
@@ -35,9 +35,9 @@ define [
         @radius = @getDistanceFromLatLngInKm rLat, rLng
         # @radius = Math.max (hiLat - loLat)/2, (hiLng - loLng)/2, 15000 # At least 15 km view.
 
-      else
-        @center = new Parse.GeoPoint -45, 78
-        @radius = 15000
+      # else
+      #   @center = new Parse.GeoPoint 45, -78
+      #   @radius = 15000
       
     # Helper function
     # average: (ary) ->
