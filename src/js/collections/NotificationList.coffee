@@ -17,12 +17,15 @@ define [
       channels.push "networks-#{Parse.User.current().get('network').id}" if Parse.User.current().get('network')
       #   channels.push "properties-#{Parse.User.current().get('property').id}" if Parse.User.current().get('property')
 
+      # LOL WTF.
       @query = new Parse.Query(Notification)
                 .containedIn("channel", channels)
                 .include('network') # For mgr invitations.
                 .include('property')
                 .include('profile')
                 .include('tenant')
+                .include('unit')
+                .include('lease')
                 .include('manager')
                 .descending("createdAt")
                 .limit(6) 

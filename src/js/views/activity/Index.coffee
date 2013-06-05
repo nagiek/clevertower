@@ -66,7 +66,8 @@ define [
       @listenTo Parse.App.activity, "reset", @addAll
       @listenTo Parse.App.activity, "add", @addOne
 
-      if Parse.User.current() then @getUserActivity() else @render()
+      @getUserActivity() if Parse.User.current()
+      @render()
 
     refreshDisplay : ->
       Parse.App.activity.each (a) -> a.trigger "refresh"
@@ -145,37 +146,46 @@ define [
     getUserActivity : =>
       # Get the property from what we've already loaded.
       Parse.User.current().activity = new ActivityList [], {} unless Parse.User.current().activity
+      
       if Parse.User.current().get("property")
-        @center = @GPoint Parse.User.current().get("property").get("center") unless @center
-        @radius = 15000
-
         # Activity list for *property*        
         Parse.User.current().activity.query.equalTo "property", Parse.User.current().get("property")
         @listenTo Parse.User.current().activity, 'add', @addOnePropertyActivity
         Parse.App.activity.query.notEqualTo "property", Parse.User.current().get("property")
 
-        # Render immediately, as we already have the center & radius from the property
-        @render()
+        # Visibility counter
+        Parse.User.current().get("property").shown = false
 
       else if Parse.User.current().get("network")
 
         # Activity list for *network*
-        unless Parse.User.current().activity
-          Parse.User.current().activity.query.equalTo "network", Parse.User.current().get("network")
-          @listenTo Parse.User.current().activity, 'add', @addOnePropertyActivity
-          Parse.App.activity.query.notEqualTo "network", Parse.User.current().get("network")
+        Parse.User.current().activity.query.equalTo "network", Parse.User.current().get("network")
+        @listenTo Parse.User.current().activity, 'add', @addOnePropertyActivity
+        Parse.App.activity.query.notEqualTo "network", Parse.User.current().get("network")
 
-        # Render asynchronously, while we wait for the property info to come in so we can determine our center & radius
-        if Parse.User.current().get("network").properties.length is 0
-          @listenToOnce Parse.User.current().get("network").properties, "reset", @getSetting
+        # Visibility counter
+        Parse.User.current().get("network").properties.each (p) -> p.shown = false
 
-        @getSetting()
-        @render()
+    getPersonalizedMapCenter : =>
+      if Parse.User.current()
+        if Parse.User.current().get("property")
+          @center = @GPoint Parse.User.current().get("property").get("center")
+          @radius = 15000
+
+        else if Parse.User.current().get("network")
+          Parse.User.current().get("network").properties.getSetting()
+          @center = @GPoint Parse.User.current().get("network").properties.center
+          @radius = Parse.User.current().get("network").properties.radius
+
+        else
+          @center = new google.maps.LatLng 43.6481, -79.4042
+          @radius = 15000
+
       else
-        @render()
+        @center = new google.maps.LatLng 43.6481, -79.4042
+        @radius = 15000
 
     render: ->
-      console.log @center
       vars = 
         today: moment().format("L")
         i18nListing: i18nListing
@@ -207,16 +217,13 @@ define [
             if obj
               @placesService.getDetails reference: obj.get("reference"), @initWithCenter
             else 
-              @center = new google.maps.LatLng 43.6481, -79.4042
-              @radius = 15000
+              @getPersonalizedMapCenter()
               @renderMap()
           , =>
-            @center = new google.maps.LatLng 43.6481, -79.4042
-            @radius = 15000
+            @getPersonalizedMapCenter()
             @renderMap()
         else
-          @center = new google.maps.LatLng 43.6481, -79.4042
-          @radius = 15000
+          @getPersonalizedMapCenter()
           @renderMap()
 
       # Track scrolling & resizing for map
@@ -333,7 +340,7 @@ define [
       # Check if activity is visible or not.
       if Parse.User.current().get("property") 
         p = Parse.User.current().get("property") 
-        if @withinBounds p then @showPropertyActivity p else @hidePropertyActivity p
+        if @withinBounds p.get("center") then @showPropertyActivity p else @hidePropertyActivity p
         @refreshDisplay()
       else if Parse.User.current().get("network")
         Parse.User.current().get("network").properties.each (p) => 
@@ -386,7 +393,7 @@ define [
         pos: a.get("property").pos()
         view: @
         linkedToProperty: true
-      if a.createdAt is undefined then view.className += " fade in" 
+      view.className += " fade in" unless a.createdAt
       @$list.append view.render().el
 
     # Add all items in the Properties collection at once.
@@ -404,20 +411,26 @@ define [
     showPropertyActivity: (property) =>
       Parse.User.current().activity.chain()
         .filter (a) => 
+          !property.shown and
           a.get("property").id is property.id and 
           (!@filter or @filter is a.get("activity_type")) and 
-          (!@specificSearchControls or @specificSearchControls.filter(a))
+          (!@specificSearchControls or @specificSearchControls.filter(a)) 
         .each (a) =>
+          property.shown = true
           # We need the property's position within the collection.
           a.set "property", property
           @addOnePropertyActivity a
 
     hidePropertyActivity: (property) =>
       Parse.User.current().activity.chain()
-        .filter((a) -> a.get("property").id is property.id and 
+        .filter((a) ->
+          property.shown is true and 
+          a.get("property").id is property.id and 
           (!@filter or @filter isnt a.get("activity_type")) and 
           (!@specificSearchControls or !@specificSearchControls.filter(a)))
-        .each (a) -> a.trigger('remove')
+        .each (a) ->
+          property.shown = false
+          a.trigger('remove')
 
     # Update the pagination with appropriate count, pages and page numbers 
     updatePaginiation : =>
@@ -514,23 +527,13 @@ define [
         @time = null
       , 250
 
-    getSetting : =>
-      if Parse.User.current().get("network").properties.length > 0
-        Parse.User.current().get("network").properties.getSetting()
-        @center = @GPoint Parse.User.current().get("network").properties.center
-        @radius = Parse.User.current().get("network").properties.radius
-
     GPoint : (GeoPoint) -> new google.maps.LatLng GeoPoint._latitude, GeoPoint._longitude
 
     # These break everything. 
     # undelegateEvents is called after init. No idea why.
     # undelegateEvents : =>
-      
-    #   Parse.App.activity.off "add"
-    #   Parse.App.activity.off "reset"
-
-    #   Parse.App.search.off "google:search"
-
+    #   @off "model:viewDetails"
+    #   @off "dragend"
     #   google.maps.event.removeListener @dragListener
     #   google.maps.event.removeListener @zoomListener
     #   super
@@ -540,15 +543,12 @@ define [
       lat = center._latitude
       lng = center._longitude
 
-      # If it is not outside the box
-      !(lat < @sw._latitude || 
-             @ne._latitude < lat || 
-             lng < @sw._longitude || 
-             @ne._longitude < lng)
-          
-
-
-
+      # Determine if it is within the box.
+      @sw._latitude < lat and
+        lat < @ne._latitude and 
+        @sw._longitude < lng and 
+        lng < @ne._longitude
+      
 
     clear : => 
       @stopListening()

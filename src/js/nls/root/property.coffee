@@ -68,12 +68,11 @@ define
     map_instructions:                 "Find your building on the map. If the building is on CleverTower, you'll have the chance to join."
     awaiting_search:                  "Awaiting search."
     no_results:                       "No nearby buildings."
-  collection:                         
-    empty:                            
-      properties:                     "You don't have any properties yet."
-      units:                          "You don't have any units yet."
-      leases:                         "You don't have any leases yet."
-      photos:                         "You don't have any photos yet."
+  empty:                            
+    properties:                       "You don't have any properties yet."
+    units:                            "You don't have any units yet."
+    leases:                           "You don't have any leases yet."
+    photos:                           "You don't have any photos yet."
                                       
   fields:                             
     description:                      "Description"

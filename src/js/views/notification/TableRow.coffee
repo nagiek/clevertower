@@ -36,7 +36,11 @@ define [
 
       # Until req.object.original lands for Cloud Code, have to pass in new status.
       actionItem.save(newStatus: "current").then ->
-        if @model.className is "Tenant" then Parse.User.current().set("property", @model.get("property"))
+        if @model.className is "Tenant" 
+          Parse.User.current().set
+            property: @model.get("property")
+            unit: @model.get("unit")
+            lease: @model.get("lease")
         else if @model.className is "Manager" then Parse.User.current().set("network", @model.get("network"))
 
     reject: (e) =>

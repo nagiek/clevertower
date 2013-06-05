@@ -136,7 +136,7 @@
         if (this.photos.length !== 0) {
           return this.photos.each(this.addOne);
         } else {
-          return this.$list.before('<p class="empty">' + i18nProperty.collection.empty.photos + '</p>');
+          return this.$list.before('<p class="empty">' + i18nProperty.empty.photos + '</p>');
         }
       };
 

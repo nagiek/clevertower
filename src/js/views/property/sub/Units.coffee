@@ -87,7 +87,7 @@ define [
       @$list = @$("#units-table tbody")
       @$list.html ''
       if @model.units.length > 0 then @model.units.each @addOne
-      else @$list.html '<p class="empty">' + i18nProperty.collection.empty.units + '</p>'
+      else @$list.html '<p class="empty">' + i18nProperty.empty.units + '</p>'
 
     # Add a single todo item to the list by creating a view for it, and
     # appending its element to the `<ul>`.

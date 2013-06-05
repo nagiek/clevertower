@@ -111,7 +111,7 @@
         if (this.model.units.length > 0) {
           return this.model.units.each(this.addOne);
         } else {
-          return this.$list.html('<p class="empty">' + i18nProperty.collection.empty.units + '</p>');
+          return this.$list.html('<p class="empty">' + i18nProperty.empty.units + '</p>');
         }
       };
 

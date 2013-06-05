@@ -81,7 +81,7 @@ define [
       unless @photos.length is 0
         @photos.each @addOne
       else
-        @$list.before '<p class="empty">' + i18nProperty.collection.empty.photos + '</p>'
+        @$list.before '<p class="empty">' + i18nProperty.empty.photos + '</p>'
 
 
     setThisMonth : (e) ->

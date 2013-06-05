@@ -12,6 +12,9 @@ define [
 
     query: new Parse.Query("Property")
 
+    center: new Parse.GeoPoint 43.6481, -79.4042
+    radius: 15000
+
     initialize: (models, attrs) ->
       # We load PropertyList before Parse is initialized, so we cannot pre-load the query.
       @query.equalTo("network", attrs.network) if attrs and attrs.network

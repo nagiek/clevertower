@@ -73,7 +73,7 @@ define [
         @$propertyList.children(':even').children().addClass 'views-row-even'
         @$propertyList.children(':odd').children().addClass  'views-row-odd'
       else
-        @$propertyList.html '<p class="empty">' + i18nProperty.collection.empty.properties + '</p>'
+        @$propertyList.html '<p class="empty">' + i18nProperty.empty.properties + '</p>'
 
     # showProperty : (id) ->
     #   Parse.history.navigate "/properties/#{id}"

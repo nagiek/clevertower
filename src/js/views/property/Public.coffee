@@ -90,7 +90,7 @@ define [
       unless @model.photos.length is 0
         @model.photos.each @addOnePhoto
       else
-        @$list.before '<p class="empty">' + i18nProperty.collection.empty.photos + '</p>'
+        @$list.before '<p class="empty">' + i18nProperty.empty.photos + '</p>'
 
     # Listings
     # --------
@@ -118,7 +118,7 @@ define [
             @$listings.append '<tr class="divider"><td colspan="4">' + i18nUnit.fields.bedrooms + ": #{i}</td></tr>"
             _.each listings, @addOneListing
       else
-        @$listings.before '<p class="empty">' + i18nProperty.collection.empty.listings + '</p>'
+        @$listings.before '<p class="empty">' + i18nProperty.empty.listings + '</p>'
 
     showModal: (e) =>
       e.preventDefault()

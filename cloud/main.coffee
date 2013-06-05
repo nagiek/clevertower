@@ -119,12 +119,13 @@ Parse.Cloud.define "AddTenants", (req, res) ->
           vars = 
             property: property
             network: network
+            unit: leaseOrInquiry.get("unit")
+            listing: leaseOrInquiry.get("listing")
             status: if user and user.id is req.user.id then 'current' else status
             profile: profile
             accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb"
             ACL: joinClassACL
           vars[className.toLowerCase()] = leaseOrInquiry
-          vars.listing = leaseOrInquiry.get("listing") if leaseOrInquiry.get("listing")
 
           joinClassSaves.push new Parse.Object(joinClassName).save(vars)
 
@@ -1143,6 +1144,8 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
       req.object.set 
         property: property
         network: network
+        unit: lease.get "unit"
+        lease: lease
         ACL: tenantACL
     
     # Change the status depending on who is creating the link.
@@ -1179,7 +1182,11 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
 
             # Made it! No need to add tenant to role as they are already there.
 
-            savesToComplete.push user.save "property", property if user
+            if user
+              savesToComplete.push user.save 
+                property: property 
+                unit: req.object.get "unit"
+                lease: req.object.get "lease"
 
             # Create activity
             activity = new Parse.Object("Activity")
@@ -1192,7 +1199,7 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
               activity_type: "new_tenant"
               public: false
               center: property.get "center"
-              # lease: req.object
+              # lease: req.object.get "lease"
               # tenant: req.object
               unit: req.object.get "unit"
               property: property
@@ -1234,7 +1241,11 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
 
           if req.object.existed() and status and status is 'invited' and newStatus and newStatus is 'current'
 
-            savesToComplete.push user.save "property", property if user
+            if user
+              savesToComplete.push user.save 
+                property: property 
+                unit: req.object.get "unit"
+                lease: req.object.get "lease"
 
             # Create activity
             activity = new Parse.Object("Activity")

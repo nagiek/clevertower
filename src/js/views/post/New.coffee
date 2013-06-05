@@ -19,7 +19,7 @@ define [
     el: "#new-post"
 
     events:
-      "submit form"                     : "post"
+      "submit form"                     : "save"
       "focus #post-title"               : "showPostForm"
       "change #show-body"               : "toggleBodyView"
       "change #centered-on-property"    : "toggleCenterOnProperty"
@@ -34,7 +34,7 @@ define [
 
       @listenTo Parse.User.current(), "change:property change:network", @handlePossiblePropertyAdd
       if Parse.User.current().get("network")
-        @listenToOnce Parse.User.current().get("network"), "add", @handlePropertyAdd
+        @listenTo Parse.User.current().get("network").properties, "add", @handlePropertyAdd
 
       @listenTo @view, "dragend", @updateCenter
       @updateCenter()
@@ -44,7 +44,6 @@ define [
         if property
           @view.map.setCenter property.GPoint()
           @view.map.setZoom 14
-
 
     updateCenter : => center = @view.map.getCenter(); @model.set "center", new Parse.GeoPoint(center.lat(), center.lng())
 
@@ -80,17 +79,18 @@ define [
         @$("#post-title").prop 'placeholder', i18nUser.form.share[newPos][rand]
 
     checkMarkerVisibility: ->
+      return unless @shown
       if @getTypeIndex() is 3
         # TODO: unable to set checkbox to 'checked' AND 'disabled'
         @$("#centered-on-property").prop('checked', true).trigger("change") unless $("#redo-search").is(":checked")
-        @$("#centered-on-property").prop('disabled', true)
+        # @$("#centered-on-property").prop('disabled', true)
       else
         @marker.setVisible true
-        @$("#centered-on-property").removeProp("disabled")
+        # @$("#centered-on-property").removeProp("disabled")
 
     getTypeIndex: -> 
       index = @$("#post-type :checked").parent().index()
-      return if index then index else 3
+      return if index then index else 0
 
     render: =>
 
@@ -148,7 +148,7 @@ define [
       @empty = true
       # Set to building-type, to show the user that they still need to join/add a property
       @$("#post-type :nth-child(4) input").prop('checked', true)
-      @$("#post-input-caret").data "position", 4
+      @$("#post-input-caret").data "position", 3
       if Parse.User.current().get("network")
         @$('.no-property').html """
                           <p>CleverTower is more fun when you're connected, but you haven't added any property yet.</p>
@@ -163,6 +163,7 @@ define [
                       #{i18nCommon.expressions.get_started}
                     </a>
                     """
+      @$("#centered-on-property").parent().append("<p class='empty'><small>(#{i18nProperty.empty.properties})</small></p>")
       @changePostType()
 
     handlePossiblePropertyAdd : =>
@@ -170,19 +171,21 @@ define [
         if Parse.User.current().get("network").properties.length > 0 then @handlePropertyAdd()
         else 
           @handleNoProperty()
-          @listenToOnce Parse.User.current().get("network"), "add", @handlePropertyAdd
+          @listenTo Parse.User.current().get("network").properties, "add", @handlePropertyAdd
       else if Parse.User.current().get("property")
         @handlePropertyAdd()
 
     handlePropertyAdd : ->
       @empty = false
       @changePostType()
+      @$("#centered-on-property").parent().remove("p.empty")
 
     showPostForm : (e) => 
       newPos = @getTypeIndex()
       return if @shown or newPos is 3 and @empty
       @shown = true
       @$('#post-options').removeClass 'hide'
+      if @empty then @$("#centered-on-property").prop("disabled", true)
       @marker.bindTo 'position', @view.map, 'center' 
       @checkMarkerVisibility()
       $("#redo-search").prop('checked', false).trigger("change") if $("#redo-search").is(":checked")
@@ -219,7 +222,7 @@ define [
       else @$('.body-group').addClass 'hide'
 
 
-    post : (e) ->
+    save : (e) ->
       e.preventDefault() if e
 
       @$('button.save').prop "disabled", true
@@ -242,9 +245,8 @@ define [
           # Reset
           @model = new Post
           @marker.setMap null
-          @undelegateEvents()
+          @shown = false
           @render()
-          @delegateEvents()
         error: (model, error) => console.log error
 
     clear: (e) =>

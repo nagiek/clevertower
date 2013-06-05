@@ -91,15 +91,14 @@
               vars = {
                 property: property,
                 network: network,
+                unit: leaseOrInquiry.get("unit"),
+                listing: leaseOrInquiry.get("listing"),
                 status: user && user.id === req.user.id ? 'current' : status,
                 profile: profile,
                 accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb",
                 ACL: joinClassACL
               };
               vars[className.toLowerCase()] = leaseOrInquiry;
-              if (leaseOrInquiry.get("listing")) {
-                vars.listing = leaseOrInquiry.get("listing");
-              }
               return joinClassSaves.push(new Parse.Object(joinClassName).save(vars));
             });
             return Parse.Promise.when(joinClassSaves);
@@ -1123,6 +1122,8 @@
           req.object.set({
             property: property,
             network: network,
+            unit: lease.get("unit"),
+            lease: lease,
             ACL: tenantACL
           });
         }
@@ -1154,7 +1155,11 @@
               }
               if (req.object.existed() && status && status === 'pending' && newStatus && newStatus === 'current') {
                 if (user) {
-                  savesToComplete.push(user.save("property", property));
+                  savesToComplete.push(user.save({
+                    property: property,
+                    unit: req.object.get("unit"),
+                    lease: req.object.get("lease")
+                  }));
                 }
                 activity = new Parse.Object("Activity");
                 activityACL = new Parse.ACL;
@@ -1211,7 +1216,11 @@
               }
               if (req.object.existed() && status && status === 'invited' && newStatus && newStatus === 'current') {
                 if (user) {
-                  savesToComplete.push(user.save("property", property));
+                  savesToComplete.push(user.save({
+                    property: property,
+                    unit: req.object.get("unit"),
+                    lease: req.object.get("lease")
+                  }));
                 }
                 activity = new Parse.Object("Activity");
                 activityACL = new Parse.ACL;
