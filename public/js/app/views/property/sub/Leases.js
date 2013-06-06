@@ -58,14 +58,14 @@
         if (this.model.leases.length > 0) {
           return this.model.leases.each(this.addOne);
         } else {
-          return this.$list.html('<p class="empty">' + i18nLease.collection.empty + '</p>');
+          return this.$list.html('<p class="empty">' + i18nLease.empty.collection + '</p>');
         }
       };
 
       PropertyLeasesView.prototype.addOne = function(lease) {
         var view;
 
-        this.$('p.empty').hide();
+        this.$('p.empty').remove();
         view = new LeaseView({
           model: lease
         });

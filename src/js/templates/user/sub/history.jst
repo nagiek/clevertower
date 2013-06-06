@@ -1,0 +1,17 @@
+<ul class="nav nav-pills">
+  <li class="active"><a id="inquiries-link" href="/account/history/inquiries" data-target="#inquiries"><%= i18nCommon.classes.Inquiries %></a></li>
+  <li><a id="leases-link" href="/account/history/leases" data-target="#leases"></i> <%= i18nCommon.classes.Leases %></a></li>
+</ul>
+
+<div class="tab-content">
+  <div id="inquiries" class="tab-pane active">
+    <ul class="unstyled">
+      <li><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" /></li>
+    </ul>
+  </div>
+	<div id="leases" class="tab-pane">
+    <ul class="unstyled">
+      <li><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" /></li>
+    </ul>
+  </div>
+</div>

@@ -32,11 +32,12 @@
       GMapView.prototype.initialize = function(attrs) {
         this.mapId = "mapCanvas";
         this.wizard = attrs.wizard;
-        this.geocoder = new google.maps.Geocoder();
+        this.geocoder = new google.maps.Geocoder;
         this.results = new PropertyList;
         this.browserGeoSupport = navigator.geolocation || google.loader.ClientLocation ? true : false;
         this.listenTo(this.wizard, "wizard:cancel", this.clear);
         this.listenTo(this.wizard, "property:save", this.clear);
+        this.listenTo(this.wizard, "lease:save", this.clear);
         return this.listenTo(this.results, "reset", this.processResults);
       };
 

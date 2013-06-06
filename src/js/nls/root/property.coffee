@@ -73,6 +73,7 @@ define
     units:                            "You don't have any units yet."
     leases:                           "You don't have any leases yet."
     photos:                           "You don't have any photos yet."
+    building:                         "You haven't joined a property yet. Join your current building, or explore and find a new one."
                                       
   fields:                             
     description:                      "Description"

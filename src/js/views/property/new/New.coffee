@@ -22,6 +22,7 @@ define [
       
       @listenTo @wizard, "wizard:cancel", @clear
       @listenTo @wizard, "property:save", @clear
+      @listenTo @wizard, "lease:save", @clear
 
         
     render : ->

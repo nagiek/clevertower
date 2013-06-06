@@ -17,6 +17,9 @@ define
     account_settings:           "Account settings"
     privacy_settings:           "Privacy settings"
     profile_menu:               "Profile menu"
+  building:
+    my_building:                "My building"
+    past_leases:                "Past leases"
   app_descriptions:     
     facebook:                   "Connect with friends and the world around you on Facebook."
   show:                         

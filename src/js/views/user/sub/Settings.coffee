@@ -6,18 +6,20 @@ define [
   "i18n!nls/common"
   "i18n!nls/devise"
   "plugins/toggler"
-  "templates/user/settings"
-], ($, _, Parse, Alert, i18nCommon, i18nDevise) ->
+  "templates/user/sub/settings"
+], ($, _, Parse, Alert, i18nCommon, i18nDevise, i18nUser) ->
 
-  class EditAccountView extends Parse.View
+  class AccountSettingsView extends Parse.View
     
-    el: '#main'
+    el: '#settings'
     
     events:
       'submit form'           : 'save'
       "click #reset-password" : 'resetPassword'
     
     initialize : (attrs) ->
+
+      @model = Parse.User.current()
                   
       @listenTo @model, 'invalid', (error) =>
         @$('.error').removeClass('error')
@@ -98,7 +100,9 @@ define [
         i18nDevise: i18nDevise
       vars.type = 'tenant' unless vars.type
       
-      @$el.html JST["src/js/templates/user/settings.jst"](vars)
+      console.log 'render'
+
+      @$el.html JST["src/js/templates/user/sub/settings.jst"](vars)
       
       @$('.toggle').toggler()
       @

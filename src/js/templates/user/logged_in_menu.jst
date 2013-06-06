@@ -4,6 +4,21 @@
     <span class="photo-float micro-float"><%= name %></span>
   </a>
 </li>
+<li class="dropdown">
+  <a id="pLabel" data-target="#" data-toggle="dropdown" role="menu" class="dropdown-toggle">
+    <i class="icon icon-cog"></i>
+  </a>
+  <ul aria-labelledby="pLabel" role="menu" class="dropdown-menu pull-right">
+    <li><a href="/account/building"><i class="icon icon-building"></i> <%= i18nCommon.nouns.building %></a></li>
+    <li><a href="/account/history"><i class="icon icon-file"></i> <%= i18nCommon.nouns.history %></a></li>
+    <li class="divider">
+    <li><a href="/account/settings"><i class="icon icon-user"></i> <%= i18nUser.menu.account_settings %></a></li>
+    <li><a href="/account/privacy"><i class="icon icon-lock"></i> <%= i18nUser.menu.privacy_settings %></a></li>
+    <li><a href="/account/apps"><i class="icon icon-th"></i> <%= i18nUser.menu.apps %></a></li>
+    <li class="divider">
+    <li><a id="logout" href="#"><%= i18nDevise.actions.logout %></a></li>
+  </ul>
+</li>
 <li id="memos" class="dropdown">
   <a id="mLabel" data-target="#" data-toggle="dropdown" role="menu" class="dropdown-toggle">
     <i class="icon icon-flag"></i>
@@ -23,16 +38,4 @@
     <ul class="notifications-menu"></ul>
     <a href="/notifications" class="dropdown-bottom"><%= i18nCommon.expressions.see_all %></a>
   </div>
-</li>
-<li class="dropdown">
-  <a id="pLabel" data-target="#" data-toggle="dropdown" role="menu" class="dropdown-toggle">
-    <i class="icon icon-cog"></i>
-  </a>
-  <ul aria-labelledby="pLabel" role="menu" class="dropdown-menu pull-right">
-    <li><a href="/account/settings"><i class="icon icon-user"></i> <%= i18nUser.menu.account_settings %></a></li>
-    <li><a href="/account/privacy"><i class="icon icon-lock"></i> <%= i18nUser.menu.privacy_settings %></a></li>
-    <li><a href="/account/apps"><i class="icon icon-th"></i> <%= i18nUser.menu.apps %></a></li>
-    <li class="divider">
-    <li><a id="logout" href="#"><%= i18nDevise.actions.logout %></a></li>
-  </ul>
 </li>

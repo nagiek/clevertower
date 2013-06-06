@@ -290,7 +290,12 @@ require [
   # Load all the stuff
   Parse.User::setup = ->
     profilePromise = (new Parse.Query(Profile)).equalTo("user", @).first()
-    userPromise = (new Parse.Query("_User")).include('property.role').include('network.role').equalTo("objectId", @id).first()
+    userPromise = (new Parse.Query("_User"))
+    .include('lease')
+    .include('unit')
+    .include('property.role')
+    .include('network.role')
+    .equalTo("objectId", @id).first()
     @notifications = new NotificationList
 
     Parse.Promise.when(profilePromise, userPromise, @notifications.query.find()).then (profile, user, notifs) => 
@@ -301,7 +306,9 @@ require [
       profile.prep("applicants").fetch()
       @set "profile", profile
 
-      @set "property", user.get("property")
+      @set "lease", user.get "lease"
+      @set "unit", user.get "unit"
+      @set "property", user.get "property"
 
       # Load the network regardless if we are on a subdomain or not, as we need the link.
       # Should query for network when loading user... this is weird.

@@ -1,0 +1,9 @@
+<a href="/users/<%= objectId %>">
+  <div class="photo photo-thumbnail inline-block">
+    <img src="<%=url%>" width="50" height="50">
+  </div>
+  <div class="inline-block">
+  	<%= name %>
+  	<% if (current_user) { %><strong><small>(<%= i18nCommon.nouns.you %>)</small></strong><% } %>
+  </div>
+</a>

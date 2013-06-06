@@ -5,24 +5,32 @@ define [
   "views/inquiry/own"
   "i18n!nls/user"
   "i18n!nls/common"
-  'templates/profile/show'
+  'templates/user/sub/history/inquiries'
 ], ($, _, Parse, InquiryView, i18nUser, i18nCommon) ->
 
-  class ProfileInquiriesView extends Parse.View
+  # This actually grabs the applicants, not the inquiries.
+  class UserInquiriesView extends Parse.View
   
     el: "#inquiries"
     
     initialize: (attrs) ->
 
+      @model = Parse.User.current().get("profile")
+
       @listenTo Parse.Dispatcher, "user:logout", @clear
 
       @model.prep('applicants')
-      @model.applicants.on "reset", @addAllInquiries
-
-      @$inquiryList = @$("> ul")
+      @listenTo @model.applicants, "reset", @addAllInquiries
     
-    render: ->      
-      if @model.applicants.length > 0 then @addAllInquiries else @model.applicants.fetch()
+    render: ->
+      vars = 
+        i18nUser: i18nUser
+        i18nCommon: i18nCommon
+      @$el.html JST["src/js/templates/user/sub/history/inquiries.jst"](vars)
+
+      @$inquiryList = @$("ul#inquiry-list")
+
+      if @model.applicants.length > 0 then @addAllInquiries() else @model.applicants.fetch()
       @
 
     clear: ->
@@ -40,7 +48,6 @@ define [
       @$inquiryList.html ""
       @printedInquiries = new Array
       unless @model.applicants.length is 0
-        @$inquiryList.find(".empty").remove()
 
         # Reverse and group associations
         groupedApplicants = @model.applicants.groupBy (a) -> a.get("inquiry").id

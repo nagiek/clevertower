@@ -28,7 +28,7 @@ define [
       @mapId = "mapCanvas"
       @wizard = attrs.wizard
       
-      @geocoder = new google.maps.Geocoder()
+      @geocoder = new google.maps.Geocoder
       @results = new PropertyList
 
       # Geolocation
@@ -36,6 +36,7 @@ define [
 
       @listenTo @wizard, "wizard:cancel", @clear
       @listenTo @wizard, "property:save", @clear
+      @listenTo @wizard, "lease:save", @clear
 
       @listenTo @results, "reset", @processResults
 

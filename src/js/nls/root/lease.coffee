@@ -23,10 +23,10 @@ define
     first_month_paid:     "First Month Paid"
     last_month_paid:      "Last Month Paid"
     checks_received:      "Checks Received"
-  collection:         
-    empty:                "You don't have any leases in the property yet."
-  tenants:         
-    empty:                "You haven't added any tenants to the lease yet."
+  empty:
+    collection:           "You don't have any leases in the property yet."
+    tenants:              "You haven't added any tenants to the lease yet."
+    roommates:            "You don't have any roommates."
   errors:
     no_title:             "You must enter a title for the unit"
     unit_missing:         "You must enter a unit"

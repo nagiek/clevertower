@@ -38,20 +38,16 @@ __p += '<header class="row">\n  <hgroup class="span">\n    <h2>' +
 '">\n        <i class="icon-repeat"></i>\n      </a>\n    </li>\n  </ul>\n</header>\n<div class="row">\n  <div class="span9">\n    <div>\n      <h3>' +
 ((__t = ( i18nLease.form.tenants )) == null ? '' : __t) +
 '</h3> \n      <p class="empty">' +
-((__t = ( i18nLease.tenants.empty )) == null ? '' : __t) +
+((__t = ( i18nLease.empty.tenants )) == null ? '' : __t) +
 '</p>\n      <ul id="tenants" class="row no-bullet"></ul>\n    </div>\n    \n    ';
  if (rent) { ;
 __p += '\n    <div>\n      <h3>' +
 ((__t = ( i18nLease.form.payments )) == null ? '' : __t) +
-'</h3> \n      ';
- if (rent) { ;
-__p += '<div><strong>' +
+'</h3> \n      <div><strong>' +
 ((__t = ( i18nLease.fields.rent )) == null ? '' : __t) +
-'</strong>' +
+':</strong> ' +
 ((__t = ( rent )) == null ? '' : __t) +
-'</div>';
- } ;
-__p += '\n    </div>\n    ';
+'</div>\n    </div>\n    ';
  } ;
 __p += '\n  </div>\n  <div class="span3">\n    ';
  if (parking_fee || parking_space || garage_remotes) { ;
@@ -61,7 +57,7 @@ __p += '\n    <div>\n      <h3>' +
  if (parking_fee) { ;
 __p += '<div><strong>' +
 ((__t = ( i18nLease.fields.parking_fee )) == null ? '' : __t) +
-'</strong>' +
+':</strong> ' +
 ((__t = ( parking_fee )) == null ? '' : __t) +
 '</div>';
  } ;
@@ -69,7 +65,7 @@ __p += '\n      ';
  if (parking_space) { ;
 __p += '<div><strong>' +
 ((__t = ( i18nLease.fields.parking_space )) == null ? '' : __t) +
-'</strong>' +
+':</strong> ' +
 ((__t = ( parking_space )) == null ? '' : __t) +
 '</div>';
  } ;
@@ -77,7 +73,7 @@ __p += '\n      ';
  if (garage_remotes) { ;
 __p += '<div><strong>' +
 ((__t = ( i18nLease.fields.garage_remotes )) == null ? '' : __t) +
-'</strong>' +
+':</strong> ' +
 ((__t = ( garage_remotes )) == null ? '' : __t) +
 '</div>';
  } ;
@@ -91,7 +87,7 @@ __p += '\n    <div>\n      <h3>' +
  if (security_deposit) { ;
 __p += '<div><strong>' +
 ((__t = ( i18nLease.fields.security_deposit )) == null ? '' : __t) +
-'</strong>' +
+':</strong> ' +
 ((__t = ( security_deposit )) == null ? '' : __t) +
 '</div>';
  } ;
@@ -99,7 +95,7 @@ __p += '\n      ';
  if (keys) { ;
 __p += '<div><strong>' +
 ((__t = ( i18nLease.fields.keys )) == null ? '' : __t) +
-'</strong>' +
+':</strong> ' +
 ((__t = ( keys )) == null ? '' : __t) +
 '</div>';
  } ;

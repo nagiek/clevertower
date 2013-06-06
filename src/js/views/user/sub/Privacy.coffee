@@ -5,26 +5,26 @@ define [
   "views/helper/Alert"
   "i18n!nls/common"
   "i18n!nls/user"
-  "templates/user/privacy"
+  "templates/user/sub/privacy"
 ], ($, _, Parse, Alert, i18nCommon, i18nUser) ->
 
   class EditPrivacyView extends Parse.View
     
-    el: '#main'
+    el: '#privacy'
     
     events:
       'submit form'           : 'save'
     
     initialize : (attrs) ->
       
-      _.bindAll this, 'save'
+      @model = Parse.User.current()
                   
       @on "save:success", (model) =>
         @$('.error').removeClass('error')
         @$('button.save').removeProp "disabled"
         new Alert(event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success')
     
-    save : (e) ->
+    save : (e) =>
       e.preventDefault()
       
       data = @$('form').serializeObject()
@@ -41,5 +41,5 @@ define [
         i18nUser: i18nUser
       
       _.defaults vars, Parse.User::defaults
-      @$el.html JST["src/js/templates/user/privacy.jst"](vars)
+      @$el.html JST["src/js/templates/user/sub/privacy.jst"](vars)
       @

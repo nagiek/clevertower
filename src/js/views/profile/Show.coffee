@@ -53,7 +53,7 @@ define [
       name = "views/profile/sub/#{action[0]}"
       
       vars = params: params, model: @model, current: @current
-      if action.length > 1 then vars.subaction = action.slice(1).join("/")
+      if action.length > 1 then vars.path = action.slice(1).join("/")
       
       # Load the model if it exists.
       @$("##{action[0]}-link").tab('show')

@@ -5,20 +5,18 @@ define [
   "views/helper/Alert"
   "i18n!nls/common"
   "i18n!nls/user"
-  "templates/user/apps"
+  "templates/user/sub/apps"
 ], ($, _, Parse, Alert, i18nCommon, i18nUser) ->
 
   class EditAppsView extends Parse.View
     
-    el: '#main'
+    el: '#apps'
     
     events:
       'click #fb-link'        : 'FBlink'
       'click #fb-unlink'      : 'FBunlink'
     
     initialize : (attrs) ->
-      
-      _.bindAll this, 'save'
                   
       @on "save:success", (model) =>
         @$('.error').removeClass('error')
@@ -46,5 +44,5 @@ define [
         i18nCommon:   i18nCommon
         i18nUser:     i18nUser
       
-      @$el.html JST["src/js/templates/user/apps.jst"](vars)
+      @$el.html JST["src/js/templates/user/sub/apps.jst"](vars)
       @

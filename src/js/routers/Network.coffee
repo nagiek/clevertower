@@ -2,30 +2,32 @@ define [
   "jquery", 
   "backbone",
   "models/Network"
-  "views/user/Menu"
-  "views/network/Menu"
+  "views/user/UserMenu"
+  "views/user/NavMenu"
   "views/helper/Search"
-], ($, Parse, Network, UserMenuView, NetworkMenuView, SearchView) ->
+], ($, Parse, Network, UserMenuView, NavMenuView, SearchView) ->
 
   class NetworkRouter extends Parse.Router
     routes:
-      ""                                    : "index"
-      "properties/new"                      : "propertiesNew"
-      "properties/:id"                      : "propertiesShow"
-      "properties/:id/*splat"               : "propertiesShow"
-      "properties/:id/*splat"               : "propertiesShow"
-      "network/*splat"                      : "networkManage"
-      "users/:id"                           : "profileShow"
-      "users/:id/*splat"                    : "profileShow"
-      "account/:category"                   : "accountSettings"
-      "notifications"                       : "notifications"
-      "*actions"                            : "index"
+      ""                            : "index"
+      "properties/new"              : "propertiesNew"
+      "properties/:id"              : "propertiesShow"
+      "properties/:id/*splat"       : "propertiesShow"
+      "properties/:id/*splat"       : "propertiesShow"
+      "network/*splat"              : "networkManage"
+      "users/:id"                   : "profileShow"
+      "users/:id/*splat"            : "profileShow"
+      # "inquiries"                   : "inquiries"
+      # "building"                    : "building"
+      "account/*splat"              : "accountSettings"
+      "notifications"               : "notifications"
+      "*actions"                    : "index"
 
     initialize: (options) ->
       Parse.history.start pushState: true
       
       @userView = new UserMenuView().render()
-      @networkView = new NetworkMenuView().render()
+      @networkView = new NavMenuView().render()
       new SearchView().render()
       
       Parse.Dispatcher.on "user:login", (user) =>
@@ -115,6 +117,8 @@ define [
     # Property
     # --------------
 
+    # DIFFERENT FROM DESKTOP
+    # FOR NETWORK
     propertiesNew: =>
       view = @view
       require ["views/property/new/Wizard"], (PropertyWizard) =>
@@ -182,13 +186,29 @@ define [
         else
           view.changeSubView(vars.path, vars.params)
 
-    accountSettings : (category) ->
-      if category is 'edit'
-        require ["views/profile/edit"], (UserSettingsView) =>
-          @view = new UserSettingsView(model: Parse.User.current().get("profile"), current: true).render()
+    # accountHistory : (category) ->
+    #   view = @view
+    #   require ["views/user/Account", "views/user/sub/History"], (UserAccountView, UserHistoryView) =>
+    #     vars = @deparamAction "history/#{category}"
+    #     if !view or view !instanceof UserHistoryView
+    #       # We have to load the UserAccountView first.
+    #       @view = new UserAccountView path: vars.path, params: vars.params
+    #     else
+    #       view.changeSubView(vars.path, vars.params)
+
+    accountSettings : (splat) ->
+      view = @view
+      if splat is 'edit'
+        require ["views/profile/edit"], (EditProfileView) =>
+          @view = new EditProfileView(model: Parse.User.current().get("profile"), current: true).render()
       else
-        require ["views/user/#{category}"], (UserSettingsView) =>
-          @view = new UserSettingsView(model: Parse.User.current()).render()
+        require ["views/user/Account"], (UserAccountView) =>
+          vars = @deparamAction splat
+
+          if !view or view !instanceof UserAccountView
+            @view = new UserAccountView vars
+          else
+            view.changeSubView vars.path, vars.params
     
     notifications : ->
       if Parse.User.current()
@@ -197,6 +217,19 @@ define [
       else
         @signupOrLogin()
   
+    # building : ->
+    #   if Parse.User.current()
+    #     require ["views/user/Building"], (UserBuildingView) =>
+    #         @view = new UserBuildingView().render()
+    #   else
+    #     @signupOrLogin()
+  
+    # inquiries : ->
+    #   if Parse.User.current()
+    #     require ["views/inquiries/Index"], (InquiriesIndexView) =>
+    #         @view = new InquiriesIndexView().render()
+    #   else
+    #     @signupOrLogin()
 
     # Utilities
     # --------------

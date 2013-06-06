@@ -48,12 +48,12 @@ define [
       @$list.html ''
       # TODO: This is getting triggered with a phantom model
       if @model.leases.length > 0 then @model.leases.each @addOne
-      else @$list.html '<p class="empty">' + i18nLease.collection.empty + '</p>'
+      else @$list.html '<p class="empty">' + i18nLease.empty.collection + '</p>'
 
     # Add a single todo item to the list by creating a view for it, and
     # appending its element to the `<ul>`.
     addOne: (lease) =>
-      @$('p.empty').hide()
+      @$('p.empty').remove()
       view = new LeaseView(model: lease)
       @$list.append view.render().el
       view.$el.find('.view-specific').toggleClass('hide') if @editing

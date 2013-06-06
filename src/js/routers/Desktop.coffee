@@ -1,14 +1,15 @@
 define [
   "jquery", 
   "backbone",
-  "views/user/Menu"
-  "views/network/Menu"
+  "views/user/UserMenu"
+  "views/user/NavMenu"
   "views/helper/Search"
-], ($, Parse, UserMenuView, NetworkMenuView, SearchView) ->
+], ($, Parse, UserMenuView, NavMenuView, SearchView) ->
 
   class DesktopRouter extends Parse.Router
     routes:
       ""                            : "index"
+      "properties/new"              : "propertiesNew"
       "places/:country/:region/:city/:id/:slug" : "propertiesPublic"
       "network/:name"               : "networkShow"
       "search/*splat"               : "search"
@@ -16,14 +17,15 @@ define [
       "users/:id/*splat"            : "profileShow"
       "notifications"               : "notifications"
       "account/setup"               : "accountSetup"
-      "account/:category"           : "accountSettings"
+      # "account/history/:category"   : "accountHistory"
+      "account/*splat"              : "accountSettings"
       "*actions"                    : "index"
 
     initialize: (options) ->
       Parse.history.start pushState: true
       
       @userView = new UserMenuView().render()
-      @networkView = new NetworkMenuView().render()
+      @networkView = new NavMenuView().render()
       Parse.App.search = new SearchView().render()
             
       Parse.Dispatcher.on "user:login", (user) =>      
@@ -93,6 +95,19 @@ define [
           vars = @deparamAction splat
           @view = new ActivityIndexView(location: vars.path, params: vars.params)
 
+    # Property
+    # --------------
+
+    # DIFFERENT FROM NETWORK
+    # FOR USER
+    propertiesNew: =>
+      view = @view
+      require ["views/property/new/Wizard"], (PropertyWizard) =>
+        if !view or view !instanceof PropertyWizard
+          @view = new PropertyWizard forNetwork: false
+          @view.setElement "#main"
+          @view.render()
+
     propertiesPublic: (country, region, city, id, slug) =>
       place = "#{city}--#{region}--#{country}"
       require ["views/property/Public"], (PublicPropertyView) => 
@@ -116,7 +131,7 @@ define [
             success: (obj) => 
               @view = new ShowProfileView path: vars.path, params: vars.params, model: obj, current: false
         else
-          view.changeSubView(vars.path, vars.params)
+          view.changeSubView vars.path, vars.params
 
     accountSetup : ->
       if Parse.User.current()
@@ -125,26 +140,27 @@ define [
           @view.render()
       else
         @signupOrLogin()
-            
-    accountSettings : (category) ->
-      if Parse.User.current()
-        if category is 'edit'
-          require ["views/profile/edit"], (UserSettingsView) =>
-            @view = new UserSettingsView(model: Parse.User.current().get("profile"), current: true).render()
-        else
-          require ["views/user/#{category}"], (UserSettingsView) =>
-            @view = new UserSettingsView(model: Parse.User.current()).render()
+
+    accountSettings : (splat) ->
+      view = @view
+      if splat is 'edit'
+        require ["views/profile/edit"], (EditProfileView) =>
+          @view = new EditProfileView(model: Parse.User.current().get("profile"), current: true).render()
       else
-        @signupOrLogin()
+        require ["views/user/Account"], (UserAccountView) =>
+          vars = @deparamAction splat
+
+          if !view or view !instanceof UserAccountView
+            @view = new UserAccountView vars
+          else
+            view.changeSubView vars.path, vars.params
   
     notifications : ->
       if Parse.User.current()
         require ["views/notification/All"], (AllNotificationsView) =>
             @view = new AllNotificationsView().render()
       else
-        @signupOrLogin()
-  
-  
+        @signupOrLogin()  
 
     # Utilities
     # --------------
@@ -152,7 +168,7 @@ define [
     deparamAction : (splat) ->
       ary = if splat then splat.split('?') else new Array('')
       combo = 
-        path: ary[0]
+        path: String ary[0]
         params: if ary[1] then @deparam ary[1] else {}
       
     

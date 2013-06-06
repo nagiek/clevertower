@@ -46,10 +46,10 @@ define [
         @$activityList.find(".empty").remove()
 
         # Group by date.
-        dates = @model.activities.filter (a) -> a.createdAt
+        dates = @model.activities.filter (a) -> a.createdAt.toDateString()
         _.each dates, (date) =>
           @$activityList.append "<li class='nav-header'>#{moment(date).format("L")}</li>"
-          _.each @model.activities.filter((a) -> a.createdAt.toDateString() is date.toDateString()), @addOneActivity
+          _.each @model.activities.filter((a) -> a.createdAt.toDateString() is date), @addOneActivity
           @$activityList.append "<li class='divider'></li>"
 
       else @$activityList.html '<li class="empty">' + 

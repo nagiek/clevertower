@@ -70,7 +70,7 @@ define [
         i18nUnit: i18nUnit
         i18nLease: i18nLease
       )
-      $(@el).html JST["src/js/templates/lease/summary.jst"](vars)
+      @$el.html JST["src/js/templates/lease/summary.jst"](vars)
       @
 
     update: (e) ->

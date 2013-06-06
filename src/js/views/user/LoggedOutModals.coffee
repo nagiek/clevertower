@@ -100,6 +100,7 @@ define [
           @$("> #signup-modal #signup-form button").removeProp "disabled"
           Parse.Dispatcher.trigger "user:loginStart", user
           Parse.Dispatcher.trigger "user:change", user
+          Parse.history.navigate "/account/setup"
 
         error: (user, error) =>
           @$("> #signup-modal #signup-form .error").removeClass 'error'

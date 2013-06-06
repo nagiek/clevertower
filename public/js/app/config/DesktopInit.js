@@ -239,7 +239,7 @@
         _this = this;
 
       profilePromise = (new Parse.Query(Profile)).equalTo("user", this).first();
-      userPromise = (new Parse.Query("_User")).include('property.role').include('network.role').equalTo("objectId", this.id).first();
+      userPromise = (new Parse.Query("_User")).include('lease').include('unit').include('property.role').include('network.role').equalTo("objectId", this.id).first();
       this.notifications = new NotificationList;
       return Parse.Promise.when(profilePromise, userPromise, this.notifications.query.find()).then(function(profile, user, notifs) {
         var network;
@@ -247,6 +247,8 @@
         _this.notifications.add(notifs);
         profile.prep("applicants").fetch();
         _this.set("profile", profile);
+        _this.set("lease", user.get("lease"));
+        _this.set("unit", user.get("unit"));
         _this.set("property", user.get("property"));
         network = user.get("network");
         if (network) {

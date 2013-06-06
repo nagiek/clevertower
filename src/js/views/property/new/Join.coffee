@@ -10,7 +10,7 @@ define [
   "i18n!nls/lease"
   "i18n!nls/common"
     # Last two are needed if the user is a tenant.
-  'templates/property/join'
+  'templates/property/new/join'
   'templates/lease/form'
   "templates/helper/field/unit"
   "templates/helper/field/property"
@@ -34,7 +34,7 @@ define [
       
       @listenTo @wizard, "wizard:cancel", @clear
       @listenTo @wizard, "property:save", @clear
-      @listenTo @wizard, "property:join", @clear
+      @listenTo @wizard, "lease:save", @clear
 
       @property = attrs.property
 
@@ -86,7 +86,7 @@ define [
         i18nLease: i18nLease
         i18nCommon: i18nCommon
 
-      @$el.html JST['src/js/templates/property/join.jst'](vars)
+      @$el.html JST['src/js/templates/property/new/join.jst'](vars)
 
       # @el = "form.lease-form"
       # @$el = $("#content form.lease-form")

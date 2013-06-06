@@ -52,19 +52,23 @@
           });
         });
         this.on("property:save", function(property) {
-          if (Parse.User.current() && Parse.User.current().get("network")) {
-            Parse.User.current().get("network").properties.add(property);
-          }
+          Parse.User.current().get("network").properties.add(property);
           Parse.history.navigate("/", {
             trigger: true
           });
-          return this.clear();
+          return _this.clear();
         });
-        return this.on("property:join", function(property) {
-          Parse.User.current().save({
-            property: property
-          });
-          Parse.history.navigate("/", {
+        return this.on("lease:save", function(lease) {
+          var vars;
+
+          console.log(lease);
+          vars = {
+            lease: lease,
+            unit: lease.get("unit"),
+            property: lease.get("property")
+          };
+          Parse.User.current().set(vars).save();
+          Parse.history.navigate("/account/building", {
             trigger: true
           });
           return this.clear();
@@ -142,7 +146,7 @@
                 return _this.animate('forward');
               });
             } else {
-              return require(["views/property/Join"], function(JoinPropertyView) {
+              return require(["views/property/new/Join"], function(JoinPropertyView) {
                 _this.form = new JoinPropertyView({
                   wizard: _this,
                   property: _this.model
@@ -157,10 +161,9 @@
             if (data.lease) {
               attrs = this.form.model.scrub(data.lease);
               attrs = this.assignAdditionalToLease(data, attrs);
-              console.log(attrs);
               return this.form.model.save(attrs, {
                 success: function(lease) {
-                  return _this.trigger("property:join", _this.model);
+                  return _this.trigger("lease:save", lease);
                 },
                 error: function(lease, error) {
                   _this.form.model.trigger("invalid", error);
@@ -186,7 +189,7 @@
             attrs = this.assignAdditionalToLease(data, attrs);
             return this.form.model.save(attrs, {
               success: function(lease) {
-                return _this.trigger("property:join", _this.model);
+                return _this.trigger("lease:save", lease);
               },
               error: function(lease, error) {
                 _this.form.model.trigger("invalid", error);

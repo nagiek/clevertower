@@ -3,7 +3,8 @@ define [
   'backbone',
   'collections/ActivityList'
   'collections/ApplicantList'
-], (_, Parse, ActivityList, ApplicantList) ->
+  'collections/TenantList'
+], (_, Parse, ActivityList, ApplicantList, TenantList) ->
 
   Profile = Parse.Object.extend "Profile",
     
@@ -53,4 +54,5 @@ define [
       @[collectionName] = switch collectionName
         when "applicants"   then new ApplicantList [], profile: @
         when "activities"   then new ActivityList [], profile: @
+        when "tenants"      then new TenantList [], profile: @
       @[collectionName]

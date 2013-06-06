@@ -1,0 +1,75 @@
+<header class="clearfix">
+  <h3 class="pull-left"><%= property.title %></h3>
+  <a href="/properties/new" id="new-property-link" class="btn btn-success pull-right">
+    <i class="icon icon-white icon-plus"></i>
+    <%= i18nProperty.actions.new_property %>
+  </a>
+</header>
+<div class="row">
+  <div class="span6">
+    <% if (property && unit && lease) { %>
+      <div>
+        <h4><%= i18nCommon.nouns.tenants %></h4> 
+        <ul id="tenants" class="unstyled no-bullet">
+          <li><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" /></li>
+        </ul>
+      </div>
+      <div>
+        <h4><%= i18nCommon.nouns.roommates %></h4> 
+        <ul id="roommates" class="unstyled no-bullet">
+          <li><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" /></li>
+        </ul>
+      </div>
+    <% } else { %>
+      <%= i18nProperty.empty.building %>
+    <% } %>
+  </div>
+
+  <div class="span6">
+    <% if (property && unit && lease) { %>
+      <div id="profile-property" class="well">
+        <hgroup>
+          <h4><%= i18nCommon.nouns.building %></h4>
+          <% if (property.thoroughfare) { %><h5><%= property.thoroughfare %></h5><% } %>
+        </hgroup>
+        <% if (property.email) { %><div><strong><%= i18nCommon.fields.email %>:</strong> <%= property.email %></div><% } %>
+        <% if (property.phone) { %><div><strong><%= i18nCommon.fields.phone %>:</strong> <%= property.phone %></div><% } %>
+      </div>
+      <div id="profile-lease" class="well">
+        <hgroup>
+          <h4><%= i18nCommon.classes.Lease %></h4>
+          <% if (unit.title) { %><h5><%= i18nCommon.classes.Unit %> <%= unit.title %></h5><% } %>
+        </hgroup>
+        <% if (lease.rent) { %>
+          <div>
+            <h6><%= i18nLease.form.payments %></h6> 
+            <div><strong><%= i18nLease.fields.rent %>:</strong> <%= lease.rent %></div>
+          </div>
+        <% } %>
+        
+        <% if (lease.parking_fee || lease.parking_space || lease.garage_remotes) { %>
+          <div>
+            <h6><%= i18nLease.form.parking %></h6> 
+            <% if (lease.parking_fee) { %><div><strong><%= i18nLease.fields.parking_fee %>:</strong> <%= lease.parking_fee %></div><% } %>
+            <% if (lease.parking_space) { %><div><strong><%= i18nLease.fields.parking_space %>:</strong> <%= lease.parking_space %></div><% } %>
+            <% if (lease.garage_remotes) { %><div><strong><%= i18nLease.fields.garage_remotes %>:</strong> <%= lease.garage_remotes %></div><% } %>
+          </div>
+        <% } %>
+          
+        <% if (lease.security_deposit || lease.keys) { %>
+          <div>
+            <h6><%= i18nLease.form.deposit %></h6> 
+            <% if (lease.security_deposit) { %><div><strong><%= i18nLease.fields.security_deposit %>:</strong> <%= lease.security_deposit %></div><% } %>
+            <% if (lease.keys) { %><div><strong><%= i18nLease.fields.keys %>:</strong> <%= lease.keys %></div><% } %>
+          </div>
+        <% } %>
+      </div>
+    <% } %>
+<!--     <div>
+      <h4><%= i18nUser.building.past_leases %></h4>
+      <ul id="past-leases" class="unstyled no-bullet">
+        <li><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" /></li>
+      </ul>
+    </div> -->
+  </div>
+</div>

@@ -1,0 +1,33 @@
+<div class="container">
+  <section class="row">
+    <div class="span12">
+      <header>
+        <ul class="nav nav-tabs">
+          <li class="active"><a id="building-link" href="/account/building" data-target="#building"><i class="icon icon-building"></i> <%= i18nCommon.nouns.building %></a></li>
+          <li><a id="history-link" href="/account/history" data-target="#history"><i class="icon icon-file"></i> <%= i18nCommon.nouns.history %></a></li>
+          <li><a id="settings-link" href="/account/settings" data-target="#settings"><i class="icon icon-user"></i> <%= i18nUser.menu.account_settings %></a></li>
+          <li><a id="privacy-link" href="/account/privacy" data-target="#privacy"><i class="icon icon-lock"></i> <%= i18nUser.menu.privacy_settings %></a></li>
+          <li><a id="apps-link" href="/account/apps" data-target="#apps"><i class="icon icon-th"></i> <%= i18nUser.menu.apps %></a></li>
+        </ul>
+      </header>
+
+      <div class="tab-content">
+        <div id="building" class="tab-pane active">
+          <img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" />
+        </div>
+        <div id="history" class="tab-pane">
+          <img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" />
+        </div>
+        <div id="settings" class="tab-pane">
+          <img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" />
+        </div>
+        <div id="privacy" class="tab-pane">
+          <img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" />
+        </div>
+        <div id="apps" class="tab-pane">
+          <img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" />
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

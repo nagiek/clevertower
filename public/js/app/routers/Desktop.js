@@ -3,7 +3,7 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "backbone", "views/user/Menu", "views/network/Menu", "views/helper/Search"], function($, Parse, UserMenuView, NetworkMenuView, SearchView) {
+  define(["jquery", "backbone", "views/user/UserMenu", "views/user/NavMenu", "views/helper/Search"], function($, Parse, UserMenuView, NavMenuView, SearchView) {
     var DesktopRouter, _ref;
 
     return DesktopRouter = (function(_super) {
@@ -11,12 +11,14 @@
 
       function DesktopRouter() {
         this.profileShow = __bind(this.profileShow, this);
-        this.propertiesPublic = __bind(this.propertiesPublic, this);        _ref = DesktopRouter.__super__.constructor.apply(this, arguments);
+        this.propertiesPublic = __bind(this.propertiesPublic, this);
+        this.propertiesNew = __bind(this.propertiesNew, this);        _ref = DesktopRouter.__super__.constructor.apply(this, arguments);
         return _ref;
       }
 
       DesktopRouter.prototype.routes = {
         "": "index",
+        "properties/new": "propertiesNew",
         "places/:country/:region/:city/:id/:slug": "propertiesPublic",
         "network/:name": "networkShow",
         "search/*splat": "search",
@@ -24,7 +26,7 @@
         "users/:id/*splat": "profileShow",
         "notifications": "notifications",
         "account/setup": "accountSetup",
-        "account/:category": "accountSettings",
+        "account/*splat": "accountSettings",
         "*actions": "index"
       };
 
@@ -35,7 +37,7 @@
           pushState: true
         });
         this.userView = new UserMenuView().render();
-        this.networkView = new NetworkMenuView().render();
+        this.networkView = new NavMenuView().render();
         Parse.App.search = new SearchView().render();
         Parse.Dispatcher.on("user:login", function(user) {
           _this.userView.render();
@@ -111,6 +113,22 @@
         });
       };
 
+      DesktopRouter.prototype.propertiesNew = function() {
+        var view,
+          _this = this;
+
+        view = this.view;
+        return require(["views/property/new/Wizard"], function(PropertyWizard) {
+          if (!view || !(view instanceof PropertyWizard)) {
+            _this.view = new PropertyWizard({
+              forNetwork: false
+            });
+            _this.view.setElement("#main");
+            return _this.view.render();
+          }
+        });
+      };
+
       DesktopRouter.prototype.propertiesPublic = function(country, region, city, id, slug) {
         var place,
           _this = this;
@@ -181,26 +199,29 @@
         }
       };
 
-      DesktopRouter.prototype.accountSettings = function(category) {
-        var _this = this;
+      DesktopRouter.prototype.accountSettings = function(splat) {
+        var view,
+          _this = this;
 
-        if (Parse.User.current()) {
-          if (category === 'edit') {
-            return require(["views/profile/edit"], function(UserSettingsView) {
-              return _this.view = new UserSettingsView({
-                model: Parse.User.current().get("profile"),
-                current: true
-              }).render();
-            });
-          } else {
-            return require(["views/user/" + category], function(UserSettingsView) {
-              return _this.view = new UserSettingsView({
-                model: Parse.User.current()
-              }).render();
-            });
-          }
+        view = this.view;
+        if (splat === 'edit') {
+          return require(["views/profile/edit"], function(EditProfileView) {
+            return _this.view = new EditProfileView({
+              model: Parse.User.current().get("profile"),
+              current: true
+            }).render();
+          });
         } else {
-          return this.signupOrLogin();
+          return require(["views/user/Account"], function(UserAccountView) {
+            var vars;
+
+            vars = _this.deparamAction(splat);
+            if (!view || !(view instanceof UserAccountView)) {
+              return _this.view = new UserAccountView(vars);
+            } else {
+              return view.changeSubView(vars.path, vars.params);
+            }
+          });
         }
       };
 
@@ -221,7 +242,7 @@
 
         ary = splat ? splat.split('?') : new Array('');
         return combo = {
-          path: ary[0],
+          path: String(ary[0]),
           params: ary[1] ? this.deparam(ary[1]) : {}
         };
       };

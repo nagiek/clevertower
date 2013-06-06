@@ -21,7 +21,8 @@
       NewPropertyView.prototype.initialize = function(attrs) {
         this.wizard = attrs.wizard;
         this.listenTo(this.wizard, "wizard:cancel", this.clear);
-        return this.listenTo(this.wizard, "property:save", this.clear);
+        this.listenTo(this.wizard, "property:save", this.clear);
+        return this.listenTo(this.wizard, "lease:save", this.clear);
       };
 
       NewPropertyView.prototype.render = function() {

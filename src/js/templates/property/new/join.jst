@@ -1,5 +1,8 @@
 <% if (propertyIsNew) { %>
-  <h3><%= i18nProperty.form.building %></h3>
+  <hgroup>
+    <h3 class="inline-block"><%= i18nProperty.form.building %></h3>
+    <span class="label label-large label-info"><%= i18nCommon.adjectives.public %></span>
+  </hgroup>
   <fieldset class="form-large form-inline">
     <!-- <legend><%= i18nProperty.form.building %></legend> -->
     <div class="row">
@@ -21,7 +24,10 @@
       </div>
     </div>
   </fieldset>
-  <h3><%= i18nCommon.classes.Lease %></h3>
+  <hgroup>
+    <h3 class="inline-block"><%= i18nCommon.classes.Lease %></h3>
+    <span class="label label-large"><%= i18nCommon.adjectives.private %></span>
+  </hgroup>
 <% } else { %>
   <h2><%= i18nProperty.actions.join_property_at(property.title) %></h2>
 <% } %>

@@ -74,7 +74,7 @@
           i18nUnit: i18nUnit,
           i18nLease: i18nLease
         });
-        $(this.el).html(JST["src/js/templates/lease/summary.jst"](vars));
+        this.$el.html(JST["src/js/templates/lease/summary.jst"](vars));
         return this;
       };
 

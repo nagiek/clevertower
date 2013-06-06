@@ -1,0 +1,16 @@
+<hgroup class="span4">
+  <h4><a href="<%= propertyUrl %>"><%= propertyTitle %></a> - <%= unitTitle %></h4>
+  <h5><%= start_date %> - <%= end_date %></h5>
+</hgroup>
+
+<div class="span">
+  <% if (primary) { %>
+    <span class="btn">
+      <%= i18nCommon.adjectives.primary %>
+    </span>
+  <% } else { %> 
+    <button class="btn make-primary">
+      <%= i18nCommon.actions.make_primary %>
+    </button>
+  <% } %>
+</div>

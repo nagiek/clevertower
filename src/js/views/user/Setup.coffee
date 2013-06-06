@@ -9,7 +9,7 @@ define [
   "i18n!nls/devise"
   "i18n!nls/user"
   "plugins/toggler"
-  "templates/user/respond"
+  "templates/user/presetup"
   "templates/user/setup"
 ], ($, _, Parse, NotificationList, NotificationView, Alert, i18nCommon, i18nDevise, i18nUser) ->
 
@@ -40,11 +40,11 @@ define [
     render: =>
       
       # Check if the user has any outstanding requests and present them. 
-      unless @skip or Parse.User.current().notifications.unclickedWithAction().length is 0
+      unless @skip or Parse.User.current().notifications.visibleWithAction().length is 0
         vars =
           i18nCommon: i18nCommon
           i18nUser: i18nUser
-        @$el.html JST["src/js/templates/user/respond.jst"](vars)
+        @$el.html JST["src/js/templates/user/presetup.jst"](vars)
         @$list = @$("table.content tbody")
         Parse.User.current().notifications.each @addOne
 
@@ -86,11 +86,3 @@ define [
           view.setElement ".content"
           view.render()
           @$(".content").delay(150).addClass("in")
-          
-
-          @listenTo view, "property:save", (property) =>
-            
-            # Add new property to collection
-            Parse.User.current().save property: property,
-            success: ->
-            error: ->

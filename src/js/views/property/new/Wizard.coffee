@@ -50,16 +50,21 @@ define [
         
         new Alert event: 'model-save', fade: false, message: msg, type: 'error'
 
-      @on "property:save", (property) ->
-        if Parse.User.current() and Parse.User.current().get("network")
-          Parse.User.current().get("network").properties.add property
+      @on "property:save", (property) =>
+        # Add new property to collection
+        Parse.User.current().get("network").properties.add property
         Parse.history.navigate "/", trigger: true
         @clear()
 
 
-      @on "property:join", (property) ->
-        Parse.User.current().save property: property
-        Parse.history.navigate "/", trigger: true
+      @on "lease:save", (lease) ->
+        console.log lease
+        vars = 
+          lease: lease
+          unit: lease.get "unit"
+          property: lease.get "property"
+        Parse.User.current().set(vars).save()
+        Parse.history.navigate "/account/building", trigger: true
         @clear()
 
     render : ->
@@ -110,7 +115,7 @@ define [
               @map.$el.after @form.render().el
               @animate 'forward'
           else        
-            require ["views/property/Join"], (JoinPropertyView) =>
+            require ["views/property/new/Join"], (JoinPropertyView) =>
               @form = new JoinPropertyView wizard: @, property: @model
               @map.$el.after @form.render().el
               @animate 'forward'
@@ -120,9 +125,8 @@ define [
           if data.lease
             attrs = @form.model.scrub data.lease
             attrs = @assignAdditionalToLease data, attrs
-            console.log attrs
             @form.model.save attrs,
-              success: (lease) =>        @trigger "property:join", @model
+              success: (lease) =>        @trigger "lease:save", lease
               error: (lease, error) =>   @form.model.trigger "invalid", error; console.log error
 
           else 
@@ -137,7 +141,7 @@ define [
           attrs = @assignAdditionalToLease data, attrs
           
           @form.model.save attrs,
-              success: (lease) =>      @trigger "property:join", @model
+              success: (lease) =>        @trigger "lease:save", lease
               error: (lease, error) => @form.model.trigger "invalid", error; console.log error
 
     back : (e) =>

@@ -70,7 +70,8 @@
       choose_file: "Choose file",
       choose_photo: "Choose photo",
       add_x_more: "Add <strong>x</strong> more",
-      changes_saved: "Changes Saved."
+      changes_saved: "Changes Saved.",
+      make_primary: "Make primary"
     },
     dates: {
       moment_format: "MM/DD/YYYY",
@@ -166,14 +167,17 @@
       home: "Home",
       cover_photo: "Cover Photo",
       link: "link",
-      building: "building",
+      building: "Building",
+      history: "History",
       tenants: "Tenants",
+      roommates: "Roommates",
       you: "You",
       people: "People",
       places: "Places",
       sample_email: "keigan@example.com",
       comments: "Comments",
       public_activity: "Public Activity",
+      likes: "Likes",
       accommodation: "Accommodation",
       optional_description: "Optional description",
       extra_details: "Extra details"
@@ -197,6 +201,7 @@
       all: "All",
       "public": "Public",
       "private": "Private",
+      primary: "Primary",
       landlord_only: "Landlord Only",
       admin: "admin",
       not_specified: "Not specified"
