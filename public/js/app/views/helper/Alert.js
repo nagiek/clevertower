@@ -18,46 +18,66 @@
       AlertView.prototype.className = 'alert';
 
       AlertView.prototype.events = {
-        'click .close': 'delete'
+        'click .close': 'clear'
       };
 
       AlertView.prototype.initialize = function(attrs) {
         this.container = $('#messages');
-        this.fade = attrs.fade != null ? attrs.fade : false;
-        this.event = attrs.event != null ? attrs.event : '';
+        this.fade = attrs.fade ? attrs.fade : false;
         this.vars = attrs;
-        if (attrs.type == null) {
+        if (!attrs.type) {
           this.vars.type = 'success';
         }
-        if (attrs.dismiss == null) {
+        if (!attrs.dismiss) {
           this.vars.dismiss = true;
         }
-        if (attrs.heading == null) {
+        if (!attrs.heading) {
           this.vars.heading = '';
         }
-        if (attrs.message == null) {
+        if (!attrs.message) {
           this.vars.message = '';
         }
-        if (attrs.buttons == null) {
+        if (!attrs.buttons) {
           this.vars.buttons = '';
         }
-        this.vars.event = this.event;
+        if (!attrs.event) {
+          this.vars.event = '';
+        }
         return this.render();
       };
 
       AlertView.prototype.render = function() {
         var alert;
 
-        if (this.event !== '' && this.container.find("#alert-" + this.event).length === 0) {
+        if (!this.vars.event) {
+          return;
+        }
+        alert = this.container.find("#alert-" + this.event);
+        if (alert.length === 0) {
           alert = this.container.append(JST['src/js/templates/helper/alert.jst'](this.vars));
-          if (this.fade) {
-            return alert.delay(3000).fadeOut();
-          }
+          return alert.delay(3000).fadeOut();
+        } else {
+          alert.removeClass("alert-");
+          alert.addClass("alert-" + this.vars.type);
+          return alert.find(".message").html(this.vars.message);
         }
       };
 
-      AlertView.prototype["delete"] = function() {
-        return delete this;
+      AlertView.prototype.clear = function() {
+        var _this = this;
+
+        this.$el.removeClass("in");
+        return setTimeout(150, function() {
+          _this.remove();
+          _this.undelegateEvents();
+          return delete _this;
+        });
+      };
+
+      AlertView.prototype.setError = function(msg) {
+        this.vars.message = msg;
+        this.vars.type = 'error';
+        return this.render();
       };
 
       return AlertView;

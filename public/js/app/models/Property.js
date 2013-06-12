@@ -2,7 +2,7 @@
   define(['underscore', 'backbone', "collections/UnitList", "collections/LeaseList", "collections/InquiryList", "collections/TenantList", "collections/ApplicantList", "collections/ListingList", "collections/PhotoList", "models/Unit", "models/Lease", "underscore.inflection"], function(_, Parse, UnitList, LeaseList, InquiryList, TenantList, ApplicantList, ListingList, PhotoList, Unit, Lease, Listing, inflection) {
     var Property;
 
-    return Property = Parse.Object.extend("Property", {
+    Property = Parse.Object.extend("Property", {
       className: "Property",
       defaults: {
         center: new Parse.GeoPoint,
@@ -64,7 +64,7 @@
         return new google.maps.LatLng(this.get("center")._latitude, this.get("center")._longitude);
       },
       url: function() {
-        return "/" + this.collection.url + "/" + this.id;
+        return "/properties/" + this.id;
       },
       publicUrl: function() {
         return "/places/" + (this.country()) + "/" + (this.get("administrative_area_level_1")) + "/" + (this.get("locality")) + "/" + this.id + "/" + (this.slug());
@@ -104,7 +104,7 @@
         if (user) {
           network = user.get("network");
         }
-        basedOnNetwork = user && network && this.get("network").id === network.id;
+        basedOnNetwork = user && network && this.get("network") && this.get("network").id === network.id;
         this[collectionName] = (function() {
           switch (collectionName) {
             case "units":
@@ -159,6 +159,19 @@
         return this[collectionName];
       }
     });
+    Property.url = function(id) {
+      return "/properties/" + id;
+    };
+    Property.publicUrl = function(country, area, locality, id, slug) {
+      return "/places/" + country + "/" + area + "/" + locality + "/" + id + "/" + slug;
+    };
+    Property.slug = function(title) {
+      return title.replace(/\s+/g, '-').toLowerCase();
+    };
+    Property.country = function(country) {
+      return Parse.App.countryCodes[country];
+    };
+    return Property;
   });
 
 }).call(this);

@@ -40,6 +40,7 @@
       show: "Show",
       post: "Post",
       join: "Join",
+      manage: "Manage",
       search: "Search",
       destroy: "Destroy",
       upload: "Upload",
@@ -61,7 +62,9 @@
       live_at: "Live at",
       revoke_access: "Revoke access",
       confirm: "Confirm",
+      accept: "Accept",
       ignore: "Ignore",
+      upgrade: "Upgrade",
       add_more: "Add more",
       add_another: "Add another",
       add_files: "Add files",
@@ -70,8 +73,9 @@
       choose_file: "Choose file",
       choose_photo: "Choose photo",
       add_x_more: "Add <strong>x</strong> more",
+      make_primary: "Make primary",
       changes_saved: "Changes Saved.",
-      make_primary: "Make primary"
+      request_sent: "Request sent."
     },
     dates: {
       moment_format: "MM/DD/YYYY",
@@ -126,6 +130,28 @@
         },
         ignore: function(network) {
           return "You have ignored the invitation to join <strong>" + (_.escape(network)) + "</strong>";
+        }
+      },
+      manager_inquiry: {
+        invited: function(person, network) {
+          return "<strong>" + (_.escape(person)) + "</strong> wants to be a manager in your network.";
+        },
+        accept: function(person) {
+          return "You have accepted <strong>" + (_.escape(person)) + "</strong>'s request.";
+        },
+        ignore: function(person) {
+          return "You have ignored <strong>" + (_.escape(person)) + "</strong>'s request.";
+        }
+      },
+      network_inquiry: {
+        invited: function(network, property) {
+          return "<strong>" + (_.escape(person)) + "</strong> wants to manage <strong>" + (_.escape(property)) + "</strong>.";
+        },
+        accept: function(network) {
+          return "You have accepted <strong>" + (_.escape(network)) + "</strong>'s request.";
+        },
+        ignore: function(network) {
+          return "You have ignored <strong>" + (_.escape(network)) + "</strong>'s request.";
         }
       }
     },
@@ -229,7 +255,9 @@
       no_permission: "You do not have permission to do that.",
       unknown: "An unknown error has occured.",
       not_logged_in: "You are not logged in.",
-      no_results: "No results found."
+      no_results: "No results found.",
+      not_yet_accepted: "You haven't been accepted into this network yet. <br/> You can only see what is publicly visible. Most things will not work correctly.",
+      pending_approval: "Pending approval."
     }
   });
 

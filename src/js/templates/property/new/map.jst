@@ -1,4 +1,8 @@
-<p class="help-general text-center"><%= i18nProperty.search.map_instructions %></p></div>
+<p class="help-general text-center">
+  <% if (forNetwork) { %><%= i18nProperty.search.map_instructions_mgr %>
+  <% } else { %><%= i18nProperty.search.map_instructions_tnt %><% } %>
+</p>
+</div>
 <div id="address-search-group" class="control-group form-inline form-large text-center">
   <div class="controls">
     <div class="input-append inline-block">
@@ -19,8 +23,9 @@
     <div id="mapCanvas" class="map"></div>
   </div>
   <div class="span4">
-    <ul id="search-results" class="unstyled">
+    <ul id="property-search-results" class="search-results unstyled">
       <li class="empty text-center font-large"><%= i18nProperty.search.awaiting_search %></li>
     </ul>
+    <p class="help-block"><%= i18nProperty.search.private_property %></p>
   </div>
 </div>

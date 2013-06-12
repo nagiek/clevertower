@@ -2,23 +2,32 @@ define [
   "jquery"
   "underscore"
   "backbone"
+  "collections/NetworkResultsList"
   "models/Network"
+  "views/network/Result"
   "views/helper/Alert"
   "i18n!nls/common"
   "i18n!nls/property"
   "templates/network/new"
   "templates/network/form"
-], ($, _, Parse, Network, Alert, i18nCommon, i18nProperty) ->
+], ($, _, Parse, NetworkResultsList, Network, NetworkView, Alert, i18nCommon, i18nProperty) ->
 
   class NewNetworkView extends Parse.View
     
     events:
-      'submit form'        : 'save'
+      'click .nav a'                  : 'showTab'
+      'submit form#new-network-form'  : 'save'
+      'click #network-search'         : 'search'
     
     initialize : (attrs) ->
       
-      @first = unless @model then true else false
-      @model = new Network if @first
+      @model = new Network unless @model
+      @results = new NetworkResultsList
+
+      @listenTo @results, "reset", @addAll
+      @listenTo @results, "network:join", =>
+        Parse.history.navigate "/", trigger: true
+        @clear()
 
       # Only do this on 'invalid', as we will reload the page 
       # for the user and we don't want them getting antsy
@@ -27,6 +36,7 @@ define [
       #   @$('button.save').removeProp "disabled"
 
       @model.on "invalid", (error) =>
+        console.log error
         @$('.error').removeClass('error')
         @$('button.save').removeProp "disabled"
         @$('.name-group').addClass('error')
@@ -46,14 +56,44 @@ define [
         # Navigate after a second.
         domain = "#{location.protocol}//#{model.get("name")}.#{location.host}"
         setTimeout window.location.replace domain, 1000
-        
-        # if @first then 
-        # require ["views/property/Manage"], (ManagePropertiesView) =>
-        #   @undelegateEvents
-        #   @view = new ManagePropertiesView if !@view or @view !instanceof ManagePropertiesView
-        #   @view.render()
-        #   delete this
     
+    showTab: (e) -> 
+      e.preventDefault()
+      $(e.currentTarget).tab('show')
+
+    clear: =>
+      @stopListening()
+      @undelegateEvents()
+      delete this
+
+    # Results Handling
+    # ----------------
+
+    addOne: (n) =>
+      view = new NetworkView model: n
+      @$list.append view.render().el
+
+    # Add all items in the Properties collection at once.
+    addAll: =>
+      @$list.html ""
+      unless @results.length is 0
+        @results.each @addOne
+      else
+        @$list.html """
+                    <li class='empty text-center font-large'>
+                      <p>#{i18nProperty.search.no_network_results}</p>
+                      <p><small>#{i18nProperty.search.private_network}</small></p>
+                    </li>
+                    """
+
+    search: (e) =>
+      e.preventDefault()
+      @results.setName @$("#network-search-input").val()
+      @results.fetch()
+
+    # Create Logic
+    # ----------------
+
     save : (e) =>
       e.preventDefault()
       data = @$('form').serializeObject()
@@ -63,7 +103,6 @@ define [
       success: (model) =>
         @model.trigger "sync", model # This is triggered automatically in Backbone, but not Parse.
         @trigger "save:success", model, this
-        Parse.Dispatcher.trigger "network:set"
       error: (model, error) =>
         @model.trigger "sync", model # This is triggered automatically in Backbone, but not Parse.
         @model.trigger "invalid", error
@@ -75,4 +114,7 @@ define [
         i18nProperty: i18nProperty
       
       @$el.html JST["src/js/templates/network/new.jst"](vars)
+
+      @$list = @$("#network-search-results")
+
       @

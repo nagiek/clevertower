@@ -10,9 +10,9 @@
       __extends(PropertyWizardView, _super);
 
       function PropertyWizardView() {
-        this.clear = __bind(this.clear, this);
         this.back = __bind(this.back, this);
         this.next = __bind(this.next, this);
+        this.manage = __bind(this.manage, this);
         this.join = __bind(this.join, this);        _ref = PropertyWizardView.__super__.constructor.apply(this, arguments);
         return _ref;
       }
@@ -23,15 +23,24 @@
 
       PropertyWizardView.prototype.events = {
         'click .back': 'back',
-        'click .next': 'next',
-        'click .join': 'join'
+        'click .next': 'next'
       };
 
       PropertyWizardView.prototype.initialize = function(attrs) {
         var _this = this;
 
-        this.model = new Property;
         this.forNetwork = attrs && attrs.forNetwork ? true : false;
+        this.model = new Property;
+        if (this.forNetwork) {
+          this.model.set("network", Parse.User.current().get("network"));
+        }
+        this.map = new GMapView({
+          wizard: this,
+          model: this.model,
+          forNetwork: this.forNetwork
+        });
+        this.listenTo(this.map, "property:join", this.join);
+        this.listenTo(this.map, "property:manage", this.manage);
         this.listenTo(this.model, "invalid", function(error) {
           var args, fn, msg;
 
@@ -53,25 +62,25 @@
         });
         this.on("property:save", function(property) {
           Parse.User.current().get("network").properties.add(property);
-          Parse.history.navigate("/", {
+          return Parse.history.navigate("/", {
             trigger: true
           });
-          return _this.clear();
         });
-        return this.on("lease:save", function(lease) {
+        return this.on("lease:save", function(lease, isNew) {
           var vars;
 
-          console.log(lease);
           vars = {
             lease: lease,
             unit: lease.get("unit"),
-            property: lease.get("property")
+            property: lease.get("property"),
+            mgrOfProp: isNew
           };
-          Parse.User.current().set(vars).save();
-          Parse.history.navigate("/account/building", {
-            trigger: true
+          return Parse.User.current().save(vars).then(function() {
+            Parse.history.navigate("/account/building", true);
+            return console.log('hi');
+          }, function(error) {
+            return console.log(error);
           });
-          return this.clear();
         });
       };
 
@@ -83,14 +92,12 @@
           setup: !Parse.User.current() || (!Parse.User.current().get("property") && !Parse.User.current().get("network"))
         };
         this.$el.html(JST['src/js/templates/property/new/wizard.jst'](vars));
-        this.map = new GMapView({
-          wizard: this,
-          model: this.model
-        }).render();
+        this.$el.find(".wizard-forms").append(this.map.render().el);
+        this.map.renderMap();
         return this;
       };
 
-      PropertyWizardView.prototype.join = function(e) {
+      PropertyWizardView.prototype.join = function(existingProperty) {
         var _this = this;
 
         if (this.state === 'join') {
@@ -100,17 +107,40 @@
         this.$('button.next').prop("disabled", "disabled");
         this.$('button.join').prop("disabled", "disabled");
         this.state = 'join';
-        return require(["views/property/Join"], function(JoinPropertyView) {
-          var btn;
-
-          btn = $(e.currentTarget);
-          _this.existingProperty = _this.map.results.get(btn.data("property-id"));
+        this.existingProperty = existingProperty;
+        return require(["views/property/new/Join"], function(JoinPropertyView) {
           _this.form = new JoinPropertyView({
             wizard: _this,
             property: _this.existingProperty
           });
           _this.map.$el.after(_this.form.render().el);
           return _this.animate('forward');
+        });
+      };
+
+      PropertyWizardView.prototype.manage = function(existingProperty) {
+        var _this = this;
+
+        this.$('.error').removeClass('error');
+        this.$('button.next').prop("disabled", "disabled");
+        this.$('button.join').prop("disabled", "disabled");
+        return require(["models/Concierge"], function(Concierge) {
+          var alert, concierge;
+
+          concierge = new Concierge({
+            property: existingProperty,
+            profile: Parse.User.current().get("profile"),
+            state: 'pending'
+          });
+          alert = new Alert({
+            event: 'model-save',
+            fade: false,
+            message: i18nCommon.actions.request_sent,
+            type: 'error'
+          });
+          return concierge.save().then(_this.clear, function(error) {
+            return alert.setError(i18nCommon.errors.unknown_error);
+          });
         });
       };
 
@@ -163,7 +193,7 @@
               attrs = this.assignAdditionalToLease(data, attrs);
               return this.form.model.save(attrs, {
                 success: function(lease) {
-                  return _this.trigger("lease:save", lease);
+                  return _this.trigger("lease:save", _this.form.model, false);
                 },
                 error: function(lease, error) {
                   _this.form.model.trigger("invalid", error);
@@ -174,7 +204,7 @@
               attrs = this.model.scrub(data.property);
               return this.model.save(attrs, {
                 success: function(property) {
-                  return _this.trigger("property:save", property);
+                  return _this.trigger("property:save", _this.model);
                 },
                 error: function(property, error) {
                   _this.model.trigger("invalid", error);
@@ -189,7 +219,7 @@
             attrs = this.assignAdditionalToLease(data, attrs);
             return this.form.model.save(attrs, {
               success: function(lease) {
-                return _this.trigger("lease:save", lease);
+                return _this.trigger("lease:save", _this.form.model, true);
               },
               error: function(lease, error) {
                 _this.form.model.trigger("invalid", error);
@@ -288,7 +318,6 @@
       };
 
       PropertyWizardView.prototype.clear = function() {
-        this.$el.empty();
         this.stopListening();
         this.undelegateEvents();
         return delete this;

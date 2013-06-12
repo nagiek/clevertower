@@ -15,7 +15,7 @@ define [
       # @listenTo Parse.Dispatcher, "user:logout", -> delete @model
 
       @listenTo Parse.Dispatcher, "user:login", @bindListenEvents
-      @listenTo Parse.Dispatcher, "user:logout", @render
+      @listenTo Parse.Dispatcher, "user:change", @render
 
       @bindListenEvents() if Parse.User.current()
 
@@ -37,9 +37,16 @@ define [
       @$('#home-nav a').prop "href", homePrefix
 
       if Parse.User.current()
+
         # Set the link to the network subdomain.
         if Parse.User.current().get("network") 
           networkUrl = if hostArray.length > 1 then "/" else Parse.User.current().get("network").privateUrl()
+        else if Parse.User.current().get("property")
+          if Parse.User.current().get("mgrOfProp") and !Parse.User.current().get("property").get("network")
+            networkUrl = "/manage"
+          else networkUrl = "/network/new"
+
+        # We have no network or property.
         else networkUrl = "/account/setup"
         @$('#network-nav').html "<a href='#{networkUrl}'>#{i18nCommon.verbs.manage}</a>"
 

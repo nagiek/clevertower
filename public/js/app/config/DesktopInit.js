@@ -165,6 +165,7 @@
       }
       return this;
     };
+    _.extend(Parse.Router.prototype, listenEvents);
     _.extend(Parse.View.prototype, listenEvents);
     _.extend(Parse.Object.prototype, listenEvents);
     Parse.View.prototype.remove = function() {
@@ -235,29 +236,43 @@
       return false;
     };
     Parse.User.prototype.setup = function() {
-      var profilePromise, userPromise,
+      var userPromise,
         _this = this;
 
-      profilePromise = (new Parse.Query(Profile)).equalTo("user", this).first();
-      userPromise = (new Parse.Query("_User")).include('lease').include('unit').include('property.role').include('network.role').equalTo("objectId", this.id).first();
+      userPromise = (new Parse.Query("_User")).include('lease').include('unit').include('profile').include('property.role').include('network.role').equalTo("objectId", this.id).first();
       this.notifications = new NotificationList;
-      return Parse.Promise.when(profilePromise, userPromise, this.notifications.query.find()).then(function(profile, user, notifs) {
+      return Parse.Promise.when(userPromise, this.notifications.query.find()).then(function(user, notifs) {
         var network;
 
         _this.notifications.add(notifs);
-        profile.prep("applicants").fetch();
-        _this.set("profile", profile);
+        _this.set("profile", user.get("profile"));
         _this.set("lease", user.get("lease"));
         _this.set("unit", user.get("unit"));
         _this.set("property", user.get("property"));
         network = user.get("network");
         if (network) {
-          network.prep("properties").fetch();
-          network.prep("managers").fetch();
-          network.prep("tenants").fetch();
-          network.prep("listings").fetch();
-          network.prep("applicants").fetch();
-          network.prep("inquiries").fetch();
+          return _this.networkSetup(network);
+        }
+      });
+    };
+    Parse.User.prototype.networkSetup = function(network) {
+      var role,
+        _this = this;
+
+      network.prep("properties").fetch();
+      network.prep("managers").fetch();
+      network.prep("tenants").fetch();
+      network.prep("listings").fetch();
+      network.prep("applicants").fetch();
+      network.prep("inquiries").fetch();
+      role = network.get("role");
+      return role.getUsers().query().get(Parse.User.current().id, {
+        success: function(user) {
+          network.mgr = true;
+          return _this.set("network", network);
+        },
+        error: function() {
+          network.mgr = false;
           return _this.set("network", network);
         }
       });

@@ -9,10 +9,9 @@ define [
   'views/listing/Summary'
   "i18n!nls/common"
   "i18n!nls/property"
-  "i18n!nls/unit"
   "i18n!nls/listing"
   'templates/property/sub/listings'
-], ($, _, Parse, ListingList, Property, Listing, Alert, ListingView, i18nCommon, i18nProperty, i18nUnit, i18nListing) ->
+], ($, _, Parse, ListingList, Property, Listing, Alert, ListingView, i18nCommon, i18nProperty, i18nListing) ->
 
   class PropertyListingsView extends Parse.View
   
@@ -35,7 +34,6 @@ define [
       vars = 
         i18nProperty: i18nProperty
         i18nCommon: i18nCommon
-        i18nUnit: i18nUnit
         i18nListing: i18nListing
       @$el.html JST["src/js/templates/property/sub/listings.jst"](vars)
       
@@ -55,5 +53,5 @@ define [
     addAll : ->
       @$list.html ""
       visible = @model.listings.select (l) => l.get("property").id is @model.id
-      if visible.length is 0 then @$list.html "<tr class='empty'><tr colspan='3'>#{i18nGroup.tenant.empty.index}</td></tr>"
+      if visible.length is 0 then @$list.html "<tr class='empty'><td colspan='5'>#{i18nListing.listings.empty.property}</td></tr>"
       else _.each visible, @addOne

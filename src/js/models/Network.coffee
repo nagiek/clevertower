@@ -44,4 +44,5 @@ define [
 
       @[collectionName]
 
+    publicUrl: -> "/networks/#{@id}"
     privateUrl: -> "#{location.protocol}//#{@get("name")}.#{location.host}"

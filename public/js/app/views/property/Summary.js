@@ -23,18 +23,17 @@
       };
 
       PropertySummaryView.prototype.render = function() {
-        var details, vars;
+        var vars;
 
-        details = {
+        vars = _.merge(this.model.toJSON(), {
           cover: this.model.cover('profile'),
           publicUrl: this.model.publicUrl(),
           listings: '0',
           incomes: '0',
           expenses: '0',
-          vacant_units: '0'
-        };
-        vars = _.merge(this.model.toJSON(), details, {
+          vacant_units: '0',
           unitsLength: this.model.unitsLength ? this.model.unitsLength : 0,
+          baseUrl: "/properties/" + this.model.id,
           i18nProperty: i18nProperty,
           i18nCommon: i18nCommon
         });

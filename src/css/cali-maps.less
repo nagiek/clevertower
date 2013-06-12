@@ -10,21 +10,36 @@
 /**
  * Search Form
  */
-#search-results,
+
 #mapCanvas {
   width:100%;
   height:350px;
 }
 
-#search-results {
+#property-search-results {
+  height:350px;
+  .empty {
+    padding-top: 40%;
+  }
+}
+
+#network-search-results {
+  height:150px;
+  .empty {
+    padding-top: 50px;
+  }
+}
+
+.search-results {
+  width:100%;
   background-color: @grayLighter;
   overflow-y: scroll;
   .empty {
-    padding-top: 40%;
     color: @grayLight;
   }
   .result {
     margin: 5px 10px;
+    padding: 10px;
     background-color: @white;
   }
   h3 {
@@ -80,7 +95,8 @@
   //     }
   //   }
   // }
-  #search-results {
+  #property-search-results,
+  #network-search-results {
     min-height:100px;
     height:auto;
   }

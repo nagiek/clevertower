@@ -16,7 +16,8 @@ define [
   # we update the model two way <-->
   class GMapView extends Parse.View
 
-    el : ".address-form"
+    tagName : "form"
+    className : "address-form span12"
     
     events:
       'keypress #geolocation-search' : 'checkForSubmit'
@@ -25,32 +26,35 @@ define [
 
     initialize: (attrs) ->
       
+      @forNetwork = if attrs.forNetwork then attrs.forNetwork else false
       @mapId = "mapCanvas"
       @wizard = attrs.wizard
+      @listenTo @wizard, "wizard:cancel", @clear
+      @listenTo @wizard, "property:save", @clear
+      @listenTo @wizard, "property:join", @clear
+      @listenTo @wizard, "property:manage", @clear
+      @listenTo @wizard, "lease:save", @clear
       
       @geocoder = new google.maps.Geocoder
-      @results = new PropertyList
+      @results = new PropertyList [], forNetwork: @forNetwork
+      @listenTo @results, "reset", @processResults
 
       # Geolocation
       @browserGeoSupport = if navigator.geolocation or google.loader.ClientLocation then true else false
-
-      @listenTo @wizard, "wizard:cancel", @clear
-      @listenTo @wizard, "property:save", @clear
-      @listenTo @wizard, "lease:save", @clear
-
-      @listenTo @results, "reset", @processResults
 
     render : ->
       vars = 
         i18nProperty: i18nProperty
         i18nCommon: i18nCommon
-
+        forNetwork: @forNetwork
       @$el.html JST["src/js/templates/property/new/map.jst"](vars)
       @$searchInput = @$('#geolocation-search').focus()
-      @$propertyList = @$('#search-results')
+      @$list = @$('#property-search-results')
       # Don't give the option if browser doesn't support it.
       @$('.geolocate').show() unless @browserGeoSupport is false
+      @
 
+    renderMap : ->
       @gmap = new google.maps.Map document.getElementById(@mapId), 
         zoom                    : 2
         center                  : new google.maps.LatLng(0,0)
@@ -86,7 +90,7 @@ define [
               origin: new google.maps.Point(50, @model.pos() * 32)
               anchor: null
               scaledSize: null
-      @
+
 
     checkForSubmit : (e) =>
       return unless e.keyCode is 13
@@ -97,12 +101,12 @@ define [
       @geocoder.geocode address: @$searchInput.val(), (results, status) =>
         if status is google.maps.GeocoderStatus.OK
           $(".wizard-actions .next").removeProp("disabled") if $(".wizard-actions .next").is("[disabled]")
-          if Parse.User.current()
-            if Parse.User.current().get("network")
-              for p in Parse.User.current().get("network").properties.models
-                if results[0].geometry.location.equals p.GPoint()
-                  msg = i18nProperty.errors.taken_by_network p.id
-                  return new Alert event: 'geocode', fade: false, message: msg, type: 'error'
+          if Parse.User.current() and Parse.User.current().get("network")
+            for p in Parse.User.current().get("network").properties.models
+              if results[0].geometry.location.equals p.GPoint()
+                msg = i18nProperty.errors.taken_by_network p.id
+                return new Alert event: 'geocode', fade: false, message: msg, type: 'error'
+
 
             # This is preventing us from creating another lease in the same building.
             # 
@@ -111,7 +115,9 @@ define [
             #     msg = i18nProperty.errors.taken_by_user Parse.User.current().get("property").id
             #     return new Alert event: 'geocode', fade: false, message: msg, type: 'error'
 
-          @result = @parse results[0]
+          @model.set @parse(results[0])
+          @$searchInput.val @model.get('formatted_address')
+          
           @results.setCenter new Parse.GeoPoint(results[0].geometry.location.lat(), results[0].geometry.location.lng())
           @results.fetch()
 
@@ -126,25 +132,23 @@ define [
           # Set current user location, if available
           navigator.geolocation.getCurrentPosition (position) =>
             @model.set "center", new Parse.GeoPoint(position.coords)
-            @geocode latLng: @GPoint @model.get "center"
+            @geocode latLng: @model.GPoint()
       
         # If browser geolication is not supoprted, try ip location
         else if google.loader.ClientLocation
           @model.set "center", new Parse.GeoPoint(google.loader.ClientLocation)
-          @geocode latLng: @GPoint @model.get "center"
+          @geocode latLng: @model.GPoint()
           
       else
         @model.set "center", new Parse.GeoPoint()
         alert i18nProperty.errors.no_geolocaiton
-        @geocode latLng: @GPoint @model.get "center"
+        @geocode latLng: @model.GPoint()
 
 
     # Results Handling
     # ----------------
 
     processResults: =>
-      @model.set @result
-      @$searchInput.val @model.get('formatted_address')
       center = @model.GPoint()
       @gmap.setCenter center        
       @setMapZoom()
@@ -152,18 +156,21 @@ define [
       @addAll()
 
     addOne: (p) =>
-      view = new PropertyResult model: p, map: @gmap
-      @$propertyList.append view.render().el
+      view = new PropertyResult model: p, view: @, forNetwork: @forNetwork
+      @$list.append view.render().el
 
     # Add all items in the Properties collection at once.
     addAll: =>
-      @$propertyList.html ""
+      @$list.html ""
       unless @results.length is 0
         @$('li.empty').remove()
         @results.each @addOne
-        @wizard.delegateEvents()
       else
-        @$propertyList.html "<li class='empty text-center font-large'>#{i18nProperty.search.no_results}</li>"
+        @$list.html """
+                    <li class='empty text-center font-large'>
+                      #{i18nProperty.search.no_property_results}
+                    </li>
+                    """
 
     # Utility
     # -------

@@ -26,7 +26,8 @@ define [
   
     # Re-render the contents of the property item.
     render: =>
-      details = 
+      
+      vars = _.merge @model.toJSON(),
         cover        : @model.cover('profile')
         publicUrl    : @model.publicUrl()
         # Convert to collections.
@@ -35,14 +36,10 @@ define [
         expenses     : '0'            # @model.expenses().sum()
         vacant_units : '0'            # @model.units().vacant().length
         # units        : '0'            # @model.units().length
-      
-      vars = _.merge(
-        @model.toJSON(),
-        details,
         unitsLength: if @model.unitsLength then @model.unitsLength else 0
+        baseUrl: "/properties/#{@model.id}"
         i18nProperty: i18nProperty
         i18nCommon: i18nCommon
-      )
       
       @$el.html JST["src/js/templates/property/summary.jst"](vars)
       @$("[rel=tooltip]").tooltip()

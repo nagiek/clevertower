@@ -16,6 +16,8 @@ define [
 
     initialize: (attrs) ->
 
+      console.log 'hey'
+
       @listenTo Parse.Dispatcher, "user:logout", @clear
       @listenTo Parse.User.current(), "change:property", @prepProperty
       

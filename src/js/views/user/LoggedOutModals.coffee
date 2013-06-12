@@ -2,13 +2,14 @@ define [
   "jquery"
   "underscore"
   "backbone"
+  "collections/NotificationList"
   'views/helper/Alert'
   "i18n!nls/common"
   "i18n!nls/devise"
   "i18n!nls/user"
   'plugins/toggler'
   'templates/user/logged_out_modals'
-], ($, _, Parse, Alert, i18nCommon, i18nDevise, i18nUser) ->
+], ($, _, Parse, NotificationList, Alert, i18nCommon, i18nDevise, i18nUser) ->
 
   class LoggedOutModalsView extends Parse.View
 
@@ -98,14 +99,22 @@ define [
         success: (user) =>
           @$('> #signup-modal').modal('hide')
           @$("> #signup-modal #signup-form button").removeProp "disabled"
-          Parse.Dispatcher.trigger "user:loginStart", user
+
+          profile = user.get("profile")
+          profile.set "email", user.get("email")
+
+          # Skip the user-setup phase, as we will not have anything to add.
+          # Only extra things we need are the profile and notifications.
+          Parse.User.current().set "profile", profile
+          Parse.User.current().notifications = new NotificationList
+
+          Parse.Dispatcher.trigger "user:login", user
           Parse.Dispatcher.trigger "user:change", user
-          Parse.history.navigate "/account/setup"
+          Parse.history.navigate "/account/setup", trigger: true
 
         error: (user, error) =>
           @$("> #signup-modal #signup-form .error").removeClass 'error'
           @$("> #signup-modal #signup-form button").removeProp "disabled"
-          console.log error
           msg = switch error.code
             when 125  then i18nDevise.errors.invalid_email_format
             when 202  then i18nDevise.errors.username_taken

@@ -9,14 +9,14 @@ define [
   "i18n!nls/property"
   "i18n!nls/common"
   "underscore.inflection"
-  'templates/property/show'
+  'templates/property/manage'
   "templates/property/menu/show"
   "templates/property/menu/reports"
   "templates/property/menu/building"
   "templates/property/menu/actions"
 ], ($, _, Parse, Property, Unit, Lease, Inquiry, i18nProperty, i18nCommon, inflection) ->
 
-  class ShowPropertyView extends Parse.View
+  class TrialPropertyView extends Parse.View
 
     el: '#main'
     
@@ -32,8 +32,8 @@ define [
       @model.prep('listings')
       @model.prep('inquiries')
       
-      @model.on 'change:image_profile', (model, name) => @refresh
-      @model.on 'destroy',  @clear
+      @listenTo @model, 'change:image_profile', @refresh
+      @listenTo @model, 'destroy', @clear
       
       # Render immediately, as we will display a subview
       @render()
@@ -47,9 +47,11 @@ define [
         cover: @model.cover 'profile'
         i18nProperty: i18nProperty
         i18nCommon: i18nCommon
+        hasNetwork: @model.get("network")
+        baseUrl: if @model.get("network") then "/properties/#{@model.id}" else "/manage"
       )
       
-      @$el.html JST["src/js/templates/property/show.jst"](vars)
+      @$el.html JST["src/js/templates/property/manage.jst"](vars)
       @
 
     changeSubView: (path, params) =>

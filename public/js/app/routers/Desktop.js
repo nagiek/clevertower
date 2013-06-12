@@ -12,7 +12,9 @@
       function DesktopRouter() {
         this.profileShow = __bind(this.profileShow, this);
         this.propertiesPublic = __bind(this.propertiesPublic, this);
-        this.propertiesNew = __bind(this.propertiesNew, this);        _ref = DesktopRouter.__super__.constructor.apply(this, arguments);
+        this.propertiesManage = __bind(this.propertiesManage, this);
+        this.propertiesNew = __bind(this.propertiesNew, this);
+        this.networkNew = __bind(this.networkNew, this);        _ref = DesktopRouter.__super__.constructor.apply(this, arguments);
         return _ref;
       }
 
@@ -20,6 +22,9 @@
         "": "index",
         "properties/new": "propertiesNew",
         "places/:country/:region/:city/:id/:slug": "propertiesPublic",
+        "manage": "propertiesManage",
+        "manage/*splat": "propertiesManage",
+        "network/new": "networkNew",
         "network/:name": "networkShow",
         "search/*splat": "search",
         "users/:id": "profileShow",
@@ -36,24 +41,20 @@
         Parse.history.start({
           pushState: true
         });
-        this.userView = new UserMenuView().render();
-        this.networkView = new NavMenuView().render();
+        new UserMenuView().render();
+        new NavMenuView().render();
         Parse.App.search = new SearchView().render();
-        Parse.Dispatcher.on("user:login", function(user) {
-          _this.userView.render();
-          _this.networkView.render();
+        this.listenTo(Parse.Dispatcher, "user:login", function(user) {
           if (!(Parse.User.current().get("network") || Parse.User.current().get("property"))) {
             return _this.accountSetup();
           } else {
             return Parse.history.loadUrl(location.pathname);
           }
         });
-        Parse.Dispatcher.on("user:logout", function() {
-          _this.userView.render();
-          _this.networkView.render();
+        this.listenTo(Parse.Dispatcher, "user:logout", function() {
           return Parse.history.loadUrl(location.pathname);
         });
-        Parse.history.on("route", function(route) {
+        this.listenTo(Parse.history, "route", function(route) {
           $('#search-menu input.search').val("").blur();
           _this.oldConstructor;
           if (_this.view) {
@@ -113,6 +114,18 @@
         });
       };
 
+      DesktopRouter.prototype.networkNew = function() {
+        var view,
+          _this = this;
+
+        view = this.view;
+        return require(["views/network/New"], function(NewNetworkView) {
+          _this.view = new NewNetworkView();
+          _this.view.setElement("#main");
+          return _this.view.render();
+        });
+      };
+
       DesktopRouter.prototype.propertiesNew = function() {
         var view,
           _this = this;
@@ -125,6 +138,24 @@
             });
             _this.view.setElement("#main");
             return _this.view.render();
+          }
+        });
+      };
+
+      DesktopRouter.prototype.propertiesManage = function(splat) {
+        var view,
+          _this = this;
+
+        view = this.view;
+        return require(["views/property/Trial"], function(PropertyView) {
+          var vars;
+
+          vars = _this.deparamAction(splat);
+          if (!view || !(view instanceof PropertyView)) {
+            vars.model = Parse.User.current().get("property");
+            return _this.view = new PropertyView(vars);
+          } else {
+            return view.changeSubView(vars.path, vars.params);
           }
         });
       };

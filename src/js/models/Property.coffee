@@ -90,7 +90,7 @@ define [
     GPoint : -> new google.maps.LatLng @get("center")._latitude, @get("center")._longitude
 
     # Backbone default, as Parse function does not exist.
-    url: -> "/#{@collection.url}/#{@id}"
+    url: -> "/properties/#{@id}"
     
     # URL friendly title
     publicUrl: -> "/places/#{@country()}/#{@get("administrative_area_level_1")}/#{@get("locality")}/#{@id}/#{@slug()}"
@@ -144,7 +144,7 @@ define [
 
       user = Parse.User.current()
       network = user.get("network") if user
-      basedOnNetwork = user and network and @get("network").id is network.id
+      basedOnNetwork = user and network and @get("network") and @get("network").id is network.id
 
       @[collectionName] = switch collectionName
         when "units" 
@@ -164,3 +164,15 @@ define [
 
       @[collectionName]
 
+
+
+  # CLASS METHODS
+  # -------------
+
+  Property.url = (id) -> "/properties/#{id}"
+  Property.publicUrl = (country, area, locality, id, slug) -> "/places/#{country}/#{area}/#{locality}/#{id}/#{slug}"
+  Property.slug = (title) -> title.replace(/\s+/g, '-').toLowerCase()
+  Property.country = (country) -> Parse.App.countryCodes[country]
+
+
+  Property

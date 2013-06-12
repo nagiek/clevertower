@@ -11,7 +11,7 @@ __p += '<div id="alert-' +
 ((__t = ( type )) == null ? '' : __t) +
 ' fade in">\n  ';
  if (dismiss) { ;
-__p += '<button type="button" class="close pull-right" data-dismiss="alert">&times;</button>';
+__p += '<button type="button" class="close stay-right" data-dismiss="alert">&times;</button>';
  } ;
 __p += '\n  <div class="inline-block">\n  ';
  if (heading) { ;

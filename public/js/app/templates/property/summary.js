@@ -10,7 +10,7 @@ __p += '<div class="property span8">\n  <div class="photo photo-medium photo-ela
 '">\n      <img src="' +
 ((__t = ( cover )) == null ? '' : __t) +
 '" alt="Profile" class="profile-picture">\n    </a>\n  </div>\n  \n  <div class="photo-float medium-float elastic-float">\n    <div class="btn-toolbar stay-right">\n      ' +
-((__t = ( JST["src/js/templates/property/menu.jst"]({publicUrl: publicUrl, objectId: objectId, i18nProperty: i18nProperty}) )) == null ? '' : __t) +
+((__t = ( JST["src/js/templates/property/menu.jst"]({publicUrl: publicUrl, base: base, i18nProperty: i18nProperty}) )) == null ? '' : __t) +
 '\n    </div>\n    \n    <h2>\n      <a href="/properties/' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '">' +

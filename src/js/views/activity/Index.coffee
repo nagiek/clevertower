@@ -5,7 +5,6 @@ define [
   'collections/ActivityList'
   "views/listing/Search"
   "views/post/New"
-  "views/property/Prompt"
   "views/activity/summary"
   "i18n!nls/listing"
   "i18n!nls/common"
@@ -13,7 +12,7 @@ define [
   'masonry'
   'jqueryui'
   "gmaps"
-], ($, _, Parse, ActivityList, ListingSearchView, NewPostView, PromptPropertyView, ActivitySummaryView, i18nListing, i18nCommon) ->
+], ($, _, Parse, ActivityList, ListingSearchView, NewPostView, ActivitySummaryView, i18nListing, i18nCommon) ->
 
   class ActivityIndexView extends Parse.View
   
@@ -35,7 +34,7 @@ define [
       # Give the user the chance to contribute
       @listenTo Parse.Dispatcher, "user:login", => 
         @getUserActivity()
-        @userView = new NewPostView(map: @map).render()
+        @userView = new NewPostView(view: @).render()
 
       @listenTo Parse.App.search, "google:search", (data) =>
         @location = data.location

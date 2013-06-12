@@ -51,6 +51,7 @@
       edit: "Edit network",
       setup: "Set up network",
       claim_domain: "Claim your domain name.",
+      find_domain: "Enter the unique domain name of the network you wish to join.",
       must_be_done: "Before you can begin adding properties to CleverTower, you must create your network.\nOnly people who you invite to your network can edit properties.\nYou can change these settings at any time.",
       give_network_a_title: "Give your network a title.",
       can_be_anything: "Can be anything you like."
@@ -68,9 +69,13 @@
       included: "Included"
     },
     search: {
-      map_instructions: "Find your building on the map. If the building is on CleverTower, you'll have the chance to join.",
+      map_instructions_mgr: "Find the building on the map. If the building is on CleverTower, you'll have the chance to manage it.",
+      map_instructions_tnt: "Find your building on the map. If the building is on CleverTower, you'll have the chance to join.",
       awaiting_search: "Awaiting search.",
-      no_results: "No nearby buildings."
+      no_property_results: "No nearby buildings on CleverTower.",
+      no_network_results: "No networks match that name.",
+      private_property: "Properties set to private will not appear.",
+      private_network: "Maybe the network is set to private?"
     },
     empty: {
       properties: "You don't have any properties yet.",
@@ -125,7 +130,7 @@
       name_too_short: "The name cannot be longer than 31 characters.",
       name_missing: "You must enter a name.",
       name_taken: function(id) {
-        return "<p>This name has been taken by an existing network.</p>\n<p>\n  <a href=\"/network/" + (_.escape(id)) + "\" class=\"btn btn-warning\">View network</a>\n  <a class=\"btn close\">Close</a>\n</p>";
+        return "<p>This name has been taken by an existing network.</p>\n<p class=\"text-left\">\n  <a href=\"/networks/" + (_.escape(id)) + "\" class=\"btn btn-warning\">View network</a>\n</p>";
       },
       network_not_set: "You have not joined a network yet.",
       invalid_address: "You must add an address.",

@@ -12,9 +12,14 @@
     </div>
     
     <header class="header photo-float thumbnail-float elastic-float">
+
       <h1 class="inline-block profile-inline">
         <a href="/properties/<%= objectId %>"><%= title %></a>
       </h1>
+
+      <% if (!hasNetwork) { %>
+        <a href="/network/new" class="pull-right btn tablet-hidden phone-hidden"><i class="icon-arrow-up"></i><%= i18nCommon.actions.upgrade %></a>
+      <% } %>
 
       <ul class="nav nav-tabs inline-block profile-inline" role="navigation">
         <li class="dropdown">
@@ -22,32 +27,35 @@
             <%= i18nProperty.menu.day_to_day %>
             <b class="caret"></b>
           </a>
-          <%= JST["src/js/templates/property/menu/show.jst"]({objectId: objectId, i18nProperty: i18nProperty}) %>
+          <%= JST["src/js/templates/property/menu/show.jst"]({baseUrl: baseUrl, i18nProperty: i18nProperty}) %>
         </li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">
             <%= i18nProperty.menu.building %>
             <b class="caret"></b>
           </a>
-          <%= JST["src/js/templates/property/menu/building.jst"]({publicUrl: publicUrl, objectId: objectId, i18nProperty: i18nProperty}) %>
+          <%= JST["src/js/templates/property/menu/building.jst"]({publicUrl: publicUrl, baseUrl: baseUrl, i18nProperty: i18nProperty}) %>
         </li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">
             <%= i18nProperty.menu.reports %>
             <b class="caret"></b>
           </a>
-          <%= JST["src/js/templates/property/menu/reports.jst"]({objectId: objectId, i18nProperty: i18nProperty}) %>
+          <%= JST["src/js/templates/property/menu/reports.jst"]({baseUrl: baseUrl, i18nProperty: i18nProperty}) %>
         </li>
         <li class="dropdown add-dropdown">
           <a href="#" class="btn.btn-success dropdown-toggle" data-toggle="dropdown">
             <%= i18nProperty.menu.actions %>
             <b class="caret"></b>
           </a>
-          <%= JST["src/js/templates/property/menu/actions.jst"]({objectId: objectId, i18nProperty: i18nProperty}) %>
+          <%= JST["src/js/templates/property/menu/actions.jst"]({baseUrl: baseUrl, i18nProperty: i18nProperty}) %>
         </li>
       </ul>
     </header>
   </div>
+  <% if (!hasNetwork) { %>
+    <a href="/network/new" class="stay-right btn desktop-hidden"><i class="icon-arrow-up"></i><%= i18nCommon.actions.upgrade %></a>
+  <% } %>
 
   <div class="content fade"></div>
 </div>

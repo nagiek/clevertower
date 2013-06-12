@@ -112,15 +112,7 @@ ul.inline, ol.inline {
   }
 }
 
-@media (max-width:767px) and (min-width:480px) {
-  .tablet-left  { float:left; }
-  .tablet-right { float:right; }
-}
 
-@media (max-width:480px) {
-  .phone-left  { float:left; }
-  .phone-right { float:right; }
-}
 
 .display-block {
   display:block;
@@ -293,6 +285,22 @@ ul.inline, ol.inline {
       float:none;
     }
   }
+}
+
+@media (max-width:767px) and (min-width:480px) {
+  .tablet-left  { float:left; }
+  .tablet-right { float:right; }
+  .tablet-hidden { display:none; }
+}
+
+@media (max-width:480px) {
+  .phone-left  { float:left; }
+  .phone-right { float:right; }
+  .phone-hidden { display:none; }
+}
+
+@media (min-width:767px) {
+  .desktop-hidden { display:none; }
 }
 
 /**

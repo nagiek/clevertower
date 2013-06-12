@@ -17,19 +17,17 @@ define [
     initialize: (attrs) ->
       @editing = false
       
-      _.bindAll this, 'render', 'addAll', 'addOne'
-
       @on "view:change", @clear
 
       @model.prep('listings')
       @model.prep('applicants')
 
-      @model.listings.on "add", @addOne
-      @model.listings.on "reset", @addAll
+      @listenTo @model.listings, "add", @addOne
+      @listenTo @model.listings, "reset", @addAll
 
       @render()
 
-    render: ->
+    render: =>
       vars = 
         i18nCommon: i18nCommon
         i18nUnit: i18nUnit
@@ -43,12 +41,12 @@ define [
       @
     
 
-    addOne : (l) ->
-      console.log (new ListingView(model: l)).render().el
+    addOne : (l) =>
       @$list.append (new ListingView(model: l)).render().el
 
-    addAll : ->
+    addAll : =>
       @$list.html ''
       if @model.listings.length > 0 
-        @$("tr.empty").remove()
         @model.listings.each @addOne
+      else
+        @$list.html '<tr class="empty"><td colspan="4">' + i18nListing.listings.empty.network + '</td></tr>'

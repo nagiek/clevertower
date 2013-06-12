@@ -21,7 +21,9 @@
         return _ref;
       }
 
-      GMapView.prototype.el = ".address-form";
+      GMapView.prototype.tagName = "form";
+
+      GMapView.prototype.className = "address-form span12";
 
       GMapView.prototype.events = {
         'keypress #geolocation-search': 'checkForSubmit',
@@ -30,30 +32,42 @@
       };
 
       GMapView.prototype.initialize = function(attrs) {
+        this.forNetwork = attrs.forNetwork ? attrs.forNetwork : false;
         this.mapId = "mapCanvas";
         this.wizard = attrs.wizard;
-        this.geocoder = new google.maps.Geocoder;
-        this.results = new PropertyList;
-        this.browserGeoSupport = navigator.geolocation || google.loader.ClientLocation ? true : false;
         this.listenTo(this.wizard, "wizard:cancel", this.clear);
         this.listenTo(this.wizard, "property:save", this.clear);
+        this.listenTo(this.wizard, "property:join", this.clear);
+        this.listenTo(this.wizard, "property:manage", this.clear);
         this.listenTo(this.wizard, "lease:save", this.clear);
-        return this.listenTo(this.results, "reset", this.processResults);
+        this.geocoder = new google.maps.Geocoder;
+        this.results = new PropertyList([], {
+          forNetwork: this.forNetwork
+        });
+        this.listenTo(this.results, "reset", this.processResults);
+        return this.browserGeoSupport = navigator.geolocation || google.loader.ClientLocation ? true : false;
       };
 
       GMapView.prototype.render = function() {
-        var p, vars, _i, _len, _ref1;
+        var vars;
 
         vars = {
           i18nProperty: i18nProperty,
-          i18nCommon: i18nCommon
+          i18nCommon: i18nCommon,
+          forNetwork: this.forNetwork
         };
         this.$el.html(JST["src/js/templates/property/new/map.jst"](vars));
         this.$searchInput = this.$('#geolocation-search').focus();
-        this.$propertyList = this.$('#search-results');
+        this.$list = this.$('#property-search-results');
         if (this.browserGeoSupport !== false) {
           this.$('.geolocate').show();
         }
+        return this;
+      };
+
+      GMapView.prototype.renderMap = function() {
+        var p, _i, _len, _ref1, _results;
+
         this.gmap = new google.maps.Map(document.getElementById(this.mapId), {
           zoom: 2,
           center: new google.maps.LatLng(0, 0),
@@ -65,7 +79,7 @@
           scrollwheel: false
         });
         if (Parse.User.current().get("property")) {
-          new google.maps.Marker({
+          return new google.maps.Marker({
             position: this.model.GPoint(),
             map: this.map,
             ZIndex: 1,
@@ -79,9 +93,10 @@
           });
         } else if (Parse.User.current().get("network")) {
           _ref1 = Parse.User.current().get("network").properties;
+          _results = [];
           for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
             p = _ref1[_i];
-            new google.maps.Marker({
+            _results.push(new google.maps.Marker({
               position: this.model.GPoint(),
               map: this.map,
               ZIndex: 1,
@@ -92,10 +107,10 @@
                 anchor: null,
                 scaledSize: null
               }
-            });
+            }));
           }
+          return _results;
         }
-        return this;
       };
 
       GMapView.prototype.checkForSubmit = function(e) {
@@ -118,24 +133,23 @@
             if ($(".wizard-actions .next").is("[disabled]")) {
               $(".wizard-actions .next").removeProp("disabled");
             }
-            if (Parse.User.current()) {
-              if (Parse.User.current().get("network")) {
-                _ref1 = Parse.User.current().get("network").properties.models;
-                for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-                  p = _ref1[_i];
-                  if (results[0].geometry.location.equals(p.GPoint())) {
-                    msg = i18nProperty.errors.taken_by_network(p.id);
-                    return new Alert({
-                      event: 'geocode',
-                      fade: false,
-                      message: msg,
-                      type: 'error'
-                    });
-                  }
+            if (Parse.User.current() && Parse.User.current().get("network")) {
+              _ref1 = Parse.User.current().get("network").properties.models;
+              for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+                p = _ref1[_i];
+                if (results[0].geometry.location.equals(p.GPoint())) {
+                  msg = i18nProperty.errors.taken_by_network(p.id);
+                  return new Alert({
+                    event: 'geocode',
+                    fade: false,
+                    message: msg,
+                    type: 'error'
+                  });
                 }
               }
             }
-            _this.result = _this.parse(results[0]);
+            _this.model.set(_this.parse(results[0]));
+            _this.$searchInput.val(_this.model.get('formatted_address'));
             _this.results.setCenter(new Parse.GeoPoint(results[0].geometry.location.lat(), results[0].geometry.location.lng()));
             return _this.results.fetch();
           } else {
@@ -153,20 +167,20 @@
             return navigator.geolocation.getCurrentPosition(function(position) {
               _this.model.set("center", new Parse.GeoPoint(position.coords));
               return _this.geocode({
-                latLng: _this.GPoint(_this.model.get("center"))
+                latLng: _this.model.GPoint()
               });
             });
           } else if (google.loader.ClientLocation) {
             this.model.set("center", new Parse.GeoPoint(google.loader.ClientLocation));
             return this.geocode({
-              latLng: this.GPoint(this.model.get("center"))
+              latLng: this.model.GPoint()
             });
           }
         } else {
           this.model.set("center", new Parse.GeoPoint());
           alert(i18nProperty.errors.no_geolocaiton);
           return this.geocode({
-            latLng: this.GPoint(this.model.get("center"))
+            latLng: this.model.GPoint()
           });
         }
       };
@@ -174,8 +188,6 @@
       GMapView.prototype.processResults = function() {
         var center;
 
-        this.model.set(this.result);
-        this.$searchInput.val(this.model.get('formatted_address'));
         center = this.model.GPoint();
         this.gmap.setCenter(center);
         this.setMapZoom();
@@ -195,19 +207,19 @@
 
         view = new PropertyResult({
           model: p,
-          map: this.gmap
+          view: this,
+          forNetwork: this.forNetwork
         });
-        return this.$propertyList.append(view.render().el);
+        return this.$list.append(view.render().el);
       };
 
       GMapView.prototype.addAll = function() {
-        this.$propertyList.html("");
+        this.$list.html("");
         if (this.results.length !== 0) {
           this.$('li.empty').remove();
-          this.results.each(this.addOne);
-          return this.wizard.delegateEvents();
+          return this.results.each(this.addOne);
         } else {
-          return this.$propertyList.html("<li class='empty text-center font-large'>" + i18nProperty.search.no_results + "</li>");
+          return this.$list.html("<li class='empty text-center font-large'>\n  " + i18nProperty.search.no_property_results + "\n</li>");
         }
       };
 

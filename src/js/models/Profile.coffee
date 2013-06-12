@@ -37,9 +37,10 @@ define [
       
     name: ->
       name = @get("name")
-      unless name?
+      unless name
         email = @get("email") 
         chunks = []
+        email = "unknown@" unless email 
         _.each email.split("@")[0].split("."), (component) -> chunks.push _.str.capitalize(component)
         name = chunks.join(" ")
       name

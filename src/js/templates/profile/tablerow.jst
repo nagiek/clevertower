@@ -12,6 +12,11 @@
   <% if (admin) { %><small>(<%= i18nCommon.adjectives.admin %>)</small><% } %>
 </td>
 <td>
+  <% if (mgr == true && status == 'pending') { %>
+    <button class="accept btn">
+      <%= i18nCommon.actions.accept %>
+    </button>
+  <% } %>
   <button class="<% if (current_user) { %>current <% } %>delete btn">
     <% if (current_user) { %> <%= current_user_leave %> <% } else { %> <%= i18nCommon.actions.remove %> <% } %>
   </button>

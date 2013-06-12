@@ -5,7 +5,7 @@
     <b class="caret"></b>
   </a>
   <h4 class="element-invisible"><%= i18nProperty.menu.day_to_day %></h4>
-  <%= JST["src/js/templates/property/menu/show.jst"]({objectId: objectId, i18nProperty: i18nProperty}) %>
+  <%= JST["src/js/templates/property/menu/show.jst"]({baseUrl: baseUrl, i18nProperty: i18nProperty}) %>
 </div>
 
 <div class="btn-group">
@@ -14,7 +14,7 @@
     <b class="caret"></b>
   </a>
   <h4 class="element-invisible"><%= i18nProperty.menu.building %></h4>
-  <%= JST["src/js/templates/property/menu/building.jst"]({publicUrl: publicUrl, objectId: objectId, i18nProperty: i18nProperty}) %>
+  <%= JST["src/js/templates/property/menu/building.jst"]({publicUrl: publicUrl, baseUrl: baseUrl, i18nProperty: i18nProperty}) %>
 </div>
 
 <div class="btn-group">
@@ -23,7 +23,7 @@
     <b class="caret"></b>
   </a>
   <h4 class="element-invisible"><%= i18nProperty.menu.reports %></h4>
-  <%= JST["src/js/templates/property/menu/reports.jst"]({objectId: objectId, i18nProperty: i18nProperty}) %>
+  <%= JST["src/js/templates/property/menu/reports.jst"]({baseUrl: baseUrl, i18nProperty: i18nProperty}) %>
 </div>
 
 <div class="btn-group">
@@ -32,5 +32,5 @@
     <b class="caret"></b>
   </a>
   <h4 class="element-invisible"><%= i18nProperty.menu.actions %></h4>
-  <%= JST["src/js/templates/property/menu/actions.jst"]({objectId: objectId, i18nProperty: i18nProperty}) %>
+  <%= JST["src/js/templates/property/menu/actions.jst"]({baseUrl: baseUrl, i18nProperty: i18nProperty}) %>
 </div>

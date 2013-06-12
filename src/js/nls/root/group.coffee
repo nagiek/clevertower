@@ -19,10 +19,9 @@ define
       update:           'Lease was successfully updated with new tenants.'
   manager:
     instructions:       """
-                        New members will be allowed to post. They will not be able to make
-                        any changes to this blog's settings, unless you promote them to an admin.
+                        New managers will be allowed to create properties, listings and invite tenants.
                         """
-    deleted_if_empty:   "This blog will be automatically deleted if all of its members leave."
+    deleted_if_empty:   "This network will be automatically deleted if all of the managers leave."
     delete_network:     "Delete network"
     notices:
       update:           'New managers were successfully added.'
@@ -35,8 +34,9 @@ define
     admin:              "admin"
   form:
     instructions:       """
-                        To invite others to contribute to this blog, submit their email address below. 
-                        They'll receive an email with instructions to join this blog and register if they're not a CleverTower user yet.
+                        To invite others to this network, enter their email address below. 
+                        They will receive an email with instructions to join this network and register 
+                        if they are not on CleverTower yet.
                         """
   errors:
     unique_tenant:       "This user has already been added."

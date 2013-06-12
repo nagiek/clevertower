@@ -11,6 +11,9 @@ define [
       ""                            : "index"
       "properties/new"              : "propertiesNew"
       "places/:country/:region/:city/:id/:slug" : "propertiesPublic"
+      "manage"                      : "propertiesManage"
+      "manage/*splat"               : "propertiesManage"
+      "network/new"                 : "networkNew"
       "network/:name"               : "networkShow"
       "search/*splat"               : "search"
       "users/:id"                   : "profileShow"
@@ -24,13 +27,11 @@ define [
     initialize: (options) ->
       Parse.history.start pushState: true
       
-      @userView = new UserMenuView().render()
-      @networkView = new NavMenuView().render()
+      new UserMenuView().render()
+      new NavMenuView().render()
       Parse.App.search = new SearchView().render()
             
-      Parse.Dispatcher.on "user:login", (user) =>      
-        @userView.render()
-        @networkView.render()
+      @listenTo Parse.Dispatcher, "user:login", (user) =>      
         unless Parse.User.current().get("network") or Parse.User.current().get("property")
           # require ["views/helper/Alert", 'i18n!nls/property'], (Alert, i18nProperty) =>
           #   new Alert
@@ -44,16 +45,14 @@ define [
           # The route functions themselves are responsible for altering content.
           Parse.history.loadUrl location.pathname
           
-      Parse.Dispatcher.on "user:logout", =>
-        @userView.render()
-        @networkView.render()
+      @listenTo Parse.Dispatcher, "user:logout", =>
         # Reload the current path. Don't use navigate, as it will fail.
         # The route functions themselves are responsible for altering content.
         Parse.history.loadUrl location.pathname
       
       
       # Clean up after views
-      Parse.history.on "route", (route) =>
+      @listenTo Parse.history, "route", (route) =>
 
         $('#search-menu input.search').val("").blur()
         @oldConstructor
@@ -95,6 +94,15 @@ define [
           vars = @deparamAction splat
           @view = new ActivityIndexView(location: vars.path, params: vars.params)
 
+    # Network
+    # --------------
+    networkNew: =>
+      view = @view
+      require ["views/network/New"], (NewNetworkView) => 
+        @view = new NewNetworkView()
+        @view.setElement "#main"
+        @view.render()
+
     # Property
     # --------------
 
@@ -107,6 +115,18 @@ define [
           @view = new PropertyWizard forNetwork: false
           @view.setElement "#main"
           @view.render()
+
+    # DIFFERENT FROM NETWORK
+    # FOR USER
+    propertiesManage: (splat) =>
+      view = @view
+      require ["views/property/Trial"], (PropertyView) => 
+        vars = @deparamAction splat
+        if !view or view !instanceof PropertyView
+          vars.model = Parse.User.current().get("property")
+          @view = new PropertyView(vars)
+        else
+          view.changeSubView(vars.path, vars.params)
 
     propertiesPublic: (country, region, city, id, slug) =>
       place = "#{city}--#{region}--#{country}"

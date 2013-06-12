@@ -236,8 +236,9 @@ Parse.Cloud.define "AddManagers", (req, res) ->
     title = network.get "title"
 
     joinClassName = "Manager"
-    joinClassACL = network.getACL()
-    joinClassACL.setRoleWriteAccess vstRole, true
+    joinClassACL = new Parse.ACL
+    joinClassACL.setRoleRoleAccess netRole, true
+    joinClassACL.setRoleWriteAccess netRole, true
 
     # Create joinClasses outside the when->then scope, to return it later.
     joinClasses = undefined
@@ -282,13 +283,18 @@ Parse.Cloud.define "AddManagers", (req, res) ->
           # Profile exists, but user does not necessarily exist.
           user = profile.get("user")
 
+          myJoinClassACL = joinClassACL
+          if user    
+            myJoinClassACL.setRoleAccess user, true
+            myJoinClassACL.setWriteAccess user, true
+
           # Save the joinClass
           vars = 
             network: network
             status: if user and user.id is req.user.id then 'current' else status
             profile: profile
             accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb"
-            ACL: joinClassACL
+            ACL: myJoinClassACL
 
           joinClassSaves.push new Parse.Object(joinClassName).save(vars)
 
@@ -412,7 +418,7 @@ Parse.Cloud.beforeSave "_User", (req, res) ->
     # Get all pre-exising profile things
     if profile 
       req.object.set "profile", profile
-      res.success()     
+      res.success()
 
     else
       profile = new Parse.Object("Profile")
@@ -463,6 +469,12 @@ Parse.Cloud.afterSave "_User", (req, res) ->
     .then (managers, tenants, notifs) ->
       if managers
         for manager in managers
+          managerACL = manager.getACL()
+          managerACL.setReadAccess req.object, true
+          managerACL.setWriteAccess req.object, true
+          manager.setACL managerACL
+          manager.save()
+
           vstRole = manager.get("network").get("vstRole")
           if vstRole
             vstRole.getUsers().add req.object
@@ -500,36 +512,48 @@ Parse.Cloud.beforeSave "Network", (req, res) ->
   if req.object.existed() then query.notEqualTo 'objectId', req.object.id
   query.first().then (obj) ->
     return res.error "#{obj.id}:name_taken" if obj
-    return res.success() if req.object.existed()
     
-    networkACL = new Parse.ACL()
+    unless req.object.existed()
     
-    # Parse can only handle one role for now...    
-    # Role lists
-    randomId = ""
-    possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-    randomId += possible.charAt Math.floor(Math.random() * possible.length) for [1...16]
-    current = "mgr-current-" + randomId
-    visit = "mgr-possible-" + randomId
-    
-    # Let members see and add other members.
-    networkACL.setRoleReadAccess current, true
-    networkACL.setRoleWriteAccess current, true
+      networkACL = new Parse.ACL()
+      
+      # Parse can only handle one role for now...    
+      # Role lists
+      randomId = ""
+      possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+      randomId += possible.charAt Math.floor(Math.random() * possible.length) for [1...16]
+      current = "mgr-current-" + randomId
+      visit = "mgr-possible-" + randomId
 
-    # Let potential members see the network
-    networkACL.setRoleReadAccess visit, true
-    req.object.setACL networkACL
-    
-    # Create new role (API not chainable)
-    role = new Parse.Role(current, networkACL)
-    vstRole = new Parse.Role(visit, networkACL)
-    role.getUsers().add(req.user)
-    Parse.Promise.when(role.save(), vstRole.save()).then -> 
-      req.object.set "role", role
-      req.object.set "vstRole", vstRole
+      # Set to be open, originally.
+      req.object.set "public", true
+      networkACL.setPublicReadAccess true
+
+      # Let members see and add other members.
+      networkACL.setRoleReadAccess current, true
+      networkACL.setRoleWriteAccess current, true
+
+      # Let potential members see the network
+      networkACL.setRoleReadAccess visit, true
+      req.object.setACL networkACL
+      
+      # Create new role (API not chainable)
+      role = new Parse.Role(current, networkACL)
+      vstRole = new Parse.Role(visit, networkACL)
+      role.getUsers().add(req.user)
+      Parse.Promise.when(role.save(), vstRole.save()).then -> 
+        req.object.set "role", role
+        req.object.set "vstRole", vstRole
+        res.success()
+      , -> res.error "role_error"
+
+    else
+      isPublic = req.object.get "public"
+      networkACL = req.object.getACL()
+      if networkACL.getPublicReadAccess() isnt isPublic
+        networkACL.setPublicReadAccess(isPublic)
+        req.object.setACL networkACL
       res.success()
-    , ->
-      res.error "role_error"
       
   , ->
     res.error "bad_query"
@@ -539,6 +563,7 @@ Parse.Cloud.beforeSave "Network", (req, res) ->
 Parse.Cloud.afterSave "Network", (req, res) ->
   unless req.object.existed()
 
+    # Since the user is by-definition accepted, use the same ACL.
     managerACL = req.object.getACL()
     managerACL.setPublicReadAccess false
 
@@ -573,8 +598,8 @@ Parse.Cloud.beforeSave "Property", (req, res) ->
     return res.error 'title_missing' 
   
   unless req.object.existed()
-    if req.user.get("network")
-      (new Parse.Query "Network").include("role").get req.user.get("network").id,
+    if req.object.get("network")
+      (new Parse.Query "Network").include("role").get req.object.get("network").id,
       success : (network) ->
 
         netRole = network.get "role"
@@ -588,6 +613,7 @@ Parse.Cloud.beforeSave "Property", (req, res) ->
 
         # Give tenants access to read the property, and managers to read/write
         roleACL = network.getACL()
+        roleACL.setPublicReadAccess false
         roleACL.setRoleReadAccess current, true
         roleACL.setRoleWriteAccess mgr, true
         roleACL.setRoleReadAccess mgr, true
@@ -604,6 +630,8 @@ Parse.Cloud.beforeSave "Property", (req, res) ->
 
           # Set the property to public.
           propertyACL = roleACL
+
+          # Set to be open, originally.
           propertyACL.setPublicReadAccess true
 
           req.object.set
@@ -723,6 +751,9 @@ Parse.Cloud.beforeSave "Unit", (req, res) ->
       # Base the ACL off the property ACL. 
       # Do not use the network as it may not exist.
       propertyACL = property.getACL()
+
+      propertyACL.setPublicReadAccess false
+
       # Add write access to the unit for the user if the user is
       # adding it to the property, and he is not part of the network.
       # 
@@ -835,7 +866,7 @@ Parse.Cloud.beforeSave "Lease", (req, res) ->
   
   # Check for overlapping dates
   unit_date_query = (new Parse.Query("Lease")).equalTo("unit", req.object.get("unit"))
-  if existed then unit_date_query.notEqualTo "id", req.object.get("unit")
+  if existed then unit_date_query.notEqualTo "objectId", req.object.id
   unit_date_query.find()
   .then (objs) ->
     if objs 
@@ -872,7 +903,7 @@ Parse.Cloud.beforeSave "Lease", (req, res) ->
 
           if obj
             req.object.set "confirmed", true
-          else
+          else unless existed
             emails = req.object.get("emails") || []
             emails.push req.user.getEmail()
             req.object.set "emails", emails
@@ -1074,7 +1105,7 @@ Parse.Cloud.afterSave "Listing", (req) ->
 # 
 # Legend:
 #   user means req.user (decider)
-#   account means targer (object)
+#   account means target (object)
 # 
 # Paths:
 # 
@@ -1119,35 +1150,7 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
     mgrRole = property.get "mgrRole"
     network = property.get "network"
     netRole = network.get "role" if network
-    
-    # Set ACL
-    unless req.object.existed()
-
-      tenantACL = new Parse.ACL
-      # Let 
-      tenantACL.setRoleReadAccess propRole, true if propRole
-
-      # Let tenants adjust their own status.
-      # Note that we use a beforeSave to catch unauthorized status updates.
-      if tntRole
-        tenantACL.setRoleReadAccess tntRole, true 
-        tenantACL.setRoleWriteAccess tntRole, true
-
-      # Let managers adjust the status
-      if mgrRole
-        tenantACL.setRoleReadAccess mgrRole, true
-        tenantACL.setRoleWriteAccess mgrRole, true
-      if netRole
-        tenantACL.setRoleReadAccess netRole, true
-        tenantACL.setRoleWriteAccess netRole, true
-
-      req.object.set 
-        property: property
-        network: network
-        unit: lease.get "unit"
-        lease: lease
-        ACL: tenantACL
-    
+        
     # Change the status depending on who is creating the link.
     if mgrRole or netRole
       # Check if the REQUEST user is in the role.
@@ -1165,6 +1168,33 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
       .then( (mgrObj, netObj, profile) ->
         savesToComplete = []
         user = profile.get "user"
+
+        # Set ACL
+        unless req.object.existed()
+
+          tenantACL = new Parse.ACL
+          tenantACL.setRoleReadAccess propRole, true if propRole
+
+          # Let tenants adjust their own status.
+          # Note that we use a beforeSave to catch unauthorized status updates.
+          if tntRole
+            tenantACL.setRoleReadAccess tntRole, true 
+            tenantACL.setRoleWriteAccess tntRole, true
+
+          # Let managers adjust the status
+          if mgrRole
+            tenantACL.setRoleReadAccess mgrRole, true
+            tenantACL.setRoleWriteAccess mgrRole, true
+          if netRole
+            tenantACL.setRoleReadAccess netRole, true
+            tenantACL.setRoleWriteAccess netRole, true
+
+          req.object.set 
+            property: property
+            network: network
+            unit: lease.get "unit"
+            lease: lease
+            ACL: tenantACL
 
         if mgrObj or netObj
           
@@ -1301,11 +1331,163 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
     else res.error "no matching role"
   error: -> res.error "bad_query"
 
+# Concerige validation
+# 
+# Legend:
+#   user means req.user (decider)
+#   account means target (object)
+# 
+# Paths:
+# 
+#                                     / user is propManager --> approve if exists, convert to network
+#            property has no network
+#         /                           \ user is joining and has network --> send notification
+#        /
+#   start
+#        \
+#         \                          
+#             property has network  --> return
+#                       
+# 
+
+Parse.Cloud.beforeSave "Concerige", (req, res) ->
+
+  # Have to use the master key to check the role.
+  Parse.Cloud.useMasterKey()
+
+  (new Parse.Query "Property")
+  .include('role')
+  .get req.object.get("property").include("network.role").id,
+  success: (property) ->
+
+    # INSECURE.
+    # Temp workaround until req.object.original lands.
+    status = req.object.get "status"
+    newStatus = req.object.get "newStatus"
+
+    mgrRole = property.get "mgrRole"
+    network = property.get "network"
+    netRole = network.get "role" 
+        
+    # Change the status depending on who is creating the link.
+    # Users are in a Parse.Relation, which requires a second query.
+    mgrUsers = mgrRole.getUsers() 
+    mgrQuery = mgrUsers.query().equalTo("objectId", req.user.id).first()
+
+    netUsers = netRole.getUsers() 
+    netQuery = netUsers.query().equalTo("objectId", req.user.id).first()
+
+    profileQuery = (new Parse.Query "Profile").include("user").equalTo("objectId", req.object.get("profile").id).first()
+
+    Parse.Promise.when(mgrQuery, profileQuery, netQuery)
+    .then( (mgrObj, profile, netObj) ->
+      savesToComplete = []
+      user = profile.get "user"
+
+      # Set ACL
+      unless req.object.existed()
+
+        # Let managers adjust the status
+        # Note that we use a beforeSave to catch unauthorized status updates.
+
+        concerigeACL = new Parse.ACL
+        concerigeACL.setRoleReadAccess mgrRole, true
+        concerigeACL.setRoleWriteAccess mgrRole, true
+        concerigeACL.setReadAccess netRole, true
+        concerigeACL.setWriteAccess netRole, true
+        req.object.setACL concerigeACL
+
+      # Check if the REQUEST user is in the role.
+      if mgrObj
+
+        # Upgrade the status
+        if req.object.existed() and status and status is 'pending' and newStatus and newStatus is 'current'
+
+          # Made it!
+
+          concerigeACL = req.object.getACL()
+          concerigeACL.setRoleReadAccess netRole, true
+          concerigeACL.setRoleWriteAccess netRole, true
+
+          savesToComplete.push property.save 
+            network: network
+            ACL: concerigeACL
+
+        else
+          newStatus = 'invited'
+
+          # Notify the user.
+          title = property.get "title"
+          notificationACL = new Parse.ACL
+          notificationACL.setRoleReadAccess netRole, true
+          notificationACL.setRoleWriteAccess netRole, true
+          savesToComplete.push new Parse.Object("Notification").save
+            name: "property_invitation"
+            text: "You have been requested to manage #{title}"
+            channels: [ "networks-#{network.id}" ]
+            channel: "networks-#{network.id}"
+            forMgr: true
+            withAction: true
+            profile: req.user.get("profile")
+            network: network
+            ACL: notificationACL
+        
+        req.object.set "status", newStatus
+            
+      else
+
+        # User is not a manager. User better be part of the network
+        return res.error() unless netObj
+
+        profileACL = profile.getACL()
+        profileACL.setRoleReadAccess mgrRole, true
+        savesToComplete.push profile.save ACL: profileACL
+
+        if req.object.existed() and status and status is 'invited' and newStatus and newStatus is 'current'
+
+          # Add the user to the managerACL list
+          concerigeACL = req.object.getACL()
+          concerigeACL.setRoleReadAccess netRole, true
+          concerigeACL.setRoleWriteAccess netRole, true
+
+          savesToComplete.push property.save 
+            network: network
+            ACL: concerigeACL
+
+        else
+          newStatus = 'pending'
+          # Notify the network.
+          title = network.get "title"
+          notificationACL = new Parse.ACL
+          notificationACL.setRoleReadAccess mgrRole, true 
+          notificationACL.setRoleWriteAccess mgrRole, true
+
+          savesToComplete.push new Parse.Object("Notification").save
+            name: "network_inquiry"
+            text: "#{title} wants to manage your property"
+            channels: [ "properties-#{property.id}" ]
+            channel: "properties-#{property.id}"
+            forMgr: false
+            withAction: true
+            profile: req.user.get("profile")
+            network: network
+            ACL: notificationACL
+        
+        req.object.set "status", newStatus
+
+      Parse.Promise.when(savesToComplete)
+    , -> res.error "bad_query"
+    ).then(
+      -> res.success() # res.success network
+    , -> res.error "bad_save"
+    ) 
+  error: -> res.error "bad_query"
+
 # Manager validation
 # 
 # Legend:
 #   user means req.user (decider)
-#   account means targer (object)
+#   account means target (object)
 # 
 # Paths:
 # 
@@ -1344,16 +1526,7 @@ Parse.Cloud.beforeSave "Manager", (req, res) ->
 
     netRole = network.get "role"
     vstRole = network.get "vstRole"
-    
-    # Set ACL
-    unless req.object.existed()
-
-      # Let managers adjust the status
-      # Note that we use a beforeSave to catch unauthorized status updates.
-      managerACL = network.getACL()
-      managerACL.setRoleWriteAccess vstRole, true
-      req.object.setACL managerACL
-    
+        
     # Change the status depending on who is creating the link.
     # Users are in a Parse.Relation, which requires a second query.
     netUsers = netRole.getUsers() 
@@ -1366,6 +1539,21 @@ Parse.Cloud.beforeSave "Manager", (req, res) ->
       savesToComplete = []
       user = profile.get "user"
 
+      # Set ACL
+      unless req.object.existed()
+
+        # Let managers adjust the status
+        # Note that we use a beforeSave to catch unauthorized status updates.
+
+        # We won't set visible to the building until they accept.
+        managerACL = new Parse.ACL
+        managerACL.setRoleReadAccess netRole, true
+        managerACL.setRoleWriteAccess netRole, true
+        if user
+          managerACL.setReadAccess user, true
+          managerACL.setWriteAccess user, true
+        req.object.setACL managerACL
+
       # Check if the REQUEST user is in the role.
       if netObj
 
@@ -1375,9 +1563,16 @@ Parse.Cloud.beforeSave "Manager", (req, res) ->
           # Made it!
           # Add the user to the managerACL list
           if user
+            # User must certainly exist at this point...
             savesToComplete.push user.save "network", network
             netRole.getUsers().add user
             savesToComplete.push netRole.save()
+
+          # Set the manager as visible to other managers.
+          managerACL = req.object.getACL()
+          managerACL.setRoleReadAccess vstRole, true
+          managerACL.setRoleWriteAccess vstRole, true
+          req.object.setACL managerACL
 
           # Create activity
           # activity = new Parse.Object("Activity")
@@ -1416,6 +1611,9 @@ Parse.Cloud.beforeSave "Manager", (req, res) ->
             
       else
 
+        # User is not a manager. User better be the person trying to join then.
+        return res.error() unless req.object.get("profile").id is req.user.get("profile").id
+
         profileACL = profile.getACL()
         profileACL.setRoleReadAccess netRole, true
         savesToComplete.push profile.save ACL: profileACL
@@ -1427,6 +1625,12 @@ Parse.Cloud.beforeSave "Manager", (req, res) ->
             savesToComplete.push user.save "network", network
             netRole.getUsers().add user
             savesToComplete.push netRole.save()
+
+          # Set the manager as visible to other managers.
+          managerACL = req.object.getACL()
+          managerACL.setRoleReadAccess vstRole, true
+          managerACL.setRoleWriteAccess vstRole, true
+          req.object.setACL managerACL
 
           # Create activity
           # activity = new Parse.Object("Activity")

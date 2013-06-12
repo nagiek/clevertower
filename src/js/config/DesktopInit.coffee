@@ -207,6 +207,7 @@ require [
       delete @_listeners[id]  if deleteListener
     @
 
+  _.extend Parse.Router.prototype, listenEvents
   _.extend Parse.View.prototype, listenEvents
   _.extend Parse.Object.prototype, listenEvents
 
@@ -289,23 +290,20 @@ require [
 
   # Load all the stuff
   Parse.User::setup = ->
-    profilePromise = (new Parse.Query(Profile)).equalTo("user", @).first()
     userPromise = (new Parse.Query("_User"))
     .include('lease')
     .include('unit')
+    .include('profile')
     .include('property.role')
     .include('network.role')
     .equalTo("objectId", @id).first()
     @notifications = new NotificationList
 
-    Parse.Promise.when(profilePromise, userPromise, @notifications.query.find()).then (profile, user, notifs) => 
+    Parse.Promise.when(userPromise, @notifications.query.find())
+    .then (user, notifs) => 
 
       @notifications.add notifs
-
-      # Find where the user has applied
-      profile.prep("applicants").fetch()
-      @set "profile", profile
-
+      @set "profile", user.get "profile"
       @set "lease", user.get "lease"
       @set "unit", user.get "unit"
       @set "property", user.get "property"
@@ -314,19 +312,24 @@ require [
       # Should query for network when loading user... this is weird.
       # Set network on current user from loaded user.
       network = user.get "network"
-      if network
+      @networkSetup(network) if network
 
-        # Create & fill our collections
-        # Can't use a Promise here, as fetch does not return a promise.
-        network.prep("properties").fetch()
-        network.prep("managers").fetch()
-        network.prep("tenants").fetch()
-        network.prep("listings").fetch()
-        network.prep("applicants").fetch()
-        network.prep("inquiries").fetch()
-        
-        # Set the network and the role on the user.
-        @set "network", network
+  Parse.User::networkSetup = (network)->
+
+    # Create & fill our collections
+    # Can't use a Promise here, as fetch does not return a promise.
+    network.prep("properties").fetch()
+    network.prep("managers").fetch()
+    network.prep("tenants").fetch()
+    network.prep("listings").fetch()
+    network.prep("applicants").fetch()
+    network.prep("inquiries").fetch()
+
+    # Set the network and the role on the user.
+    role = network.get("role")
+    role.getUsers().query().get Parse.User.current().id,
+      success: (user) => network.mgr = true; @set "network", network
+      error: => network.mgr = false; @set "network", network
 
   # Set up Dispatcher for global events
   Parse.Dispatcher = {}

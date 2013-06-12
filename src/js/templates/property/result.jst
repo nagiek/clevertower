@@ -4,7 +4,13 @@
 
 <div class="photo-float thumbnail-float elastic-float">    
   <h4><%= title %></h4>
-  <button type="button" class="join btn btn-primary" data-property-id="<%= objectId %>"><%= i18nCommon.actions.join %></button>
+  <button type="button" class="join btn btn-primary" data-property-id="<%= objectId %>">
+    <% if (forNetwork) { %>
+      <%= i18nCommon.actions.manage %>
+    <% } else { %>
+      <%= i18nCommon.actions.join %>
+    <% } %>
+  </button>
    <ul class="property-info inline inline-condensed">
     <li class="position"><%= pos %></li>
   </ul>

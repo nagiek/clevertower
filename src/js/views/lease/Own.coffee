@@ -23,7 +23,7 @@ define [
     render: ->
       
       vars = 
-        primary: Parse.User.current().get("lease") and Parse.User.current().get("lease") is @model.get("lease").id 
+        primary: Parse.User.current().get("lease") and Parse.User.current().get("lease").id is @model.get("lease").id 
         start_date: moment(@model.get("lease").get("start_date")).format("LL")
         end_date: moment(@model.get("lease").get("end_date")).format("LL")
         unitTitle: @model.get("lease").get("unit").get("title")

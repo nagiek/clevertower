@@ -13,9 +13,13 @@ define [
   
     tagName: "li"
     className: "result clearfix lifted position-relative"
+
+    events:
+      'click .join'         : 'join'
   
     initialize: (attrs) =>
-      @map = attrs.map
+      @forNetwork = if attrs.forNetwork then attrs.forNetwork else false
+      @view = attrs.view
       @listenTo @model, "remove", @clear
 
     render: =>
@@ -24,11 +28,12 @@ define [
         pos:          @model.pos() + 1
         publicUrl:    @model.publicUrl()
         i18nCommon:   i18nCommon
+        forNetwork:   @forNetwork
       
       @$el.html JST["src/js/templates/property/result.jst"](vars)
       @marker = new google.maps.Marker 
         position: @model.GPoint()
-        map: @map
+        map: @view.gmap
         ZIndex:   1
         icon: 
           url: "/img/icon/pins-sprite.png"
@@ -37,6 +42,12 @@ define [
           anchor: null
           scaledSize: null
       @
+
+    join: ->
+      if @forNetwork
+        @view.trigger "property:join", @model
+      else 
+        @view.trigger "property:manage", @model
 
     clear: =>
       @marker.setMap null

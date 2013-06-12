@@ -25,14 +25,18 @@ define [
     events:
       'click .back'         : 'back'
       'click .next'         : 'next'
-      'click .join'         : 'join'
       # 'click .cancel'       : 'cancel'
     
     initialize : (attrs) ->
 
-      @model = new Property
-
       @forNetwork = if attrs and attrs.forNetwork then true else false
+
+      @model = new Property
+      @model.set "network", Parse.User.current().get("network") if @forNetwork 
+
+      @map = new GMapView(wizard: @, model: @model, forNetwork: @forNetwork)
+      @listenTo @map, "property:join", @join
+      @listenTo @map, "property:manage", @manage
 
       @listenTo @model, "invalid", (error) =>
         @$('button.next').removeProp "disabled"
@@ -54,41 +58,56 @@ define [
         # Add new property to collection
         Parse.User.current().get("network").properties.add property
         Parse.history.navigate "/", trigger: true
-        @clear()
+        # @clear()
 
-
-      @on "lease:save", (lease) ->
-        console.log lease
+      @on "lease:save", (lease, isNew) =>
         vars = 
           lease: lease
           unit: lease.get "unit"
           property: lease.get "property"
-        Parse.User.current().set(vars).save()
-        Parse.history.navigate "/account/building", trigger: true
-        @clear()
+          mgrOfProp: isNew
+        Parse.User.current().save(vars).then ->
+          Parse.history.navigate "/account/building", true
+          console.log 'hi'
+        , (error) -> console.log error
+          # @clear()
 
     render : ->
       vars = 
         i18nCommon: i18nCommon
         setup: !Parse.User.current() or (!Parse.User.current().get("property") and !Parse.User.current().get("network"))
       @$el.html JST['src/js/templates/property/new/wizard.jst'](vars)
-      @map = new GMapView(wizard: @, model: @model).render()
+      @$el.find(".wizard-forms").append @map.render().el
+      @map.renderMap()
       @
 
-    join : (e) =>
+    join : (existingProperty) =>
       return if @state is 'join'
       @$('.error').removeClass('error')
       @$('button.next').prop "disabled", "disabled"
       @$('button.join').prop "disabled", "disabled"
       @state = 'join'
+      @existingProperty = existingProperty
 
-      require ["views/property/Join"], (JoinPropertyView) =>
-        btn = $(e.currentTarget)
-        @existingProperty = @map.results.get btn.data("property-id")
-
+      require ["views/property/new/Join"], (JoinPropertyView) =>
         @form = new JoinPropertyView wizard: @, property: @existingProperty
         @map.$el.after @form.render().el
         @animate 'forward'
+
+    manage : (existingProperty) =>
+      @$('.error').removeClass('error')
+      @$('button.next').prop "disabled", "disabled"
+      @$('button.join').prop "disabled", "disabled"
+
+      require ["models/Concierge"], (Concierge) =>
+        concierge = new Concierge
+          property: existingProperty
+          profile: Parse.User.current().get("profile")
+          state: 'pending'
+
+        alert = new Alert event: 'model-save', fade: false, message: i18nCommon.actions.request_sent, type: 'error'
+        concierge.save().then @clear , 
+          (error) -> alert.setError i18nCommon.errors.unknown_error
 
 
     next : (e) =>
@@ -126,13 +145,13 @@ define [
             attrs = @form.model.scrub data.lease
             attrs = @assignAdditionalToLease data, attrs
             @form.model.save attrs,
-              success: (lease) =>        @trigger "lease:save", lease
+              success: (lease) =>        @trigger "lease:save", @form.model, false
               error: (lease, error) =>   @form.model.trigger "invalid", error; console.log error
 
           else 
             attrs = @model.scrub data.property
             @model.save attrs,
-              success: (property) =>        @trigger "property:save", property
+              success: (property) =>        @trigger "property:save", @model
               error: (property, error) =>   @model.trigger "invalid", error; console.log error
 
         when 'join'
@@ -141,7 +160,7 @@ define [
           attrs = @assignAdditionalToLease data, attrs
           
           @form.model.save attrs,
-              success: (lease) =>        @trigger "lease:save", lease
+              success: (lease) =>        @trigger "lease:save", @form.model, true
               error: (lease, error) => @form.model.trigger "invalid", error; console.log error
 
     back : (e) =>
@@ -218,8 +237,7 @@ define [
           @$('.back').prop disabled: 'disabled'
           @$('.next').html(i18nCommon.actions.create)
 
-    clear : =>
-      @$el.empty()
+    clear : ->
       @stopListening()
       @undelegateEvents()
       delete this

@@ -17,7 +17,6 @@ define [
       'submit form': 'doNothing'
 
     initialize : ->
-      _.bindAll @, 'search', 'render', 'clear'
 
       @autoService = new google.maps.places.AutocompleteService()
 
@@ -30,8 +29,12 @@ define [
         Parse.history.navigate "/search/#{data.location}", trigger: true 
         new Search(reference: data.reference, location: data.location).save()
 
-      Parse.Dispatcher.on "user:logout", @clear
+      @listenTo Parse.Dispatcher, "user:change", @reset
 
+      @initDatasets()
+
+
+    initDatasets: ->
       @vars = [
         name: 'properties'
         header: "<span class='nav-header'>#{i18nCommon.classes.Properties}</span>"
@@ -55,7 +58,7 @@ define [
             _.map parsedResponse.results, (p) ->
               value: p.title
               img_src: if p.image_tiny then p.image_tiny else "/img/fallback/property-tiny.png"
-              url: "/properties/#{p.objectId}"
+              url: if Parse.onNetwork then Property.url(p.objectId) else Property.publicUrl(Property.country(p.country), p.administrative_area_level_1, p.locality,  p.objectId, Property.slug(p.title))
               tokens: _.union(p.title.split(" "), p.thoroughfare.split(" "), [p.locality])
         limit: 5
         template: _.template  """
@@ -148,7 +151,7 @@ define [
         #                       """
       ]
 
-      if Parse.onNetwork and Parse.User.current()
+      if Parse.onNetwork and Parse.User.current() and Parse.User.current().get("network")
 
         @vars[0].local = Parse.User.current().get("network").properties.map (p) ->
             value: p.get("title")
@@ -199,7 +202,7 @@ define [
         # Keep the local vars active in search
         # ------------------------------------
 
-        Parse.User.current().get("network").properties.on "add reset", =>
+        @listenTo Parse.User.current().get("network").properties, "add reset", =>
           @$('.search').typeahead 'destroy'
           @vars[0].local = Parse.User.current().get("network").properties.map (p) ->
             value: p.get("title")
@@ -209,7 +212,7 @@ define [
 
           @$('.search').typeahead @vars
 
-        Parse.User.current().get("network").tenants.on "add reset", =>
+        @listenTo Parse.User.current().get("network").tenants, "add reset", =>
           @$('.search').typeahead 'destroy'
           @vars[2].local =  Parse.User.current().get("network").tenants.map (t) ->
             p = t.get("profile")
@@ -220,27 +223,25 @@ define [
             value: name
             img_src: p.cover("tiny")
             url: p.url()
-
-    if Parse.onNetwork and Parse.User.current()
           @$('.search').typeahead @vars
 
-
     # typeahead widget takes care of navigation.
-    doNothing : (e) -> e.preventDefault()
+    doNothing : (e) => e.preventDefault()
 
     googleSearch : (e, data) => 
       if data.reference
         data.location = _.map(data.terms, (t) -> t.value).join("--").replace(" ", "-")
         @trigger "google:search", data
 
-    render : ->
+    render : =>
       @$el.html JST["src/js/templates/helper/search.jst"](i18nCommon: i18nCommon)
 
       @$('.search').on "typeahead:selected", @googleSearch
-      @$('.search').typeahead @vars unless Parse.onNetwork and Parse.User.current()
+      @$('.search').typeahead @vars
       @
       
-    clear : ->
+    reset : =>
       @$('.search').typeahead('destroy')
-      @remove()
+      @initDatasets()
+      @$('.search').typeahead @vars
       
