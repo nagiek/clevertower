@@ -1,9 +1,9 @@
 define
   headers:
-    add_listing:          "Add Listing"
     edit_listing:         "Edit Listing"
     extend_listing:       "Extend Listing"
   actions:
+    add_listing:          "Add Listing"
     apply:                "Apply"
     apply_to:             "Apply to"
     withdraw:             "withdraw"

@@ -2,7 +2,8 @@ this["JST"] = this["JST"] || {};
 
 this["JST"]["src/js/templates/property/sub/units.jst"] = function(obj) {
 obj || (obj = {});
-var __t, __p = '', __e = _.escape;
+var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
+function print() { __p += __j.call(arguments, '') }
 with (obj) {
 __p += '<form id="units" method="post">\n  <header class="clearfix">\n    <h2 class="pull-left">' +
 ((__t = ( i18nProperty.menu.dashboard )) == null ? '' : __t) +
@@ -26,9 +27,13 @@ __p += '<form id="units" method="post">\n  <header class="clearfix">\n    <h2 cl
 ((__t = (i18nUnit.fields.status)) == null ? '' : __t) +
 '</th>\n        <th class="view-specific view-show">' +
 ((__t = (i18nLease.attributes.ending)) == null ? '' : __t) +
-'</th>\n        <th class="view-specific view-show">' +
+'</th>\n        ';
+ if (isMgr) { ;
+__p += '\n          <th class="view-specific view-show">' +
 ((__t = (i18nLease.attributes.rent_this_month)) == null ? '' : __t) +
-'</th>\n        <th class="view-specific view-edit hide">' +
+'</th>\n        ';
+ } ;
+__p += '\n        <th class="view-specific view-edit hide">' +
 ((__t = (i18nUnit.fields.bedrooms)) == null ? '' : __t) +
 '</th>\n        <th class="view-specific view-edit hide">' +
 ((__t = (i18nUnit.fields.bathrooms)) == null ? '' : __t) +

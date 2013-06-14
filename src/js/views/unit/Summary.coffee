@@ -6,11 +6,12 @@ define [
   'models/Unit'
   'models/Lease'
   'views/helper/Alert'
+  "i18n!nls/listing"
   "i18n!nls/lease"
   "i18n!nls/unit"
   "i18n!nls/common"
   'templates/unit/summary'
-], ($, _, Parse, moment, Unit, Lease, Alert, i18nLease, i18nUnit, i18nCommon) ->
+], ($, _, Parse, moment, Unit, Lease, Alert, i18nListing, i18nLease, i18nUnit, i18nCommon) ->
 
   class UnitSummaryView extends Parse.View
   
@@ -28,6 +29,7 @@ define [
     initialize: (attrs) ->
 
       @baseUrl = attrs.baseUrl
+      @isMgr = attrs.isMgr
 
       @listenTo @model, "change:title", =>
         @$('.unit-link').html @model.get "title"
@@ -48,13 +50,18 @@ define [
 
     # Re-render the contents of the Unit item.
     render: ->
+
+      
+
       vars = _.merge @model.toJSON(),
         moment: moment
         objectId: if @model.id then @model.id else false
         i18nCommon: i18nCommon
         i18nUnit: i18nUnit
         i18nLease: i18nLease
+        i18nListing: i18nListing
         baseUrl: @baseUrl
+        isMgr: @isMgr
         isNew: @model.isNew()
 
       if vars.activeLease = @model.get("activeLease") 

@@ -37,6 +37,7 @@
 
         this.on("view:change", this.clear);
         this.baseUrl = attrs.baseUrl;
+        this.isMgr = Parse.User.current().get("network") && Parse.User.current().get("network").id === this.model.get("network").id;
         this.listenTo(this.model.units, "add", this.addOne);
         this.listenTo(this.model.units, "reset", this.addAll);
         this.listenTo(this.model.units, "invalid", function(error) {
@@ -66,7 +67,8 @@
           i18nCommon: i18nCommon,
           i18nUnit: i18nUnit,
           i18nLease: i18nLease,
-          today: today
+          today: today,
+          isMgr: this.isMgr
         };
         this.$el.html(JST["src/js/templates/property/sub/units.jst"](vars));
         this.$table = this.$("#units-table");
@@ -122,7 +124,8 @@
         this.$('p.empty').hide();
         view = new UnitView({
           model: unit,
-          baseUrl: this.baseUrl
+          baseUrl: this.baseUrl,
+          isMgr: this.isMgr
         });
         this.$list.append(view.render().el);
         if (this.editing) {

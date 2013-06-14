@@ -59,13 +59,17 @@ __p += '\n    ' +
 ((__t = ( end_date )) == null ? '' : __t) +
 '\n  ';
  } ;
-__p += '\n</td>\n<td class="view-specific view-show">\n  ';
+__p += '\n</td>\n';
+ if (isMgr) { ;
+__p += '\n  <td class="view-specific view-show">\n    ';
  if (activeLease && activeLease.get("rent")) { ;
-__p += '\n    ' +
+__p += '\n      ' +
 ((__t = ( activeLease.get("rent") )) == null ? '' : __t) +
-'\n  ';
+'\n    ';
  } ;
-__p += '\n</td>\n<td class="view-specific view-edit hide">\n  <div class="control-group">\n\t\t<div class="controls">\n\t\t\t<select value="' +
+__p += '\n  </td>\n';
+ } ;
+__p += '\n<td class="view-specific view-edit hide">\n  <div class="control-group">\n\t\t<div class="controls">\n\t\t\t<select value="' +
 ((__t = ( bedrooms )) == null ? '' : __t) +
 '" name="bedrooms">\n\t\t\t  <option value="0" ' +
 ((__t = ( bedrooms == 0 ? 'selected' : '' )) == null ? '' : __t) +
@@ -130,13 +134,13 @@ __p += '\n    <a class="btn btn-mini add-lease view-specific view-show"\n       
 '/add/lease?unit=' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '" \n       rel="tooltip" \n       data-original-title="' +
-((__t = ( i18nUnit.actions.add_lease )) == null ? '' : __t) +
+((__t = ( i18nLease.actions.add_new_lease )) == null ? '' : __t) +
 '">\n      <i class="icon-plus"></i>\n    </a>\n    <a class="btn btn-mini add-listing view-specific view-show"\n       href="' +
 ((__t = ( baseUrl )) == null ? '' : __t) +
 '/add/listing?unit=' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '"\n       rel="tooltip" \n       data-original-title="' +
-((__t = ( i18nUnit.actions.add_listing )) == null ? '' : __t) +
+((__t = ( i18nListing.actions.add_listing )) == null ? '' : __t) +
 '">\n      <i class="icon-listing"></i>\n    </a>\n    ';
  if (activeLease) { ;
 __p += '\n      <a class="btn btn-mini add-tenants view-specific view-show"\n         href="' +

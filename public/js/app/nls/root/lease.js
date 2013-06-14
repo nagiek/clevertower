@@ -6,10 +6,9 @@
       extend_lease: "Extend Lease"
     },
     actions: {
-      add_tenants: "add tenants to lease",
+      add_tenants: "Add tenants to lease",
       add_new_lease: "Add a new lease",
-      extend: "extend lease",
-      "new": "new lease"
+      extend: "Extend lease"
     },
     attributes: {
       starting: "Starting",

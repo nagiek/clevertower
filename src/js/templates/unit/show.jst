@@ -1,14 +1,17 @@
 <header>
   <h2><%=i18nCommon.classes.Unit%> <%= title %></a></h2>  
   <div>
-    <a href="<%= baseUrl %>/units/<%= objectId %>/edit" class="btn">
-      <%= i18nCommon.actions.edit %>
-    </a>
     <a  class="btn add-lease"
         href="<%= baseUrl %>/add/lease?unit=<%= objectId %>"
         rel="tooltip"
-        data-original-title="<%= i18nUnit.actions.add_lease %>">
+        data-original-title="<%= i18nLease.actions.add_new_lease %>">
       <i class="icon-plus"></i>
+    </a>
+    <a  class="btn add-listing"
+        href="<%= baseUrl %>/add/listing?unit=<%= objectId %>"
+        rel="tooltip"
+        data-original-title="<%= i18nListing.actions.add_listing %>">
+      <i class="icon-listing"></i>
     </a>
   </div>
 </header>

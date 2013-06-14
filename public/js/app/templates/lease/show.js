@@ -40,7 +40,7 @@ __p += '<header class="row">\n  <hgroup class="span">\n    <h2>' +
 '</h3> \n      <p class="empty">' +
 ((__t = ( i18nLease.empty.tenants )) == null ? '' : __t) +
 '</p>\n      <ul id="tenants" class="row no-bullet"></ul>\n    </div>\n    \n    ';
- if (rent) { ;
+ if (isMgr && rent) { ;
 __p += '\n    <div>\n      <h3>' +
 ((__t = ( i18nLease.form.payments )) == null ? '' : __t) +
 '</h3> \n      <div><strong>' +
@@ -49,11 +49,13 @@ __p += '\n    <div>\n      <h3>' +
 ((__t = ( rent )) == null ? '' : __t) +
 '</div>\n    </div>\n    ';
  } ;
-__p += '\n  </div>\n  <div class="span3">\n    ';
+__p += '\n  </div>\n  ';
+ if (isMgr) { ;
+__p += '\n    <div class="span3">\n      ';
  if (parking_fee || parking_space || garage_remotes) { ;
-__p += '\n    <div>\n      <h3>' +
+__p += '\n      <div>\n        <h3>' +
 ((__t = ( i18nLease.form.parking )) == null ? '' : __t) +
-'</h3> \n      ';
+'</h3> \n        ';
  if (parking_fee) { ;
 __p += '<div><strong>' +
 ((__t = ( i18nLease.fields.parking_fee )) == null ? '' : __t) +
@@ -61,7 +63,7 @@ __p += '<div><strong>' +
 ((__t = ( parking_fee )) == null ? '' : __t) +
 '</div>';
  } ;
-__p += '\n      ';
+__p += '\n        ';
  if (parking_space) { ;
 __p += '<div><strong>' +
 ((__t = ( i18nLease.fields.parking_space )) == null ? '' : __t) +
@@ -69,7 +71,7 @@ __p += '<div><strong>' +
 ((__t = ( parking_space )) == null ? '' : __t) +
 '</div>';
  } ;
-__p += '\n      ';
+__p += '\n        ';
  if (garage_remotes) { ;
 __p += '<div><strong>' +
 ((__t = ( i18nLease.fields.garage_remotes )) == null ? '' : __t) +
@@ -77,13 +79,13 @@ __p += '<div><strong>' +
 ((__t = ( garage_remotes )) == null ? '' : __t) +
 '</div>';
  } ;
-__p += '\n    </div>\n    ';
+__p += '\n      </div>\n      ';
  } ;
-__p += '\n    \n    ';
+__p += '\n      \n      ';
  if (security_deposit || keys) { ;
-__p += '\n    <div>\n      <h3>' +
+__p += '\n      <div>\n        <h3>' +
 ((__t = ( i18nLease.form.deposit )) == null ? '' : __t) +
-'</h3> \n      ';
+'</h3> \n        ';
  if (security_deposit) { ;
 __p += '<div><strong>' +
 ((__t = ( i18nLease.fields.security_deposit )) == null ? '' : __t) +
@@ -91,7 +93,7 @@ __p += '<div><strong>' +
 ((__t = ( security_deposit )) == null ? '' : __t) +
 '</div>';
  } ;
-__p += '\n      ';
+__p += '\n        ';
  if (keys) { ;
 __p += '<div><strong>' +
 ((__t = ( i18nLease.fields.keys )) == null ? '' : __t) +
@@ -99,9 +101,11 @@ __p += '<div><strong>' +
 ((__t = ( keys )) == null ? '' : __t) +
 '</div>';
  } ;
-__p += '\n    </div>\n    ';
+__p += '\n      </div>\n      ';
  } ;
-__p += '\n  </div>\n</div>';
+__p += '\n    </div>\n  ';
+ } ;
+__p += '\n</div>';
 
 }
 return __p

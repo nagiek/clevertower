@@ -30,6 +30,7 @@ define [
       @on "view:change", @clear
 
       @baseUrl = attrs.baseUrl
+      @isMgr = Parse.User.current().get("network") and Parse.User.current().get("network").id is @model.get("network").id 
       
       # Fetch all the property items for this user
       @listenTo @model.units, "add", @addOne
@@ -55,6 +56,7 @@ define [
         i18nUnit: i18nUnit
         i18nLease: i18nLease
         today: today
+        isMgr: @isMgr
 
       @$el.html JST["src/js/templates/property/sub/units.jst"](vars)      
       
@@ -95,7 +97,7 @@ define [
     # appending its element to the `<ul>`.
     addOne: (unit) =>
       @$('p.empty').hide()
-      view = new UnitView(model: unit, baseUrl: @baseUrl)
+      view = new UnitView(model: unit, baseUrl: @baseUrl, isMgr: @isMgr)
       @$list.append view.render().el
       view.$('.view-specific').toggleClass('hide') if @editing
       @$list.last().find('.title').focus()

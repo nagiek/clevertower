@@ -1,7 +1,6 @@
 (function() {
   define({
     actions: {
-      add_lease: "add a new lease",
       edit_units: "Edit Units",
       add_x_units: "Add <strong>X</strong> Units"
     },

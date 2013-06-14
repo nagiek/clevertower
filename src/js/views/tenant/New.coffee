@@ -25,14 +25,14 @@ define [
     
     initialize : (attrs) ->
       
-      _.bindAll this, 'addOne', 'addAll', 'save'
-      
       @property = attrs.property
+      @baseUrl = attrs.baseUrl
       @leaseId = attrs.leaseId
+      @forNetwork = attrs.forNetwork
       
       @leases = if @property then @property.prep('leases') else new LeaseList      
-      @leases.bind "add", @addOne
-      @leases.bind "reset", @addAll
+      @listenTo @leases, "add", @addOne
+      @listenTo @leases, "reset", @addAll
       
       @on 'submit:return', ->
         @$('button.save').removeProp "disabled"
@@ -43,13 +43,18 @@ define [
           
       
       @on "submit:success", (model) =>
+        @property.leases.add @model if !@leaseId
+        new Parse.Query("Tenant").equalTo("lease", @model).include("profile").find()
+        .then (objs) -> 
+          @property.tenants.add objs
+          # Add tenants to the network collection, if it exists.
+          Parse.User.current().get("network").tenants.add objs if Parse.User.current().get("network")
+        
         require ["views/lease/Show"], (ShowLeaseView) =>
           # Alert the user and move on
-          new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
-          new ShowLeaseView(model: model, property: @property).render()
-          Parse.history.navigate "/properties/#{@property.id}/leases/#{model.id}"
-          @undelegateEvents()
-          delete this
+          new ShowLeaseView(model: @model, property: @property, forNetwork: @forNetwork, baseUrl: @baseUrl).render()
+          Parse.history.navigate "#{@baseUrl}/leases/#{model.id}"
+          @clear()
 
     addOne : (l) =>
       if l.isActive() then @addActive(l) else @addInactive(l) 
@@ -78,7 +83,7 @@ define [
       _.each @leases.active(), @addActive
       _.each @leases.inactive(), @addInactive
 
-    save : (e) ->
+    save : (e) =>
       e.preventDefault()
       
       @$('button.save').prop "disabled", "disabled"
@@ -117,8 +122,8 @@ define [
 
     render: ->
       vars =
-        property_path: "/properties/#{@property.id}"
-        cancel_path: "/properties/#{@property.id}" + if @leaseId then "/leases/#{@leaseId}"
+        baseUrl: @baseUrl
+        cancelPath: @baseUrl + if @leaseId then "/leases/#{@leaseId}" else ""
         i18nCommon: i18nCommon
         i18nLease: i18nLease
       
@@ -128,3 +133,7 @@ define [
       
       @leases.fetch() if @leases.length is 0
       @
+
+    clear: =>
+      @undelegateEvents()
+      delete this

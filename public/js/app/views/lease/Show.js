@@ -27,16 +27,16 @@
       };
 
       ShowLeaseView.prototype.render = function() {
-        var modelVars, unitId, vars;
+        var isMgr, vars;
 
-        modelVars = this.model.toJSON();
-        unitId = this.model.get("unit").id;
-        modelVars.unitId = unitId;
-        modelVars.title = this.model.get("unit").get("title");
-        modelVars.tenants = false;
-        modelVars.start_date = moment(this.model.get("start_date")).format("LL");
-        modelVars.end_date = moment(this.model.get("end_date")).format("LL");
-        vars = _.merge(modelVars, {
+        isMgr = Parse.User.current().get("network") && Parse.User.current().get("network").id === this.model.get("network").id;
+        vars = _.merge(this.model.toJSON(), {
+          unitId: this.model.get("unit").id,
+          title: this.model.get("unit").get("title"),
+          tenants: false,
+          isMgr: isMgr,
+          start_date: moment(this.model.get("start_date")).format("LL"),
+          end_date: moment(this.model.get("end_date")).format("LL"),
           i18nUnit: i18nUnit,
           i18nLease: i18nLease,
           i18nCommon: i18nCommon,

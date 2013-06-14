@@ -36,10 +36,10 @@
 
         this.property = attrs.property;
         this.baseUrl = attrs.baseUrl;
+        this.forNetwork = attrs.forNetwork;
         if (!this.model) {
           this.model = new Lease;
         }
-        this.forNetwork = attrs.forNetwork;
         if (this.forNetwork && Parse.User.current() && Parse.User.current().get("network")) {
           this.model.set(network, Parse.User.current().get("network"));
         }
@@ -91,24 +91,29 @@
             type: 'success'
           });
           _this.model.id = model.id;
-          if (_this.forNetwork && Parse.User.current() && Parse.User.current().get("network")) {
+          if (_this.forNetwork && Parse.User.current()) {
             _this.property.leases.add(_this.model);
             new Parse.Query("Tenant").equalTo("lease", _this.model).include("profile").find().then(function(objs) {
-              return Parse.User.current().get("network").tenants.add(objs);
+              this.property.tenants.add(objs);
+              if (Parse.User.current().get("network")) {
+                return Parse.User.current().get("network").tenants.add(objs);
+              }
             });
             return require(["views/lease/Show"], function(ShowLeaseView) {
               new ShowLeaseView({
                 model: _this.model,
-                property: _this.property
+                property: _this.property,
+                forNetwork: _this.forNetwork,
+                baseUrl: _this.baseUrl
               }).render();
               Parse.history.navigate("" + _this.baseUrl + "/leases/" + model.id);
               return _this.clear();
             });
           } else {
             vars = {
-              lease: lease,
-              unit: lease.get("unit"),
-              property: lease.get("property"),
+              lease: model,
+              unit: model.get("unit"),
+              property: model.get("property"),
               mgrOfProp: isNew
             };
             return Parse.User.current().save(vars).then(function() {

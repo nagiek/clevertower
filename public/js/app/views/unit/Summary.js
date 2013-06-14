@@ -3,7 +3,7 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", "moment", 'models/Unit', 'models/Lease', 'views/helper/Alert', "i18n!nls/lease", "i18n!nls/unit", "i18n!nls/common", 'templates/unit/summary'], function($, _, Parse, moment, Unit, Lease, Alert, i18nLease, i18nUnit, i18nCommon) {
+  define(["jquery", "underscore", "backbone", "moment", 'models/Unit', 'models/Lease', 'views/helper/Alert', "i18n!nls/listing", "i18n!nls/lease", "i18n!nls/unit", "i18n!nls/common", 'templates/unit/summary'], function($, _, Parse, moment, Unit, Lease, Alert, i18nListing, i18nLease, i18nUnit, i18nCommon) {
     var UnitSummaryView, _ref;
 
     return UnitSummaryView = (function(_super) {
@@ -29,6 +29,7 @@
         var _this = this;
 
         this.baseUrl = attrs.baseUrl;
+        this.isMgr = attrs.isMgr;
         this.listenTo(this.model, "change:title", function() {
           return _this.$('.unit-link').html(_this.model.get("title"));
         });
@@ -56,7 +57,9 @@
           i18nCommon: i18nCommon,
           i18nUnit: i18nUnit,
           i18nLease: i18nLease,
+          i18nListing: i18nListing,
           baseUrl: this.baseUrl,
+          isMgr: this.isMgr,
           isNew: this.model.isNew()
         });
         if (vars.activeLease = this.model.get("activeLease")) {

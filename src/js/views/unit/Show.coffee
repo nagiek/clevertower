@@ -9,9 +9,10 @@ define [
   "views/lease/summary"
   "i18n!nls/unit"
   "i18n!nls/lease"
+  "i18n!nls/listing"
   "i18n!nls/common"
   'templates/unit/show'
-], ($, _, Parse, moment, LeaseList, Unit, Lease, LeaseView, i18nUnit, i18nLease, i18nCommon) ->
+], ($, _, Parse, moment, LeaseList, Unit, Lease, LeaseView, i18nUnit, i18nLease, i18nListing, i18nCommon) ->
 
   class ShowUnitView extends Parse.View
   
@@ -30,8 +31,15 @@ define [
     render: ->      
       modelVars = @model.toJSON()
       
-      vars = _.merge(modelVars, i18nUnit: i18nUnit, i18nLease: i18nLease, i18nCommon: i18nCommon, baseUrl: @baseUrl)
+      vars = _.merge modelVars, 
+        i18nUnit: i18nUnit
+        i18nLease: i18nLease
+        i18nListing: i18nListing
+        i18nCommon: i18nCommon
+        baseUrl: @baseUrl
       @$el.html JST["src/js/templates/unit/show.jst"](vars)
+
+      @$('[rel=tooltip]').tooltip()
       
       @$list = @$('#leases-table tbody')
       @model.leases.fetch()

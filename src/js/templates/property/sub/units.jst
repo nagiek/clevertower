@@ -31,7 +31,9 @@
         <th><%=i18nCommon.classes.Unit%></th>
         <th class="variable-begin"><%=i18nUnit.fields.status%></th>
         <th class="view-specific view-show"><%=i18nLease.attributes.ending%></th>
-        <th class="view-specific view-show"><%=i18nLease.attributes.rent_this_month%></th>
+        <% if (isMgr) { %>
+          <th class="view-specific view-show"><%=i18nLease.attributes.rent_this_month%></th>
+        <% } %>
         <th class="view-specific view-edit hide"><%=i18nUnit.fields.bedrooms%></th>
         <th class="view-specific view-edit hide"><%=i18nUnit.fields.bathrooms%></th>
         <th class="view-specific view-edit hide"><%=i18nUnit.fields.square_feet%></th>

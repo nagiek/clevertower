@@ -18,12 +18,14 @@ define [
 
     initialize : (attrs) ->
       if Parse.User.current()
-        @markAsApplied()
+        @listenForApplication()
       else 
-        Parse.Dispatcher.on "user:login", @markAsApplied
+        @listenTo Parse.Dispatcher, "user:login", @listenForApplication
 
-    markAsApplied: ->
-      Parse.User.current().get("profile").applicants.on "add", (model) => if model.id is @model.id then @render()
+    listenForApplication: ->
+      Parse.User.current().get("profile").prep("applicants")
+      @listenTo Parse.User.current().get("profile").applicants, "add", (model) =>
+        @render() if model.id is @model.id
 
     # Re-render the contents of the Unit item.
     render: ->

@@ -40,10 +40,9 @@ define [
 
       @property = attrs.property
       @baseUrl = attrs.baseUrl
+      @forNetwork = attrs.forNetwork
 
       @model = new Lease unless @model
-
-      @forNetwork = attrs.forNetwork
       @model.set network, Parse.User.current().get("network") if @forNetwork and Parse.User.current() and Parse.User.current().get("network")
 
       @modal = attrs.modal
@@ -78,22 +77,25 @@ define [
         new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
         @model.id = model.id
 
-        if @forNetwork and Parse.User.current() and Parse.User.current().get("network")
+        if @forNetwork and Parse.User.current()
           @property.leases.add @model
           new Parse.Query("Tenant").equalTo("lease", @model).include("profile").find()
-          .then (objs) -> Parse.User.current().get("network").tenants.add objs
+          .then (objs) -> 
+            @property.tenants.add objs
+            # Add tenants to the network collection, if it exists.
+            Parse.User.current().get("network").tenants.add objs if Parse.User.current().get("network")
           
           require ["views/lease/Show"], (ShowLeaseView) =>
             # Alert the user and move on
-            new ShowLeaseView(model: @model, property: @property).render()
+            new ShowLeaseView(model: @model, property: @property, forNetwork: @forNetwork, baseUrl: @baseUrl).render()
             Parse.history.navigate "#{@baseUrl}/leases/#{model.id}"
             @clear()
 
         else 
           vars = 
-            lease: lease
-            unit: lease.get "unit"
-            property: lease.get "property"
+            lease: model
+            unit: model.get "unit"
+            property: model.get "property"
             mgrOfProp: isNew
           Parse.User.current().save(vars).then ->
             Parse.history.navigate "/account/building", true

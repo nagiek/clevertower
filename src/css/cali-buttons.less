@@ -15,13 +15,16 @@ td.btn-group > .btn {
 }
 
 // Create default spacing
-.btn + .btn {
+.btn + .btn,
+// Tooltips for icon buttons are inserted after the button, thus breaking spacing.
+.tooltip + .btn {
   margin-left: 5px;
 }
 
 // Restore old styles
 .btn-group {
-  .btn + .btn {
+  .btn + .btn,
+  .tooltip + .btn {
     margin-left: -1px;
   }
 }
