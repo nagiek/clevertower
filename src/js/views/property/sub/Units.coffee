@@ -28,6 +28,8 @@ define [
     initialize: (attrs) ->
       
       @on "view:change", @clear
+
+      @baseUrl = attrs.baseUrl
       
       # Fetch all the property items for this user
       @listenTo @model.units, "add", @addOne
@@ -93,7 +95,7 @@ define [
     # appending its element to the `<ul>`.
     addOne: (unit) =>
       @$('p.empty').hide()
-      view = new UnitView(model: unit)
+      view = new UnitView(model: unit, baseUrl: @baseUrl)
       @$list.append view.render().el
       view.$('.view-specific').toggleClass('hide') if @editing
       @$list.last().find('.title').focus()

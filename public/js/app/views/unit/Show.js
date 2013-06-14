@@ -19,23 +19,23 @@
 
       ShowUnitView.prototype.initialize = function(attrs) {
         this.property = attrs.property;
-        console.log(this.model);
+        this.baseUrl = attrs.baseUrl;
         this.model.prep("leases");
-        this.model.leases.on("reset", this.addAll);
-        return this.model.leases.on("add", this.addOne);
+        this.listenTo(this.model.leases, "reset", this.addAll);
+        return this.listenTo(this.model.leases, "add", this.addOne);
       };
 
       ShowUnitView.prototype.render = function() {
         var modelVars, vars;
 
         modelVars = this.model.toJSON();
-        modelVars.propertyId = this.property.id;
         vars = _.merge(modelVars, {
           i18nUnit: i18nUnit,
           i18nLease: i18nLease,
-          i18nCommon: i18nCommon
+          i18nCommon: i18nCommon,
+          baseUrl: this.baseUrl
         });
-        $(this.el).html(JST["src/js/templates/unit/show.jst"](vars));
+        this.$el.html(JST["src/js/templates/unit/show.jst"](vars));
         this.$list = this.$('#leases-table tbody');
         this.model.leases.fetch();
         return this;

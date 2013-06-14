@@ -1,5 +1,6 @@
 (function() {
-  var __hasProp = {}.hasOwnProperty,
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(["jquery", "underscore", "backbone", "moment", 'models/Unit', 'models/Lease', 'views/helper/Alert', "i18n!nls/lease", "i18n!nls/unit", "i18n!nls/common", 'templates/lease/summary'], function($, _, Parse, moment, Unit, Lease, Alert, i18nLease, i18nUnit, i18nCommon) {
@@ -9,7 +10,7 @@
       __extends(LeaseSummaryView, _super);
 
       function LeaseSummaryView() {
-        _ref = LeaseSummaryView.__super__.constructor.apply(this, arguments);
+        this.clear = __bind(this.clear, this);        _ref = LeaseSummaryView.__super__.constructor.apply(this, arguments);
         return _ref;
       }
 
@@ -27,16 +28,11 @@
         var _this = this;
 
         this.onUnit = attrs.onUnit ? true : false;
+        this.baseUrl = attrs.baseUrl;
         this.link_text = this.onUnit ? i18nCommon.nouns.link : i18nCommon.classes.lease;
-        this.model.on("save:success", function() {
-          return _this.render();
-        });
-        this.model.on("destroy", function() {
-          _this.remove();
-          _this.undelegateEvents();
-          return delete _this;
-        });
-        return this.model.on("invalid", function(unit, error) {
+        this.listenTo(this.model, "save:success", this.render);
+        this.listenTo(this.model, "destroy", this.clear);
+        return this.listenTo(this.model, "invalid", function(unit, error) {
           var msg;
 
           _this.$el.addClass('error');
@@ -67,7 +63,7 @@
           unitId: this.model.get("unit").id,
           unitTitle: this.model.get("unit").get("title"),
           moment: moment,
-          propertyId: this.model.get("property").id,
+          baseUrl: this.baseUrl,
           objectId: this.model.get("objectId"),
           isNew: this.model.isNew(),
           i18nCommon: i18nCommon,
@@ -104,6 +100,12 @@
           id = this.model.get("property").id;
           return this.model.destroy();
         }
+      };
+
+      LeaseSummaryView.prototype.clear = function() {
+        this.remove();
+        this.undelegateEvents();
+        return delete this;
       };
 
       return LeaseSummaryView;

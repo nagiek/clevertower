@@ -11,8 +11,7 @@ define [
     className: "Profile"
       
     initialize: ->
-      _.bindAll @, "cover"
-          
+              
     defaults:
       # Name
       name                : ""

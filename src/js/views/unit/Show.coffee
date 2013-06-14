@@ -20,21 +20,18 @@ define [
     initialize: (attrs) ->
 
       @property = attrs.property
-      
-      console.log @model
+      @baseUrl = attrs.baseUrl
+
       @model.prep "leases"
-      @model.leases.on "reset", @addAll
-      @model.leases.on "add", @addOne
+      @listenTo @model.leases, "reset", @addAll
+      @listenTo @model.leases, "add", @addOne
             
     # Re-render the contents of the Unit item.
     render: ->      
       modelVars = @model.toJSON()
       
-      # References
-      modelVars.propertyId = @property.id
-      
-      vars = _.merge(modelVars, i18nUnit: i18nUnit, i18nLease: i18nLease, i18nCommon: i18nCommon)
-      $(@el).html JST["src/js/templates/unit/show.jst"](vars)
+      vars = _.merge(modelVars, i18nUnit: i18nUnit, i18nLease: i18nLease, i18nCommon: i18nCommon, baseUrl: @baseUrl)
+      @$el.html JST["src/js/templates/unit/show.jst"](vars)
       
       @$list = @$('#leases-table tbody')
       @model.leases.fetch()

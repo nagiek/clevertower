@@ -26,7 +26,8 @@ define [
     
     events:
       'submit form'                 : 'save'
-      'click .close'                : 'close'
+      # Adjust the modal (don't need this)
+      # 'click .close'                : 'close'
 
       'click .starting-this-month'  : 'setThisMonth'
       'click .starting-next-month'  : 'setNextMonth'
@@ -38,6 +39,7 @@ define [
     initialize : (attrs) ->
 
       @property = attrs.property
+      @baseUrl = attrs.baseUrl
 
       @model = new Lease unless @model
 
@@ -56,7 +58,7 @@ define [
             fn = args.pop()
             switch fn
               when "overlapping_dates"
-                i18nLease.errors[fn]("/properties/#{@property.id}/leases/#{args[0]}")
+                i18nLease.errors[fn]("#{@baseUrl}/leases/#{args[0]}")
               else
                 i18nLease.errors[fn](args[0])
           else if i18nLease.errors[error.message]
@@ -84,7 +86,7 @@ define [
           require ["views/lease/Show"], (ShowLeaseView) =>
             # Alert the user and move on
             new ShowLeaseView(model: @model, property: @property).render()
-            Parse.history.navigate "/properties/#{@property.id}/leases/#{model.id}"
+            Parse.history.navigate "#{@baseUrl}/leases/#{model.id}"
             @clear()
 
         else 
@@ -195,7 +197,7 @@ define [
 
       tmpl = (if @model.isNew() then 'new' else 'edit') + if @modal then "-modal" else ""
       template = "src/js/templates/lease/#{tmpl}.jst"
-      cancel_path = "/properties/#{@property.id}" + unless @model.isNew() then "/leases/#{@model.id}" else ""
+      cancel_path = "#{@baseUrl}" + unless @model.isNew() then "/leases/#{@model.id}" else ""
 
       vars =
         lease: _.defaults @model.attributes, Lease::defaults

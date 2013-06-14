@@ -20,6 +20,7 @@
 
       ShowLeaseView.prototype.initialize = function(attrs) {
         this.property = attrs.property;
+        this.baseUrl = attrs.baseUrl;
         this.model.prep('tenants');
         this.listenTo(this.model.tenants, "add", this.addOne);
         return this.listenTo(this.model.tenants, "reset", this.addAll);
@@ -30,7 +31,6 @@
 
         modelVars = this.model.toJSON();
         unitId = this.model.get("unit").id;
-        modelVars.propertyId = this.property.id;
         modelVars.unitId = unitId;
         modelVars.title = this.model.get("unit").get("title");
         modelVars.tenants = false;
@@ -39,7 +39,8 @@
         vars = _.merge(modelVars, {
           i18nUnit: i18nUnit,
           i18nLease: i18nLease,
-          i18nCommon: i18nCommon
+          i18nCommon: i18nCommon,
+          baseUrl: this.baseUrl
         });
         this.$el.html(JST["src/js/templates/lease/show.jst"](vars));
         this.$list = this.$('ul#tenants');

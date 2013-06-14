@@ -17,7 +17,8 @@ define [
       
       @on "view:change", @clear
       
-      @vars = property: @model, lease: undefined
+      @baseUrl = attrs.baseUrl
+      @vars = property: @model, lease: undefined, baseUrl: @baseUrl
       
       if attrs.params and attrs.params.lease
         @model.prep('leases')
@@ -30,8 +31,10 @@ define [
       @
     
     clear : ->
-      delete @form.undelegateEvents()
+      @form.stopListening()
+      @form.undelegateEvents()
       delete @form
+      @stopListening()
       @undelegateEvents()
       delete this
-      Parse.history.navigate "/properties/#{@model.id}"
+      Parse.history.navigate @baseUrl

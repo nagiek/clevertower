@@ -40,12 +40,13 @@ define [
       _.bindAll this, 'addOne', 'addAll', 'save', 'setThisMonth', 'setNextMonth', 'setJulyJune'
       
       @property = attrs.property
+      @baseUrl = attrs.baseUrl
       
       @model = new Listing(network: Parse.User.current().get("network")) unless @model
       @template = "src/js/templates/listing/#{if @model.isNew() then 'new' else 'edit'}.jst"
-      @cancel_path = "/properties/#{@property.id}" + unless @model.isNew() then "/listings/#{@model.id}" else ""
+      @cancel_path = @baseUrl + unless @model.isNew() then "/listings/#{@model.id}" else ""
             
-      @model.on 'invalid', (error) =>
+      @listenTo @model, 'invalid', (error) =>
         console.log error
         @$('.error').removeClass('error')
         @$('button.save').removeProp "disabled"
@@ -55,7 +56,7 @@ define [
             fn = args.pop()
             switch fn
               when "overlapping_dates"
-                i18nListing.errors[fn]("/properties/#{@property.id}/listings/#{args[0]}")
+                i18nListing.errors[fn]("#{@baseUrl}/listings/#{args[0]}")
               else
                 i18nListing.errors[fn](args[0])
           else if i18nListing.errors[error.message]
@@ -87,13 +88,10 @@ define [
         require ["views/listing/Show"], (ShowListingView) =>
           # Alert the user and move on
           new ShowListingView(model: @model, property: @property).render()
-          Parse.history.navigate "/properties/#{@property.id}/listings/#{model.id}"
-          @undelegateEvents()
-          delete this
+          Parse.history.navigate "#{@baseUrl}/listings/#{model.id}"
+          @clear()
                 
-      @model.on 'destroy', =>
-        @undelegateEvents()
-        delete this
+      @listenTo @model, 'destroy', @clear
       
       @units = @property.prep("units") if @property
 
@@ -199,3 +197,8 @@ define [
       
       if @units.length is 0 then @units.fetch() else @addAll()
       @
+
+    clear: =>
+      @stopListening()
+      @undelegateEvents()
+      delete this

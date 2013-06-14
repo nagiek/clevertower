@@ -7,16 +7,16 @@ function print() { __p += __j.call(arguments, '') }
 with (obj) {
 __p += '<td class="title-group">\n  <div class="view-specific view-show">\n    ';
  if (objectId) { ;
-__p += '\n      <a class="unit-link" href="/properties/' +
-((__t = ( property.objectId )) == null ? '' : __t) +
+__p += '\n      <a class="unit-link" href="' +
+((__t = ( baseUrl )) == null ? '' : __t) +
 '/units/' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '">' +
 ((__t = ( title )) == null ? '' : __t) +
 '</a>\n      ';
  if (activeLease) { ;
-__p += '\n        | <a href="/properties/' +
-((__t = ( property.objectId )) == null ? '' : __t) +
+__p += '\n        | <a href="' +
+((__t = ( baseUrl )) == null ? '' : __t) +
 '/leases/' +
 ((__t = ( activeLease.id )) == null ? '' : __t) +
 '">' +
@@ -125,28 +125,28 @@ __p += '\n</td>\n<td class="view-specific view-edit hide">\n  <div class="contro
 ((__t = ( i18nUnit.form.squarefeetsymbol )) == null ? '' : __t) +
 '</div>\n\t\t</div>\n\t</div>\n</td>\n<td>\n  ';
  if (objectId) { ;
-__p += '\n    <a class="btn btn-mini add-lease view-specific view-show"\n       href="/properties/' +
-((__t = ( property.objectId )) == null ? '' : __t) +
+__p += '\n    <a class="btn btn-mini add-lease view-specific view-show"\n       href="' +
+((__t = ( baseUrl )) == null ? '' : __t) +
 '/add/lease?unit=' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '" \n       rel="tooltip" \n       data-original-title="' +
 ((__t = ( i18nUnit.actions.add_lease )) == null ? '' : __t) +
-'">\n      <i class="icon-plus"></i>\n    </a>\n    <a class="btn btn-mini add-listing view-specific view-show"\n       href="/properties/' +
-((__t = ( property.objectId )) == null ? '' : __t) +
+'">\n      <i class="icon-plus"></i>\n    </a>\n    <a class="btn btn-mini add-listing view-specific view-show"\n       href="' +
+((__t = ( baseUrl )) == null ? '' : __t) +
 '/add/listing?unit=' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '"\n       rel="tooltip" \n       data-original-title="' +
 ((__t = ( i18nUnit.actions.add_listing )) == null ? '' : __t) +
 '">\n      <i class="icon-listing"></i>\n    </a>\n    ';
  if (activeLease) { ;
-__p += '\n      <a class="btn btn-mini add-tenants view-specific view-show"\n         href="/properties/' +
-((__t = ( property.objectId )) == null ? '' : __t) +
+__p += '\n      <a class="btn btn-mini add-tenants view-specific view-show"\n         href="' +
+((__t = ( baseUrl )) == null ? '' : __t) +
 '/add/tenants?lease=' +
 ((__t = ( activeLease.id )) == null ? '' : __t) +
 '" \n         rel="tooltip" \n         data-original-title="' +
 ((__t = ( i18nLease.actions.add_tenants )) == null ? '' : __t) +
-'">\n        <i class="icon-user"></i>\n      </a>\n      <a class="btn btn-mini extend view-specific view-show"\n         href="/properties/' +
-((__t = ( property.objectId )) == null ? '' : __t) +
+'">\n        <i class="icon-user"></i>\n      </a>\n      <a class="btn btn-mini extend view-specific view-show"\n         href="' +
+((__t = ( baseUrl )) == null ? '' : __t) +
 '/leases/' +
 ((__t = ( activeLease.id )) == null ? '' : __t) +
 '/extend"\n         rel="tooltip" \n         data-original-title="' +

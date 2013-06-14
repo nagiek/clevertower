@@ -20,6 +20,7 @@ define [
     
     initialize: (attrs) =>
       @property = attrs.property
+      @baseUrl = attrs.baseUrl
       
       @model.prep('tenants')
       
@@ -32,7 +33,6 @@ define [
       
       # References
       unitId = @model.get("unit").id
-      modelVars.propertyId = @property.id
       modelVars.unitId = unitId
       modelVars.title = @model.get("unit").get("title")
       modelVars.tenants = false
@@ -41,7 +41,7 @@ define [
       modelVars.start_date = moment(@model.get "start_date").format("LL")
       modelVars.end_date = moment(@model.get "end_date").format("LL")
       
-      vars = _.merge(modelVars, i18nUnit: i18nUnit, i18nLease: i18nLease, i18nCommon: i18nCommon)
+      vars = _.merge(modelVars, i18nUnit: i18nUnit, i18nLease: i18nLease, i18nCommon: i18nCommon, baseUrl: @baseUrl)
       @$el.html JST["src/js/templates/lease/show.jst"](vars)
       
       @$list = @$('ul#tenants')

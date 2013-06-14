@@ -22,27 +22,23 @@ define [
       
     initialize: (attrs) ->
       
+      @baseUrl = attrs.baseUrl
       @onUnit = if attrs.onUnit then true else false
       @link_text = if @onUnit then i18nCommon.nouns.link else i18nCommon.classes.listing
 
       @model.prep('inquiries')
           
-      @model.on "save:success", =>
-        @render()
-        
-      @model.on "destroy", =>
-        @remove()
-        @undelegateEvents()
-        delete this
+      @listenTo @model, "save:success", @render
+      @listenTo @model, "destroy", @clear
       
-      @model.on "invalid", (unit, error) =>
+      @listenTo @model, "invalid", (unit, error) =>
         # Mark up form
         @$el.addClass('error')
         switch error.message
           when 'title_missing'
             @$('.title-group .control-group').addClass('error')
 
-        msg = if error.code? i18nCommon.errors[error.message] else i18nUnit.errors[error.message]
+        msg = if error.code then i18nCommon.errors[error.message] else i18nUnit.errors[error.message]
         new Alert(event: 'unit-invalid', fade: false, message: msg, type: 'error')
 
     # Re-render the contents of the Unit item.
@@ -58,7 +54,7 @@ define [
         status: i18nListing.fields.public[Number @model.get("public")]
         link_text: @link_text
         onUnit: @onUnit
-        propertyId: @model.get("property").id
+        baseUrl: @baseUrl
         unitId: @model.get("unit").id
         unitTitle: @model.get("unit").get("title")
         isNew: @model.isNew()
@@ -74,3 +70,8 @@ define [
       if confirm(i18nCommon.actions.confirm + " " + i18nCommon.warnings.no_undo)
         id = @model.get("property").id
         @model.destroy()
+
+    clear : =>
+      @remove()
+      @undelegateEvents()
+      delete this

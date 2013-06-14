@@ -25,7 +25,10 @@ define [
       'click .delete'     : 'delete'
       "keypress .title"   : "newOnEnter"
       
-    initialize: () ->
+    initialize: (attrs) ->
+
+      @baseUrl = attrs.baseUrl
+
       @listenTo @model, "change:title", =>
         @$('.unit-link').html @model.get "title"
       
@@ -45,16 +48,15 @@ define [
 
     # Re-render the contents of the Unit item.
     render: ->
-      vars = _.merge(
-        @model.toJSON(),
+      vars = _.merge @model.toJSON(),
         moment: moment
         objectId: if @model.id then @model.id else false
-        propertyId: @model.get("property").id
         i18nCommon: i18nCommon
         i18nUnit: i18nUnit
         i18nLease: i18nLease
+        baseUrl: @baseUrl
         isNew: @model.isNew()
-      )
+
       if vars.activeLease = @model.get("activeLease") 
         end_date = @model.get("activeLease").get("end_date")
         vars.end_date = if @model.get("has_lease") and end_date then moment(end_date).format("MMM DD YYYY") else false

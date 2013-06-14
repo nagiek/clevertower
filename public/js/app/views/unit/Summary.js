@@ -25,9 +25,10 @@
         "keypress .title": "newOnEnter"
       };
 
-      UnitSummaryView.prototype.initialize = function() {
+      UnitSummaryView.prototype.initialize = function(attrs) {
         var _this = this;
 
+        this.baseUrl = attrs.baseUrl;
         this.listenTo(this.model, "change:title", function() {
           return _this.$('.unit-link').html(_this.model.get("title"));
         });
@@ -52,10 +53,10 @@
         vars = _.merge(this.model.toJSON(), {
           moment: moment,
           objectId: this.model.id ? this.model.id : false,
-          propertyId: this.model.get("property").id,
           i18nCommon: i18nCommon,
           i18nUnit: i18nUnit,
           i18nLease: i18nLease,
+          baseUrl: this.baseUrl,
           isNew: this.model.isNew()
         });
         if (vars.activeLease = this.model.get("activeLease")) {

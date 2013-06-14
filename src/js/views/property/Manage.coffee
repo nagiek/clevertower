@@ -34,6 +34,8 @@ define [
       
       @listenTo @model, 'change:image_profile', @refresh
       @listenTo @model, 'destroy', @clear
+
+      @baseUrl = if @model.get("network") then "/properties/#{@model.id}" else "/manage"
       
       # Render immediately, as we will display a subview
       @render()
@@ -48,7 +50,7 @@ define [
         i18nProperty: i18nProperty
         i18nCommon: i18nCommon
         hasNetwork: @model.get("network")
-        baseUrl: if @model.get("network") then "/properties/#{@model.id}" else "/manage"
+        baseUrl: @baseUrl
       )
       
       @$el.html JST["src/js/templates/property/manage.jst"](vars)
@@ -63,7 +65,7 @@ define [
       
       if action.length is 1 or action[0] is "add"
         name = "views/property/sub/#{action.join("/")}"
-        @renderSubView name, model: @model, params: params, forNetwork: true
+        @renderSubView name, model: @model, params: params, forNetwork: true, baseUrl: @baseUrl
         
       else
 
@@ -78,7 +80,7 @@ define [
         submodel = if @model[action[0]] then @model[action[0]].get(subid) else false
 
         if submodel
-          @renderSubView name, property: @model, model: submodel, forNetwork: true
+          @renderSubView name, property: @model, model: submodel, forNetwork: true, baseUrl: @baseUrl
         # Else get it from the server.
         else
           nodeType = switch action[0]
@@ -86,7 +88,7 @@ define [
             when "leases" then Lease
             when "units" then Unit
           (new Parse.Query(nodeType)).get subid, success: (submodel) =>
-            @renderSubView name, property: @model, model: submodel, forNetwork: true
+            @renderSubView name, property: @model, model: submodel, forNetwork: true, baseUrl: @baseUrl
 
 
     renderSubView: (name, vars) =>

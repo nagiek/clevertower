@@ -1033,7 +1033,7 @@ Parse.Cloud.beforeSave "Listing", (req, res) ->
   unless req.object.get "title"     then return res.error 'title_missing'
   unless req.object.get "rent"      then return res.error 'rent_missing'
 
-  (new Parse.Query "Unit").include('property.network.role').get req.object.get("unit").id,
+  (new Parse.Query "Unit").include('property.mgrRole').include('property.network.role').get req.object.get("unit").id,
   success: (unit) ->
 
     property = unit.get "property"
@@ -1041,13 +1041,24 @@ Parse.Cloud.beforeSave "Listing", (req, res) ->
 
     unless req.object.existed()
       network = property.get "network"
-      netRole = network.get "role"
+
 
       # Give public access to read the lease, and managers to read/write
       listingACL = new Parse.ACL()
       listingACL.setPublicReadAccess propertyIsPublic
-      listingACL.setRoleWriteAccess netRole, true
-      listingACL.setRoleReadAccess netRole, true
+      if network
+        netRole = network.get "role"
+        listingACL.setRoleWriteAccess netRole, true
+        listingACL.setRoleReadAccess netRole, true
+      
+      mgrRole = property.get "mgrRole"
+      if mgrRole
+        listingACL.setRoleWriteAccess mgrRole, true
+        listingACL.setRoleReadAccess mgrRole, true
+
+      # Let the user modify their own listing, if 
+      listingACL.setWriteAccess req.user, true
+      listingACL.setReadAccess req.user, true
 
       req.object.set 
         # Update the listing with the location
@@ -1777,12 +1788,12 @@ Parse.Cloud.afterSave "Notification", (req) ->
       req.object.set "error", JSON.stringify(error)
       req.object.save()
 
-# Search validation
-Parse.Cloud.beforeSave "Search", (req, res) ->
-  req.object.set 
-    user: req.user
-    ACL: new Parse.ACL() # Set to private
-  res.success()
+# # Search validation
+# Parse.Cloud.beforeSave "Search", (req, res) ->
+#   req.object.set 
+#     user: req.user
+#     ACL: new Parse.ACL() # Set to private
+#   res.success()
 
 # Post validation
 Parse.Cloud.beforeSave "Post", (req, res) ->

@@ -1,13 +1,13 @@
 <td>
-  <% if (!onUnit) { %><a href="/properties/<%= propertyId %>/units/<%= unitId %>"><%= unitTitle %></a> |<% }%>
-  <a href="/properties/<%= propertyId %>/leases/<%= objectId %>"><%= link_text %></a>
+  <% if (!onUnit) { %><a href="<%= baseUrl %>/units/<%= unitId %>"><%= unitTitle %></a> |<% }%>
+  <a href="<%= baseUrl %>/leases/<%= objectId %>"><%= link_text %></a>
 </td>
 <td><%= start_date %></td>
 <td><%= end_date %></td>
 <td><%= rent %></td>
 <td>
   <% if (objectId) { %>
-    <a href="/properties/<%= property.objectId %>/leases/<%= objectId %>/edit" class="btn btn-mini">
+    <a href="<%= baseUrl %>/leases/<%= objectId %>/edit" class="btn btn-mini">
       <%= i18nCommon.actions.edit %>
     </a>
     <button class="btn btn-mini add-tenants"

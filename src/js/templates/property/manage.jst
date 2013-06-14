@@ -1,7 +1,7 @@
 <div id="property" class="container">
   <div class="page-header clearfix">    
     <div class="photo photo-thumbnail photo-elastic pull-left tablet-left">
-      <a href="/properties/<%= objectId %>">
+      <a href="<%= baseUrl %>">
         <img src="<%= cover %>" alt="Profile" class="img-rounded profile-picture">
       </a>
       <div class="photo-actions hide">
@@ -14,7 +14,7 @@
     <header class="header photo-float thumbnail-float elastic-float">
 
       <h1 class="inline-block profile-inline">
-        <a href="/properties/<%= objectId %>"><%= title %></a>
+        <a href="<%= baseUrl %>"><%= title %></a>
       </h1>
 
       <% if (!hasNetwork) { %>

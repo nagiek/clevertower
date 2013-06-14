@@ -1,6 +1,6 @@
 <td>
-  <% if (!onUnit) { %><a href="/properties/<%= propertyId %>/units/<%= unitId %>"><%= unitTitle %></a> |<% }%>
-  <a href="/properties/<%= propertyId %>/listings/<%= objectId %>"><%= title %></a>
+  <% if (!onUnit) { %><a href="<%= baseUrl %>/units/<%= unitId %>"><%= unitTitle %></a> |<% }%>
+  <a href="<%= baseUrl %>/listings/<%= objectId %>"><%= title %></a>
 </td>
 <td><%= rent %></td>
 <td><span class="label<% if (public) { %> label-success<% } %>"><%= status %></span></td>
@@ -9,7 +9,7 @@
   <% if (newInquiries) { %><small>(<%= newInquiries %> <%= i18nCommon.adjectives.new %>)</small><% } %>
 </td>
 <td>
-  <a href="/properties/<%= property.objectId %>/listings/<%= objectId %>/edit" class="btn btn-mini">
+  <a href="<%= baseUrl %>/listings/<%= objectId %>/edit" class="btn btn-mini">
     <%= i18nCommon.actions.edit %>
   </a>
   <button class="btn btn-mini delete"

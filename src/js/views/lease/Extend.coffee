@@ -10,7 +10,7 @@ define [
       
       super
       @template = "src/js/templates/lease/extend.jst"
-      @cancel_path = "/properties/#{@property.id}/leases/#{@model.id}"
+      @cancel_path = "#{@baseUrl}/leases/#{@model.id}"
 
       delete @model.id
       delete @model.createdAt

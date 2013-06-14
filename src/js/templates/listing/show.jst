@@ -4,7 +4,7 @@
       <h2 class="pull-left"><%= title %></h2>
       <ul class="pull-right actions inline">
         <li>
-          <a class="btn" href="/properties/<%= propertyId %>/listings/<%= objectId %>/edit">
+          <a class="btn" href="<%= baseUrl %>/listings/<%= objectId %>/edit">
             <%= i18nCommon.actions.edit %>
           </a>
         </li>
@@ -34,7 +34,7 @@
     <h3><%= i18nCommon.form.info %></h3>
     <p><strong class="field-label"><%= i18nCommon.fields.posted %>:</strong> <%= posted %></p>
     <hr>
-    <p><strong class="field-label"><%= i18nCommon.classes.Unit %>:</strong> <a href="/properties/<%= propertyId %>/units/<%= unitId %>"><%= unitTitle %></a></p>
+    <p><strong class="field-label"><%= i18nCommon.classes.Unit %>:</strong> <%= unitTitle %></p>
     <p><strong class="field-label"><%= i18nListing.form.dates %>:</strong> <%= start_date %> - <%= end_date %></p>
     <p><strong class="field-label"><%= i18nListing.fields.rent %>:</strong> $<%= rent %></p>
   </div>

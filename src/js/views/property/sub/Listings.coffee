@@ -20,15 +20,15 @@ define [
     initialize: (attrs) ->
       @editing = false
       
-      _.bindAll this, 'render', 'addAll', 'addOne'
+      @baseUrl = attrs.baseUrl
 
       @on "view:change", @clear
 
       @model.prep('listings')
       @model.prep('applicants')
 
-      @model.listings.on "add", @addOne
-      @model.listings.on "reset", @addAll
+      @listenTo @model.listings, "add", @addOne
+      @listenTo @model.listings, "reset", @addAll
 
     render: ->
       vars = 
@@ -45,12 +45,12 @@ define [
     
 
     # Our collection includes non-property specific tenants, so we must be vigilant
-    addOne : (l) ->
+    addOne : (l) =>
       if l.get("property").id is @model.id
         @$("tr.empty").remove()
-        @$list.append (new ListingView(model: l)).render().el
+        @$list.append (new ListingView(model: l, baseUrl: @baseUrl)).render().el
 
-    addAll : ->
+    addAll : =>
       @$list.html ""
       visible = @model.listings.select (l) => l.get("property").id is @model.id
       if visible.length is 0 then @$list.html "<tr class='empty'><td colspan='5'>#{i18nListing.listings.empty.property}</td></tr>"

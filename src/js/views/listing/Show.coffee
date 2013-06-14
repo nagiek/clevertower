@@ -22,12 +22,13 @@ define [
     
     initialize: (attrs) =>
       @property = attrs.property
+      @baseUrl = attrs.baseUrl
       
       @model.prep('inquiries')
       @model.prep('applicants')
       
-      @model.inquiries.on "add",   @addOne
-      @model.inquiries.on "reset", @addAll
+      @listenTo @model.inquiries, "add",   @addOne
+      @listenTo @model.inquiries, "reset", @addAll
       
     # Re-render the contents of the Unit item.
     render: ->
@@ -40,9 +41,8 @@ define [
         posted: moment(@model.createdAt).fromNow()
         topDomain: topDomain
         publicUrl: @property.publicUrl()
-        propertyId: @property.id
+        baseUrl: @baseUrl
         property: @property.toJSON()
-        unitId: @model.get("unit").id
         unitTitle: @model.get("unit").get("title")
         start_date: moment(@model.get "start_date").format("LL")
         end_date: moment(@model.get "end_date").format("LL")

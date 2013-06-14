@@ -19,6 +19,8 @@ define [
     el: ".content"
         
     initialize: (attrs) ->
+      @baseUrl = attrs.baseUrl
+
       @editing = false
       
       @on "view:change", @clear
@@ -54,6 +56,6 @@ define [
     # appending its element to the `<ul>`.
     addOne: (lease) =>
       @$('p.empty').remove()
-      view = new LeaseView(model: lease)
+      view = new LeaseView(model: lease, baseUrl: @baseUrl)
       @$list.append view.render().el
       view.$el.find('.view-specific').toggleClass('hide') if @editing

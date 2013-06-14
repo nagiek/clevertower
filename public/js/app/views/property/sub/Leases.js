@@ -20,6 +20,7 @@
       PropertyLeasesView.prototype.el = ".content";
 
       PropertyLeasesView.prototype.initialize = function(attrs) {
+        this.baseUrl = attrs.baseUrl;
         this.editing = false;
         this.on("view:change", this.clear);
         this.model.leases.on("add", this.addOne);
@@ -67,7 +68,8 @@
 
         this.$('p.empty').remove();
         view = new LeaseView({
-          model: lease
+          model: lease,
+          baseUrl: this.baseUrl
         });
         this.$list.append(view.render().el);
         if (this.editing) {

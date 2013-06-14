@@ -12,3 +12,6 @@ define [
 
     # Index of model in its collection.
     pos : -> @collection.indexOf(@)
+
+    # Index of model in its collection.
+    publicUrl : -> if @get("property") then @get("property").publicUrl() else "#"

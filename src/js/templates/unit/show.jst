@@ -1,19 +1,13 @@
 <header>
   <h2><%=i18nCommon.classes.Unit%> <%= title %></a></h2>  
   <div>
-    <a href="/properties/<%= property.objectId %>/units/<%= objectId %>/edit" class="btn">
+    <a href="<%= baseUrl %>/units/<%= objectId %>/edit" class="btn">
       <%= i18nCommon.actions.edit %>
     </a>
     <a  class="btn add-lease"
-        href="/properties/<%= property.objectId %>/add/lease?unit=<%= objectId %>"
+        href="<%= baseUrl %>/add/lease?unit=<%= objectId %>"
         rel="tooltip"
         data-original-title="<%= i18nUnit.actions.add_lease %>">
-      <i class="icon-plus"></i>
-    </a>
-    <a  class="btn add-task"
-        href="/properties/<%= property.objectId %>/add/task?unit=<%= objectId %>"
-        rel="tooltip"
-        data-original-title="<%= i18nUnit.actions.add_task %>">
       <i class="icon-plus"></i>
     </a>
   </div>

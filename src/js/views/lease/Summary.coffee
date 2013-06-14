@@ -27,17 +27,14 @@ define [
     initialize: (attrs) ->
       
       @onUnit = if attrs.onUnit then true else false
+      @baseUrl = attrs.baseUrl
       @link_text = if @onUnit then i18nCommon.nouns.link else i18nCommon.classes.lease
           
-      @model.on "save:success", =>
-        @render()
+      @listenTo @model, "save:success", @render
         
-      @model.on "destroy", =>
-        @remove()
-        @undelegateEvents()
-        delete this
+      @listenTo @model, "destroy", @clear
       
-      @model.on "invalid", (unit, error) =>
+      @listenTo @model, "invalid", (unit, error) =>
         # Mark up form
         @$el.addClass('error')
         switch error.message
@@ -55,21 +52,19 @@ define [
       modelVars.start_date = moment(@model.get "start_date").format("LL")
       modelVars.end_date = moment(@model.get "end_date").format("LL")
       
-      vars = _.merge(
-        modelVars,
+      vars = _.merge modelVars,
         link_text: @link_text
         onUnit: @onUnit
         propertyId: @model.get("property").id
         unitId: @model.get("unit").id
         unitTitle: @model.get("unit").get("title")
         moment: moment
-        propertyId: @model.get("property").id
+        baseUrl: @baseUrl
         objectId: @model.get "objectId"
         isNew: @model.isNew()
         i18nCommon: i18nCommon
         i18nUnit: i18nUnit
         i18nLease: i18nLease
-      )
       @$el.html JST["src/js/templates/lease/summary.jst"](vars)
       @
 
@@ -90,3 +85,8 @@ define [
       if confirm(i18nCommon.actions.confirm + " " + i18nCommon.warnings.no_undo)
         id = @model.get("property").id
         @model.destroy()
+
+    clear : =>
+      @remove()
+      @undelegateEvents()
+      delete this

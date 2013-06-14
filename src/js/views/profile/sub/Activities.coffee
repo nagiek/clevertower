@@ -2,7 +2,7 @@ define [
   "jquery"
   "underscore"
   "backbone"
-  "views/activity/Summary"
+  "views/activity/list"
   "i18n!nls/user"
   "i18n!nls/common"
   'templates/profile/show'
@@ -40,16 +40,15 @@ define [
 
     addAllActivities : =>
       @$activityList.html ""
-      dates = _.uniq @model.activities.map (a) -> a.createdAt.toDateString()
 
       unless @model.activities.length is 0
-        @$activityList.find(".empty").remove()
 
         # Group by date.
-        dates = @model.activities.filter (a) -> a.createdAt.toDateString()
-        _.each dates, (date) =>
-          @$activityList.append "<li class='nav-header'>#{moment(date).format("L")}</li>"
-          _.each @model.activities.filter((a) -> a.createdAt.toDateString() is date), @addOneActivity
+        dates = @model.activities.groupBy (a) -> moment(a.createdAt).format("LL")
+        _.each dates, (set, date) =>
+          @$activityList.append "<li class='nav-header'>#{date}</li>"
+          console.log set
+          _.each set, @addOneActivity
           @$activityList.append "<li class='divider'></li>"
 
       else @$activityList.html '<li class="empty">' + 

@@ -19,6 +19,7 @@
         var vars;
 
         this.on("view:change", this.clear);
+        this.baseUrl = attrs.baseUrl;
         vars = {
           property: this.model,
           network: this.model.get("network")
@@ -40,17 +41,20 @@
       AddLeaseToPropertyView.prototype.render = function() {
         this.form = new NewLeaseView({
           model: this.lease,
-          property: this.model
+          property: this.model,
+          baseUrl: this.baseUrl
         }).render();
         return this;
       };
 
       AddLeaseToPropertyView.prototype.clear = function() {
+        this.form.stopListening();
         this.form.undelegateEvents();
         delete this.form;
+        this.stopListening();
         this.undelegateEvents();
         delete this;
-        return Parse.history.navigate("/properties/" + this.model.id);
+        return Parse.history.navigate(this.baseUrl);
       };
 
       return AddLeaseToPropertyView;

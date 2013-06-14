@@ -4,7 +4,9 @@ this["JST"]["src/js/templates/property/sub/leases.jst"] = function(obj) {
 obj || (obj = {});
 var __t, __p = '', __e = _.escape;
 with (obj) {
-__p += '<form id="leases" method="post">\n  <h2>Listing units</h2>\n\n  <table id="leases-table" class="table form-condensed">\n    <thead>\n      <tr>\n        <th>' +
+__p += '<form id="leases" method="post">\n  <h2>' +
+((__t = ( i18nCommon.classes.Leases )) == null ? '' : __t) +
+'</h2>\n\n  <table id="leases-table" class="table form-condensed">\n    <thead>\n      <tr>\n        <th>' +
 ((__t = (i18nCommon.classes.Unit)) == null ? '' : __t) +
 '</th>\n        <th class="view-specific view-show">' +
 ((__t = (i18nLease.attributes.starting)) == null ? '' : __t) +

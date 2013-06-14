@@ -7,16 +7,16 @@ function print() { __p += __j.call(arguments, '') }
 with (obj) {
 __p += '<td>\n  ';
  if (!onUnit) { ;
-__p += '<a href="/properties/' +
-((__t = ( propertyId )) == null ? '' : __t) +
+__p += '<a href="' +
+((__t = ( baseUrl )) == null ? '' : __t) +
 '/units/' +
 ((__t = ( unitId )) == null ? '' : __t) +
 '">' +
 ((__t = ( unitTitle )) == null ? '' : __t) +
 '</a> |';
  };
-__p += '\n  <a href="/properties/' +
-((__t = ( propertyId )) == null ? '' : __t) +
+__p += '\n  <a href="' +
+((__t = ( baseUrl )) == null ? '' : __t) +
 '/leases/' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '">' +
@@ -29,8 +29,8 @@ __p += '\n  <a href="/properties/' +
 ((__t = ( rent )) == null ? '' : __t) +
 '</td>\n<td>\n  ';
  if (objectId) { ;
-__p += '\n    <a href="/properties/' +
-((__t = ( property.objectId )) == null ? '' : __t) +
+__p += '\n    <a href="' +
+((__t = ( baseUrl )) == null ? '' : __t) +
 '/leases/' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '/edit" class="btn btn-mini">\n      ' +

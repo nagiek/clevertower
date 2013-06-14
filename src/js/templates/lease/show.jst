@@ -1,23 +1,23 @@
 <header class="row">
   <hgroup class="span">
-    <h2><%= i18nLease.attributes.lease_on_unit %> <a href="/properties/<%= propertyId %>/units/<%= unitId %>"><%=title %></a></h2>
+    <h2><%= i18nLease.attributes.lease_on_unit %> <a href="<%= baseUrl %>/units/<%= unitId %>"><%=title %></a></h2>
     <h4><%= start_date %> - <%= end_date %></h4>
   </hgroup>
   <ul class="span offset1 inline">
     <li>
-      <a href="/properties/<%= property.objectId %>/leases/<%= objectId %>/edit" class="btn">
+      <a href="<%= baseUrl %>/leases/<%= objectId %>/edit" class="btn">
       <%= i18nCommon.actions.edit %>
       </a>
     </li>
     <li>
-      <a href="/properties/<%= property.objectId %>/add/tenants?lease=<%= objectId %>" class="btn add-tenants"
+      <a href="<%= baseUrl %>/add/tenants?lease=<%= objectId %>" class="btn add-tenants"
           rel="tooltip"
           data-original-title="<%= i18nLease.actions.add_tenants %>">
         <i class="icon-user"></i>
       </a>
     </li>
     <li>
-      <a href="/properties/<%= property.objectId %>/leases/<%= objectId %>/extend"
+      <a href="<%= baseUrl %>/leases/<%= objectId %>/extend"
           class="btn extend"
           rel="tooltip"
           data-original-title="<%= i18nLease.actions.extend %>">

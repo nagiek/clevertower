@@ -16,6 +16,7 @@ define [
       # Activity List is very personal to the user.
       if attrs.property then @query.equalTo("property", attrs.property)
       else if attrs.network then @query.equalTo("network", attrs.network)
+      else if attrs.profile then @query.equalTo("profile", attrs.profile).include("property")
       else if attrs.center and attrs.radius 
         @query
         .withinKilometers("center", attrs.center, attrs.radius)

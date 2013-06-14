@@ -25,7 +25,6 @@
 
       NewLeaseView.prototype.events = {
         'submit form': 'save',
-        'click .close': 'close',
         'click .starting-this-month': 'setThisMonth',
         'click .starting-next-month': 'setNextMonth',
         'click .july-to-june': 'setJulyJune',
@@ -36,6 +35,7 @@
         var _this = this;
 
         this.property = attrs.property;
+        this.baseUrl = attrs.baseUrl;
         if (!this.model) {
           this.model = new Lease;
         }
@@ -58,7 +58,7 @@
               fn = args.pop();
               switch (fn) {
                 case "overlapping_dates":
-                  return i18nLease.errors[fn]("/properties/" + this.property.id + "/leases/" + args[0]);
+                  return i18nLease.errors[fn]("" + this.baseUrl + "/leases/" + args[0]);
                 default:
                   return i18nLease.errors[fn](args[0]);
               }
@@ -101,7 +101,7 @@
                 model: _this.model,
                 property: _this.property
               }).render();
-              Parse.history.navigate("/properties/" + _this.property.id + "/leases/" + model.id);
+              Parse.history.navigate("" + _this.baseUrl + "/leases/" + model.id);
               return _this.clear();
             });
           } else {
@@ -226,7 +226,7 @@
 
         tmpl = (this.model.isNew() ? 'new' : 'edit') + (this.modal ? "-modal" : "");
         template = "src/js/templates/lease/" + tmpl + ".jst";
-        cancel_path = ("/properties/" + this.property.id) + (!this.model.isNew() ? "/leases/" + this.model.id : "");
+        cancel_path = ("" + this.baseUrl) + (!this.model.isNew() ? "/leases/" + this.model.id : "");
         vars = {
           lease: _.defaults(this.model.attributes, Lease.prototype.defaults),
           unit: this.model.get("unit") ? this.model.get("unit") : false,

@@ -9,24 +9,18 @@ __p += '<header>\n  <h2>' +
 ((__t = (i18nCommon.classes.Unit)) == null ? '' : __t) +
 ' ' +
 ((__t = ( title )) == null ? '' : __t) +
-'</a></h2>  \n  <div>\n    <a href="/properties/' +
-((__t = ( property.objectId )) == null ? '' : __t) +
+'</a></h2>  \n  <div>\n    <a href="' +
+((__t = ( baseUrl )) == null ? '' : __t) +
 '/units/' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '/edit" class="btn">\n      ' +
 ((__t = ( i18nCommon.actions.edit )) == null ? '' : __t) +
-'\n    </a>\n    <a  class="btn add-lease"\n        href="/properties/' +
-((__t = ( property.objectId )) == null ? '' : __t) +
+'\n    </a>\n    <a  class="btn add-lease"\n        href="' +
+((__t = ( baseUrl )) == null ? '' : __t) +
 '/add/lease?unit=' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '"\n        rel="tooltip"\n        data-original-title="' +
 ((__t = ( i18nUnit.actions.add_lease )) == null ? '' : __t) +
-'">\n      <i class="icon-plus"></i>\n    </a>\n    <a  class="btn add-task"\n        href="/properties/' +
-((__t = ( property.objectId )) == null ? '' : __t) +
-'/add/task?unit=' +
-((__t = ( objectId )) == null ? '' : __t) +
-'"\n        rel="tooltip"\n        data-original-title="' +
-((__t = ( i18nUnit.actions.add_task )) == null ? '' : __t) +
 '">\n      <i class="icon-plus"></i>\n    </a>\n  </div>\n</header>\n<div class="row">\n  <div class="span9">\n    <div class="well">\n      <h2>' +
 ((__t = ( i18nUnit.show.leases )) == null ? '' : __t) +
 '</h2>\n      <table id="leases-table" class="table">\n        <thead>\n          <tr>\n            <th>' +

@@ -84,10 +84,12 @@ define [
     logInWithFacebook : (e) =>  
       e.preventDefault()
       Parse.FacebookUtils.logIn "user_likes,email",
-        success: (user) ->
-          @$('> .modal.in').modal('hide')
+        success: (user) =>
+          @$('> #login-modal').modal('hide')
+          # We don't know if this is a signup or a login.
           Parse.Dispatcher.trigger "user:loginStart", user
-        error: (user, error) ->
+
+        error: (user, error) =>
             
     signUp: (e) =>
       e.preventDefault()
@@ -100,11 +102,12 @@ define [
           @$('> #signup-modal').modal('hide')
           @$("> #signup-modal #signup-form button").removeProp "disabled"
 
+          # Skip the user-setup phase, as we will not have anything to add.
+          # Only extra things we need are the profile and notifications.
+
           profile = user.get("profile")
           profile.set "email", user.get("email")
 
-          # Skip the user-setup phase, as we will not have anything to add.
-          # Only extra things we need are the profile and notifications.
           Parse.User.current().set "profile", profile
           Parse.User.current().notifications = new NotificationList
 

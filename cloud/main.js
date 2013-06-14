@@ -1039,19 +1039,28 @@
     if (!req.object.get("rent")) {
       return res.error('rent_missing');
     }
-    return (new Parse.Query("Unit")).include('property.network.role').get(req.object.get("unit").id, {
+    return (new Parse.Query("Unit")).include('property.mgrRole').include('property.network.role').get(req.object.get("unit").id, {
       success: function(unit) {
-        var isPublic, listingACL, netRole, network, property, propertyIsPublic;
+        var isPublic, listingACL, mgrRole, netRole, network, property, propertyIsPublic;
 
         property = unit.get("property");
         propertyIsPublic = property.getACL().getPublicReadAccess();
         if (!req.object.existed()) {
           network = property.get("network");
-          netRole = network.get("role");
           listingACL = new Parse.ACL();
           listingACL.setPublicReadAccess(propertyIsPublic);
-          listingACL.setRoleWriteAccess(netRole, true);
-          listingACL.setRoleReadAccess(netRole, true);
+          if (network) {
+            netRole = network.get("role");
+            listingACL.setRoleWriteAccess(netRole, true);
+            listingACL.setRoleReadAccess(netRole, true);
+          }
+          mgrRole = property.get("mgrRole");
+          if (mgrRole) {
+            listingACL.setRoleWriteAccess(mgrRole, true);
+            listingACL.setRoleReadAccess(mgrRole, true);
+          }
+          listingACL.setWriteAccess(req.user, true);
+          listingACL.setReadAccess(req.user, true);
           req.object.set({
             locality: property.get("locality"),
             center: property.get("center"),
@@ -1600,14 +1609,6 @@
         return req.object.save();
       }
     });
-  });
-
-  Parse.Cloud.beforeSave("Search", function(req, res) {
-    req.object.set({
-      user: req.user,
-      ACL: new Parse.ACL()
-    });
-    return res.success();
   });
 
   Parse.Cloud.beforeSave("Post", function(req, res) {

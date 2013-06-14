@@ -24,7 +24,7 @@ define [
       'change #redo-search'       : 'changeSearchPrefs'
     
     initialize : (attrs) ->
-      @location = attrs.location || "Montreal--QC--Canada"
+      @location = attrs.location || "" # "Montreal--QC--Canada"
       @locationAppend = if attrs.params.lat and attrs.params.lng then "?lat=#{attrs.params.lat}&lng=#{attrs.params.lng}" else ''
       @page = attrs.params.page || 1
       @center = new google.maps.LatLng attrs.params.lat, attrs.params.lng if attrs.params.lat and attrs.params.lng
@@ -438,35 +438,50 @@ define [
     updatePaginiation : =>
       countQuery = Parse.App.activity.query
       # Reset old filters
-      .notContainedIn("objectId", [])
+      countQuery.notContainedIn("objectId", [])
       # Limit of -1 means do not send a limit.
-      .limit(-1).skip(0)
-      .count()
+      countQuery.limit(-1).skip(0)
+      counting = countQuery.count()
 
-      if Parse.User.current()
+      if Parse.User.current() and (Parse.User.current().get("property") or Parse.User.current().get("network"))
         userCountQuery = Parse.User.current().activity.query
         # Limit of -1 means do not send a limit.
-        .limit(-1).skip(0)
-        .count()
+        userCountQuery.limit(-1).skip(0)
+
+        if Parse.User.current().get("property")
+          # Visibility counter
+          if Parse.User.current().get("property").shown is true
+            userCountQuery.containedIn "property", Parse.User.current().get("property")
+            userCounting = userCountQuery.count()
+          else 
+            userCounting = undefined
+
+        else if Parse.User.current().get("network")
+
+          properties = Parse.User.current().get("network").properties.map (p) -> p.shown is true
+          userCountQuery.containedIn "property", properties
+          userCounting = userCountQuery.count()
+
       else 
-        userCountQuery = undefined
+        userCounting = undefined
       
       Parse.Promise
-      .when(countQuery, userCountQuery)
+      .when(counting, userCounting)
       .then (count, userCount) =>
         # remaining pages
         userCount = 0 unless userCount
         @pages = Math.ceil((count + userCount)/ @resultsPerPage)
-        @renderPaginiation()
+
+        @$('.pagination > ul > li > a').off 'click'
+        @$pagination.html ""
 
         if count + userCount is 0
           @$list.append '<li class="general empty">' + i18nListing.listings.empty.index + '</li>'
+        else 
+          @renderPaginiation()
           
     
     renderPaginiation : (e) =>
-      
-      @$('.pagination > ul > li > a').off 'click'
-      @$pagination.html ""
 
       pages = @pages - @chunk + 1
 

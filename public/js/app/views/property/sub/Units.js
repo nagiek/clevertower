@@ -36,6 +36,7 @@
         var _this = this;
 
         this.on("view:change", this.clear);
+        this.baseUrl = attrs.baseUrl;
         this.listenTo(this.model.units, "add", this.addOne);
         this.listenTo(this.model.units, "reset", this.addAll);
         this.listenTo(this.model.units, "invalid", function(error) {
@@ -120,7 +121,8 @@
 
         this.$('p.empty').hide();
         view = new UnitView({
-          model: unit
+          model: unit,
+          baseUrl: this.baseUrl
         });
         this.$list.append(view.render().el);
         if (this.editing) {
