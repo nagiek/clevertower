@@ -36,10 +36,12 @@
         var _this = this;
 
         this.property = attrs.property;
-        if (!(this.model || !Parse.User.current())) {
-          this.model = new Lease({
-            network: Parse.User.current().get("network")
-          });
+        if (!this.model) {
+          this.model = new Lease;
+        }
+        this.forNetwork = attrs.forNetwork;
+        if (this.forNetwork && Parse.User.current() && Parse.User.current().get("network")) {
+          this.model.set(network, Parse.User.current().get("network"));
         }
         this.modal = attrs.modal;
         if (this.modal) {
@@ -80,7 +82,7 @@
           }
         });
         this.on("save:success", function(model) {
-          var network, user;
+          var vars;
 
           new Alert({
             event: 'model-save',
@@ -89,27 +91,33 @@
             type: 'success'
           });
           _this.model.id = model.id;
-          user = Parse.User.current();
-          if (user) {
-            network = user.get("network");
-          }
-          if (user && network) {
+          if (_this.forNetwork && Parse.User.current() && Parse.User.current().get("network")) {
             _this.property.leases.add(_this.model);
             new Parse.Query("Tenant").equalTo("lease", _this.model).include("profile").find().then(function(objs) {
-              return network.tenants.add(objs);
+              return Parse.User.current().get("network").tenants.add(objs);
+            });
+            return require(["views/lease/Show"], function(ShowLeaseView) {
+              new ShowLeaseView({
+                model: _this.model,
+                property: _this.property
+              }).render();
+              Parse.history.navigate("/properties/" + _this.property.id + "/leases/" + model.id);
+              return _this.clear();
+            });
+          } else {
+            vars = {
+              lease: lease,
+              unit: lease.get("unit"),
+              property: lease.get("property"),
+              mgrOfProp: isNew
+            };
+            return Parse.User.current().save(vars).then(function() {
+              Parse.history.navigate("/account/building", true);
+              return this.clear();
             });
           }
-          return require(["views/lease/Show"], function(ShowLeaseView) {
-            new ShowLeaseView({
-              model: _this.model,
-              property: _this.property
-            }).render();
-            Parse.history.navigate("/properties/" + _this.property.id + "/leases/" + model.id);
-            _this.undelegateEvents();
-            return delete _this;
-          });
         });
-        this.listenTo(this.model, 'destroy', this.close);
+        this.listenTo(this.model, 'destroy', this.clear);
         if (this.property) {
           this.units = this.property.prep("units");
         }
@@ -243,7 +251,8 @@
         return this;
       };
 
-      NewLeaseView.prototype.close = function() {
+      NewLeaseView.prototype.clear = function() {
+        this.stopListening();
         this.undelegateEvents();
         return delete this;
       };

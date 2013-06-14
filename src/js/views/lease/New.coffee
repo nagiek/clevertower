@@ -39,12 +39,14 @@ define [
 
       @property = attrs.property
 
-      @model = new Lease(network: Parse.User.current().get("network")) unless @model or !Parse.User.current()
+      @model = new Lease unless @model
+
+      @forNetwork = attrs.forNetwork
+      @model.set network, Parse.User.current().get("network") if @forNetwork and Parse.User.current() and Parse.User.current().get("network")
 
       @modal = attrs.modal
-
       @setElement '#apply-modal' if @modal
-            
+
       @listenTo @model, 'invalid', (error) =>
         @$('.error').removeClass('error')
         @$('button.save').removeProp "disabled"
@@ -74,22 +76,28 @@ define [
         new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
         @model.id = model.id
 
-        # Add the tenants to the network
-        user = Parse.User.current() 
-        network = user.get("network") if user
-        if user and network
+        if @forNetwork and Parse.User.current() and Parse.User.current().get("network")
           @property.leases.add @model
           new Parse.Query("Tenant").equalTo("lease", @model).include("profile").find()
-          .then (objs) -> network.tenants.add objs
-        
-        require ["views/lease/Show"], (ShowLeaseView) =>
-          # Alert the user and move on
-          new ShowLeaseView(model: @model, property: @property).render()
-          Parse.history.navigate "/properties/#{@property.id}/leases/#{model.id}"
-          @undelegateEvents()
-          delete this
+          .then (objs) -> Parse.User.current().get("network").tenants.add objs
+          
+          require ["views/lease/Show"], (ShowLeaseView) =>
+            # Alert the user and move on
+            new ShowLeaseView(model: @model, property: @property).render()
+            Parse.history.navigate "/properties/#{@property.id}/leases/#{model.id}"
+            @clear()
+
+        else 
+          vars = 
+            lease: lease
+            unit: lease.get "unit"
+            property: lease.get "property"
+            mgrOfProp: isNew
+          Parse.User.current().save(vars).then ->
+            Parse.history.navigate "/account/building", true
+            @clear()
                 
-      @listenTo @model, 'destroy', @close
+      @listenTo @model, 'destroy', @clear
       
       @units = @property.prep("units") if @property # We may on public page instead of network.
 
@@ -215,7 +223,7 @@ define [
 
       @
 
-
-    close : ->
+    clear : ->
+      @stopListening()
       @undelegateEvents()
       delete this

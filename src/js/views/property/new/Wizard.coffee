@@ -68,9 +68,9 @@ define [
           mgrOfProp: isNew
         Parse.User.current().save(vars).then ->
           Parse.history.navigate "/account/building", true
-          console.log 'hi'
+          @clear()
         , (error) -> console.log error
-          # @clear()
+
 
     render : ->
       vars = 

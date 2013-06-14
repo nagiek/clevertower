@@ -24,7 +24,6 @@ define [
       'change #redo-search'       : 'changeSearchPrefs'
     
     initialize : (attrs) ->
-
       @location = attrs.location || "Montreal--QC--Canada"
       @locationAppend = if attrs.params.lat and attrs.params.lng then "?lat=#{attrs.params.lat}&lng=#{attrs.params.lng}" else ''
       @page = attrs.params.page || 1
@@ -93,6 +92,10 @@ define [
         # Groom the incoming data.
         Parse.App.activity.remove Parse.App.activity.select((m) => @filter isnt m.get("activity_type"))
 
+        appQuery = Parse.App.activity.query
+        .notContainedIn("objectId", Parse.App.activity.map((l) -> l.id))
+        .find()
+
         # Remove the User activity, which is still showing.
         # handleUserActivity() will not do it, as it only removes activity not shown on the map.
         if Parse.User.current()
@@ -101,16 +104,18 @@ define [
           userActivityToRemove = userActivityToRemove.concat Parse.User.current().activity.select(@specificSearchControls.filter) if @specificSearchControls 
           if userActivityToRemove.length > 0
             _.each userActivityToRemove, (a) => a.trigger('remove') 
-            @refreshDisplay()
           @handleUserActivity() 
 
-        Parse.App.activity.query.notContainedIn("objectId", Parse.App.activity.map((l) -> l.id))
-        .find()
-        .then (objs) =>
+          userQuery = Parse.User.current().activity.query
+          .notContainedIn("objectId", Parse.User.current().activity.map((l) -> l.id))
+          .find() 
+        else 
+          userQuery = undefined
+
+        Parse.Promise.when(appQuery, userQuery)
+        .then (objs, userObjs) =>
           Parse.App.activity.add objs if objs
-          Parse.User.current().activity.query.notContainedIn("objectId", Parse.User.current().activity.map((l) -> l.id)).find() if Parse.User.current()
-        .then (objs) =>
-          Parse.App.activity.add objs if Parse.User.current() and objs
+          Parse.User.current().activity.add userObjs if Parse.User.current() and userObjs
           @refreshDisplay()
 
       else
@@ -140,7 +145,7 @@ define [
         @redoSearch = false
       else 
         @redoSearch = true
-        @performSearchWithinMap()
+        @search()
 
     getUserActivity : =>
       # Get the property from what we've already loaded.
@@ -169,7 +174,7 @@ define [
       if Parse.User.current()
         if Parse.User.current().get("property")
           @center = @GPoint Parse.User.current().get("property").get("center")
-          @radius = 15000
+          @radius = 50000
 
         else if Parse.User.current().get("network")
           Parse.User.current().get("network").properties.getSetting()
@@ -178,11 +183,11 @@ define [
 
         else
           @center = new google.maps.LatLng 43.6481, -79.4042
-          @radius = 15000
+          @radius = 50000
 
       else
         @center = new google.maps.LatLng 43.6481, -79.4042
-        @radius = 15000
+        @radius = 50000
 
     render: ->
       vars = 
@@ -235,18 +240,19 @@ define [
 
     renderMap : =>
 
-      if @radius > 1000000 then zoom = 4
-      else if @radius > 300000 then zoom = 5
-      else if @radius > 150000 then zoom = 6
-      else if @radius > 72500 then zoom = 8
-      else if @radius > 35000 then zoom = 9
-      else if @radius > 18800 then zoom = 10
-      else if @radius > 9300 then zoom = 11
-      else if @radius > 4600 then zoom = 12
-      else zoom = 13
-      # else if @radius > 23000 then zoom = 14
-      # else if @radius > 9000 then zoom = 15
-      # else zoom = 16
+      if @radius
+        if @radius > 1000000 then zoom = 4
+        else if @radius > 300000 then zoom = 5
+        else if @radius > 500000 then zoom = 6
+        else if @radius > 72500 then zoom = 8
+        else if @radius > 35000 then zoom = 9
+        else if @radius > 18800 then zoom = 10
+        else if @radius > 9300 then zoom = 11
+        else if @radius > 4600 then zoom = 12
+        else zoom = 13
+      else
+        # Default zoom for when we move the map.
+        zoom = 10
 
       @map = new google.maps.Map document.getElementById(@mapId), 
         zoom              : zoom
@@ -267,7 +273,7 @@ define [
             icon: 
               url: "/img/icon/pins-sprite.png"
               size: new google.maps.Size(25, 32, "px", "px")
-              origin: new google.maps.Point(0, 0)
+              origin: new google.maps.Point(50, 0)
               anchor: null
               scaledSize: null
         else if Parse.User.current().get("network")
@@ -285,11 +291,13 @@ define [
 
       @dragListener = google.maps.event.addListener @map, 'dragend', => @trigger "dragend"
       @zoomListener = google.maps.event.addListener @map, 'zoom_changed', @checkIfShouldSearch
+
+      # Search once the map is ready.
       google.maps.event.addListenerOnce @map, 'idle', @performSearchWithinMap
 
     initWithCenter : (place, status) =>
       @center = place.geometry.location if status is google.maps.places.PlacesServiceStatus.OK
-      @radius = 15000
+      @radius = 50000
       @renderMap()
 
     googleSearch : (place, status) =>
@@ -307,19 +315,22 @@ define [
         @chunk = 1
         @page = 1
 
-        @performSearchWithinMap()
+        @search()
 
     checkIfShouldSearch : =>
       if @redoSearch
         @chunk = 1
         @page = 1
-        @performSearchWithinMap()
+        @search()
   
-    performSearchWithinMap : =>
+    search : =>
       center = @map.getCenter()
       @locationAppend = "?lat=#{center.lat()}&lng=#{center.lng()}"
       Parse.history.navigate "/search/#{@location}#{@locationAppend}"
 
+      @performSearchWithinMap()
+
+    performSearchWithinMap: =>
       bounds = @map.getBounds()
       @sw = new Parse.GeoPoint(bounds.getSouthWest().lat(), bounds.getSouthWest().lng())
       @ne = new Parse.GeoPoint(bounds.getNorthEast().lat(), bounds.getNorthEast().lng())
@@ -328,10 +339,10 @@ define [
       Parse.App.activity.setBounds @sw, @ne
       Parse.App.activity.query.skip(0)
 
-      @search()
+      @$list.find('> li.empty').remove()
+      # @$list.remove('> li.empty')
 
-    search: ->
-      @handleUserActivity() if Parse.User.current() 
+      @handleUserActivity() if Parse.User.current()
       @handleMapActivity()
       @updatePaginiation()
 
@@ -340,11 +351,9 @@ define [
       if Parse.User.current().get("property") 
         p = Parse.User.current().get("property") 
         if @withinBounds p.get("center") then @showPropertyActivity p else @hidePropertyActivity p
-        @refreshDisplay()
       else if Parse.User.current().get("network")
         Parse.User.current().get("network").properties.each (p) => 
           if @withinBounds p.get("center") then @showPropertyActivity p else @hidePropertyActivity p
-        @refreshDisplay()
 
     handleMapActivity : ->
 
@@ -352,7 +361,7 @@ define [
       if Parse.App.activity.length is 0
         # Start from scratch
         Parse.App.activity.query.limit(@resultsPerPage)
-        Parse.App.activity.fetch()
+        replaceQuery = Parse.App.activity.query
       else
         # Groom the incoming data.
         activitiesToRemove = Parse.App.activity.select (a) =>
@@ -372,11 +381,11 @@ define [
           else
             replaceQuery.limit(@resultsPerPage - Parse.App.activity.length)
 
-          replaceQuery.find()
-          .then (objs) =>
-            if objs
-              Parse.App.activity.add objs
-              @refreshDisplay()
+      replaceQuery.find()
+      .then (objs) =>
+        Parse.App.activity.add objs if objs
+        @refreshDisplay()
+          
 
     addOne: (a) =>
       view = new ActivitySummaryView
@@ -397,14 +406,8 @@ define [
 
     # Add all items in the Properties collection at once.
     addAll: (collection, filter) =>
-      @$list.find(".loading").remove()
-      @$list.find("> .general").remove()
-      unless Parse.App.activity.length is 0
-        @$('li.empty').remove() if @$('li.empty')
+      if Parse.App.activity.length > 0
         Parse.App.activity.each @addOne
-      else
-        @$list.append '<li class="general empty">' + i18nListing.listings.empty.index + '</li>'
-      @refreshDisplay()
     
     # Show activity where we have already loaded the property
     showPropertyActivity: (property) =>
@@ -435,13 +438,30 @@ define [
     updatePaginiation : =>
       countQuery = Parse.App.activity.query
       # Reset old filters
-      countQuery.notContainedIn("objectId", [])
+      .notContainedIn("objectId", [])
       # Limit of -1 means do not send a limit.
-      countQuery.limit(-1).skip(0).count()
-      .then (count) =>
+      .limit(-1).skip(0)
+      .count()
+
+      if Parse.User.current()
+        userCountQuery = Parse.User.current().activity.query
+        # Limit of -1 means do not send a limit.
+        .limit(-1).skip(0)
+        .count()
+      else 
+        userCountQuery = undefined
+      
+      Parse.Promise
+      .when(countQuery, userCountQuery)
+      .then (count, userCount) =>
         # remaining pages
-        @pages = Math.ceil((count / @resultsPerPage))
+        userCount = 0 unless userCount
+        @pages = Math.ceil((count + userCount)/ @resultsPerPage)
         @renderPaginiation()
+
+        if count + userCount is 0
+          @$list.append '<li class="general empty">' + i18nListing.listings.empty.index + '</li>'
+          
     
     renderPaginiation : (e) =>
       
@@ -493,7 +513,7 @@ define [
 
         # Reset and get new
         Parse.App.activity.reset()
-        @performSearchWithinMap()
+        @search()
 
     
     # Track positioning and visibility.

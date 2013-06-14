@@ -63,7 +63,7 @@ define [
       
       if action.length is 1 or action[0] is "add"
         name = "views/property/sub/#{action.join("/")}"
-        @renderSubView name, model: @model, params: params 
+        @renderSubView name, model: @model, params: params, forNetwork: true
         
       else
 
@@ -78,7 +78,7 @@ define [
         submodel = if @model[action[0]] then @model[action[0]].get(subid) else false
 
         if submodel
-          @renderSubView name, property: @model, model: submodel
+          @renderSubView name, property: @model, model: submodel, forNetwork: true
         # Else get it from the server.
         else
           nodeType = switch action[0]
@@ -86,7 +86,7 @@ define [
             when "leases" then Lease
             when "units" then Unit
           (new Parse.Query(nodeType)).get subid, success: (submodel) =>
-            @renderSubView name, property: @model, model: submodel
+            @renderSubView name, property: @model, model: submodel, forNetwork: true
 
 
     renderSubView: (name, vars) =>

@@ -77,7 +77,7 @@
           };
           return Parse.User.current().save(vars).then(function() {
             Parse.history.navigate("/account/building", true);
-            return console.log('hi');
+            return this.clear();
           }, function(error) {
             return console.log(error);
           });

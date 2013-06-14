@@ -598,6 +598,9 @@ Parse.Cloud.beforeSave "Property", (req, res) ->
     return res.error 'title_missing' 
   
   unless req.object.existed()
+
+    # TODO: Special transfer code if it was previously NOT part of a network and has now been transferred.
+
     if req.object.get("network")
       (new Parse.Query "Network").include("role").get req.object.get("network").id,
       success : (network) ->

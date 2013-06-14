@@ -162,8 +162,8 @@ define
     first:                "First"
     last:                 "Last"
   adjectives:
-    small:                "Big"
-    big:                  "Small"
+    small:                "Small"
+    big:                  "Big"
     done:                 "Done"
     new:                  "new"
     unsaved:              "Unsaved"
