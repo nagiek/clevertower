@@ -45,9 +45,9 @@ define [
 
     join: ->
       if @forNetwork
-        @view.trigger "property:join", @model
-      else 
         @view.trigger "property:manage", @model
+      else 
+        @view.trigger "property:join", @model
 
     clear: =>
       @marker.setMap null

@@ -237,7 +237,7 @@ define [
           @$('.back').prop disabled: 'disabled'
           @$('.next').html(i18nCommon.actions.create)
 
-    clear : ->
+    clear : =>
       @stopListening()
       @undelegateEvents()
       delete this

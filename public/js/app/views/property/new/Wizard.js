@@ -10,6 +10,7 @@
       __extends(PropertyWizardView, _super);
 
       function PropertyWizardView() {
+        this.clear = __bind(this.clear, this);
         this.back = __bind(this.back, this);
         this.next = __bind(this.next, this);
         this.manage = __bind(this.manage, this);
