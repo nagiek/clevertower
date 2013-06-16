@@ -37,9 +37,6 @@
         return Parse.Promise.when(mgrQuery, netQuery, profileQuery).then(function(mgrObj, netObj, profiles) {
           var email, foundProfile, joinClassACL, joinClassName, newProfileSaves, profileACL, propRoleUsers, tntRoleUsers, _i, _len;
 
-          if (className === "Lease" && !(mgrObj || netObj)) {
-            res.error("not_a_manager");
-          }
           joinClassName = className === "Lease" ? "Tenant" : "Applicant";
           joinClassACL = new Parse.ACL;
           if (tntRole) {
@@ -879,9 +876,12 @@
       if (existed) {
         return res.success();
       }
+      console.log(req.user);
+      Parse.Cloud.useMasterKey();
+      console.log(req.user);
       return (new Parse.Query("Property")).include('mgrRole').include('network.role').get(req.object.get("property").id, {
         success: function(property) {
-          var current, emails, leaseACL, mgrRole, netRole, network, possible, randomId, role, users, _j;
+          var channels, current, emails, leaseACL, mgrRole, netRole, network, notificationACL, possible, randomId, role, savesToComplete, _j;
 
           network = property.get("network");
           mgrRole = property.get("mgrRole");
@@ -891,84 +891,66 @@
             property: property,
             network: network
           });
+          randomId = "";
+          possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+          for (_j = 1; _j < 16; _j++) {
+            randomId += possible.charAt(Math.floor(Math.random() * possible.length));
+          }
+          current = "tnt-current-" + randomId;
+          leaseACL = new Parse.ACL();
+          leaseACL.setPublicReadAccess(false);
+          leaseACL.setRoleReadAccess(current, true);
+          leaseACL.setRoleWriteAccess(current, true);
+          leaseACL.setRoleReadAccess(mgrRole, true);
+          leaseACL.setRoleWriteAccess(mgrRole, true);
           if (network) {
             netRole = network.get("role");
             if (!netRole) {
               return res.error("role_missing");
             }
-            users = netRole.getUsers();
-            return users.query().get(req.user.id, {
-              success: function(obj) {
-                var current, emails, leaseACL, possible, randomId, role, _j;
-
-                if (obj) {
-                  req.object.set("confirmed", true);
-                } else if (!existed) {
-                  emails = req.object.get("emails") || [];
-                  emails.push(req.user.getEmail());
-                  req.object.set("emails", emails);
-                }
-                randomId = "";
-                possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-                for (_j = 1; _j < 16; _j++) {
-                  randomId += possible.charAt(Math.floor(Math.random() * possible.length));
-                }
-                current = "tnt-current-" + randomId;
-                leaseACL = property.getACL();
-                leaseACL.setPublicReadAccess(false);
-                leaseACL.setRoleReadAccess(current, true);
-                if (netRole) {
-                  leaseACL.setRoleWriteAccess(netRole, true);
-                }
-                if (netRole) {
-                  leaseACL.setRoleReadAccess(netRole, true);
-                }
-                leaseACL.setRoleReadAccess(mgrRole, true);
-                leaseACL.setRoleWriteAccess(mgrRole, true);
-                req.object.setACL(leaseACL);
-                role = new Parse.Role(current, leaseACL);
-                return role.save().then(function() {
-                  req.object.set("role", role);
-                  return res.success();
-                }, function() {
-                  return res.error();
-                });
-              },
-              error: function() {
-                return res.error("user_missing");
-              }
-            });
-          } else {
+            leaseACL.setRoleReadAccess(netRole, true);
+            leaseACL.setRoleWriteAccess(netRole, true);
+          }
+          req.object.setACL(leaseACL);
+          savesToComplete = [];
+          if (!(property.get("user").id === req.user.id && req.object.get("forNetwork"))) {
+            channels = ["properties-" + property.id];
+            notificationACL = new Parse.ACL;
+            notificationACL.setRoleReadAccess(mgrRole, true);
+            notificationACL.setRoleWriteAccess(mgrRole, true);
+            if (network) {
+              notificationACL.setRoleReadAccess(propRole, true);
+              notificationACL.setRoleWriteAccess(propRole, true);
+              channels.push("networks-" + network.id);
+            }
+            savesToComplete.push(new Parse.Object("Notification").save({
+              name: "lease_join",
+              text: "New tenants have joined " + (property.get("title")),
+              channels: channels,
+              channel: "property-" + property.id,
+              forMgr: true,
+              withAction: false,
+              property: property,
+              network: network,
+              ACL: notificationACL
+            }));
+          }
+          if (!req.object.get("forNetwork")) {
             emails = req.object.get("emails") || [];
             emails.push(req.user.getEmail());
             req.object.set("emails", emails);
-            randomId = "";
-            possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            for (_j = 1; _j < 16; _j++) {
-              randomId += possible.charAt(Math.floor(Math.random() * possible.length));
-            }
-            current = "tnt-current-" + randomId;
-            leaseACL = property.getACL();
-            leaseACL.setPublicReadAccess(false);
-            leaseACL.setRoleReadAccess(current, true);
-            if (netRole) {
-              leaseACL.setRoleWriteAccess(netRole, true);
-            }
-            if (netRole) {
-              leaseACL.setRoleReadAccess(netRole, true);
-            }
-            leaseACL.setRoleReadAccess(mgrRole, true);
-            leaseACL.setRoleWriteAccess(mgrRole, true);
-            req.object.setACL(leaseACL);
-            role = new Parse.Role(current, leaseACL);
-            role.getUsers().add(req.user);
-            return role.save().then(function() {
-              req.object.set("role", role);
-              return res.success();
-            }, function() {
-              return res.error();
-            });
           }
+          role = new Parse.Role(current, leaseACL);
+          if (!req.object.get("forNetwork")) {
+            role.getUsers().add(req.user);
+          }
+          savesToComplete.push(role.save());
+          return Parse.Promise.when(savesToComplete).then(function() {
+            req.object.set("role", role);
+            return res.success();
+          }, function() {
+            return res.error("role_error");
+          });
         },
         error: function() {
           return res.error("bad_query");
@@ -985,19 +967,38 @@
     today = new Date;
     start_date = req.object.get("start_date");
     end_date = req.object.get("end_date");
+    if (!req.object.get("forNetwork")) {
+      req.user.save({
+        property: req.object.get("property"),
+        unit: req.object.get("unit"),
+        lease: req.object
+      });
+    }
     active = start_date < today && today < end_date;
     if (active || !req.object.existed()) {
       (new Parse.Query("Unit")).get(req.object.get("unit").id, {
         success: function(unit) {
-          var noProperty;
+          var keys, noProperty, role, unitACL, unitACLList, _;
 
+          unitACL = req.object.getACL();
           if (active) {
             unit.set("activeLease", req.object);
+            _ = require("underscore");
+            unitACLList = unitACL.toJSON();
+            keys = _.keys(unitACLList);
+            role = _.find(keys, function(key) {
+              return key.indexOf("role:tnt-current" === 0);
+            });
+            if (role) {
+              role = role.substr(5);
+              unitACL.setRoleReadAccess(role, true);
+              unitACL.setRoleWriteAccess(role, true);
+            }
           }
           noProperty = !unit.get("property");
           if (noProperty) {
             unit.set({
-              ACL: req.object.getACL(),
+              ACL: unitACL,
               property: req.object.get("property")
             });
           }
@@ -1233,8 +1234,11 @@
               }
               req.object.set("status", newStatus);
             } else {
-              if (mgrRole || netRole) {
+              if (mgrRole || netRole || propRole) {
                 profileACL = profile.getACL();
+                if (propRole) {
+                  profileACL.setRoleReadAccess(propRole, true);
+                }
                 if (mgrRole) {
                   profileACL.setRoleReadAccess(mgrRole, true);
                 }

@@ -4,11 +4,12 @@ define [
   "backbone"
   "i18n!nls/common"
   "i18n!nls/property"
+  "i18n!nls/group"
   "i18n!nls/lease"
   "i18n!nls/user"
   "templates/user/sub/building"
   "templates/profile/thumbnail"
-], ($, _, Parse, i18nCommon, i18nProperty, i18nLease, i18nUser) ->
+], ($, _, Parse, i18nCommon, i18nProperty, i18nGroup, i18nLease, i18nUser) ->
 
   class BuildingUserView extends Parse.View
     
@@ -57,11 +58,11 @@ define [
       @$rList.html ""
 
       # Check to see if we have more than one tenant for each lsit
-      hasR = Parse.User.current().get("property").tenants.find (t) -> t.get("lease").id is Parse.User.current().get("lease").id
-      hasT = Parse.User.current().get("property").tenants.find (t) -> t.get("lease").id isnt Parse.User.current().get("lease").id
+      hasR = Parse.User.current().get("property").tenants.find (t) -> t.get("lease").id isnt Parse.User.current().get("lease").id
+      hasT = Parse.User.current().get("property").tenants.find (t) -> t.get("lease").id is Parse.User.current().get("lease").id
 
-      if hasT then @$tList.append "<li class='empty'>#{i18nLease.empty.tenants}</li>"
-      if hasR then @$rList.append "<li class='empty'>#{i18nLease.empty.roommates}</li>"
+      unless hasT then @$tList.append "<li class='empty'>#{i18nGroup.tenant.empty.in_property}</li>"
+      unless hasR then @$rList.append "<li class='empty'>#{i18nLease.empty.roommates}</li>"
       Parse.User.current().get("property").tenants.each @addOne
 
     addOne: (t) =>

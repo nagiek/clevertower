@@ -76,12 +76,9 @@
             property: lease.get("property"),
             mgrOfProp: isNew
           };
-          return Parse.User.current().save(vars).then(function() {
-            Parse.history.navigate("/account/building", true);
-            return this.clear();
-          }, function(error) {
-            return console.log(error);
-          });
+          Parse.User.current().set(vars);
+          Parse.history.navigate("/account/building", true);
+          return _this.clear();
         });
       };
 
@@ -105,8 +102,8 @@
           return;
         }
         this.$('.error').removeClass('error');
-        this.$('button.next').prop("disabled", "disabled");
-        this.$('button.join').prop("disabled", "disabled");
+        this.$('button.next').prop("disabled", true);
+        this.$('button.join').prop("disabled", true);
         this.state = 'join';
         this.existingProperty = existingProperty;
         return require(["views/property/new/Join"], function(JoinPropertyView) {
@@ -123,8 +120,8 @@
         var _this = this;
 
         this.$('.error').removeClass('error');
-        this.$('button.next').prop("disabled", "disabled");
-        this.$('button.join').prop("disabled", "disabled");
+        this.$('button.next').prop("disabled", true);
+        this.$('button.join').prop("disabled", true);
         return require(["models/Concierge"], function(Concierge) {
           var alert, concierge;
 
@@ -150,8 +147,8 @@
           _this = this;
 
         this.$('.error').removeClass('error');
-        this.$('button.next').prop("disabled", "disabled");
-        this.$('button.join').prop("disabled", "disabled");
+        this.$('button.next').prop("disabled", true);
+        this.$('button.join').prop("disabled", true);
         switch (this.state) {
           case 'address':
             center = this.model.get("center");

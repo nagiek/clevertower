@@ -27,7 +27,7 @@
 
   <div class="span6">
     <% if (property && unit && lease) { %>
-      <div id="profile-property" class="well">
+      <div id="profile-property">
         <hgroup>
           <h4><%= i18nCommon.nouns.building %></h4>
           <% if (property.thoroughfare) { %><h5><%= property.thoroughfare %></h5><% } %>
@@ -35,7 +35,7 @@
         <% if (property.email) { %><div><strong><%= i18nCommon.fields.email %>:</strong> <%= property.email %></div><% } %>
         <% if (property.phone) { %><div><strong><%= i18nCommon.fields.phone %>:</strong> <%= property.phone %></div><% } %>
       </div>
-      <div id="profile-lease" class="well">
+      <div id="profile-lease">
         <hgroup>
           <h4><%= i18nCommon.classes.Lease %></h4>
           <% if (unit.title) { %><h5><%= i18nCommon.classes.Unit %> <%= unit.title %></h5><% } %>

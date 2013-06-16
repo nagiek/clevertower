@@ -43,6 +43,7 @@
         if (this.forNetwork && Parse.User.current() && Parse.User.current().get("network")) {
           this.model.set(network, Parse.User.current().get("network"));
         }
+        this.model.set(forNetwork, this.forNetwork);
         this.modal = attrs.modal;
         if (this.modal) {
           this.setElement('#apply-modal');
@@ -81,7 +82,7 @@
               return _this.$('.date-group').addClass('error');
           }
         });
-        this.on("save:success", function(model) {
+        this.on("save:success", function(model, isNew) {
           var vars;
 
           new Alert({
@@ -113,13 +114,11 @@
             vars = {
               lease: model,
               unit: model.get("unit"),
-              property: model.get("property"),
-              mgrOfProp: isNew
+              property: model.get("property")
             };
-            return Parse.User.current().save(vars).then(function() {
-              Parse.history.navigate("/account/building", true);
-              return this.clear();
-            });
+            Parse.User.current().set(vars);
+            Parse.history.navigate("/account/building", true);
+            return _this.clear();
           }
         });
         this.listenTo(this.model, 'destroy', this.clear);

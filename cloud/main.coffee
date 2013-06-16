@@ -60,7 +60,8 @@ Parse.Cloud.define "AddTenants", (req, res) ->
 
     Parse.Promise.when(mgrQuery, netQuery, profileQuery)
     .then (mgrObj, netObj, profiles) ->
-      res.error "not_a_manager" if className is "Lease" and !(mgrObj or netObj)
+      # We can allow this, for tenants joining the property.
+      # res.error "not_a_manager" if className is "Lease" and !(mgrObj or netObj)
 
       # ACL for our new object
       # ----------------------
@@ -880,6 +881,13 @@ Parse.Cloud.beforeSave "Lease", (req, res) ->
         if start_date <= ed and ed <= end_date then return res.error "#{obj.id}:overlapping_dates"
      
     return res.success() if existed
+
+    console.log req.user
+
+    # Have to use the master key to check the role.
+    Parse.Cloud.useMasterKey()
+
+    console.log req.user
     
     (new Parse.Query "Property").include('mgrRole').include('network.role').get req.object.get("property").id,
     success: (property) ->
@@ -892,92 +900,83 @@ Parse.Cloud.beforeSave "Lease", (req, res) ->
         confirmed: false
         property: property
         network: network
-      
-      # Change the status depending on who is creating the lease.
+
+      # Role lists
+      randomId = ""
+      possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+      randomId += possible.charAt Math.floor(Math.random() * possible.length) for [1...16]
+      current = "tnt-current-" + randomId
+
+      # Give tenants access to read the property, and managers to read/write
+      leaseACL = new Parse.ACL()
+      # leaseACL = property.getACL()
+      # Never let the lease be publicly visible
+      leaseACL.setPublicReadAccess false
+
+      # Let the tenants read/write the lease. 
+      # If we don't want the the tenants to make changes, we can catch the attributes in the beforesave.
+      leaseACL.setRoleReadAccess current, true
+      leaseACL.setRoleWriteAccess current, true
+
+      leaseACL.setRoleReadAccess mgrRole, true
+      leaseACL.setRoleWriteAccess mgrRole, true
+
+      # Let managers edit the lease.
       if network
         netRole = network.get("role") 
         return res.error "role_missing" unless netRole
-        
-        # Check if the user is in the role.
-        # Users are in a Parse.Relation, which requires a second query.
-        users = netRole.getUsers()
-        users.query().get req.user.id,
-        success: (obj) ->
+        leaseACL.setRoleReadAccess netRole, true
+        leaseACL.setRoleWriteAccess netRole, true
+      req.object.setACL leaseACL
 
-          if obj
-            req.object.set "confirmed", true
-          else unless existed
-            emails = req.object.get("emails") || []
-            emails.push req.user.getEmail()
-            req.object.set "emails", emails
-            
-          # Role lists
-          randomId = ""
-          possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-          randomId += possible.charAt Math.floor(Math.random() * possible.length) for [1...16]
-          current = "tnt-current-" + randomId
+      # Send a notification to the property if we are joining.
+      # 
+      # Instead of going through the hassle of checking the roles,
+      # we can simplify and just compare if the property and lease were 
+      # created by the same person.
+      # --------
 
-          # Give tenants access to read the property, and managers to read/write
-          # leaseACL = new Parse.ACL()
-          leaseACL = property.getACL()
-          # Never let the lease be publicly visible
-          leaseACL.setPublicReadAccess false
-          leaseACL.setRoleReadAccess current, true
-          leaseACL.setRoleWriteAccess netRole, true if netRole
-          leaseACL.setRoleReadAccess netRole, true if netRole
-          leaseACL.setRoleReadAccess mgrRole, true
-          leaseACL.setRoleWriteAccess mgrRole, true
+      savesToComplete = []
 
-          req.object.setACL leaseACL
+      unless property.get("user").id is req.user.id and req.object.get("forNetwork")
+        channels = ["properties-#{property.id}"]
+        notificationACL = new Parse.ACL
+        notificationACL.setRoleReadAccess mgrRole, true
+        notificationACL.setRoleWriteAccess mgrRole, true
+        if network
+          notificationACL.setRoleReadAccess propRole, true
+          notificationACL.setRoleWriteAccess propRole, true
+          channels.push "networks-#{network.id}"
+        savesToComplete.push new Parse.Object("Notification").save
+          name: "lease_join"
+          text: "New tenants have joined #{property.get("title")}"
+          channels: channels
+          channel: "property-#{property.id}"
+          forMgr: true
+          withAction: false
+          property: property
+          network: network
+          ACL: notificationACL
 
-          # Create new role (API not chainable)
-          # Prepare a role for tenants
-          role = new Parse.Role(current, leaseACL)
-          role.save().then -> 
-            req.object.set "role", role
-            res.success()
-          , ->
-            res.error()
-
-        error: -> res.error "user_missing"
-      else 
-
-        # ----------------------------------
-        # Cut and paste from the code above.
-        # ----------------------------------
-
+      # Change the status depending on who is creating the lease.
+      unless req.object.get "forNetwork"
         emails = req.object.get("emails") || []
         emails.push req.user.getEmail()
         req.object.set "emails", emails
-            
-        # Role lists
-        randomId = ""
-        possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-        randomId += possible.charAt Math.floor(Math.random() * possible.length) for [1...16]
-        current = "tnt-current-" + randomId
 
-        # Give tenants access to read the property, and managers to read/write
-        leaseACL = property.getACL()
-        # Never let the lease be publicly visible
-        leaseACL.setPublicReadAccess false
-        leaseACL.setRoleReadAccess current, true
-        leaseACL.setRoleWriteAccess netRole, true if netRole
-        leaseACL.setRoleReadAccess netRole, true if netRole
-        leaseACL.setRoleReadAccess mgrRole, true
-        leaseACL.setRoleWriteAccess mgrRole, true
+      # Create new role (API not chainable)
+      # Prepare a role for tenants
+      role = new Parse.Role(current, leaseACL)
+      role.getUsers().add req.user unless req.object.get "forNetwork"
+      savesToComplete.push role.save()
 
-        req.object.setACL leaseACL
+      Parse.Promise.when(savesToComplete)
+      .then -> 
+        req.object.set "role", role
+        res.success()
+      , ->
+        res.error "role_error"
 
-        # Create new role (API not chainable)
-        # Prepare a role for tenants
-        role = new Parse.Role(current, leaseACL)
-        # !!! Only different thing from above.
-        role.getUsers().add req.user
-        role.save().then -> 
-          req.object.set "role", role
-          res.success()
-        , ->
-          res.error()
     error: -> res.error "bad_query"
   , -> res.error "bad_query"
 
@@ -990,6 +989,12 @@ Parse.Cloud.afterSave "Lease", (req) ->
   start_date  = req.object.get "start_date"
   end_date    = req.object.get "end_date"
 
+  unless req.object.get "forNetwork"  
+    req.user.save 
+      property: req.object.get "property"
+      unit: req.object.get "unit"
+      lease: req.object
+
   # Adjust the unit if the lease is active, or if there is
   # the chance that the unit is new and needs adjusting.
   active = start_date < today and today < end_date
@@ -997,14 +1002,28 @@ Parse.Cloud.afterSave "Lease", (req) ->
     (new Parse.Query "Unit").get req.object.get("unit").id,
     success: (unit) ->
 
-      unit.set "activeLease", req.object if active
+      unitACL = req.object.getACL()
+
+      if active
+        unit.set "activeLease", req.object
+
+        _ = require "underscore"
+        unitACLList = unitACL.toJSON()
+        keys = _.keys unitACLList
+        role = _.find keys, (key) -> key.indexOf "role:tnt-current" is 0
+
+        if role 
+          # Remove the "role:" from the name.
+          role = role.substr(5)
+          unitACL.setRoleReadAccess role, true
+          unitACL.setRoleWriteAccess role, true
 
       # We do not have an ACL if we do not have a property (like when a
       # tenant creates a lease/property combo). Therefore set the ACL
       # from the lease.
       noProperty = !unit.get("property")
       if noProperty then unit.set
-        ACL: req.object.getACL()
+        ACL: unitACL
         property: req.object.get("property")
 
       # Save only if we have to.
@@ -1275,10 +1294,11 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
         else
 
           # Give property managers access to user.
-          if mgrRole or netRole
+          if mgrRole or netRole or propRole
             # This will fail if mgrRole or netRole doesn't exist.
             # unless profileACL.getRoleReadAccess(mgrRole) and profileACL.getRoleReadAccess(netRole)
             profileACL = profile.getACL()
+            profileACL.setRoleReadAccess propRole, true if propRole
             profileACL.setRoleReadAccess mgrRole, true if mgrRole
             profileACL.setRoleReadAccess netRole, true if netRole
             savesToComplete.push profile.save ACL: profileACL

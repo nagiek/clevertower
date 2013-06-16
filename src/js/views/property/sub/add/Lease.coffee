@@ -28,7 +28,7 @@ define [
       @lease = new Lease(vars)
       
     render : ->
-      @form = new NewLeaseView(model: @lease, property: @model, baseUrl: @baseUrl).render()
+      @form = new NewLeaseView(model: @lease, property: @model, baseUrl: @baseUrl, forNetwork: true).render()
       @
     
     clear : ->

@@ -66,10 +66,9 @@ define [
           unit: lease.get "unit"
           property: lease.get "property"
           mgrOfProp: isNew
-        Parse.User.current().save(vars).then ->
-          Parse.history.navigate "/account/building", true
-          @clear()
-        , (error) -> console.log error
+        Parse.User.current().set(vars)
+        Parse.history.navigate "/account/building", true
+        @clear()
 
 
     render : ->
@@ -84,8 +83,8 @@ define [
     join : (existingProperty) =>
       return if @state is 'join'
       @$('.error').removeClass('error')
-      @$('button.next').prop "disabled", "disabled"
-      @$('button.join').prop "disabled", "disabled"
+      @$('button.next').prop "disabled", true
+      @$('button.join').prop "disabled", true
       @state = 'join'
       @existingProperty = existingProperty
 
@@ -96,8 +95,8 @@ define [
 
     manage : (existingProperty) =>
       @$('.error').removeClass('error')
-      @$('button.next').prop "disabled", "disabled"
-      @$('button.join').prop "disabled", "disabled"
+      @$('button.next').prop "disabled", true
+      @$('button.join').prop "disabled", true
 
       require ["models/Concierge"], (Concierge) =>
         concierge = new Concierge
@@ -112,8 +111,8 @@ define [
 
     next : (e) =>
       @$('.error').removeClass('error')
-      @$('button.next').prop "disabled", "disabled"
-      @$('button.join').prop "disabled", "disabled"
+      @$('button.next').prop "disabled", true
+      @$('button.join').prop "disabled", true
       switch @state
         when 'address'
           center = @model.get "center"

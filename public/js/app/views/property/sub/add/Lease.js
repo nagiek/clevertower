@@ -42,7 +42,8 @@
         this.form = new NewLeaseView({
           model: this.lease,
           property: this.model,
-          baseUrl: this.baseUrl
+          baseUrl: this.baseUrl,
+          forNetwork: true
         }).render();
         return this;
       };

@@ -39,7 +39,7 @@ define [
       @property = attrs.property
 
       # Don't set the property on the lease, as we may not have access to it.
-      @model = new Lease
+      @model = new Lease(forNetwork: false)
             
       @listenTo @model, 'invalid', (error) =>
         @$('.error').removeClass('error')

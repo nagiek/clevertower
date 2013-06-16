@@ -44,6 +44,7 @@ define [
 
       @model = new Lease unless @model
       @model.set network, Parse.User.current().get("network") if @forNetwork and Parse.User.current() and Parse.User.current().get("network")
+      @model.set forNetwork, @forNetwork
 
       @modal = attrs.modal
       @setElement '#apply-modal' if @modal
@@ -72,7 +73,7 @@ define [
           when 'dates_missing' or 'dates_incorrect'
             @$('.date-group').addClass('error')
       
-      @on "save:success", (model) =>
+      @on "save:success", (model, isNew) =>
 
         new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
         @model.id = model.id
@@ -96,10 +97,10 @@ define [
             lease: model
             unit: model.get "unit"
             property: model.get "property"
-            mgrOfProp: isNew
-          Parse.User.current().save(vars).then ->
-            Parse.history.navigate "/account/building", true
-            @clear()
+
+          Parse.User.current().set(vars)
+          Parse.history.navigate "/account/building", true
+          @clear()
                 
       @listenTo @model, 'destroy', @clear
       

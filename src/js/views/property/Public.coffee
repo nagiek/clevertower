@@ -123,8 +123,8 @@ define [
     showModal: (e) =>
       e.preventDefault()
       if Parse.User.current()
-        require ['models/Lease', 'views/lease/New'], (Lease, LeaseView) =>
-          @lease = new Lease property: @model unless @lease
-          new LeaseView(model: @lease, property: @model, modal: true).render().$el.modal()
+        require ['models/Lease', 'views/lease/New'], (Lease, NewLeaseView) =>
+          @lease = new Lease property: @model, forNetwork: false unless @lease
+          new NewLeaseView(model: @lease, property: @model, network: @model.get("network"), modal: true).render().$el.modal()
       else
         $("#signup-modal").modal()
