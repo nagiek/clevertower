@@ -70,10 +70,9 @@ define [
       else
 
         # Subnode view
-        propertyCentric = false
         node = action[0][0].toUpperCase() + inflection.singularize[action[0]].substring(1) # units => Unit
         subid = action[1]
-        subaction = if action[2] then action[2] else "show"
+        subaction = if action[2] then "sub/#{action[2]}" else "show"
         name = "views/#{node}/#{subaction}"
 
         # Load the model if it exists.
@@ -103,7 +102,6 @@ define [
       $('#preview-profile-picture img').prop('src', @model.cover('profile'))
     
     clear: =>
-      Parse.User.current().get("network").properties.trigger "close"
       @undelegateEvents()
       @remove()
       delete this

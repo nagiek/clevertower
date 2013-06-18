@@ -18,7 +18,6 @@ define [
       @listenTo Parse.Dispatcher, "user:change", @render
 
       @bindListenEvents() if Parse.User.current()
-
     
     bindListenEvents : ->
       @listenTo Parse.User.current(), "change:network", @render
@@ -42,9 +41,13 @@ define [
         if Parse.User.current().get("network") 
           networkUrl = if hostArray.length > 1 then "/" else Parse.User.current().get("network").privateUrl()
         else if Parse.User.current().get("property")
-          if Parse.User.current().get("mgrOfProp") and !Parse.User.current().get("property").get("network")
-            networkUrl = "/manage"
-          else networkUrl = "/network/new"
+
+          # /manage contains a link to upgrade.
+          networkUrl = "/manage"
+
+          # if Parse.User.current().get("mgrOfProp") and !Parse.User.current().get("property").get("network")
+          #   networkUrl = "/manage"
+          # else networkUrl = "/network/new"
 
         # We have no network or property.
         else networkUrl = "/account/setup"

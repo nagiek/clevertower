@@ -2,11 +2,14 @@ define [
   'underscore'
   'backbone'
   "collections/TenantList"
+  "collections/ListingList"
+  "collections/InquiryList"
+  "collections/ApplicantList"
   "models/Property"
   "models/Unit"
   "moment"
   "i18n!nls/common"
-], (_, Parse, TenantList, Property, Unit, moment, i18nCommon) ->
+], (_, Parse, TenantList, ListingList, InquiryList, ApplicantList, Property, Unit, moment, i18nCommon) ->
 
   Lease = Parse.Object.extend "Lease",
   
@@ -29,10 +32,7 @@ define [
       # tenants_invited: new Parse.Relation()
       # tenants_current: new Parse.Relation()
     
-    initialize: ->
-      _.bindAll this, 'isActive'
-    
-    isActive: ->
+    isActive: =>
       sd = @get "start_date"
       ed = @get "end_date"
       return false unless sd and ed
@@ -80,5 +80,11 @@ define [
             @[collectionName] = new TenantList [], lease: @
           else
             @[collectionName] = if network.tenants then network.tenants else new TenantList [], lease: @
+        when "listings"
+          @[collectionName] = new ListingList [], lease: @
+        when "inquiries"
+          @[collectionName] = new InquiryList [], lease: @
+        when "applicants"
+          @[collectionName] = new ApplicantList [], lease: @
 
       @[collectionName]

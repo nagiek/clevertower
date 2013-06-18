@@ -62,6 +62,22 @@
         return this[collectionName];
       };
 
+      Unit.prototype.scrub = function(unit) {
+        var attr, _i, _len, _ref1;
+
+        _ref1 = ['bedrooms', 'bathrooms'];
+        for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+          attr = _ref1[_i];
+          if (unit[attr] === '' || unit[attr] === '0') {
+            unit[attr] = 0;
+          }
+          if (unit[attr]) {
+            unit[attr] = Number(unit[attr]);
+          }
+        }
+        return unit;
+      };
+
       return Unit;
 
     })(Parse.Object);

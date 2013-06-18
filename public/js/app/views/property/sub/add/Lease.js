@@ -20,6 +20,7 @@
 
         this.on("view:change", this.clear);
         this.baseUrl = attrs.baseUrl;
+        this.forNetwork = attrs.forNetwork;
         vars = {
           property: this.model,
           network: this.model.get("network")
@@ -43,7 +44,7 @@
           model: this.lease,
           property: this.model,
           baseUrl: this.baseUrl,
-          forNetwork: true
+          forNetwork: this.forNetwork
         }).render();
         return this;
       };

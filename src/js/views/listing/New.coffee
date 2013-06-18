@@ -13,7 +13,6 @@ define [
   "i18n!nls/unit"
   "i18n!nls/listing"
   "templates/listing/new"
-  "templates/listing/edit"
   "templates/listing/form"
   "templates/helper/field/unit"
   "templates/helper/field/property"
@@ -36,15 +35,15 @@ define [
       'change .unit-select'         : 'showUnitIfNew'
     
     initialize : (attrs) ->
-      
-      _.bindAll this, 'addOne', 'addAll', 'save', 'setThisMonth', 'setNextMonth', 'setJulyJune'
-      
+
       @property = attrs.property
+      @unit = attrs.unit
       @baseUrl = attrs.baseUrl
+      @forNetwork = attrs.forNetwork
       
       @model = new Listing(network: Parse.User.current().get("network")) unless @model
-      @template = "src/js/templates/listing/#{if @model.isNew() then 'new' else 'edit'}.jst"
-      @cancel_path = @baseUrl + unless @model.isNew() then "/listings/#{@model.id}" else ""
+      @template = "src/js/templates/listing/#{if @model.isNew() then 'new' else 'sub/edit'}.jst"
+      @cancel_path = @baseUrl + if !@model.isNew() and @forNetwork then "/listings/#{@model.id}" else ""
             
       @listenTo @model, 'invalid', (error) =>
         console.log error
@@ -93,15 +92,46 @@ define [
                 
       @listenTo @model, 'destroy', @clear
       
-      @units = @property.prep("units") if @property
-
-      @units.bind "add", @addOne
-      @units.bind "reset", @addAll
+      @unit = @model.get("unit")
+      unless @unit
+        @property.prep("units")
+        @listenTo @property.units, "add", @addOne
+        @listenTo @property.units, "reset", @addAll
               
       @current = new Date().setDate(1)
       @dates =
         start:  if @model.get "start_date"  then moment(@model.get("start_date")).format("L")  else moment(@current).format("L")
         end:    if @model.get "end_date"    then moment(@model.get("end_date")).format("L")    else moment(@current).add(1, 'year').subtract(1, 'day').format("L")
+
+
+    render: =>
+      rand = Math.floor Math.random() * i18nListing.form.title_placeholders.length
+      vars =
+        listing: _.defaults(@model.attributes, Listing::defaults)
+        unit: if @unit then @unit.toJSON() else false
+        dates: @dates
+        cancel_path: @cancel_path
+        title_placeholder: i18nListing.form.title_placeholders[rand]
+        moment: moment
+        i18nCommon: i18nCommon
+        i18nUnit: i18nUnit
+        i18nListing: i18nListing
+
+      @$el.html JST[@template](vars)
+      
+      # @el = "form.listing-form"
+      # @$el = $("#content form.listing-form")
+      @$unitSelect = @$('.unit-select')
+          
+      @$startDate = @$('.start-date')
+      @$endDate = @$('.end-date')
+      $('.datepicker').datepicker()
+      
+      if @unit        
+        @addOne @unit
+      else
+        if @property.units.length is 0 then @property.units.fetch() else @addAll()
+      @
 
     addOne : (u) =>
       HTML = "<option value='#{u.id}'" + (if @model.get("unit") and @model.get("unit").id == u.id then "selected='selected'" else "") + ">#{u.get('title')}</option>"
@@ -114,9 +144,10 @@ define [
           <option value=''>#{i18nCommon.form.select.select_value}</option>
           <option value='-1'>#{i18nUnit.constants.new_unit}</option>
         """
-      @units.each @addOne
 
-    save : (e) ->
+      @property.units.each @addOne
+
+    save : (e) =>
       e.preventDefault() if e
       
       @$('button.save').prop "disabled", "disabled"
@@ -139,7 +170,7 @@ define [
           unit = new Unit data.unit.attributes
           unit.set "property", @property
         else 
-          unit = @units.get data.unit.id
+          unit = @property.units.get data.unit.id
         attrs.unit = unit
 
       @model.save attrs,
@@ -159,44 +190,17 @@ define [
     #   diff = end.diff(start, 'days')
     #   @$endDate.val start.add(diff, 'days').format("L")
 
-    setThisMonth : ->
+    setThisMonth : =>
       @$startDate.val moment(@current).format("L")
       @$endDate.val moment(@current).add(1, 'year').subtract(1, 'day').format("L")
       
-    setNextMonth : ->
+    setNextMonth : =>
       @$startDate.val moment(@current).add(1, 'month').format("L")
       @$endDate.val moment(@current).add(1, 'month').add(1, 'year').subtract(1, 'day').format("L")
       
-    setJulyJune : ->
+    setJulyJune : =>
       @$startDate.val moment(@current).month(6).format("L")
       @$endDate.val moment(@current).month(6).add(1, 'year').subtract(1, 'day').format("L")
-
-    render: ->
-      rand = Math.floor Math.random() * i18nListing.form.title_placeholders.length
-      vars =
-        listing: _.defaults(@model.attributes, Listing::defaults)
-        unit: if @model.get "unit" then @model.get "unit" else false
-        dates: @dates
-        cancel_path: @cancel_path
-        title_placeholder: i18nListing.form.title_placeholders[rand]
-        # units: @units
-        moment: moment
-        i18nCommon: i18nCommon
-        i18nUnit: i18nUnit
-        i18nListing: i18nListing
-
-      @$el.html JST[@template](vars)
-      
-      # @el = "form.listing-form"
-      # @$el = $("#content form.listing-form")
-      @$unitSelect = @$('.unit-select')
-          
-      @$startDate = @$('.start-date')
-      @$endDate = @$('.end-date')
-      $('.datepicker').datepicker()
-      
-      if @units.length is 0 then @units.fetch() else @addAll()
-      @
 
     clear: =>
       @stopListening()

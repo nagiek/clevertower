@@ -15,7 +15,7 @@ require.config
     jqueryui:                 "libs/jqueryui/jquery-ui-1.10.3.custom.min",                  # includes core, widget, slider, datepicker
     # underscore:               "//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min"
     underscore:               "//cdnjs.cloudflare.com/ajax/libs/lodash.js/1.0.1/lodash.min" # "libs/underscore/lodash"
-    backbone:                 "//www.parsecdn.com/js/parse-1.2.7"                       # "libs/backbone/parse"
+    backbone:                 "//www.parsecdn.com/js/parse-1.2.8"                       # "libs/backbone/parse"
                               
     # Async Libraries         
     # ---------------         
@@ -117,6 +117,9 @@ require [
   "underscore"
   "backbone"
   "facebook"
+  "models/Property"
+  "models/Unit"
+  "models/Lease"
   "models/Profile"
   "collections/ListingFeaturedList"
   "collections/ActivityList"
@@ -128,8 +131,7 @@ require [
   "serializeObject"
   "typeahead"
   "masonry"
-], ($, _, Parse, FB, Profile, FeaturedListingList, ActivityList, NotificationList, AppRouter, _String) ->
-
+], ($, _, Parse, FB, Property, Unit, Lease, Profile, FeaturedListingList, ActivityList, NotificationList, AppRouter, _String) ->
 
   # Events
   # ---------
@@ -295,6 +297,7 @@ require [
     .include('unit')
     .include('profile')
     .include('property.role')
+    .include('property.mgrRole')
     .include('network.role')
     .equalTo("objectId", @id).first()
     @notifications = new NotificationList
@@ -305,7 +308,8 @@ require [
       @notifications.add notifs
       @set "profile", user.get "profile"
       @set "lease", user.get "lease"
-      @set "unit", user.get "unit"
+      # Need to get the Unit functions when managing our lease.
+      @set "unit", new Unit(user.get("unit").attributes)
       @set "property", user.get "property"
 
       # Load the network regardless if we are on a subdomain or not, as we need the link.

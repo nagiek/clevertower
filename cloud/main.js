@@ -110,17 +110,19 @@
 
               profile = joinClass.get("profile");
               user = profile.get("user");
+              if (tntRole) {
+                tntRoleUsers.add(user);
+              }
+              if (propRole && className === "Lease") {
+                if (mgrObj || netObj || !netRole) {
+                  propRoleUsers.add(user);
+                }
+              }
               if (!(user && user.id === req.user.id)) {
                 notificationACL = new Parse.ACL();
                 if (user) {
                   notificationACL.setReadAccess(user, true);
                   notificationACL.setWriteAccess(user, true);
-                  if (tntRole) {
-                    tntRoleUsers.add(user);
-                  }
-                  if (propRole && className === "Lease") {
-                    propRoleUsers.add(user);
-                  }
                 } else {
                   Mandrill.sendEmail({
                     message: {
@@ -876,9 +878,7 @@
       if (existed) {
         return res.success();
       }
-      console.log(req.user);
       Parse.Cloud.useMasterKey();
-      console.log(req.user);
       return (new Parse.Query("Property")).include('mgrRole').include('network.role').get(req.object.get("property").id, {
         success: function(property) {
           var channels, current, emails, leaseACL, mgrRole, netRole, network, notificationACL, possible, randomId, role, savesToComplete, _j;
@@ -941,9 +941,6 @@
             req.object.set("emails", emails);
           }
           role = new Parse.Role(current, leaseACL);
-          if (!req.object.get("forNetwork")) {
-            role.getUsers().add(req.user);
-          }
           savesToComplete.push(role.save());
           return Parse.Promise.when(savesToComplete).then(function() {
             req.object.set("role", role);
@@ -962,17 +959,18 @@
   });
 
   Parse.Cloud.afterSave("Lease", function(req) {
-    var active, end_date, start_date, today;
+    var active, end_date, start_date, today, vars;
 
     today = new Date;
     start_date = req.object.get("start_date");
     end_date = req.object.get("end_date");
     if (!req.object.get("forNetwork")) {
-      req.user.save({
+      vars = {
         property: req.object.get("property"),
         unit: req.object.get("unit"),
         lease: req.object
-      });
+      };
+      req.user.save(vars);
     }
     active = start_date < today && today < end_date;
     if (active || !req.object.existed()) {

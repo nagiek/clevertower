@@ -43,7 +43,6 @@ define [
       if @model.listings.length is 0 then @model.listings.fetch() else @addAll()
       @
     
-
     # Our collection includes non-property specific tenants, so we must be vigilant
     addOne : (l) =>
       if l.get("property").id is @model.id

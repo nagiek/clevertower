@@ -1,0 +1,10 @@
+<form class="tenants-form" method="post">
+  <fieldset>
+    <%= JST["src/js/templates/helper/field/tenant.jst"]({emails: '', label: false, i18nCommon: i18nCommon}) %>
+  </fieldset>
+  
+  <div class="form-actions">
+    <button class="save btn btn-primary"><%= i18nCommon.actions.save %></button>
+    <a href="<%= baseUrl %>" class="cancel btn"><%= i18nCommon.actions.cancel %></a>
+  </div>
+</form>

@@ -1,7 +1,7 @@
 define [
   "moment"
   "views/lease/New"
-  "templates/lease/extend"
+  "templates/lease/sub/extend"
 ], (moment, NewLeaseView) ->
 
   class ExtendLeaseView extends NewLeaseView
@@ -9,7 +9,7 @@ define [
   	initialize : (attrs) ->
       
       super
-      @template = "src/js/templates/lease/extend.jst"
+      @template = "src/js/templates/lease/sub/extend.jst"
       @cancel_path = "#{@baseUrl}/leases/#{@model.id}"
 
       delete @model.id

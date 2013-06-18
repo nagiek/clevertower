@@ -2,11 +2,8 @@
   <fieldset class="span<% if (isNew) { %>4<% } else { %>6<% } %>">
     <legend><%= i18nCommon.prepositions.where %></legend>
     <div class="row">
-      <div class="unit-group control-group span<% if (isNew) { %>4<% } else { %>6<% } %>">
-        <label for="lease-unit" class="control-label"><%= i18nCommon.classes.Unit %> <span class="required">*</span></label>
-        <div class="controls">
-          <%= JST["src/js/templates/helper/field/unit.jst"]({required: true, i18nUnit: i18nUnit, i18nCommon: i18nCommon}) %>
-        </div>
+      <div class="form-inline span<% if (isNew) { %>4<% } else { %>6<% } %>">
+        <%= JST["src/js/templates/helper/field/unit.jst"]({required: true, unit: unit, i18nUnit: i18nUnit, i18nCommon: i18nCommon, help: false}) %>
       </div>
     </div>
   </fieldset>

@@ -143,21 +143,30 @@
       };
 
       DesktopRouter.prototype.propertiesManage = function(splat) {
-        var view,
+        var vars, view,
           _this = this;
 
         view = this.view;
-        return require(["views/property/Trial"], function(PropertyView) {
-          var vars;
-
-          vars = _this.deparamAction(splat);
-          if (!view || !(view instanceof PropertyView)) {
-            vars.model = Parse.User.current().get("property");
-            return _this.view = new PropertyView(vars);
-          } else {
-            return view.changeSubView(vars.path, vars.params);
-          }
-        });
+        vars = this.deparamAction(splat);
+        if (Parse.User.current().get("property").get("mgrRole")) {
+          return require(["views/property/Manage"], function(PropertyView) {
+            if (!view || !(view instanceof PropertyView)) {
+              vars.model = Parse.User.current().get("property");
+              return _this.view = new PropertyView(vars);
+            } else {
+              return view.changeSubView(vars.path, vars.params);
+            }
+          });
+        } else {
+          return require(["views/lease/Manage"], function(LeaseView) {
+            if (!view || !(view instanceof LeaseView)) {
+              vars.model = Parse.User.current().get("lease");
+              return _this.view = new LeaseView(vars);
+            } else {
+              return view.changeSubView(vars.path, vars.params);
+            }
+          });
+        }
       };
 
       DesktopRouter.prototype.propertiesPublic = function(country, region, city, id, slug) {

@@ -58,8 +58,8 @@ define [
       @$rList.html ""
 
       # Check to see if we have more than one tenant for each lsit
-      hasR = Parse.User.current().get("property").tenants.find (t) -> t.get("lease").id isnt Parse.User.current().get("lease").id
-      hasT = Parse.User.current().get("property").tenants.find (t) -> t.get("lease").id is Parse.User.current().get("lease").id
+      hasR = Parse.User.current().get("property").tenants.find (t) -> t.get("lease").id is Parse.User.current().get("lease").id
+      hasT = Parse.User.current().get("property").tenants.find (t) -> t.get("lease").id isnt Parse.User.current().get("lease").id
 
       unless hasT then @$tList.append "<li class='empty'>#{i18nGroup.tenant.empty.in_property}</li>"
       unless hasR then @$rList.append "<li class='empty'>#{i18nLease.empty.roommates}</li>"
@@ -74,5 +74,5 @@ define [
         i18nCommon: i18nCommon
 
       if t.get("lease").id is Parse.User.current().get("lease").id
-        @$tList.append "<li class='profile'>" + JST["src/js/templates/profile/thumbnail.jst"](vars) + "</li>"
-      else @$rList.append "<li class='profile'>" +JST["src/js/templates/profile/thumbnail.jst"](vars) + "</li>"
+        @$rList.append "<li class='profile'>" + JST["src/js/templates/profile/thumbnail.jst"](vars) + "</li>"
+      else @$tList.append "<li class='profile'>" +JST["src/js/templates/profile/thumbnail.jst"](vars) + "</li>"

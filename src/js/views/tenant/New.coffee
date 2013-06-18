@@ -27,10 +27,10 @@ define [
       
       @property = attrs.property
       @baseUrl = attrs.baseUrl
-      @leaseId = attrs.leaseId
       @forNetwork = attrs.forNetwork
+      @leaseId = attrs.leaseId
       
-      @leases = if @property then @property.prep('leases') else new LeaseList      
+      @leases = if @property then @property.prep('leases') else new LeaseList
       @listenTo @leases, "add", @addOne
       @listenTo @leases, "reset", @addAll
       

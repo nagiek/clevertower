@@ -10,17 +10,9 @@
 
 <fieldset class="form-large">
   <div class="row">
-    <div class="unit-group control-group span3">
-      <label for="listing-unit" class="control-label">
-        <%= i18nCommon.classes.Unit %>
-      </label>
-      <div class="controls">
-        <%= JST["src/js/templates/helper/field/unit.jst"]({required: true, i18nUnit: i18nUnit, i18nCommon: i18nCommon}) %>
-      </div>
-      <p class="help-block">
-        <span class="label label-large"><%= i18nCommon.adjectives.private %></span> 
-        <%= i18nListing.form.unit_help %>
-      </p>
+    <div class="span3">
+      <%= JST["src/js/templates/helper/field/unit.jst"]({unit: unit, required: true, i18nUnit: i18nUnit, i18nCommon: i18nCommon, help: '<p class="help-block"><span class="label label-large">' + i18nCommon.adjectives.private + "</span>" + i18nListing.form.unit_help + "</p>"}) %>
+      
     </div>
     <div class="date-group control-group span6">
       <label for="listing-unit" class="control-label"><%= i18nListing.form.dates %></label>

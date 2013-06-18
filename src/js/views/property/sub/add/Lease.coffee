@@ -18,6 +18,7 @@ define [
       @on "view:change", @clear
 
       @baseUrl = attrs.baseUrl
+      @forNetwork = attrs.forNetwork
       
       vars = property: @model, network: @model.get("network")
       if attrs.params and attrs.params.unit
@@ -28,7 +29,7 @@ define [
       @lease = new Lease(vars)
       
     render : ->
-      @form = new NewLeaseView(model: @lease, property: @model, baseUrl: @baseUrl, forNetwork: true).render()
+      @form = new NewLeaseView(model: @lease, property: @model, baseUrl: @baseUrl, forNetwork: @forNetwork).render()
       @
     
     clear : ->

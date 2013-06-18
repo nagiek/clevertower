@@ -69,9 +69,7 @@ __p += '\n      ' +
  } ;
 __p += '\n  </td>\n';
  } ;
-__p += '\n<td class="view-specific view-edit hide">\n  <div class="control-group">\n\t\t<div class="controls">\n\t\t\t<select value="' +
-((__t = ( bedrooms )) == null ? '' : __t) +
-'" name="bedrooms">\n\t\t\t  <option value="0" ' +
+__p += '\n<td class="view-specific view-edit hide">\n  <div class="control-group">\n\t\t<div class="controls">\n\t\t\t<select name="bedrooms">\n\t\t\t  <option value="0" ' +
 ((__t = ( bedrooms == 0 ? 'selected' : '' )) == null ? '' : __t) +
 '>' +
 ((__t = ( i18nUnit.form.bedrooms.zero )) == null ? '' : __t) +

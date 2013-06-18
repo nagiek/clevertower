@@ -7,7 +7,7 @@
       jquery: "//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min",
       jqueryui: "libs/jqueryui/jquery-ui-1.10.3.custom.min",
       underscore: "//cdnjs.cloudflare.com/ajax/libs/lodash.js/1.0.1/lodash.min",
-      backbone: "//www.parsecdn.com/js/parse-1.2.7",
+      backbone: "//www.parsecdn.com/js/parse-1.2.8",
       facebook: "//connect.facebook.net/en_US/all",
       jqueryuiwidget: "libs/jqueryui/jquery.ui.widget.min",
       jquerymobile: "//cdnjs.cloudflare.com/ajax/libs/jquery-mobile/1.2.0/jquery.mobile.min",
@@ -79,7 +79,7 @@
 
   router = onNetwork ? "routers/Network" : "routers/Desktop";
 
-  require(["jquery", "underscore", "backbone", "facebook", "models/Profile", "collections/ListingFeaturedList", "collections/ActivityList", "collections/NotificationList", router, "underscore.string", "json2", "bootstrap", "serializeObject", "typeahead", "masonry"], function($, _, Parse, FB, Profile, FeaturedListingList, ActivityList, NotificationList, AppRouter, _String) {
+  require(["jquery", "underscore", "backbone", "facebook", "models/Property", "models/Unit", "models/Lease", "models/Profile", "collections/ListingFeaturedList", "collections/ActivityList", "collections/NotificationList", router, "underscore.string", "json2", "bootstrap", "serializeObject", "typeahead", "masonry"], function($, _, Parse, FB, Property, Unit, Lease, Profile, FeaturedListingList, ActivityList, NotificationList, AppRouter, _String) {
     var eventSplitter, eventsApi, listenEvents, listenMethods;
 
     eventSplitter = /\s+/;
@@ -239,7 +239,7 @@
       var userPromise,
         _this = this;
 
-      userPromise = (new Parse.Query("_User")).include('lease').include('unit').include('profile').include('property.role').include('network.role').equalTo("objectId", this.id).first();
+      userPromise = (new Parse.Query("_User")).include('lease').include('unit').include('profile').include('property.role').include('property.mgrRole').include('network.role').equalTo("objectId", this.id).first();
       this.notifications = new NotificationList;
       return Parse.Promise.when(userPromise, this.notifications.query.find()).then(function(user, notifs) {
         var network;
@@ -247,7 +247,7 @@
         _this.notifications.add(notifs);
         _this.set("profile", user.get("profile"));
         _this.set("lease", user.get("lease"));
-        _this.set("unit", user.get("unit"));
+        _this.set("unit", new Unit(user.get("unit").attributes));
         _this.set("property", user.get("property"));
         network = user.get("network");
         if (network) {

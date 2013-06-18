@@ -39,12 +39,13 @@ define [
     initialize : (attrs) ->
 
       @property = attrs.property
+      @unit = attrs.unit
       @baseUrl = attrs.baseUrl
       @forNetwork = attrs.forNetwork
 
       @model = new Lease unless @model
-      @model.set network, Parse.User.current().get("network") if @forNetwork and Parse.User.current() and Parse.User.current().get("network")
-      @model.set forNetwork, @forNetwork
+      @model.set "network", Parse.User.current().get("network") if @forNetwork and Parse.User.current() and Parse.User.current().get("network")
+      @model.set "forNetwork", true
 
       @modal = attrs.modal
       @setElement '#apply-modal' if @modal
@@ -52,6 +53,8 @@ define [
       @listenTo @model, 'invalid', (error) =>
         @$('.error').removeClass('error')
         @$('button.save').removeProp "disabled"
+
+        console.log error
 
         msg = if error.message.indexOf(":") > 0
             args = error.message.split ":"
@@ -99,20 +102,56 @@ define [
             property: model.get "property"
 
           Parse.User.current().set(vars)
-          Parse.history.navigate "/account/building", true
+          if @model.isNew()
+            Parse.history.navigate "/account/building", true
+          else
+            Parse.history.navigate "/manage", true
           @clear()
                 
       @listenTo @model, 'destroy', @clear
       
-      @units = @property.prep("units") if @property # We may on public page instead of network.
-
-      @listenTo @units, "add", @addOne
-      @listenTo @units, "reset", @addAll
+      # # We may on public page instead of network.
+      # unless @unit
+      #   @property.prep("units") 
+      #   @listenTo @property.units, "add", @addOne
+      #   @listenTo @property.units, "reset", @addAll
               
       @current = new Date().setDate(1)
       @dates =
         start:  if @model.get "start_date"  then moment(@model.get("start_date")).format("L")  else moment(@current).format("L")
         end:    if @model.get "end_date"    then moment(@model.get("end_date")).format("L")    else moment(@current).add(1, 'year').subtract(1, 'day').format("L")
+
+    render: =>
+
+      tmpl = (if @model.isNew() then 'new' else 'sub/edit') + if @modal then "-modal" else ""
+      template = "src/js/templates/lease/#{tmpl}.jst"
+      cancel_path = @baseUrl + if !@model.isNew() and @forNetwork then "/leases/#{@model.id}" else ""
+
+      vars =
+        lease: _.defaults @model.attributes, Lease::defaults
+        unit: if @unit then @unit.toJSON() else false
+        dates: @dates
+        cancel_path: cancel_path
+        title: if @property then @property.get "title" else false
+        # units: @property.units
+        i18nCommon: i18nCommon
+        i18nUnit: i18nUnit
+        i18nLease: i18nLease
+        emails: if @model.get "emails" then @model.get "emails" else ""
+
+      @$el.html JST[template](vars)
+      
+      # @el = "form.lease-form"
+      # @$el = $("#content form.lease-form")
+          
+      @$startDate = @$('.start-date')
+      @$endDate = @$('.end-date')
+      @$('.datepicker').datepicker()
+      
+      unless @unit
+        @$unitSelect = @$('.unit-select')
+        if @property.units.length is 0 then @property.units.fetch() else @addAll()
+      @
 
     addOne : (u) =>
       HTML = "<option value='#{u.id}'" + (if @model.get("unit") and @model.get("unit").id is u.id then "selected='selected'" else "") + ">#{u.get('title')}</option>"
@@ -125,7 +164,7 @@ define [
           <option value=''>#{i18nCommon.form.select.select_value}</option>
           <option value='-1'>#{i18nUnit.constants.new_unit}</option>
         """
-      @units.each @addOne
+      @property.units.each @addOne
 
 
     # Split into separate functions for other uses, such as joining.
@@ -139,12 +178,17 @@ define [
 
       # Set unit
       if data.unit and data.unit.id isnt ""
-        if data.unit.id is "-1"
-          unit = new Unit data.unit.attributes
-          unit.set "property", @property
+        if @unit
+          console.log @unit
+          @unit.set @unit.scrub(data.unit.attributes)
+          attrs.unit = @unit
         else 
-          unit = @units.get data.unit.id
-        attrs.unit = unit
+          if data.unit.id is "-1"
+            unit = new Unit data.unit.attributes
+            unit.set "property", @property
+          else 
+            unit = @property.units.get data.unit.id
+          attrs.unit = unit
       
       # Validate tenants (assignment done in Cloud)
       userValid = true
@@ -195,38 +239,6 @@ define [
       e.preventDefault()
       @$startDate.val moment(@current).month(6).format("L")
       @$endDate.val moment(@current).month(6).add(1, 'year').subtract(1, 'day').format("L")
-
-    render: =>
-
-      tmpl = (if @model.isNew() then 'new' else 'edit') + if @modal then "-modal" else ""
-      template = "src/js/templates/lease/#{tmpl}.jst"
-      cancel_path = "#{@baseUrl}" + unless @model.isNew() then "/leases/#{@model.id}" else ""
-
-      vars =
-        lease: _.defaults @model.attributes, Lease::defaults
-        unit: if @model.get "unit" then @model.get "unit" else false
-        dates: @dates
-        cancel_path: cancel_path
-        title: if @property then @property.get "title" else false
-        # units: @units
-        i18nCommon: i18nCommon
-        i18nUnit: i18nUnit
-        i18nLease: i18nLease
-        emails: if @model.get "emails" then @model.get "emails" else ""
-
-      @$el.html JST[template](vars)
-      
-      # @el = "form.lease-form"
-      # @$el = $("#content form.lease-form")
-      @$unitSelect = @$('.unit-select')
-          
-      @$startDate = @$('.start-date')
-      @$endDate = @$('.end-date')
-      @$('.datepicker').datepicker()
-      
-      if @units.length is 0 then @units.fetch() else @addAll()
-
-      @
 
     clear : ->
       @stopListening()

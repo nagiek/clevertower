@@ -26,18 +26,16 @@ define [
     FBlink: (e) ->
       e.preventDefault()
       unless Parse.FacebookUtils.isLinked(Parse.User.current())
-        Parse.FacebookUtils.link Parse.User.current(), 
-          success: (user) ->
-            alert("The user is no longer associated with their Facebook account.")
+        Parse.FacebookUtils.link Parse.User.current(), "email", 
+          success: @render
+            
 
     FBunlink: (e) ->
       e.preventDefault()
       if Parse.FacebookUtils.isLinked(Parse.User.current())
-        Parse.FacebookUtils.unlink Parse.User.current(), 
-          success: (user) ->
-            alert("The user is no longer associated with their Facebook account.")
+        Parse.FacebookUtils.unlink Parse.User.current(), success: @render
             
-    render: ->
+    render: =>
       vars =
         fbLinked:     Parse.FacebookUtils.isLinked(Parse.User.current())
         cancel_path:  "/users/#{Parse.User.current().get('profile').id}"

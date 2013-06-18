@@ -142,6 +142,15 @@ Parse.Cloud.define "AddTenants", (req, res) ->
           profile = joinClass.get("profile")
           user = profile.get("user")
 
+          # Add to the role.
+          tntRoleUsers.add user if tntRole
+
+          if propRole and className is "Lease"
+            # Security for propRoleUsers. Should only be allowed if: 
+            #   1) We are a manager.
+            #   2) We are trying to join and the property is set to open.
+            if mgrObj or netObj or !netRole then propRoleUsers.add user 
+
           # Send a notification, unless it is to us.
           unless user and user.id is req.user.id 
 
@@ -150,9 +159,6 @@ Parse.Cloud.define "AddTenants", (req, res) ->
             if user
               notificationACL.setReadAccess user, true
               notificationACL.setWriteAccess user, true
-
-              tntRoleUsers.add user if tntRole
-              propRoleUsers.add user if propRole and className is "Lease"
 
             else
               # Notify the user
@@ -882,12 +888,8 @@ Parse.Cloud.beforeSave "Lease", (req, res) ->
      
     return res.success() if existed
 
-    console.log req.user
-
     # Have to use the master key to check the role.
     Parse.Cloud.useMasterKey()
-
-    console.log req.user
     
     (new Parse.Query "Property").include('mgrRole').include('network.role').get req.object.get("property").id,
     success: (property) ->
@@ -967,7 +969,8 @@ Parse.Cloud.beforeSave "Lease", (req, res) ->
       # Create new role (API not chainable)
       # Prepare a role for tenants
       role = new Parse.Role(current, leaseACL)
-      role.getUsers().add req.user unless req.object.get "forNetwork"
+      # This is done via the AddTenants function.
+      # role.getUsers().add req.user unless req.object.get "forNetwork"
       savesToComplete.push role.save()
 
       Parse.Promise.when(savesToComplete)
@@ -989,11 +992,12 @@ Parse.Cloud.afterSave "Lease", (req) ->
   start_date  = req.object.get "start_date"
   end_date    = req.object.get "end_date"
 
-  unless req.object.get "forNetwork"  
-    req.user.save 
+  unless req.object.get "forNetwork"
+    vars = 
       property: req.object.get "property"
       unit: req.object.get "unit"
       lease: req.object
+    req.user.save(vars)
 
   # Adjust the unit if the lease is active, or if there is
   # the chance that the unit is new and needs adjusting.

@@ -18,7 +18,9 @@ define [
       @on "view:change", @clear
       
       @baseUrl = attrs.baseUrl
-      @vars = property: @model, lease: undefined, baseUrl: @baseUrl
+      @forNetwork = attrs.forNetwork
+
+      @vars = property: @model, lease: undefined, baseUrl: @baseUrl, forNetwork: @forNetwork
       
       if attrs.params and attrs.params.lease
         @model.prep('leases')

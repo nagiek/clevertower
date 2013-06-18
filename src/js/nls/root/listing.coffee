@@ -29,6 +29,7 @@ define
     empty:
       network:            "You don't have any listings in the network yet."
       property:           "You don't have any listings in the property yet."
+      self:               "You haven't created a listing yet."
       index:              "No one has posted any thing here yet."
   inquiries:
     label:                "Inquiries"

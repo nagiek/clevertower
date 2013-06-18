@@ -1,8 +1,51 @@
-<input type="hidden" name="unit[__type]" value="Pointer">
-<input type="hidden" name="unit[className]" value="Unit">
-<select name="unit[id]" class="span unit-select" required="<%= required %>">
-  <option value=""><%= i18nCommon.form.select.select_value %></option>
-  <option value="-1"><%= i18nUnit.constants.new_unit %></option>
-</select>
+<% if (unit) { %>
+  <div class="control-group">
+    <label for="unit[attributes][title]" class="control-label"><%= i18nCommon.classes.Unit %><% if (required) { %> <span class="required">*</span><% } %></label>
+    <div class="controls">
+      <input type="text" name="unit[attributes][title]" placeholder="<%= i18nUnit.form.unit_number %>" class="new-unit input-xsmall" maxlength="16" value="<%= unit.title %>">
+    </div>
+  </div>
+  <div class="control-group">
+    <label for="unit[attributes][bedrooms]" class="control-label"><%= i18nUnit.fields.bedrooms %><% if (required) { %> <span class="required">*</span><% } %></label>
+    <div class="controls">
+      <select name="unit[attributes][bedrooms]">
+        <option value="0" <%= unit.bedrooms == 0 ? 'selected' : '' %>><%= i18nUnit.form.bedrooms.zero %></option>
+        <option value="1" <%= unit.bedrooms == 1 ? 'selected' : '' %>><%= i18nUnit.form.bedrooms.one %></option>
+        <option value="2" <%= unit.bedrooms == 2 ? 'selected' : '' %>><%= i18nUnit.form.bedrooms.two %></option>
+        <option value="3" <%= unit.bedrooms == 3 ? 'selected' : '' %>><%= i18nUnit.form.bedrooms.three %></option>
+        <option value="4" <%= unit.bedrooms == 4 ? 'selected' : '' %>><%= i18nUnit.form.bedrooms.four %></option>
+        <option value="5" <%= unit.bedrooms == 5 ? 'selected' : '' %>><%= i18nUnit.form.bedrooms.five %></option>
+      </select>
+    </div>
+  </div>
+  <div class="control-group">
+    <label for="unit[attributes][bathrooms]" class="control-label"><%= i18nUnit.fields.bathrooms %><% if (required) { %> <span class="required">*</span><% } %></label>
+    <div class="controls">
+      <select name="unit[attributes][bathrooms]">
+        <option value="0" <%= unit.bathrooms == 0 ? 'selected' : '' %>><%= i18nUnit.form.bathrooms.zero %></option>
+        <option value="1" <%= unit.bathrooms == 1 ? 'selected' : '' %>><%= i18nUnit.form.bathrooms.one %></option>
+        <option value="1.5" <%= unit.bathrooms == 1.5 ? 'selected' : '' %>><%= i18nUnit.form.bathrooms.oneandahalf %></option>
+        <option value="2" <%= unit.bathrooms == 2 ? 'selected' : '' %>><%= i18nUnit.form.bathrooms.two %></option>
+        <option value="2.5" <%= unit.bathrooms == 2.5 ? 'selected' : '' %>><%= i18nUnit.form.bathrooms.twoandahalf %></option>
+        <option value="3" <%= unit.bathrooms == 3 ? 'selected' : '' %>><%= i18nUnit.form.bathrooms.three %></option>
+        <option value="3.5" <%= unit.bathrooms == 3.5 ? 'selected' : '' %>><%= i18nUnit.form.bathrooms.threeandahalf %></option>
+      </select>
+    </div>
+  </div>
+  <% if (help) { %><%- help %><% } %>
+<% } else { %>
+  <div class="unit-group control-group">
+    <label for="unit-select" class="control-label"><%= i18nCommon.classes.Unit %><% if (required) { %> <span class="required">*</span><% } %></label>
+    <div class="controls">
+      <input type="hidden" name="unit[__type]" value="Pointer">
+      <input type="hidden" name="unit[className]" value="Unit">
+      <select name="unit[id]" class="span unit-select" required="<%= required %>">
+        <option value=""><%= i18nCommon.form.select.select_value %></option>
+        <option value="-1"><%= i18nUnit.constants.new_unit %></option>
+      </select>
 
-<input type="text" name="unit[attributes][title]" placeholder="<%= i18nUnit.form.unit_number %>" class="new-unit input-xsmall" maxlength="16" style="display:none;">
+      <input type="text" name="unit[attributes][title]" placeholder="<%= i18nUnit.form.unit_number %>" class="new-unit input-xsmall" maxlength="16" style="display:none;">
+    </div>
+    <% if (help) { %><%- help %><% } %>
+  </div>
+<% } %>

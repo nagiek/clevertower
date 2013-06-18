@@ -120,13 +120,29 @@ define [
     # FOR USER
     propertiesManage: (splat) =>
       view = @view
-      require ["views/property/Trial"], (PropertyView) => 
-        vars = @deparamAction splat
-        if !view or view !instanceof PropertyView
-          vars.model = Parse.User.current().get("property")
-          @view = new PropertyView(vars)
-        else
-          view.changeSubView(vars.path, vars.params)
+      vars = @deparamAction splat
+      # Check if we are managing the property or the lease.
+      # If we can see the mgrRole, we must be part of it.
+      # Yes, this looks strange, but it works.
+      # 
+      # TODO: Or does it? Can't see propRole either. Check "AddTenants" function.
+      if Parse.User.current().get("property").get("mgrRole")
+      # Parse.User.current().get("property").get("mgrRole").getUsers().query().get Parse.User.current().id,
+      # success: =>
+        require ["views/property/Manage"], (PropertyView) => 
+          if !view or view !instanceof PropertyView
+            vars.model = Parse.User.current().get("property")
+            @view = new PropertyView(vars)
+          else
+            view.changeSubView(vars.path, vars.params)
+      else
+      # error: =>
+        require ["views/lease/Manage"], (LeaseView) => 
+          if !view or view !instanceof LeaseView
+            vars.model = Parse.User.current().get("lease")
+            @view = new LeaseView(vars)
+          else
+            view.changeSubView(vars.path, vars.params)
 
     propertiesPublic: (country, region, city, id, slug) =>
       place = "#{city}--#{region}--#{country}"

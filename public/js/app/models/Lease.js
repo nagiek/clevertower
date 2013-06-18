@@ -1,6 +1,7 @@
 (function() {
-  define(['underscore', 'backbone', "collections/TenantList", "models/Property", "models/Unit", "moment", "i18n!nls/common"], function(_, Parse, TenantList, Property, Unit, moment, i18nCommon) {
-    var Lease;
+  define(['underscore', 'backbone', "collections/TenantList", "collections/ListingList", "collections/InquiryList", "collections/ApplicantList", "models/Property", "models/Unit", "moment", "i18n!nls/common"], function(_, Parse, TenantList, ListingList, InquiryList, ApplicantList, Property, Unit, moment, i18nCommon) {
+    var Lease,
+      _this = this;
 
     return Lease = Parse.Object.extend("Lease", {
       className: "Lease",
@@ -15,14 +16,11 @@
         last_month_paid: false,
         checks_received: false
       },
-      initialize: function() {
-        return _.bindAll(this, 'isActive');
-      },
       isActive: function() {
         var ed, sd, today;
 
-        sd = this.get("start_date");
-        ed = this.get("end_date");
+        sd = _this.get("start_date");
+        ed = _this.get("end_date");
         if (!(sd && ed)) {
           return false;
         }
@@ -114,6 +112,21 @@
                 lease: this
               });
             }
+            break;
+          case "listings":
+            this[collectionName] = new ListingList([], {
+              lease: this
+            });
+            break;
+          case "inquiries":
+            this[collectionName] = new InquiryList([], {
+              lease: this
+            });
+            break;
+          case "applicants":
+            this[collectionName] = new ApplicantList([], {
+              lease: this
+            });
         }
         return this[collectionName];
       }

@@ -1,0 +1,52 @@
+<div id="lease" class="container">
+  <div class="page-header clearfix">    
+    <div class="photo photo-thumbnail photo-elastic pull-left tablet-left">
+      <a href="<%= baseUrl %>">
+        <img src="<%= cover %>" alt="Profile" class="img-rounded profile-picture">
+      </a>
+    </div>
+    
+    <header class="header photo-float thumbnail-float elastic-float">
+
+      <% if (!hasNetwork) { %>
+        <a href="/network/new" class="pull-right btn tablet-hidden phone-hidden"><i class="icon-arrow-up"></i><%= i18nCommon.actions.upgrade %></a>
+      <% } %>
+
+      <hgroup class="inline-block align-top">
+        <a href="<%= baseUrl %>">
+          <h1 class="property-title"><%= title %></h1>
+          <h2 class="inline-block"><%= i18nLease.attributes.lease_on_unit %> <span class="unit-title"><%= unitTitle %></span></h2>
+          <h4 class="inline-block"><span class="start-date"><%= startDate %></span> - <span class="end-date"><%= endDate %></span></h4>
+        </a>
+      </hgroup>
+      <ul class="inline-block align-top offset1 inline">
+        <li>
+          <a href="<%= baseUrl %>/edit" class="btn">
+          <%= i18nCommon.actions.edit %>
+          </a>
+        </li>
+        <li>
+          <a href="<%= baseUrl %>/add/tenants" class="btn add-tenants"
+              rel="tooltip"
+              data-placement="bottom"
+              data-original-title="<%= i18nLease.actions.add_tenants %>">
+            <i class="icon-user"></i>
+          </a>
+        </li>
+        <li>
+          <a href="<%= baseUrl %>/add/listing" class="btn add-listing"
+              rel="tooltip"
+              data-placement="bottom"
+              data-original-title="<%= i18nListing.actions.add_listing %>">
+            <i class="icon-listing"></i>
+          </a>
+        </li>
+      </ul>
+    </header>
+  </div>
+  <% if (!hasNetwork) { %>
+    <a href="/network/new" class="stay-right btn desktop-hidden"><i class="icon-arrow-up"></i><%= i18nCommon.actions.upgrade %></a>
+  <% } %>
+
+  <div class="content fade in"></div>
+</div>
