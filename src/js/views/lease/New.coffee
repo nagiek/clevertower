@@ -3,6 +3,7 @@ define [
   "underscore"
   "backbone"
   "moment"
+  "gapi"
   "models/Property"
   "models/Unit"
   "models/Lease"
@@ -18,7 +19,7 @@ define [
   "templates/helper/field/property"
   "templates/helper/field/tenant"
   "datepicker"
-], ($, _, Parse, moment, Property, Unit, Lease, Tenant, Alert, i18nCommon, i18nUnit, i18nLease) ->
+], ($, _, Parse, moment, gapi, Property, Unit, Lease, Tenant, Alert, i18nCommon, i18nUnit, i18nLease) ->
 
   class NewLeaseView extends Parse.View
     
@@ -28,6 +29,7 @@ define [
       'submit form'                 : 'save'
       # Adjust the modal (don't need this)
       # 'click .close'                : 'close'
+      "click .google-oauth"         : "googleOAuth"
 
       'click .starting-this-month'  : 'setThisMonth'
       'click .starting-next-month'  : 'setNextMonth'
@@ -239,6 +241,41 @@ define [
       e.preventDefault()
       @$startDate.val moment(@current).month(6).format("L")
       @$endDate.val moment(@current).month(6).add(1, 'year').subtract(1, 'day').format("L")
+
+    googleOAuth : (e) =>
+      e.preventDefault()
+
+      # Log in to Google to before getting the contacts
+      unless Parse.User.current().get("accessToken")
+        window.location.replace """
+          https://accounts.google.com/o/oauth2/auth?
+          response_type=token&
+          client_id=#{window.GCLIENT_ID}&
+          scope=https://www.googleapis.com/auth/userinfo.profile%20
+          https://www.googleapis.com/auth/userinfo.email%20
+          https://www.googleapis.com/auth/contacts&
+          login_hint=#{Parse.User.current().getEmail()}&
+          state=#{window.location.pathname}&
+          redirect_uri=https://www.clevertower.com/oauth2callback
+          """
+      # Get the contacts
+      else
+        @emailModal = $('body > #select-email-modal')
+        # Step 1: Load the API
+        gapi.client.load "contacts", "v1", ->
+          
+          # Step 2: Assemble the API request
+          request = gapi.client.carddav.people.get(userId: "me")
+          
+          # Step 3: Execute the API request
+          request.execute (resp) ->
+            heading = document.createElement("h4")
+            image = document.createElement("img")
+            image.src = resp.image.url
+            heading.appendChild image
+            heading.appendChild document.createTextNode(resp.displayName)
+            document.getElementById("content").appendChild heading
+          @emailModal.modal()
 
     clear : ->
       @stopListening()

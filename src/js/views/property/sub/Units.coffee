@@ -91,12 +91,12 @@ define [
       @$list = @$("#units-table tbody")
       @$list.html ''
       if @model.units.length > 0 then @model.units.each @addOne
-      else @$list.html '<p class="empty">' + i18nProperty.empty.units + '</p>'
+      else @$list.html '<tr class="empty"><td colspan="8">' + i18nProperty.empty.units + '</td></tr>'
 
     # Add a single todo item to the list by creating a view for it, and
     # appending its element to the `<ul>`.
     addOne: (unit) =>
-      @$('p.empty').hide()
+      @$list.find('tr.empty').remove()
       view = new UnitView(model: unit, baseUrl: @baseUrl, isMgr: @isMgr)
       @$list.append view.render().el
       view.$('.view-specific').toggleClass('hide') if @editing
@@ -130,7 +130,7 @@ define [
     save: (e) =>
       e.preventDefault()
       @$('.error').removeClass('error') if @$('.error')
-      Parse.Object.saveAll @model.units, 
+      Parse.Object.saveAll @model.units.models, 
         success: (units) =>
           new Alert(event: 'units-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success')
           @model.units.trigger "save:success"

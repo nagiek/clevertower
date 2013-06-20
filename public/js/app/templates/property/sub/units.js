@@ -13,7 +13,7 @@ __p += '<form id="units" method="post">\n  <header class="clearfix">\n    <h2 cl
 ((__t = ( today )) == null ? '' : __t) +
 '">\n          </div>\n        </div>\n      </div> -->\n  \n      <div class="well well-small form-actions form-inline form-condensed pull-right">\n        <button id="units-edit" class="btn">' +
 ((__t = ( i18nUnit.actions.edit_units )) == null ? '' : __t) +
-'</button>\n      \t<div class="control-group">\n      \t\t<div class="control-label">' +
+'</button>\n      \t<div class="control-group">\n      \t\t<div class="control-label text-center">' +
 ((__t = ( i18nUnit.actions.add_x_units )) == null ? '' : __t) +
 '</div>\n      \t\t<div class="controls input-append">\n      \t\t\t<input id="x" type="number" size="2" maxlength="2" class="span1" value="1">\n      \t\t\t<button id="add-x" class="btn btn-info">' +
 ((__t = ( i18nCommon.actions.go )) == null ? '' : __t) +

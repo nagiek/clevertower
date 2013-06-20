@@ -52,7 +52,7 @@
       setup: "Set up network",
       claim_domain: "Claim your domain name.",
       find_domain: "Enter the unique domain name of the network you wish to join.",
-      must_be_done: "Before you can begin adding properties to CleverTower, you must create your network.\nOnly people who you invite to your network can edit properties.\nYou can change these settings at any time.",
+      must_be_done: "Before you can begin managing properties to CleverTower, you must create your network.\nOnly people who you invite to your network can edit properties.\nYou can change these settings at any time.",
       give_network_a_title: "Give your network a title.",
       can_be_anything: "Can be anything you like."
     },

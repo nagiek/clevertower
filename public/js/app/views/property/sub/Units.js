@@ -114,14 +114,14 @@
         if (this.model.units.length > 0) {
           return this.model.units.each(this.addOne);
         } else {
-          return this.$list.html('<p class="empty">' + i18nProperty.empty.units + '</p>');
+          return this.$list.html('<tr class="empty"><td colspan="8">' + i18nProperty.empty.units + '</td></tr>');
         }
       };
 
       PropertyUnitsView.prototype.addOne = function(unit) {
         var view;
 
-        this.$('p.empty').hide();
+        this.$list.find('tr.empty').remove();
         view = new UnitView({
           model: unit,
           baseUrl: this.baseUrl,
@@ -176,7 +176,7 @@
         if (this.$('.error')) {
           this.$('.error').removeClass('error');
         }
-        return Parse.Object.saveAll(this.model.units, {
+        return Parse.Object.saveAll(this.model.units.models, {
           success: function(units) {
             new Alert({
               event: 'units-save',

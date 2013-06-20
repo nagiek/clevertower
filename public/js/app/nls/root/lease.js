@@ -2,6 +2,7 @@
   define({
     headers: {
       add_lease: "Add Lease",
+      add_tenants: "Add Tenants",
       edit_lease: "Edit Lease",
       extend_lease: "Extend Lease"
     },

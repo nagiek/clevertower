@@ -10,6 +10,7 @@ define [
   "i18n!nls/user"
   "i18n!nls/common"
   "templates/user/logged_in_menu"
+  "templates/helper/field/select_email"
 ], ($, _, Parse, Pusher, PropertyList, Profile, NotificationsView, i18nDevise, i18nUser, i18nCommon) ->
 
   class LoggedInView extends Parse.View
@@ -42,7 +43,7 @@ define [
 
     # Logs out the user and shows the login view
     logOut: (e) ->
-
+      $('body > #select-email-modal').remove()
       # Record the user login time for next session.
       Parse.User.current().save {lastLogin: Parse.User.current().updatedAt}, {patch: true}
 
@@ -66,6 +67,7 @@ define [
       @$el.html JST["src/js/templates/user/logged_in_menu.jst"](vars)
       @notificationsView = new NotificationsView
       @notificationsView.render()
+      $("body").append JST["src/js/templates/helper/field/select_email.jst"](i18nCommon: i18nCommon)
       @
 
 

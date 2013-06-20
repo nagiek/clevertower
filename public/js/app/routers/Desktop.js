@@ -32,6 +32,7 @@
         "notifications": "notifications",
         "account/setup": "accountSetup",
         "account/*splat": "accountSettings",
+        "oauth2callback": "oauth2callback",
         "*actions": "index"
       };
 
@@ -277,10 +278,66 @@
         }
       };
 
-      DesktopRouter.prototype.deparamAction = function(splat) {
-        var ary, combo;
+      DesktopRouter.prototype.oauth2callback = function() {
+        var vars;
 
-        ary = splat ? splat.split('?') : new Array('');
+        if (Parse.User.current()) {
+          vars = this.deparam(window.location.hash.substring(1));
+          console.log(window.location.hash);
+          console.log(vars);
+          console.log(Parse.Cloud);
+          if (!vars.error) {
+            return Parse.Cloud.httpRequest({
+              url: "https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=" + vars.accessToken
+            }).then(function(verify) {
+              if (verify.audience === window.GCLIENT_ID) {
+                return Parse.User.current().save({
+                  accessToken: vars.accessToken
+                }).then(function() {
+                  return Parse.history.navigate(vars.state, true);
+                });
+              } else {
+                require(["views/helper/Alert", 'i18n!nls/common'], function(Alert, i18nCommon) {
+                  return new Alert({
+                    event: 'access-denied',
+                    type: 'error',
+                    fade: true,
+                    heading: i18nCommon.oauth.error,
+                    message: i18nCommon.oauth.unverified_token
+                  });
+                });
+                return Parse.history.navigate(vars.state, true);
+              }
+            });
+          } else {
+            require(["views/helper/Alert", 'i18n!nls/common'], function(Alert, i18nCommon) {
+              return new Alert({
+                event: 'access-denied',
+                type: 'error',
+                fade: true,
+                heading: i18nCommon.oauth.error,
+                message: i18nCommon.oauth[vars.error]
+              });
+            });
+            return Parse.history.navigate(vars.state, true);
+          }
+        } else {
+          return this.signupOrLogin();
+        }
+      };
+
+      DesktopRouter.prototype.deparamAction = function(splat) {
+        var ary, combo, indexOfHash;
+
+        if (!splat) {
+          return {
+            path: "",
+            params: {}
+          };
+        }
+        indexOfHash = splat.indexOf("#");
+        splat = indexOfHash >= 0 ? splat.substring(0, indexOfHash) : void 0;
+        ary = splat.indexOf("?") >= 0 ? splat.split('?') : new Array(splat);
         return combo = {
           path: String(ary[0]),
           params: ary[1] ? this.deparam(ary[1]) : {}

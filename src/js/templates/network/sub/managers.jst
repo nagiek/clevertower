@@ -5,10 +5,10 @@
 <p><%= i18nGroup.form.instructions %></p>
 <p><%= i18nGroup.manager.instructions %></p>
 
-<form class="form-inline">
+<form class="form-condensed">
   <div class="control-group emails-group">
     <label for="manager-email" class="control-label element-invisible"><%= i18nCommon.adjectives.new %></label>
-    <div class="controls">
+    <div class="controls inline-block align-top">
       <input type="text" class="span3" name="manager[email]" maxlength="127" placeholder="<%= i18nCommon.nouns.sample_email %>" />
     </div>
     <button class="save btn"><%= i18nGroup.actions.invite_to_network %></button>

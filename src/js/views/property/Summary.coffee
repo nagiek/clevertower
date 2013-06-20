@@ -3,11 +3,10 @@ define [
   "underscore"
   "backbone"
   'models/Property'
-  "views/property/Show"
   "i18n!nls/property"
   "i18n!nls/common"
   'templates/property/summary'
-], ($, _, Parse, Property, ShowPropertyView, i18nProperty, i18nCommon) ->
+], ($, _, Parse, Property, i18nProperty, i18nCommon) ->
 
   class PropertySummaryView extends Parse.View
   
@@ -16,8 +15,8 @@ define [
   
     initialize: ->
       
-      # @model.collection.on 'show', => @undelegateEvents()
-      # @model.collection.on 'close', => @delegateEvents()
+      # @listenTo @model.collection, 'show', @undelegateEvents
+      # @listenTo @model.collection, 'close', @delegateEvents
       @listenTo @model, "change", @render
       
     # show: (e) =>

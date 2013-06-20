@@ -78,12 +78,7 @@ __p += '</label>\n    <div class="controls">\n      <select name="unit[attribute
 ((__t = ( unit.bathrooms == 3.5 ? 'selected' : '' )) == null ? '' : __t) +
 '>' +
 ((__t = ( i18nUnit.form.bathrooms.threeandahalf )) == null ? '' : __t) +
-'</option>\n      </select>\n    </div>\n  </div>\n  ';
- if (help) { ;
-__p +=
-__e( help );
- } ;
-__p += '\n';
+'</option>\n      </select>\n    </div>\n  </div>\n';
  } else { ;
 __p += '\n  <div class="unit-group control-group">\n    <label for="unit-select" class="control-label">' +
 ((__t = ( i18nCommon.classes.Unit )) == null ? '' : __t);
@@ -98,12 +93,15 @@ __p += '</label>\n    <div class="controls">\n      <input type="hidden" name="u
 ((__t = ( i18nUnit.constants.new_unit )) == null ? '' : __t) +
 '</option>\n      </select>\n\n      <input type="text" name="unit[attributes][title]" placeholder="' +
 ((__t = ( i18nUnit.form.unit_number )) == null ? '' : __t) +
-'" class="new-unit input-xsmall" maxlength="16" style="display:none;">\n    </div>\n    ';
+'" class="new-unit input-xsmall" maxlength="16" style="display:none;">\n    </div>\n  </div>\n  ';
  if (help) { ;
-__p +=
-__e( help );
+__p += '\n    <p class="help-block">\n      <span class="label label-large">' +
+((__t = ( i18nCommon.adjectives.private )) == null ? '' : __t) +
+'</span>\n      ' +
+((__t = ( i18nUnit.form.help )) == null ? '' : __t) +
+'\n    </p>\n  ';
  } ;
-__p += '\n  </div>\n';
+__p += '\n';
  } ;
 __p += '\n';
 

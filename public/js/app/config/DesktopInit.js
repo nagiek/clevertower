@@ -63,7 +63,9 @@
     }
   });
 
-  window.GMAPS_KEY = "AIzaSyDX4LWzK2LTiw4EJFKlOHwBK3m7AmIdpgE";
+  window.GCLIENT_ID = "318583282454.apps.googleusercontent.com";
+
+  window.GAPI_KEY = "AIzaSyDX4LWzK2LTiw4EJFKlOHwBK3m7AmIdpgE";
 
   window.APPID = "z00OPdGYL7X4uW9soymp8n5JGBSE6k26ILN1j3Hu";
 
@@ -71,7 +73,22 @@
 
   window.RESTAPIKEY = "NZDSkpVLG9Gw6NiZOUBevvLt4qPGtpCsLvWh4ZDc";
 
-  define("gmaps", ["async!//maps.googleapis.com/maps/api/js?v=3.11&libraries=places&sensor=false&key=" + window.GMAPS_KEY], function() {
+  define("gapi", ["async!//apis.google.com/js/client.js"], function() {
+    var scopes;
+
+    scopes = "https://www.googleapis.com/auth/userinfo.profile\nhttps://www.googleapis.com/auth/userinfo.email\nhttps://www.googleapis.com/auth/contacts&";
+    gapi.client.setApiKey(window.GAPI_KEY);
+    window.setTimeout(function() {
+      return gapi.auth.authorize({
+        client_id: window.GCLIENT_ID,
+        scope: scopes,
+        immediate: true
+      });
+    }, 1);
+    return gapi;
+  });
+
+  define("gmaps", ["async!//maps.googleapis.com/maps/api/js?v=3.11&libraries=places&sensor=false&key=" + window.GAPI_KEY], function() {
     return window.google.maps;
   });
 
@@ -247,7 +264,9 @@
         _this.notifications.add(notifs);
         _this.set("profile", user.get("profile"));
         _this.set("lease", user.get("lease"));
-        _this.set("unit", new Unit(user.get("unit").attributes));
+        if (user.get("unit")) {
+          _this.set("unit", new Unit(user.get("unit").attributes));
+        }
         _this.set("property", user.get("property"));
         network = user.get("network");
         if (network) {

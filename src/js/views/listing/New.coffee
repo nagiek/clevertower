@@ -92,7 +92,7 @@ define [
                 
       @listenTo @model, 'destroy', @clear
       
-      @unit = @model.get("unit")
+      # @unit = @model.get("unit")
       unless @unit
         @property.prep("units")
         @listenTo @property.units, "add", @addOne

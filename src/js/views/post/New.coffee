@@ -135,7 +135,7 @@ define [
        
       @
 
-    populatePropertySelect : ->
+    populatePropertySelectFromNetwork : ->
       if Parse.User.current().get("network").properties.length > 0
         propertyOptions = ''
         Parse.User.current().get("network").properties.each (p) -> 

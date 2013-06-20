@@ -13,7 +13,7 @@ __p += '<label for="emails" class="control-label">' +
  } ;
 __p += '\n    <div class="controls">\n    \t<div class="help-block">\n        <small class="strong inline-block align-middle">' +
 ((__t = ( i18nCommon.form.find_people_using )) == null ? '' : __t) +
-':</small>\n        <ul class="inline inline-block align-middle">\n          <li><a href="#">Google</a></li>\n          <li><a href="#">Facebook</a></li>\n        </ul>\n      </div>\n      <textarea name="emails" rows="2" class="input-block-level">';
+':</small>\n        <ul class="inline inline-block align-middle">\n          <li><a class="google-oauth" href="#">Google</a></li>\n        </ul>\n      </div>\n      <textarea name="emails" rows="2" class="input-block-level">';
  if (emails) { ;
 __p +=
 ((__t = ( emails )) == null ? '' : __t);

@@ -91,7 +91,8 @@ require.config
     underscore:
       exports: "_"
 
-window.GMAPS_KEY  = "AIzaSyDX4LWzK2LTiw4EJFKlOHwBK3m7AmIdpgE"
+window.GCLIENT_ID = "318583282454.apps.googleusercontent.com"
+window.GAPI_KEY   = "AIzaSyDX4LWzK2LTiw4EJFKlOHwBK3m7AmIdpgE"
 window.APPID      = "z00OPdGYL7X4uW9soymp8n5JGBSE6k26ILN1j3Hu"
 window.JSKEY      = "NifB9pRHfmsTDQSDA9DKxMuux03S4w2WGVdcxPHm"
 window.RESTAPIKEY = "NZDSkpVLG9Gw6NiZOUBevvLt4qPGtpCsLvWh4ZDc"
@@ -101,8 +102,31 @@ window.RESTAPIKEY = "NZDSkpVLG9Gw6NiZOUBevvLt4qPGtpCsLvWh4ZDc"
   #     locale: "fr-fr"
       # locale: localStorage.getItem("locale") || "fr-fr"
 
+# Google JS API
+define "gapi", ["async!//apis.google.com/js/client.js"], ->
+
+  scopes = """
+    https://www.googleapis.com/auth/userinfo.profile
+    https://www.googleapis.com/auth/userinfo.email
+    https://www.googleapis.com/auth/contacts&
+  """
+
+  gapi.client.setApiKey window.GAPI_KEY
+  window.setTimeout ->
+    gapi.auth.authorize
+      client_id: window.GCLIENT_ID
+      scope: scopes
+      immediate: true
+  , 1
+
+  gapi
+
+
+
+
+
 # convert Google Maps into an AMD module
-define "gmaps", ["async!//maps.googleapis.com/maps/api/js?v=3.11&libraries=places&sensor=false&key=#{window.GMAPS_KEY}"], ->
+define "gmaps", ["async!//maps.googleapis.com/maps/api/js?v=3.11&libraries=places&sensor=false&key=#{window.GAPI_KEY}"], ->
 
   # return the gmaps namespace for brevity
   window.google.maps
@@ -309,7 +333,8 @@ require [
       @set "profile", user.get "profile"
       @set "lease", user.get "lease"
       # Need to get the Unit functions when managing our lease.
-      @set "unit", new Unit(user.get("unit").attributes)
+      if user.get("unit")
+        @set "unit", new Unit(user.get("unit").attributes)
       @set "property", user.get "property"
 
       # Load the network regardless if we are on a subdomain or not, as we need the link.

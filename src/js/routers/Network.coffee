@@ -21,6 +21,7 @@ define [
       # "building"                    : "building"
       "account/*splat"              : "accountSettings"
       "notifications"               : "notifications"
+      "oauth2callback"              : "oauth2callback"
       "*actions"                    : "index"
 
     initialize: (options) ->
@@ -214,6 +215,43 @@ define [
     #         @view = new InquiriesIndexView().render()
     #   else
     #     @signupOrLogin()
+
+    # OAuth
+    # --------------
+
+    oauth2callback : ->
+      if Parse.User.current()
+        # Variables will be placed in a hash querystring.
+        vars = @deparam window.location.hash.substring(1)
+        console.log window.location.hash
+        console.log vars
+        console.log Parse.Cloud
+        unless vars.error
+          $.get "https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=#{vars.accessToken}", null, (verify) -> 
+            if verify.audience is window.GCLIENT_ID
+              Parse.User.current().save(accessToken: vars.accessToken).then ->
+                Parse.history.navigate vars.state, true
+            else
+              require ["views/helper/Alert", 'i18n!nls/common'], (Alert, i18nCommon) -> 
+                new Alert
+                  event:    'access-denied'
+                  type:     'error'
+                  fade:     true
+                  heading:  i18nCommon.oauth.error
+                  message:  i18nCommon.oauth.unverified_token
+              Parse.history.navigate vars.state, true
+        else
+          require ["views/helper/Alert", 'i18n!nls/common'], (Alert, i18nCommon) -> 
+            new Alert
+              event:    'access-denied'
+              type:     'error'
+              fade:     true
+              heading:  i18nCommon.oauth.error
+              message:  i18nCommon.oauth[vars.error]
+          Parse.history.navigate vars.state, true
+      else
+        @signupOrLogin()  
+
 
     # Utilities
     # --------------

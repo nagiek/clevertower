@@ -21,7 +21,8 @@ define [
     el: '.content'
     
     events:
-      'submit .tenants-form'          : 'save'
+      'submit .tenants-form'  : 'save'
+      "click .google-oauth"   : "googleOAuth"
     
     initialize : (attrs) ->
       
@@ -133,6 +134,41 @@ define [
       
       @leases.fetch() if @leases.length is 0
       @
+
+    googleOAuth : (e) =>
+      e.preventDefault()
+
+      # Log in to Google to before getting the contacts
+      unless Parse.User.current().get("accessToken")
+        window.location.replace """
+          https://accounts.google.com/o/oauth2/auth?
+          response_type=token&
+          client_id=#{window.GCLIENT_ID}&
+          scope=https://www.googleapis.com/auth/userinfo.profile%20
+          https://www.googleapis.com/auth/userinfo.email%20
+          https://www.googleapis.com/auth/contacts&
+          login_hint=#{Parse.User.current().getEmail()}&
+          state=#{window.location.pathname}&
+          redirect_uri=https://www.clevertower.com/oauth2callback
+          """
+      # Get the contacts
+      else
+        @emailModal = $('body > #select-email-modal')
+        # Step 1: Load the API
+        gapi.client.load "contacts", "v1", ->
+          
+          # Step 2: Assemble the API request
+          request = gapi.client.carddav.people.get(userId: "me")
+          
+          # Step 3: Execute the API request
+          request.execute (resp) ->
+            heading = document.createElement("h4")
+            image = document.createElement("img")
+            image.src = resp.image.url
+            heading.appendChild image
+            heading.appendChild document.createTextNode(resp.displayName)
+            document.getElementById("content").appendChild heading
+          @emailModal.modal()
 
     clear: =>
       @undelegateEvents()

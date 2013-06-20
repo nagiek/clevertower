@@ -192,6 +192,11 @@ define
       select_value:       "- Select a value -"
       numeric:            "Numeric (1 ➡ 2)"
       alphabetical:       "Alphabetical (A ➡ B)"
+  oauth:
+    error:                "We could not reach the server."
+    access_denied:        "You cancelled the process."
+    invalid_token:        "The token is invalid. You may need to sign in again."
+    unverified_token:     "We did not receive the correct response. If this error persists, this could indicate a serious problem."
   warnings:               
     no_undo:              "This action cannot be undone."
   errors:                 

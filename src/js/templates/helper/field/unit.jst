@@ -32,7 +32,6 @@
       </select>
     </div>
   </div>
-  <% if (help) { %><%- help %><% } %>
 <% } else { %>
   <div class="unit-group control-group">
     <label for="unit-select" class="control-label"><%= i18nCommon.classes.Unit %><% if (required) { %> <span class="required">*</span><% } %></label>
@@ -46,6 +45,11 @@
 
       <input type="text" name="unit[attributes][title]" placeholder="<%= i18nUnit.form.unit_number %>" class="new-unit input-xsmall" maxlength="16" style="display:none;">
     </div>
-    <% if (help) { %><%- help %><% } %>
   </div>
+  <% if (help) { %>
+    <p class="help-block">
+      <span class="label label-large"><%= i18nCommon.adjectives.private %></span>
+      <%= i18nUnit.form.help %>
+    </p>
+  <% } %>
 <% } %>

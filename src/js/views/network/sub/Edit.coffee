@@ -17,8 +17,6 @@ define [
     
     initialize : (attrs) ->
       
-      _.bindAll this, 'save'
-      
       @first = unless @model then true else false
       @model = new Network if @first
 
@@ -49,7 +47,7 @@ define [
         
       @render()
     
-    save : (e) ->
+    save : (e) =>
       e.preventDefault()
       data = @$('form').serializeObject()
 

@@ -1,5 +1,6 @@
 define
   headers:
+    add_listing:          "Add Listing"
     edit_listing:         "Edit Listing"
     extend_listing:       "Extend Listing"
   actions:
@@ -59,4 +60,3 @@ define
                           "Cozy studio for students/young professionals."
                           ]
     title_help:           "First thing shown to potential applicants. What makes your place special?"
-    unit_help:            "Only visible to managers."

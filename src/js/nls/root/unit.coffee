@@ -31,6 +31,7 @@ define
       twoandahalf:    "2.5"
       three:          "3"
       threeandahalf:  "3+"
+    help:             "Only visible to managers."
   errors:
     title_missing:    "You must specify a unit title. If this is a house or other single-dwelling building, enter <em>Main</em>."
   fields:

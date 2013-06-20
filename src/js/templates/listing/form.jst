@@ -10,8 +10,8 @@
 
 <fieldset class="form-large">
   <div class="row">
-    <div class="span3">
-      <%= JST["src/js/templates/helper/field/unit.jst"]({unit: unit, required: true, i18nUnit: i18nUnit, i18nCommon: i18nCommon, help: '<p class="help-block"><span class="label label-large">' + i18nCommon.adjectives.private + "</span>" + i18nListing.form.unit_help + "</p>"}) %>
+    <div class="span3 form-inline">
+      <%= JST["src/js/templates/helper/field/unit.jst"]({unit: unit, required: true, i18nUnit: i18nUnit, i18nCommon: i18nCommon, help: true}) %>
       
     </div>
     <div class="date-group control-group span6">
