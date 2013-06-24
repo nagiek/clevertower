@@ -2,6 +2,7 @@ define
   fields:
     title:                "Title"
     body:                 "Body"
+    email:                "Email"
     status:               "Status"
     name:                 "Name"
     posted:               "Posted"
@@ -56,6 +57,7 @@ define
     link:                 "Link"
     leave:                "Leave"
     apply:                "Apply"
+    select:               "Select"
     live_at:              "Live at"
     revoke_access:        "Revoke access"
     confirm:              "Confirm"
@@ -71,6 +73,7 @@ define
     choose_photo:         "Choose photo"
     add_x_more:           "Add <strong>x</strong> more"
     make_primary:         "Make primary"
+    select_contacts:      "Select contacts"
     # Not really actions.
     changes_saved:        "Changes Saved."
     request_sent:         "Request sent."
@@ -165,6 +168,7 @@ define
     small:                "Small"
     big:                  "Big"
     done:                 "Done"
+    selected:             "Selected"
     new:                  "new"
     unsaved:              "Unsaved"
     linked:               "Linked"

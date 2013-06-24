@@ -3,7 +3,7 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", "moment", "gapi", "models/Property", "models/Unit", "models/Lease", "models/Tenant", "views/helper/Alert", "i18n!nls/common", "i18n!nls/unit", "i18n!nls/lease", "templates/lease/new", "templates/lease/new-modal", "templates/lease/form", "templates/helper/field/unit", "templates/helper/field/property", "templates/helper/field/tenant", "datepicker"], function($, _, Parse, moment, gapi, Property, Unit, Lease, Tenant, Alert, i18nCommon, i18nUnit, i18nLease) {
+  define(["jquery", "underscore", "backbone", "moment", "gapi", "models/Property", "models/Unit", "models/Lease", "models/Tenant", "views/helper/Alert", "views/helper/SelectEmail", "i18n!nls/common", "i18n!nls/unit", "i18n!nls/lease", "templates/lease/new", "templates/lease/new-modal", "templates/lease/form", "templates/helper/field/unit", "templates/helper/field/property", "templates/helper/field/tenant", "datepicker"], function($, _, Parse, moment, gapi, Property, Unit, Lease, Tenant, Alert, SelectEmail, i18nCommon, i18nUnit, i18nLease) {
     var NewLeaseView, _ref;
 
     return NewLeaseView = (function(_super) {
@@ -268,29 +268,9 @@
 
       NewLeaseView.prototype.googleOAuth = function(e) {
         e.preventDefault();
-        if (!Parse.User.current().get("accessToken")) {
-          return window.location.replace("https://accounts.google.com/o/oauth2/auth?\nresponse_type=token&\nclient_id=" + window.GCLIENT_ID + "&\nscope=https://www.googleapis.com/auth/userinfo.profile%20\nhttps://www.googleapis.com/auth/userinfo.email%20\nhttps://www.googleapis.com/auth/contacts&\nlogin_hint=" + (Parse.User.current().getEmail()) + "&\nstate=" + window.location.pathname + "&\nredirect_uri=https://www.clevertower.com/oauth2callback");
-        } else {
-          this.emailModal = $('body > #select-email-modal');
-          return gapi.client.load("contacts", "v1", function() {
-            var request;
-
-            request = gapi.client.carddav.people.get({
-              userId: "me"
-            });
-            request.execute(function(resp) {
-              var heading, image;
-
-              heading = document.createElement("h4");
-              image = document.createElement("img");
-              image.src = resp.image.url;
-              heading.appendChild(image);
-              heading.appendChild(document.createTextNode(resp.displayName));
-              return document.getElementById("content").appendChild(heading);
-            });
-            return this.emailModal.modal();
-          });
-        }
+        return new SelectEmail({
+          view: this
+        }).render().el;
       };
 
       NewLeaseView.prototype.clear = function() {

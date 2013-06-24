@@ -3,7 +3,7 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", "pusher", 'collections/PropertyList', 'models/Profile', 'views/notification/Index', "i18n!nls/devise", "i18n!nls/user", "i18n!nls/common", "templates/user/logged_in_menu", "templates/helper/field/select_email"], function($, _, Parse, Pusher, PropertyList, Profile, NotificationsView, i18nDevise, i18nUser, i18nCommon) {
+  define(["jquery", "underscore", "backbone", "pusher", 'collections/PropertyList', 'models/Profile', 'views/notification/Index', "i18n!nls/devise", "i18n!nls/user", "i18n!nls/common", "templates/user/logged_in_menu"], function($, _, Parse, Pusher, PropertyList, Profile, NotificationsView, i18nDevise, i18nUser, i18nCommon) {
     var LoggedInView, _ref;
 
     return LoggedInView = (function(_super) {
@@ -38,7 +38,6 @@
       };
 
       LoggedInView.prototype.logOut = function(e) {
-        $('body > #select-email-modal').remove();
         Parse.User.current().save({
           lastLogin: Parse.User.current().updatedAt
         }, {
@@ -67,9 +66,6 @@
         this.$el.html(JST["src/js/templates/user/logged_in_menu.jst"](vars));
         this.notificationsView = new NotificationsView;
         this.notificationsView.render();
-        $("body").append(JST["src/js/templates/helper/field/select_email.jst"]({
-          i18nCommon: i18nCommon
-        }));
         return this;
       };
 

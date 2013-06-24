@@ -9,6 +9,7 @@ define [
   "models/Lease"
   "models/Tenant"
   "views/helper/Alert"
+  "views/helper/SelectEmail"
   "i18n!nls/common"
   "i18n!nls/unit"
   "i18n!nls/lease"
@@ -19,7 +20,7 @@ define [
   "templates/helper/field/property"
   "templates/helper/field/tenant"
   "datepicker"
-], ($, _, Parse, moment, gapi, Property, Unit, Lease, Tenant, Alert, i18nCommon, i18nUnit, i18nLease) ->
+], ($, _, Parse, moment, gapi, Property, Unit, Lease, Tenant, Alert, SelectEmail, i18nCommon, i18nUnit, i18nLease) ->
 
   class NewLeaseView extends Parse.View
     
@@ -244,38 +245,7 @@ define [
 
     googleOAuth : (e) =>
       e.preventDefault()
-
-      # Log in to Google to before getting the contacts
-      unless Parse.User.current().get("accessToken")
-        window.location.replace """
-          https://accounts.google.com/o/oauth2/auth?
-          response_type=token&
-          client_id=#{window.GCLIENT_ID}&
-          scope=https://www.googleapis.com/auth/userinfo.profile%20
-          https://www.googleapis.com/auth/userinfo.email%20
-          https://www.googleapis.com/auth/contacts&
-          login_hint=#{Parse.User.current().getEmail()}&
-          state=#{window.location.pathname}&
-          redirect_uri=https://www.clevertower.com/oauth2callback
-          """
-      # Get the contacts
-      else
-        @emailModal = $('body > #select-email-modal')
-        # Step 1: Load the API
-        gapi.client.load "contacts", "v1", ->
-          
-          # Step 2: Assemble the API request
-          request = gapi.client.carddav.people.get(userId: "me")
-          
-          # Step 3: Execute the API request
-          request.execute (resp) ->
-            heading = document.createElement("h4")
-            image = document.createElement("img")
-            image.src = resp.image.url
-            heading.appendChild image
-            heading.appendChild document.createTextNode(resp.displayName)
-            document.getElementById("content").appendChild heading
-          @emailModal.modal()
+      new SelectEmail(view: @).render().el
 
     clear : ->
       @stopListening()

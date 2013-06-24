@@ -23,6 +23,7 @@ define [
       @baseUrl = "/manage"
       @listenTo @model, "change:start_date change:end_date", @renderHeader
       @listenTo Parse.User.current().get("unit"), "change:title", @renderHeader
+      @listenTo Parse.Dispatcher, "user:logout", @clear
       @render()
       @changeSubView attrs.path, attrs.params
 
@@ -89,10 +90,14 @@ define [
           (new Parse.Query(nodeType)).get subid, success: (submodel) =>
             @renderSubView name, property: Parse.User.current().get("property"), unit: Parse.User.current().get("unit"), onUnit: true, lease: @model, model: submodel, forNetwork: false, baseUrl: @baseUrl
 
-
     renderSubView: (name, vars) =>
       @subView.trigger "view:change" if @subView
       @$('.content').removeClass 'in'
       require [name], (PropertySubView) =>
         @subView = new PropertySubView(vars).render()
         @$('.content').addClass 'in'
+
+    clear: =>
+      @stopListening()
+      @undelegateEvents()
+      delete this

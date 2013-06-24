@@ -2,6 +2,7 @@ define [
   "jquery"
   "underscore"
   "backbone"
+  "gapi"
   "collections/TenantList"
   "models/Property"
   "models/Lease"
@@ -14,7 +15,7 @@ define [
   "templates/helper/field/property"
   "templates/helper/field/tenant"
   "datepicker"
-], ($, _, Parse, TenantList, Property, Lease, Tenant, Profile, Alert, i18nCommon, i18nLease) ->
+], ($, _, Parse, gapi, TenantList, Property, Lease, Tenant, Profile, Alert, i18nCommon, i18nLease) ->
   
   class NewTenantsView extends Parse.View
     
@@ -137,38 +138,31 @@ define [
 
     googleOAuth : (e) =>
       e.preventDefault()
-
       # Log in to Google to before getting the contacts
-      unless Parse.User.current().get("accessToken")
+      if !Parse.User.current().get("googleAuthData") or Parse.User.current().get("googleAuthData").expires_in > new Date().getTime()
+      # if true
         window.location.replace """
           https://accounts.google.com/o/oauth2/auth?
           response_type=token&
           client_id=#{window.GCLIENT_ID}&
-          scope=https://www.googleapis.com/auth/userinfo.profile%20
-          https://www.googleapis.com/auth/userinfo.email%20
-          https://www.googleapis.com/auth/contacts&
+          scope=
+            https://www.googleapis.com/auth/userinfo.email%20
+            https://www.googleapis.com/auth/userinfo.profile%20
+            https://www.google.com/m8/feeds&
           login_hint=#{Parse.User.current().getEmail()}&
           state=#{window.location.pathname}&
-          redirect_uri=https://www.clevertower.com/oauth2callback
+          redirect_uri=http://localhost:3000/oauth2callback
           """
       # Get the contacts
       else
-        @emailModal = $('body > #select-email-modal')
-        # Step 1: Load the API
-        gapi.client.load "contacts", "v1", ->
-          
-          # Step 2: Assemble the API request
-          request = gapi.client.carddav.people.get(userId: "me")
-          
-          # Step 3: Execute the API request
-          request.execute (resp) ->
-            heading = document.createElement("h4")
-            image = document.createElement("img")
-            image.src = resp.image.url
-            heading.appendChild image
-            heading.appendChild document.createTextNode(resp.displayName)
-            document.getElementById("content").appendChild heading
-          @emailModal.modal()
+        $.ajax "https://www.google.com/m8/feeds/contacts/default/full?alt=json",
+          # Include a blank beforeSend to override the default headers.
+          beforeSend: (jqXHR, settings) ->
+            jqXHR.setRequestHeader "Authorization", "Bearer " + Parse.User.current().get("googleAuthData").access_token
+            jqXHR.setRequestHeader "Gdata-version", "3.0"
+          success: (res) -> 
+            console.log res
+            $('body').append new SelectEmail(view: @).render().el
 
     clear: =>
       @undelegateEvents()

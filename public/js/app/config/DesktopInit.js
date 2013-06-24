@@ -34,6 +34,7 @@
       json2: "//cdnjs.cloudflare.com/ajax/libs/json2/20121008/json2",
       text: "libs/plugins/text",
       async: "libs/plugins/async",
+      goog: "libs/plugins/goog",
       propertyParser: "libs/plugins/propertyParser",
       i18n: "libs/plugins/i18n",
       collections: "app/collections",
@@ -63,7 +64,7 @@
     }
   });
 
-  window.GCLIENT_ID = "318583282454.apps.googleusercontent.com";
+  window.GCLIENT_ID = "318583282454-5r9n44vinmdfg9eakbbgnoa1iddk0f27.apps.googleusercontent.com";
 
   window.GAPI_KEY = "AIzaSyDX4LWzK2LTiw4EJFKlOHwBK3m7AmIdpgE";
 
@@ -73,19 +74,9 @@
 
   window.RESTAPIKEY = "NZDSkpVLG9Gw6NiZOUBevvLt4qPGtpCsLvWh4ZDc";
 
-  define("gapi", ["async!//apis.google.com/js/client.js"], function() {
-    var scopes;
-
-    scopes = "https://www.googleapis.com/auth/userinfo.profile\nhttps://www.googleapis.com/auth/userinfo.email\nhttps://www.googleapis.com/auth/contacts&";
-    gapi.client.setApiKey(window.GAPI_KEY);
-    window.setTimeout(function() {
-      return gapi.auth.authorize({
-        client_id: window.GCLIENT_ID,
-        scope: scopes,
-        immediate: true
-      });
-    }, 1);
-    return gapi;
+  define("gapi", ["async!//apis.google.com/js/client.js?onload="], function() {
+    window.gapi.client.setApiKey(window.GAPI_KEY);
+    return window.gapi;
   });
 
   define("gmaps", ["async!//maps.googleapis.com/maps/api/js?v=3.11&libraries=places&sensor=false&key=" + window.GAPI_KEY], function() {
@@ -200,9 +191,9 @@
     };
     _.str = _String;
     $.ajaxSetup({
-      beforeSend: function(jqXhr, settings) {
-        jqXhr.setRequestHeader("X-Parse-Application-Id", window.APPID);
-        return jqXhr.setRequestHeader("X-Parse-REST-API-Key", window.RESTAPIKEY);
+      beforeSend: function(jqXHR, settings) {
+        jqXHR.setRequestHeader("X-Parse-Application-Id", window.APPID);
+        return jqXHR.setRequestHeader("X-Parse-REST-API-Key", window.RESTAPIKEY);
       }
     });
     Parse.FacebookUtils.init({

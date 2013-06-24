@@ -60,6 +60,7 @@ require.config
     # -----------------       
     text:                     "libs/plugins/text"
     async:                    "libs/plugins/async"
+    goog:                     "libs/plugins/goog"
     propertyParser:           "libs/plugins/propertyParser"
     i18n:                     "libs/plugins/i18n"
                               
@@ -91,7 +92,8 @@ require.config
     underscore:
       exports: "_"
 
-window.GCLIENT_ID = "318583282454.apps.googleusercontent.com"
+
+window.GCLIENT_ID = "318583282454-5r9n44vinmdfg9eakbbgnoa1iddk0f27.apps.googleusercontent.com"
 window.GAPI_KEY   = "AIzaSyDX4LWzK2LTiw4EJFKlOHwBK3m7AmIdpgE"
 window.APPID      = "z00OPdGYL7X4uW9soymp8n5JGBSE6k26ILN1j3Hu"
 window.JSKEY      = "NifB9pRHfmsTDQSDA9DKxMuux03S4w2WGVdcxPHm"
@@ -102,28 +104,28 @@ window.RESTAPIKEY = "NZDSkpVLG9Gw6NiZOUBevvLt4qPGtpCsLvWh4ZDc"
   #     locale: "fr-fr"
       # locale: localStorage.getItem("locale") || "fr-fr"
 
+
 # Google JS API
-define "gapi", ["async!//apis.google.com/js/client.js"], ->
+define "gapi", ["async!//apis.google.com/js/client.js?onload="], ->
 
-  scopes = """
-    https://www.googleapis.com/auth/userinfo.profile
-    https://www.googleapis.com/auth/userinfo.email
-    https://www.googleapis.com/auth/contacts&
-  """
+  # Note: following was added to async.plugin to accommodate client.js.
+  # if (name.indexOf("onload=")>0) {name += id;}
 
-  gapi.client.setApiKey window.GAPI_KEY
-  window.setTimeout ->
-    gapi.auth.authorize
-      client_id: window.GCLIENT_ID
-      scope: scopes
-      immediate: true
-  , 1
+  window.gapi.client.setApiKey window.GAPI_KEY
+  # window.setTimeout ->
+  #   scopes = """
+  #   https://www.googleapis.com/auth/userinfo.profile
+  #   https://www.googleapis.com/auth/userinfo.email
+  #   https://www.googleapis.com/auth/contacts&
+  #   """
+  #   window.gapi.auth.authorize
+  #     client_id: window.GCLIENT_ID
+  #     scope: scopes
+  #     immediate: true
+  #   # , handleAuthResult
+  # , 1
 
-  gapi
-
-
-
-
+  window.gapi
 
 # convert Google Maps into an AMD module
 define "gmaps", ["async!//maps.googleapis.com/maps/api/js?v=3.11&libraries=places&sensor=false&key=#{window.GAPI_KEY}"], ->
@@ -273,9 +275,9 @@ require [
   _.str = _String
   
   # Always include these headers, unless otherwise noted.
-  $.ajaxSetup beforeSend: (jqXhr, settings) ->
-    jqXhr.setRequestHeader "X-Parse-Application-Id", window.APPID
-    jqXhr.setRequestHeader "X-Parse-REST-API-Key", window.RESTAPIKEY
+  $.ajaxSetup beforeSend: (jqXHR, settings) ->
+    jqXHR.setRequestHeader "X-Parse-Application-Id", window.APPID
+    jqXHR.setRequestHeader "X-Parse-REST-API-Key", window.RESTAPIKEY
 
   # init the FB JS SDK
   Parse.FacebookUtils.init

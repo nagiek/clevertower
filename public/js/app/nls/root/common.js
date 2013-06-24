@@ -3,6 +3,7 @@
     fields: {
       title: "Title",
       body: "Body",
+      email: "Email",
       status: "Status",
       name: "Name",
       posted: "Posted"
@@ -59,6 +60,7 @@
       link: "Link",
       leave: "Leave",
       apply: "Apply",
+      select: "Select",
       live_at: "Live at",
       revoke_access: "Revoke access",
       confirm: "Confirm",
@@ -74,6 +76,7 @@
       choose_photo: "Choose photo",
       add_x_more: "Add <strong>x</strong> more",
       make_primary: "Make primary",
+      select_contacts: "Select contacts",
       changes_saved: "Changes Saved.",
       request_sent: "Request sent."
     },
@@ -216,6 +219,7 @@
       small: "Small",
       big: "Big",
       done: "Done",
+      selected: "Selected",
       "new": "new",
       unsaved: "Unsaved",
       linked: "Linked",

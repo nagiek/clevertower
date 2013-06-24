@@ -42,6 +42,10 @@
         });
         this.listenTo(this.map, "property:join", this.join);
         this.listenTo(this.map, "property:manage", this.manage);
+        this.listenTo(Parse.Dispatcher, 'user:logout', function() {
+          Parse.history.navigate("/", true);
+          return this.clear();
+        });
         this.listenTo(this.model, "invalid", function(error) {
           var args, fn, msg;
 

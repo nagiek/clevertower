@@ -283,30 +283,30 @@
 
         if (Parse.User.current()) {
           vars = this.deparam(window.location.hash.substring(1));
-          console.log(window.location.hash);
-          console.log(vars);
-          console.log(Parse.Cloud);
           if (!vars.error) {
-            return Parse.Cloud.httpRequest({
-              url: "https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=" + vars.accessToken
-            }).then(function(verify) {
-              if (verify.audience === window.GCLIENT_ID) {
-                return Parse.User.current().save({
-                  accessToken: vars.accessToken
-                }).then(function() {
-                  return Parse.history.navigate(vars.state, true);
-                });
-              } else {
-                require(["views/helper/Alert", 'i18n!nls/common'], function(Alert, i18nCommon) {
-                  return new Alert({
-                    event: 'access-denied',
-                    type: 'error',
-                    fade: true,
-                    heading: i18nCommon.oauth.error,
-                    message: i18nCommon.oauth.unverified_token
+            return $.ajax("https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=" + vars.access_token, {
+              beforeSend: function(jqXHR, settings) {},
+              success: function(res) {
+                if (res.audience && res.audience === window.GCLIENT_ID) {
+                  res.access_token = vars.access_token;
+                  res.expires_in += new Date().getTime() / 1000;
+                  return Parse.User.current().save({
+                    googleAuthData: res
+                  }).then(function() {
+                    return Parse.history.navigate(vars.state, true);
                   });
-                });
-                return Parse.history.navigate(vars.state, true);
+                } else {
+                  require(["views/helper/Alert", 'i18n!nls/common'], function(Alert, i18nCommon) {
+                    return new Alert({
+                      event: 'access-denied',
+                      type: 'error',
+                      fade: true,
+                      heading: i18nCommon.oauth.error,
+                      message: i18nCommon.oauth.unverified_token
+                    });
+                  });
+                  return Parse.history.navigate(vars.state, true);
+                }
               }
             });
           } else {
@@ -336,7 +336,9 @@
           };
         }
         indexOfHash = splat.indexOf("#");
-        splat = indexOfHash >= 0 ? splat.substring(0, indexOfHash) : void 0;
+        if (indexOfHash >= 0) {
+          splat = splat.substr(0, indexOfHash);
+        }
         ary = splat.indexOf("?") >= 0 ? splat.split('?') : new Array(splat);
         return combo = {
           path: String(ary[0]),

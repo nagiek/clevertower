@@ -35,6 +35,8 @@ define [
       @listenTo @model, 'change:image_profile', @refresh
       @listenTo @model, 'destroy', @clear
 
+      @listenTo Parse.Dispatcher, 'user:logout', @clear
+
       @baseUrl = if @model.get("network") then "/properties/#{@model.id}" else "/manage"
       
       # Render immediately, as we will display a subview
@@ -103,7 +105,8 @@ define [
     
     clear: =>
       @undelegateEvents()
-      @remove()
+      @stopListening()
+      Parse.history.navigate "/", true
       delete this
     
     editProfilePicture: ->

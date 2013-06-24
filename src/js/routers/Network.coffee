@@ -227,19 +227,20 @@ define [
         console.log vars
         console.log Parse.Cloud
         unless vars.error
-          $.get "https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=#{vars.accessToken}", null, (verify) -> 
-            if verify.audience is window.GCLIENT_ID
-              Parse.User.current().save(accessToken: vars.accessToken).then ->
-                Parse.history.navigate vars.state, true
-            else
-              require ["views/helper/Alert", 'i18n!nls/common'], (Alert, i18nCommon) -> 
-                new Alert
-                  event:    'access-denied'
-                  type:     'error'
-                  fade:     true
-                  heading:  i18nCommon.oauth.error
-                  message:  i18nCommon.oauth.unverified_token
-              Parse.history.navigate vars.state, true
+          # We shold verify, but we won't be accepted on localhost
+          # $.get "https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=#{vars.accessToken}", null, (verify) -> 
+          #   if verify.audience is window.GCLIENT_ID
+          Parse.User.current().save(accessToken: vars.accessToken).then ->
+            Parse.history.navigate vars.state, true
+            # else
+            #   require ["views/helper/Alert", 'i18n!nls/common'], (Alert, i18nCommon) -> 
+            #     new Alert
+            #       event:    'access-denied'
+            #       type:     'error'
+            #       fade:     true
+            #       heading:  i18nCommon.oauth.error
+            #       message:  i18nCommon.oauth.unverified_token
+            #   Parse.history.navigate vars.state, true
         else
           require ["views/helper/Alert", 'i18n!nls/common'], (Alert, i18nCommon) -> 
             new Alert
@@ -257,12 +258,15 @@ define [
     # --------------
   
     deparamAction : (splat) ->
-      ary = if splat then splat.split('?') else new Array('')
+      unless splat then return path: "", params: {}
+      
+      indexOfHash = splat.indexOf("#")
+      if indexOfHash >= 0 then splat = splat.substr(0, indexOfHash)
+      ary = if splat.indexOf("?") >= 0 then splat.split('?') else new Array(splat)
       combo = 
-        path: ary[0]
+        path: String ary[0]
         params: if ary[1] then @deparam ary[1] else {}
       
-    
     deparam : (querystring) ->
       # remove any preceding url and split
       querystring = querystring.split('&')

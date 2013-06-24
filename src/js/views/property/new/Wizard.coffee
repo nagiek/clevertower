@@ -38,6 +38,10 @@ define [
       @listenTo @map, "property:join", @join
       @listenTo @map, "property:manage", @manage
 
+      @listenTo Parse.Dispatcher, 'user:logout', ->
+        Parse.history.navigate "/", true
+        @clear()
+
       @listenTo @model, "invalid", (error) =>
         @$('button.next').removeProp "disabled"
 

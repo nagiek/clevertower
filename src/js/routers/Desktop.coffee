@@ -206,14 +206,16 @@ define [
       if Parse.User.current()
         # Variables will be placed in a hash querystring.
         vars = @deparam window.location.hash.substring(1)
-        console.log window.location.hash
-        console.log vars
-        console.log Parse.Cloud
         unless vars.error
-          Parse.Cloud.httpRequest(url: "https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=#{vars.accessToken}")
-          .then (verify) -> 
-            if verify.audience is window.GCLIENT_ID
-              Parse.User.current().save(accessToken: vars.accessToken).then ->
+          # We shold verify, but we won't be accepted on localhost
+          $.ajax "https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=#{vars.access_token}",
+          # Include a blank beforeSend to override the default headers.
+          beforeSend: (jqXHR, settings) ->
+          success: (res) -> 
+            if res.audience and res.audience is window.GCLIENT_ID
+              res.access_token = vars.access_token
+              res.expires_in += new Date().getTime() / 1000
+              Parse.User.current().save(googleAuthData: res).then ->
                 Parse.history.navigate vars.state, true
             else
               require ["views/helper/Alert", 'i18n!nls/common'], (Alert, i18nCommon) -> 
@@ -244,7 +246,7 @@ define [
       unless splat then return path: "", params: {}
       
       indexOfHash = splat.indexOf("#")
-      splat = if indexOfHash >= 0 then splat.substring(0, indexOfHash)
+      if indexOfHash >= 0 then splat = splat.substr(0, indexOfHash)
       ary = if splat.indexOf("?") >= 0 then splat.split('?') else new Array(splat)
       combo = 
         path: String ary[0]
