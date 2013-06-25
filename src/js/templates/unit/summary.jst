@@ -1,7 +1,7 @@
 <td class="title-group">
   <div class="view-specific view-show">
     <% if (objectId) { %>
-      <a class="unit-link" href="<%= baseUrl %>/units/<%= objectId %>"><%= title %></a>
+      <%= title %>
       <% if (activeLease) { %>
         | <a href="<%= baseUrl %>/leases/<%= activeLease.id %>"><%= i18nCommon.classes.lease %></a>
       <% } %>

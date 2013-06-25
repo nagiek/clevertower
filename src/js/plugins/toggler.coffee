@@ -4,16 +4,19 @@ define [
 
   $.fn.toggler = ->
     
-    @radio = @find "input"
-    @radio.eq(0).on 'click', => 
+    toggleOn = => 
       @toggleClass "toggle-off"
       @removeProp "checked"
       @radio.eq(1).prop "checked", "checked"
-      
-    @radio.eq(1).on 'click', => 
+
+    toggleOff = => 
       @toggleClass "toggle-off"
       @removeProp "checked"
       @radio.eq(0).prop "checked", "checked"
+
+    @radio = @find "input"
+    @radio.eq(0).on 'click', toggleOn
+    @radio.eq(1).on 'click', toggleOff
     
     if @radio.eq(0).is(":checked")
       @removeClass "toggle-off"

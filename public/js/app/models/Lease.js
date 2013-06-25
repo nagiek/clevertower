@@ -1,7 +1,6 @@
 (function() {
   define(['underscore', 'backbone', "collections/TenantList", "collections/ListingList", "collections/InquiryList", "collections/ApplicantList", "models/Property", "models/Unit", "moment", "i18n!nls/common"], function(_, Parse, TenantList, ListingList, InquiryList, ApplicantList, Property, Unit, moment, i18nCommon) {
-    var Lease,
-      _this = this;
+    var Lease;
 
     return Lease = Parse.Object.extend("Lease", {
       className: "Lease",
@@ -19,8 +18,8 @@
       isActive: function() {
         var ed, sd, today;
 
-        sd = _this.get("start_date");
-        ed = _this.get("end_date");
+        sd = this.get("start_date");
+        ed = this.get("end_date");
         if (!(sd && ed)) {
           return false;
         }

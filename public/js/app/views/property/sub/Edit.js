@@ -35,7 +35,7 @@
         this.on("property:sync", function() {
           return this.$('button.save').removeProp('disabled');
         });
-        return this.model.on("invalid", function(error) {
+        return this.listenTo(this.model, "invalid", function(error) {
           console.log(error);
           new Alert({
             event: 'model-save',

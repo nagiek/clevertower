@@ -32,7 +32,7 @@ define [
       # tenants_invited: new Parse.Relation()
       # tenants_current: new Parse.Relation()
     
-    isActive: =>
+    isActive: ->
       sd = @get "start_date"
       ed = @get "end_date"
       return false unless sd and ed

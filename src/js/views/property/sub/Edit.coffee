@@ -29,7 +29,7 @@ define [
       @on "property:sync", ->
         @$('button.save').removeProp('disabled')
       
-      @model.on "invalid", (error) ->
+      @listenTo @model, "invalid", (error) ->
         console.log error
 
         new Alert(event: 'model-save', fade: false, message: i18nProperty.errors[error.message], type: 'error')

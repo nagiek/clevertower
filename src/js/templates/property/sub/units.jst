@@ -1,7 +1,7 @@
 <form id="units" method="post">
   <header class="clearfix">
-    <h2 class="pull-left"><%= i18nProperty.menu.dashboard %></h2>
-      <!-- <div class="well form-actions form-inline form-condensed pull-left">
+    <h2 class="pull-left"><%= i18nProperty.menu.building %></h2>
+      <!-- <div class="well form-inline form-condensed pull-left">
         <div class="control-group">
           <div class="control-label"><%= i18nCommon.dates.date %></div>
           <div class="controls">
@@ -9,8 +9,7 @@
           </div>
         </div>
       </div> -->
-  
-      <div class="well well-small form-actions form-inline form-condensed pull-right">
+      <div class="well well-small form-inline form-condensed pull-right">
         <button id="units-edit" class="btn"><%= i18nUnit.actions.edit_units %></button>
       	<div class="control-group">
       		<div class="control-label text-center"><%= i18nUnit.actions.add_x_units %></div>
@@ -22,6 +21,11 @@
       	<button class="btn undo" disabled="disabled"><%= i18nCommon.actions.undo %></button>
         <button class="save btn btn-primary"><%= i18nCommon.actions.save %></button>
       </div>
+      <ul class="inline pull-right">
+        <li><a class="btn" href="<%= baseUrl %>/add/lease">
+          <i class="icon-plus"></i> <%= i18nProperty.menu.add_lease %>
+        </a></li>
+      </ul>
     </div>
   </header>
 

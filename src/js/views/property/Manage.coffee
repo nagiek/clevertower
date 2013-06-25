@@ -56,6 +56,7 @@ define [
       )
       
       @$el.html JST["src/js/templates/property/manage.jst"](vars)
+      @$("[rel=tooltip]").tooltip()
       @
 
     changeSubView: (path, params) =>

@@ -12,6 +12,7 @@ define
     Leases:               "Leases"
     Network:              "Network"
     Unit:                 "Unit"
+    address:              "Address"
     Tenant:               "Tenant"
     Tenants:              "Tenants"
     unit:                 "unit"
@@ -181,11 +182,13 @@ define
     public:               "Public"
     private:              "Private"
     primary:              "Primary"
+    approximate:          "Approximate"
+    exact:                "Exact"
     landlord_only:        "Landlord Only"
     admin:                "admin"
     not_specified:        "Not specified"
   form:                   
-    find_people_using:    'Find people using'
+    find_contacts_in:     'Find contacts in'
     center_on_property:   "Center on property"
     operations:           "Operations"
     info:                 "Info"

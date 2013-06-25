@@ -1,5 +1,51 @@
-<header>
-  <h2><%= i18nCommon.classes.Listings %></h2>
+<header class="clearfix">
+  <h2 class="pull-left"><%= i18nCommon.classes.Listings %></h2>
+  <div class="pull-right well well-small">
+    <form class="form-inline form-condensed pull-left">
+      <div class="control-group public-group">
+        <label for="type" class="control-label">
+          <%= i18nCommon.adjectives.public %>
+            <span class="help-info"
+            data-trigger="hover"
+            data-placement="bottom"
+            data-html="true"
+            title="Public Display"
+            data-content="Whether this property will appear in search results"
+            for="type"
+            rel="popover">[ ? ]</span>
+        </label>
+        <div class="controls">
+          <div class="toggle">
+          <label class="toggle-radio" for="publicOption1"><%= i18nCommon.prepositions.on %></label>
+          <input type="radio" name="property[public]" id="publicOption1" value="1" <%= public ? checked="checked" : '' %>>
+          <input type="radio" name="property[public]" id="publicOption2" value="0" <%= !public ? checked="checked" : '' %>>
+          <label class="toggle-radio" for="publicOption2"><%= i18nCommon.prepositions.off %></label>
+        </div>
+        </div>
+      </div>
+      <div class="control-group address-group">
+        <label class="control-label">
+          <%= i18nCommon.classes.address %>
+          <span class="help-info"
+          data-trigger="hover"
+          data-placement="bottom"
+          data-html="true"
+          title="Address Display"
+          data-content="Whether the exact address or a representative area is shown. <img src='/img/doodad/exact-vs-approx.png'>"
+          for="type"
+          rel="popover">[ ? ]</span>
+        </label>
+        <div class="controls">
+          <div class="toggle">
+          <label class="toggle-radio" for="approxOption1"><%= i18nCommon.adjectives.approximate %></label>
+          <input type="radio" name="property[approx]" id="approxOption1" value="1" <%= approx ? checked="checked" : '' %>>
+          <input type="radio" name="property[approx]" id="approxOption2" value="0" <%= !approx ? checked="checked" : '' %>>
+          <label class="toggle-radio" for="approxOption2"><%= i18nCommon.adjectives.exact %></label>
+        </div>
+        </div>
+      </div>
+    </form>
+  </div>
 </header>
 
 <table id="listings-table" class="table form-condensed">

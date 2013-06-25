@@ -25,8 +25,8 @@ define [
       
       @on "view:change", @clear
 
-      @model.leases.on "add", @addOne
-      @model.leases.on "reset", @addAll
+      @listenTo @model.leases, "add", @addOne
+      @listenTo @model.leases, "reset", @addAll
 
     render: =>
       vars = _.merge(i18nProperty: i18nProperty, i18nCommon: i18nCommon, i18nUnit: i18nUnit, i18nLease: i18nLease)

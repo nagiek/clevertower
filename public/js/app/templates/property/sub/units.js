@@ -6,12 +6,12 @@ var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
 with (obj) {
 __p += '<form id="units" method="post">\n  <header class="clearfix">\n    <h2 class="pull-left">' +
-((__t = ( i18nProperty.menu.dashboard )) == null ? '' : __t) +
-'</h2>\n      <!-- <div class="well form-actions form-inline form-condensed pull-left">\n        <div class="control-group">\n          <div class="control-label">' +
+((__t = ( i18nProperty.menu.building )) == null ? '' : __t) +
+'</h2>\n      <!-- <div class="well form-inline form-condensed pull-left">\n        <div class="control-group">\n          <div class="control-label">' +
 ((__t = ( i18nCommon.dates.date )) == null ? '' : __t) +
 '</div>\n          <div class="controls">\n            <input id="date" type="text" class="input-small" value="' +
 ((__t = ( today )) == null ? '' : __t) +
-'">\n          </div>\n        </div>\n      </div> -->\n  \n      <div class="well well-small form-actions form-inline form-condensed pull-right">\n        <button id="units-edit" class="btn">' +
+'">\n          </div>\n        </div>\n      </div> -->\n      <div class="well well-small form-inline form-condensed pull-right">\n        <button id="units-edit" class="btn">' +
 ((__t = ( i18nUnit.actions.edit_units )) == null ? '' : __t) +
 '</button>\n      \t<div class="control-group">\n      \t\t<div class="control-label text-center">' +
 ((__t = ( i18nUnit.actions.add_x_units )) == null ? '' : __t) +
@@ -21,7 +21,11 @@ __p += '<form id="units" method="post">\n  <header class="clearfix">\n    <h2 cl
 ((__t = ( i18nCommon.actions.undo )) == null ? '' : __t) +
 '</button>\n        <button class="save btn btn-primary">' +
 ((__t = ( i18nCommon.actions.save )) == null ? '' : __t) +
-'</button>\n      </div>\n    </div>\n  </header>\n\n  <table id="units-table" class="table table-condensed form-condensed">\n    <thead>\n      <tr>\n        <th>' +
+'</button>\n      </div>\n      <ul class="inline pull-right">\n        <li><a class="btn" href="' +
+((__t = ( baseUrl )) == null ? '' : __t) +
+'/add/lease">\n          <i class="icon-plus"></i> ' +
+((__t = ( i18nProperty.menu.add_lease )) == null ? '' : __t) +
+'\n        </a></li>\n      </ul>\n    </div>\n  </header>\n\n  <table id="units-table" class="table table-condensed form-condensed">\n    <thead>\n      <tr>\n        <th>' +
 ((__t = (i18nCommon.classes.Unit)) == null ? '' : __t) +
 '</th>\n        <th class="variable-begin">' +
 ((__t = (i18nUnit.fields.status)) == null ? '' : __t) +

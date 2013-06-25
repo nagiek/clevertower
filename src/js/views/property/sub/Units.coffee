@@ -57,6 +57,7 @@ define [
         i18nLease: i18nLease
         today: today
         isMgr: @isMgr
+        baseUrl: @baseUrl
 
       @$el.html JST["src/js/templates/property/sub/units.jst"](vars)      
       

@@ -22,7 +22,7 @@
       other: "Other",
       actions: "Actions",
       building: "Building",
-      tenants: "Tenant Directory",
+      tenants: "Tenants",
       message_board: "Message Board",
       tasks: "Tasks",
       listings: "Listings",
@@ -33,12 +33,13 @@
       add_expense: "Add expense",
       add_post: "Add a post",
       add_task: "Add a task",
-      add_listing: "Advertise",
+      add_listing: "Add listing",
       occupancy: "Occupancy",
       incomes: "Income",
       expenses: "Expenses",
       cash_transactions: "Cash Transactions",
       lease_history: "Lease History",
+      photos: "Photos",
       edit_property: "Edit Property",
       edit_photos: "Edit Photos",
       edit_units: "Edit Units",
@@ -76,6 +77,10 @@
       no_network_results: "No networks match that name.",
       private_property: "Properties set to private will not appear.",
       private_network: "Maybe the network is set to private?"
+    },
+    tenant_empty: {
+      photos: "This property has not added any photos.",
+      listings: "There are no advertised vacancies in the property."
     },
     empty: {
       properties: "You don't have any properties yet.",

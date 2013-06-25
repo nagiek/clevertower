@@ -19,6 +19,8 @@ define [
     
     initialize: (attrs) ->
 
+      @baseUrl = attrs.baseUrl
+
       @currentFilter = 'filter-all'
 
       @model.prep('tenants')
@@ -31,7 +33,10 @@ define [
     # Re-render the contents of the Unit item.
     render: =>
       
-      vars = _.merge(i18nGroup: i18nGroup, i18nCommon: i18nCommon)
+      vars = 
+        i18nGroup: i18nGroup
+        i18nCommon: i18nCommon
+        baseUrl: @baseUrl
       @$el.html JST["src/js/templates/network/sub/tenants.jst"](vars)
 
       @$filters = @$('.nav')

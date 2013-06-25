@@ -61,7 +61,11 @@
         }
       },
       GPoint: function() {
-        return new google.maps.LatLng(this.get("center")._latitude, this.get("center")._longitude);
+        var lat, lng;
+
+        lat = this.get("center")._latitude + (this.get("offset").lat - 50) * 250 * 7.871 / 100000000;
+        lng = this.get("center")._longitude + (this.get("offset").lng - 50) / 10000000;
+        return new google.maps.LatLng(lat, lng);
       },
       url: function() {
         return "/properties/" + this.id;
@@ -87,7 +91,7 @@
       scrub: function(attrs) {
         var attr, bools, _i, _len;
 
-        bools = ['electricity', 'furniture', 'gas', 'heat', 'hot_water', 'air_conditioning', 'back_yard', 'balcony', 'cats_allowed', 'concierge', 'dogs_allowed', 'doorman', 'elevator', 'exposed_brick', 'fireplace', 'front_yard', 'gym', 'laundry', 'indoor_parking', 'outdoor_parking', 'pool', 'sauna', 'wheelchair', 'public', 'anon'];
+        bools = ['electricity', 'furniture', 'gas', 'heat', 'hot_water', 'air_conditioning', 'back_yard', 'balcony', 'cats_allowed', 'concierge', 'dogs_allowed', 'doorman', 'elevator', 'exposed_brick', 'fireplace', 'front_yard', 'gym', 'laundry', 'indoor_parking', 'outdoor_parking', 'pool', 'sauna', 'wheelchair', 'approx', 'public', 'anon'];
         for (_i = 0, _len = bools.length; _i < _len; _i++) {
           attr = bools[_i];
           attrs[attr] = attrs[attr] === "on" || attrs[attr] === "1" ? true : false;

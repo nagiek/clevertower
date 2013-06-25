@@ -7,7 +7,42 @@
   
   <div class="photo-float medium-float elastic-float">
     <div class="btn-toolbar stay-right">
-      <%= JST["src/js/templates/property/menu.jst"]({publicUrl: publicUrl, baseUrl: baseUrl, i18nProperty: i18nProperty}) %>
+      <div class="btn-group">
+        <a href="#" class="btn btn-small dropdown-toggle" rel="tooltip" data-toggle="dropdown" data-original-title="<%= i18nProperty.menu.day_to_day %>">
+          <i class="icon icon-eye-open"></i>
+          <b class="caret"></b>
+        </a>
+        <h4 class="element-invisible"><%= i18nProperty.menu.day_to_day %></h4>
+        <%= JST["src/js/templates/property/menu/show.jst"]({baseUrl: baseUrl, i18nProperty: i18nProperty}) %>
+      </div>
+
+      <div class="btn-group">
+        <a href="#" class="btn btn-small dropdown-toggle" rel="tooltip" data-toggle="dropdown" data-original-title="<%= i18nProperty.menu.building %>">
+          <i class="icon icon-building"></i>
+          <b class="caret"></b>
+        </a>
+        <h4 class="element-invisible"><%= i18nProperty.menu.building %></h4>
+        <%= JST["src/js/templates/property/menu/building.jst"]({publicUrl: publicUrl, baseUrl: baseUrl, i18nProperty: i18nProperty}) %>
+      </div>
+      <!--
+      <div class="btn-group">
+        <a href="#" class="btn btn-small dropdown-toggle" rel="tooltip" data-toggle="dropdown" data-original-title="<%= i18nProperty.menu.reports %>">
+          <i class="icon icon-file"></i>
+          <b class="caret"></b>
+        </a>
+        <h4 class="element-invisible"><%= i18nProperty.menu.reports %></h4>
+        <%= JST["src/js/templates/property/menu/reports.jst"]({baseUrl: baseUrl, i18nProperty: i18nProperty}) %>
+      </div>
+
+      <div class="btn-group">
+        <a href="#" class="btn btn-small btn-success dropdown-toggle" rel="tooltip" data-toggle="dropdown" data-original-title="<%= i18nProperty.menu.actions %>">
+          <i class="icon icon-plus icon-white"></i>
+          <b class="caret"></b>
+        </a>
+        <h4 class="element-invisible"><%= i18nProperty.menu.actions %></h4>
+        <%= JST["src/js/templates/property/menu/actions.jst"]({baseUrl: baseUrl, i18nProperty: i18nProperty}) %>
+      </div>
+       -->
     </div>
     
     <h2>

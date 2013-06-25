@@ -31,7 +31,7 @@ require.config
     # datepickermobile:         "libs/jqueryui/jquery.ui.datepicker.mobile.min"
     serializeObject:          "app/plugins/serialize_object"
     filePicker:               "app/plugins/file_picker"
-    toggler:                  "app/plugins/toggler"
+    # toggler:                  "app/plugins/toggler"
     masonry:                  "libs/jquery/jquery.masonry"
     rangeSlider:              "libs/jquery/jquery.rangeSlider"
     slideshowify:              "libs/jquery/jquery.slideshowify"

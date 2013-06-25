@@ -23,12 +23,13 @@ define [
       @listenTo @model, "remove", @clear
 
     render: =>
-      vars = _.merge @model.toJSON(),
-        cover:        @model.cover('profile')
-        pos:          @model.pos() + 1
-        publicUrl:    @model.publicUrl()
-        i18nCommon:   i18nCommon
-        forNetwork:   @forNetwork
+      vars = 
+        formatted_address: @model.get "formatted_address"
+        cover:             @model.cover('profile')
+        pos:               @model.pos() + 1
+        publicUrl:         @model.publicUrl()
+        i18nCommon:        i18nCommon
+        forNetwork:        @forNetwork
       
       @$el.html JST["src/js/templates/property/result.jst"](vars)
       @marker = new google.maps.Marker 

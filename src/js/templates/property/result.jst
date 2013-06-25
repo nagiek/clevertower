@@ -3,8 +3,8 @@
 </div>
 
 <div class="photo-float thumbnail-float elastic-float">    
-  <h4><%= title %></h4>
-  <button type="button" class="join btn btn-primary" data-property-id="<%= objectId %>">
+  <h4><%= formatted_address %></h4>
+  <button type="button" class="join btn btn-primary">
     <% if (forNetwork) { %>
       <%= i18nCommon.actions.manage %>
     <% } else { %>

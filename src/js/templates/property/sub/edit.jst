@@ -1,17 +1,4 @@
 <form class="property-form" enctype="multipart/form-data" method="post" >
-  <fieldset>
-    <div class="control-group public-group">
-      <label for="type" class="control-label"><%= i18nCommon.adjectives.public %></label>
-      <div class="controls">
-        <div class="toggle">
-        <label class="toggle-radio" for="publicOption1"><%= i18nCommon.prepositions.on %></label>
-        <input type="radio" name="property[public]" id="publicOption1" value="1" <%= property.public ? checked="checked" : '' %>>
-        <input type="radio" name="property[public]" id="publicOption2" value="0" <%= !property.public ? checked="checked" : '' %>>
-        <label class="toggle-radio" for="publicOption2"><%= i18nCommon.prepositions.off %></label>
-      </div>
-      </div>
-    </div>
-  </fieldset>
   <%= JST["src/js/templates/property/form.jst"]({property: property, i18nCommon: i18nCommon, i18nProperty: i18nProperty}) %>
   
   <div class="form-actions">

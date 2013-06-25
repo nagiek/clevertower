@@ -581,6 +581,17 @@
     } else if (!req.object.get("title")) {
       return res.error('title_missing');
     }
+    if (req.object.get("approx")) {
+      req.object.set("offset", {
+        lat: Math.floor(Math.random() * 100),
+        lng: Math.floor(Math.random() * 100)
+      });
+    } else {
+      req.object.set("offset", {
+        lat: 50,
+        lng: 50
+      });
+    }
     if (!req.object.existed()) {
       if (req.object.get("network")) {
         return (new Parse.Query("Network")).include("role").get(req.object.get("network").id, {

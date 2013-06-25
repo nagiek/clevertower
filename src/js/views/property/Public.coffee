@@ -30,14 +30,12 @@ define [
       @model.prep "photos"
       @model.prep "listings"
 
-      @model.photos.on "add", @addOnePhoto
-      @model.photos.on "reset", @addAllPhotos
+      @listenTo @model.photos, "add", @addOnePhoto
+      @listenTo @model.photos, "reset", @addAllPhotos
 
       @model.listings.title = @model.get "title"
-      @model.listings.on "add", @addOneListing
-      @model.listings.on "reset", @addAllListings
-
-    GPoint : (GeoPoint)-> new google.maps.LatLng GeoPoint._latitude, GeoPoint._longitude
+      @listenTo @model.listings, "add", @addOneListing
+      @listenTo @model.listings, "reset", @addAllListings
 
     showTab : (e) ->
       e.preventDefault()
@@ -56,16 +54,27 @@ define [
 
       @$el.html JST["src/js/templates/property/public.jst"](vars)
 
-      center = @GPoint @model.get("center")
+      center = @model.GPoint()
 
       map = new google.maps.Map document.getElementById(@mapId), 
-        zoom          : 16
+        zoom          : 15
         center        : center
         mapTypeId     : google.maps.MapTypeId.ROADMAP
 
-      marker = new google.maps.Marker
-        position: center
-        map:      map
+      if @model.get "approx"
+        marker = new google.maps.Circle
+          center:         center
+          map:            map
+          radius:         250
+          fillColor:      "#f8aa6f"
+          fillOpacity:    0.5
+          strokeColor:    "#f28255"
+          strokeOpacity:  0.8
+          strokeWeight:   3
+      else
+        marker = new google.maps.Marker
+          position: center
+          map:      map
 
       @$list = $("#photos > ul")
       @$listings = $("#listings > table > tbody")
@@ -90,7 +99,7 @@ define [
       unless @model.photos.length is 0
         @model.photos.each @addOnePhoto
       else
-        @$list.before '<p class="empty">' + i18nProperty.empty.photos + '</p>'
+        @$list.before '<p class="empty">' + i18nProperty.tenant_empty.photos + '</p>'
 
     # Listings
     # --------
@@ -118,7 +127,7 @@ define [
             @$listings.append '<tr class="divider"><td colspan="4">' + i18nUnit.fields.bedrooms + ": #{i}</td></tr>"
             _.each listings, @addOneListing
       else
-        @$listings.before '<p class="empty">' + i18nProperty.empty.listings + '</p>'
+        @$listings.before "<tr class='empty'><td colspan='4'>#{i18nProperty.tenant_empty.listings}</td></tr>"
 
     showModal: (e) =>
       e.preventDefault()

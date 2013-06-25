@@ -14,7 +14,6 @@
       datepicker: "libs/bootstrap/bootstrap-datepicker.min",
       serializeObject: "app/plugins/serialize_object",
       filePicker: "app/plugins/file_picker",
-      toggler: "app/plugins/toggler",
       masonry: "libs/jquery/jquery.masonry",
       rangeSlider: "libs/jquery/jquery.rangeSlider",
       slideshowify: "libs/jquery/jquery.slideshowify",

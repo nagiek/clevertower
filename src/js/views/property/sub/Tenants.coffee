@@ -7,9 +7,10 @@ define [
   'views/helper/Alert'
   'views/tenant/Summary'
   "i18n!nls/group"
+  "i18n!nls/property"
   "i18n!nls/common"
   'templates/property/sub/tenants'
-], ($, _, Parse, Tenant, Profile, Alert, TenantView, i18nGroup, i18nCommon) ->
+], ($, _, Parse, Tenant, Profile, Alert, TenantView, i18nGroup, i18nProperty, i18nCommon) ->
 
   class PropertyTenantsView extends Parse.View
   
@@ -19,22 +20,24 @@ define [
       'click .nav a' : 'filter'
     
     initialize: (attrs) ->
-      
-      _.bindAll this, 'addOne', 'addAll', 'render', 'filter'
+
+      @baseUrl = attrs.baseUrl
 
       @currentFilter = 'filter-all'
       
       @model.prep('tenants')
       
-      @model.tenants.on "add",   @addOne
-      @model.tenants.on "reset", @addAll
-      
-      @render()
+      @listenTo @model.tenants, "add",   @addOne
+      @listenTo @model.tenants, "reset", @addAll
       
     # Re-render the contents of the Unit item.
-    render: ->
+    render: =>
       
-      vars = _.merge(i18nGroup: i18nGroup, i18nCommon: i18nCommon)
+      vars = 
+        i18nGroup: i18nGroup
+        i18nCommon: i18nCommon
+        i18nProperty: i18nProperty
+        baseUrl: @baseUrl
       @$el.html JST["src/js/templates/property/sub/tenants.jst"](vars)
       
       @$filters = @$('.nav')
@@ -50,14 +53,14 @@ define [
         @$("p.empty").text ''
         @$list.append (new TenantView(model: t)).render().el
 
-    addAll : (e) ->
+    addAll : (e) =>
 
       @filter(e)
 
       @$filters.find(".filter-all .count").html @model.tenants.where(property: @model).length      
       @$filters.find(".filter-recent .count").html @model.tenants.filterRecent(property: @model).length
 
-    filter : (e) ->
+    filter : (e) =>
       @currentFilter = e.currentTarget.className if e and e.currentTarget
       @$list.html ""
       @$list.removeClass "in"

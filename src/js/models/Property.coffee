@@ -87,7 +87,14 @@ define [
     pos : -> if @collection then @collection.indexOf(@) else 0
 
     # Helper function
-    GPoint : -> new google.maps.LatLng @get("center")._latitude, @get("center")._longitude
+    GPoint : -> 
+      # @get("offset") will be from 0-99
+      # degrees N/S or E/W at equator  E/W at 23N/S E/W at 45N/S E/W at 67N/S
+      # 0.0001  11.132 m  10.247 m  7.871 m
+      lat = @get("center")._latitude + (@get("offset").lat - 50) * 250 * 7.871 / 100000000
+      lng = @get("center")._longitude + (@get("offset").lng - 50)/10000000
+
+      new google.maps.LatLng lat, lng
 
     # Backbone default, as Parse function does not exist.
     url: -> "/properties/#{@id}"
@@ -130,6 +137,7 @@ define [
         'sauna'
         'wheelchair'
         # Private
+        'approx'
         'public'
         'anon'
       ]

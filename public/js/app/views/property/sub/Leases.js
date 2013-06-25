@@ -23,8 +23,8 @@
         this.baseUrl = attrs.baseUrl;
         this.editing = false;
         this.on("view:change", this.clear);
-        this.model.leases.on("add", this.addOne);
-        return this.model.leases.on("reset", this.addAll);
+        this.listenTo(this.model.leases, "add", this.addOne);
+        return this.listenTo(this.model.leases, "reset", this.addAll);
       };
 
       PropertyLeasesView.prototype.render = function() {

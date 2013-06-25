@@ -7,13 +7,9 @@ function print() { __p += __j.call(arguments, '') }
 with (obj) {
 __p += '<td class="title-group">\n  <div class="view-specific view-show">\n    ';
  if (objectId) { ;
-__p += '\n      <a class="unit-link" href="' +
-((__t = ( baseUrl )) == null ? '' : __t) +
-'/units/' +
-((__t = ( objectId )) == null ? '' : __t) +
-'">' +
+__p += '\n      ' +
 ((__t = ( title )) == null ? '' : __t) +
-'</a>\n      ';
+'\n      ';
  if (activeLease) { ;
 __p += '\n        | <a href="' +
 ((__t = ( baseUrl )) == null ? '' : __t) +

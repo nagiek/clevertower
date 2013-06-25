@@ -602,7 +602,18 @@ Parse.Cloud.beforeSave "Property", (req, res) ->
     # Insufficient data
     return res.error 'insufficient_data'
   else unless req.object.get "title"
-    return res.error 'title_missing' 
+    return res.error 'title_missing'
+
+  # Set a proxy center for fake addresses.
+  if req.object.get "approx"
+    req.object.set "offset", 
+      lat: Math.floor Math.random() * 100
+      lng: Math.floor Math.random() * 100
+  else
+    req.object.set "offset", 
+      # 50 = no offset
+      lat: 50
+      lng: 50
   
   unless req.object.existed()
 
