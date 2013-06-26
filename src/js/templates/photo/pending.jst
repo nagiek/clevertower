@@ -1,7 +1,7 @@
 <!-- The template to display files available for upload -->
 <% for (var i=0, file; file=files[i]; i++) { %>
-  <div class="photo template-upload span4">
-    <div class="preview row"><span class="fade"></span></div>
+  <li class="photo template-upload span4">
+    <div class="preview"></div>
     <div class="progress progress-success progress-striped active"
          role="progressbar"
          aria-valuemin="0"
@@ -10,13 +10,13 @@
       <div class="bar" style="width:0%;"></div>
     </div>
     <div class="photo-actions hide">
-      <button class="start btn" title="<%= i18nCommon.actions.start %>">
+      <button type="button" class="start btn" title="<%= i18nCommon.actions.start %>">
         <i class="icon-upload"></i>
       </button>
-      <button class="cancel btn btn-warning" title="<%= i18nCommon.actions.cancel %>">
+      <button type="button" class="cancel btn btn-warning" title="<%= i18nCommon.actions.cancel %>">
         <i class="icon-ban-circle icon-white"></i>
       </button>
       <!-- <input type="checkbox" name="delete" value="1"> -->
     </div>
-  </div>
+  </li>
 <% } %>

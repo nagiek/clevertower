@@ -359,7 +359,7 @@
         return activity.save({
           activity_type: "new_photo",
           "public": true,
-          photoUrl: req.params.photoUrl,
+          image: req.params.image,
           center: property.get("center"),
           property: property,
           network: property.get("network"),
@@ -1681,70 +1681,71 @@
   });
 
   Parse.Cloud.afterSave("Post", function(req, res) {
+    var activity, activityACL;
+
     if (!req.object.existed()) {
-      return (new Parse.Query("Profile")).equalTo("user", req.user).first().then(function(profile) {
-        var activity, activityACL;
+      Parse.Cloud.useMasterKey();
+      if (req.object.get("property")) {
+        return (new Parse.Query("Property")).include('role').include('network.role').get(req.object.get("property").id, {
+          success: function(property) {
+            var activity, activityACL, mgrRole, netRole, network, propRole;
 
-        if (req.object.get("property")) {
-          return (new Parse.Query("Property")).include('role').include('network.role').get(req.object.get("property").id, {
-            success: function(property) {
-              var activity, activityACL, mgrRole, netRole, network, propRole;
-
-              propRole = property.get("role");
-              mgrRole = property.get("mgrRole");
-              network = property.get("network");
-              activity = new Parse.Object("Activity");
-              activityACL = new Parse.ACL;
-              if (propRole) {
-                activityACL.setRoleReadAccess(propRole, true);
-              }
-              if (mgrRole) {
-                activityACL.setRoleReadAccess(mgrRole, true);
-              }
-              if (network) {
-                netRole = network.get("role");
-                if (netRole) {
-                  activityACL.setRoleReadAccess(netRole, true);
-                }
-              }
-              activityACL.setReadAccess(req.user, true);
-              if (req.object.get("public")) {
-                activityACL.setPublicReadAccess(true);
-              }
-              return activity.save({
-                activity_type: "new_post",
-                post_type: req.object.get("post_type"),
-                title: req.object.get("title"),
-                body: req.object.get("body"),
-                "public": req.object.get("public"),
-                center: property.get("center"),
-                property: property,
-                network: property.get("network"),
-                profile: profile,
-                lease: req.user.get("lease"),
-                unit: req.user.get("unit"),
-                post: req.object,
-                ACL: activityACL
-              });
+            propRole = property.get("role");
+            mgrRole = property.get("mgrRole");
+            network = property.get("network");
+            activity = new Parse.Object("Activity");
+            activityACL = new Parse.ACL;
+            if (propRole) {
+              activityACL.setRoleReadAccess(propRole, true);
             }
-          });
-        } else {
-          activity = new Parse.Object("Activity");
-          activityACL = new Parse.ACL;
-          activityACL.setPublicReadAccess(true);
-          return activity.save({
-            activity_type: "new_post",
-            post_type: req.object.get("post_type"),
-            title: req.object.get("title"),
-            body: req.object.get("body"),
-            "public": true,
-            center: req.object.get("center"),
-            profile: profile,
-            post: req.object,
-            ACL: activityACL
-          });
-        }
-      });
+            if (mgrRole) {
+              activityACL.setRoleReadAccess(mgrRole, true);
+            }
+            if (network) {
+              netRole = network.get("role");
+              if (netRole) {
+                activityACL.setRoleReadAccess(netRole, true);
+              }
+            }
+            activityACL.setReadAccess(req.user, true);
+            if (req.object.get("public")) {
+              activityACL.setPublicReadAccess(true);
+            }
+            return activity.save({
+              activity_type: "new_post",
+              post_type: req.object.get("post_type"),
+              image: req.object.get("image"),
+              title: req.object.get("title"),
+              body: req.object.get("body"),
+              "public": req.object.get("public"),
+              center: property.get("center"),
+              property: property,
+              network: property.get("network"),
+              profile: req.user.get("profile"),
+              lease: req.user.get("lease"),
+              unit: req.user.get("unit"),
+              post: req.object,
+              ACL: activityACL
+            });
+          }
+        });
+      } else {
+        activity = new Parse.Object("Activity");
+        activityACL = new Parse.ACL;
+        activityACL.setPublicReadAccess(true);
+        return activity.save({
+          activity_type: "new_post",
+          image: req.object.get("image"),
+          post_type: req.object.get("post_type"),
+          title: req.object.get("title"),
+          body: req.object.get("body"),
+          "public": true,
+          center: req.object.get("center"),
+          profile: req.user.get("profile"),
+          post: req.object,
+          ACL: activityACL
+        });
+      }
     }
   });
 

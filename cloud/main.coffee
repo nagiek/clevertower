@@ -388,7 +388,7 @@ Parse.Cloud.define "AddPhotoActivity", (req, res) ->
     activity.save
       activity_type: "new_photo"
       public: true
-      photoUrl: req.params.photoUrl
+      image: req.params.image
       center: property.get "center"
       property: property
       network: property.get "network"
@@ -1880,61 +1880,61 @@ Parse.Cloud.afterSave "Post", (req, res) ->
   
   unless req.object.existed()
 
-    # Query for the profile and include the user to add to roles
-    (new Parse.Query "Profile").equalTo("user", req.user).first()
-    .then (profile) ->
-          
-      if req.object.get("property")
+    Parse.Cloud.useMasterKey()
 
-        (new Parse.Query "Property").include('role').include('network.role').get req.object.get("property").id,
-        success: (property) ->
+    if req.object.get("property")
 
-            propRole = property.get "role"
-            mgrRole = property.get "mgrRole"
-            network = property.get "network"
+      (new Parse.Query "Property").include('role').include('network.role').get req.object.get("property").id,
+      success: (property) ->
 
-            # Create activity
-            activity = new Parse.Object "Activity"
-            activityACL = new Parse.ACL
-            activityACL.setRoleReadAccess propRole, true if propRole
-            activityACL.setRoleReadAccess mgrRole, true if mgrRole
-            if network
-              netRole = network.get "role"
-              activityACL.setRoleReadAccess netRole, true if netRole
-            activityACL.setReadAccess req.user, true
-            activityACL.setPublicReadAccess true if req.object.get "public"
+          propRole = property.get "role"
+          mgrRole = property.get "mgrRole"
+          network = property.get "network"
 
-            activity.save
-              activity_type: "new_post"
-              post_type: req.object.get "post_type"
-              title: req.object.get "title"
-              body: req.object.get "body"
-              public: req.object.get "public"
-              center: property.get "center"
-              property: property
-              network: property.get "network"
-              profile: profile
-              lease: req.user.get "lease" 
-              unit: req.user.get "unit"
-              post: req.object
-              ACL: activityACL
+          # Create activity
+          activity = new Parse.Object "Activity"
+          activityACL = new Parse.ACL
+          activityACL.setRoleReadAccess propRole, true if propRole
+          activityACL.setRoleReadAccess mgrRole, true if mgrRole
+          if network
+            netRole = network.get "role"
+            activityACL.setRoleReadAccess netRole, true if netRole
+          activityACL.setReadAccess req.user, true
+          activityACL.setPublicReadAccess true if req.object.get "public"
 
-      else
-        # Create activity
-        activity = new Parse.Object "Activity"
-        activityACL = new Parse.ACL
-        activityACL.setPublicReadAccess true
+          activity.save
+            activity_type: "new_post"
+            post_type: req.object.get "post_type"
+            image: req.object.get "image"
+            title: req.object.get "title"
+            body: req.object.get "body"
+            public: req.object.get "public"
+            center: property.get "center"
+            property: property
+            network: property.get "network"
+            profile: req.user.get "profile"
+            lease: req.user.get "lease" 
+            unit: req.user.get "unit"
+            post: req.object
+            ACL: activityACL
 
-        activity.save
-          activity_type: "new_post"
-          post_type: req.object.get "post_type"
-          title: req.object.get "title"
-          body: req.object.get "body"
-          public: true
-          center: req.object.get "center"
-          profile: profile
-          post: req.object
-          ACL: activityACL
+    else
+      # Create activity
+      activity = new Parse.Object "Activity"
+      activityACL = new Parse.ACL
+      activityACL.setPublicReadAccess true
+
+      activity.save
+        activity_type: "new_post"
+        image: req.object.get "image"
+        post_type: req.object.get "post_type"
+        title: req.object.get "title"
+        body: req.object.get "body"
+        public: true
+        center: req.object.get "center"
+        profile: req.user.get "profile"
+        post: req.object
+        ACL: activityACL
 
 # # Task validation
 # Parse.Cloud.beforeSave "Task", (req, res) ->

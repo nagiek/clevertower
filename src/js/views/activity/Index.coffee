@@ -173,7 +173,7 @@ define [
     getPersonalizedMapCenter : =>
       if Parse.User.current()
         if Parse.User.current().get("property")
-          @center = @GPoint Parse.User.current().get("property").get("center")
+          @center = Parse.User.current().get("property").GPoint()
           @radius = 50000
 
         else if Parse.User.current().get("network")
@@ -263,11 +263,10 @@ define [
 
       if Parse.User.current()
         Parse.User.current().activity.fetch() if Parse.User.current().activity
-        @userView = new NewPostView(view: @).render()
 
         if Parse.User.current().get("property")
           Parse.User.current().get("property").marker = new google.maps.Marker
-            position: @center
+            position: Parse.User.current().get("property").GPoint()
             map:      @map
             ZIndex:   1
             icon: 
@@ -279,7 +278,7 @@ define [
         else if Parse.User.current().get("network")
           Parse.User.current().get("network").properties.each (p) =>
             p.marker = new google.maps.Marker
-              position: @GPoint p.get("center")
+              position: p.GPoint()
               map:      @map
               ZIndex:   1
               icon: 
@@ -288,6 +287,8 @@ define [
                 origin: new google.maps.Point(50, p.pos() * 32)
                 anchor: null
                 scaledSize: null
+                
+        @userView = new NewPostView(view: @).render()
 
       @dragListener = google.maps.event.addListener @map, 'dragend', => @trigger "dragend"
       @zoomListener = google.maps.event.addListener @map, 'zoom_changed', @checkIfShouldSearch
@@ -392,7 +393,7 @@ define [
         model: a
         view: @
       if a.createdAt is undefined then view.$el.addClass "fade in"
-      @$list.append view.render().el
+      @$list.prepend view.render().el
 
     addOnePropertyActivity: (a) => 
       view = new ActivitySummaryView
@@ -402,7 +403,7 @@ define [
         view: @
         linkedToProperty: true
       view.className += " fade in" unless a.createdAt
-      @$list.append view.render().el
+      @$list.prepend view.render().el
 
     # Add all items in the Properties collection at once.
     addAll: (collection, filter) =>
@@ -476,7 +477,7 @@ define [
         @$pagination.html ""
 
         if count + userCount is 0
-          @$list.append '<li class="general empty">' + i18nListing.listings.empty.index + '</li>'
+          @$list.prepend '<li class="general empty">' + i18nListing.listings.empty.index + '</li>'
         else 
           @renderPaginiation()
           

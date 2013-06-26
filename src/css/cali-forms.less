@@ -42,6 +42,7 @@ input[type="url"],
 input[type="search"],
 input[type="tel"],
 input[type="color"],
+textarea,
 .uneditable-input {
   &.input-condensed {
     margin-bottom: 0;
@@ -210,10 +211,21 @@ input {
   margin-bottom: 5px;
 }
 .fileinput-button {
-    position: relative;
-    overflow: hidden;
-    float: left;
-    margin-right: 4px;
+  position: relative;
+  overflow: hidden;
+  float: left;
+  // margin-right: 4px;
+}
+
+.template-upload {
+  position: relative;
+  .progress {
+    margin: 0 8px;
+    position: absolute;
+    top: 8px;
+    left: 0;
+    right: 0;
+  }
 }
 
 /* Fix for IE 6: */
@@ -361,6 +373,11 @@ input {
     .control-label {
       font-size: 14px;
       line-height: 24px;
+    }
+    textarea {
+      font-size: 14px;
+      line-height: 18px;
+      padding: 6px 12px;
     }
     input[type="text"],
     input[type="password"],

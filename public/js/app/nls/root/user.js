@@ -74,7 +74,7 @@
       }
     },
     form: {
-      share: [["Share your thoughts.", "What's on your mind?"], ["Curious? Ask!", "Anything you want to know?"], ["What defines your neighbourhood?", "Share why you like your area."], ["Tell your building something nice.", "Share something with your building."]],
+      share: [["Share your thoughts.", "What's on your mind?"], ["What defines your area?", "Share what you like nearby."]],
       bulk_edit: "Edit users",
       building: {
         label: "Visibility: Building",

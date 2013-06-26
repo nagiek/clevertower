@@ -5,7 +5,24 @@
 
 .photo {
   overflow:hidden;
+  position:relative;
+  .photo-actions {
+    position:absolute;
+    top:4px;
+    right:4px;
+    .opacity(50);
+  }
+
+  &:hover {
+    .photo-actions {
+      display:block;
+      &:hover {
+        .opacity(100);
+      }
+    }
+  }
 }
+
 
 img[class*="span"] {
   height: auto;

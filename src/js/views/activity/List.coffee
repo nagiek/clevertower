@@ -55,7 +55,7 @@ define [
                           #{footer}
                         </div>
             """
-          
+
         when "new_post"
 
           vars.icon = @model.get('post_type')
@@ -65,11 +65,23 @@ define [
           #   when 'tip'
           #   when 'building'
 
-          vars.content = """
-                        <blockquote>
-                          #{title}
-                        </blockquote>
-                        """
+          if @model.get "image"
+            vars.content = """
+                          <div class="row">
+                            <div class="photo photo-span4">
+                              <img src="#{@model.get("image")}" alt="#{i18nCommon.nouns.cover_photo}">
+                            </div>
+                          </div>
+                          <div class="caption">
+                            <strong>#{title}</strong>
+                          </div>
+                          """
+          else
+            vars.content = """
+                          <blockquote>
+                            #{title}
+                          </blockquote>
+                          """
           if @model.get("body") then vars.content += @model.get("body")
           vars.content += """
                         
@@ -78,16 +90,28 @@ define [
 
         when "new_photo"
           vars.icon = 'photo'
-          cover = @model.get('property').cover("span6")
-          vars.content = """
-                        <div class="photo photo-thumbnail stay-left">
-                          <img class="" src="#{cover}" alt="#{i18nCommon.nouns.cover_photo}">
-                        </div>
-                        <div class="photo-float thumbnail-float caption">
-                          <strong>#{title}</strong>
-                          #{footer}
-                        </div>
-            """
+          if @view.display is "small"
+            vars.content = """
+                          <div class="photo photo-thumbnail stay-left">
+                            <img src="#{@model.get("image")}" alt="#{i18nCommon.nouns.cover_photo}">
+                          </div>
+                          <div class="photo-float thumbnail-float caption">
+                            <strong>#{title}</strong>
+                            #{footer}
+                          </div>
+              """
+          else
+            vars.content = """
+                          <div class="row">
+                            <div class="photo photo-span4">
+                              <img src="#{@model.get("image")}" alt="#{i18nCommon.nouns.cover_photo}">
+                            </div>
+                          </div>
+                          <div class="caption">
+                            <strong>#{title}</strong>
+                            #{footer}
+                          </div>
+                          """
 
         when "new_property"
           vars.icon = 'building'

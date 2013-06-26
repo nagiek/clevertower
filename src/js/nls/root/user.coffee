@@ -23,7 +23,7 @@ define
   app_descriptions:     
     facebook:                   "Connect with friends and the world around you on Facebook."
   show:                         
-    photo:      (name) ->       "#{_.escape(name)}'s photo"
+    photo:            (name) -> "#{_.escape(name)}'s photo"
   setup:
     performing_setup_for:       "Performing setup for"
     existing_notifications:     "You have existing offers to join or manage properties. Please select from the list below."
@@ -60,18 +60,18 @@ define
                                 "Share your thoughts."
                                 "What's on your mind?"
       ]
-      [ # question:
-                                "Curious? Ask!"
-                                "Anything you want to know?"
-      ]
+      # [ # photo:
+      #                           "Share a picture!"
+      #                           "See something cool around?"
+      # ]
       [ # tip:
-                                "What defines your neighbourhood?"
-                                "Share why you like your area."
+                                "What defines your area?"
+                                "Share what you like nearby."
       ]
-      [ # building:
-                                "Tell your building something nice."
-                                "Share something with your building."
-      ]
+      # [ # building:
+      #                           "Tell your building something nice."
+      #                           "Share something with your building."
+      # ]
     ]
 
     bulk_edit:                  "Edit users"

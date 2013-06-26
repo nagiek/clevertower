@@ -18,6 +18,8 @@
         previewMaxWidth: 370,
         previewMaxHeight: 500,
         previewAsCanvas: true,
+        uploadTemplateId: "src/js/templates/photo/pending.jst",
+        downloadTemplateId: "src/js/templates/file/download.jst",
         filesContainer: undefined,
         prependFiles: false,
         dataType: "json",
@@ -371,7 +373,7 @@
         options = this.options;
         dfd = $.Deferred();
         return ((loadImage && loadImage(file, function(img) {
-          img.className = 'span4';
+          img.className = 'fade in';
           node.append(img);
           that._forceReflow(node);
           that._transition(node).done(function() {
@@ -391,7 +393,7 @@
 
         that = this;
         options = this.options;
-        data.context.find(".preview span").each(function(index, element) {
+        data.context.find(".preview").each(function(index, element) {
           var file;
 
           file = data.files[index];
@@ -532,8 +534,8 @@
 
         options = this.options;
         options.templatesContainer = this.document[0].createElement(options.filesContainer.prop("nodeName"));
-        options.uploadTemplate = JST["src/js/templates/photo/pending.jst"];
-        return options.downloadTemplate = JST["src/js/templates/file/download.jst"];
+        options.uploadTemplate = JST[options.uploadTemplateId];
+        return options.downloadTemplate = JST[options.downloadTemplateId];
       },
       _initFilesContainer: function() {
         var options;
@@ -580,7 +582,7 @@
       },
       _create: function() {
         this._super();
-        this._refreshOptionsList.push("filesContainer");
+        this._refreshOptionsList.push("filesContainer", "uploadTemplateId", "downloadTemplateId");
         if (!this._processingQueue) {
           this._processingQueue = $.Deferred().resolveWith(this).promise();
           this.process = function() {

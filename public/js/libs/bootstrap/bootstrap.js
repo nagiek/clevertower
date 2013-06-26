@@ -1180,7 +1180,7 @@
 
         actualWidth = $tip[0].offsetWidth
         actualHeight = $tip[0].offsetHeight
-
+        
         switch (placement) {
           case 'bottom':
             tp = {top: pos.top + pos.height, left: pos.left + pos.width / 2 - actualWidth / 2}
@@ -1209,6 +1209,9 @@
         , actualHeight
         , delta
         , replace
+
+
+      console.log(offset);
 
       $tip
         .offset(offset)

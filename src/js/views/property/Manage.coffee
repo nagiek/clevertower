@@ -24,8 +24,6 @@ define [
       'click .edit-profile-picture': 'editProfilePicture'
 
     initialize: (attrs) ->
-            
-      @$form = $("#profile-picture-upload")
       
       @model.prep('units')
       @model.prep('leases')
@@ -45,17 +43,16 @@ define [
 
     # Re-render the contents of the property item.
     render: ->
-      vars = _.merge(
-        @model.toJSON(),
+      vars = _.merge @model.toJSON(),
         publicUrl: @model.publicUrl()
         cover: @model.cover 'profile'
         i18nProperty: i18nProperty
         i18nCommon: i18nCommon
         hasNetwork: @model.get("network")
         baseUrl: @baseUrl
-      )
       
       @$el.html JST["src/js/templates/property/manage.jst"](vars)
+      @$form = @$("#profile-picture-upload-form")
       @$("[rel=tooltip]").tooltip()
       @
 
@@ -133,7 +130,7 @@ define [
           done: (e, data) ->
             file = data.result
             _this.model.save image_thumb: file.url, image_profile: file.url, image_full: file.url
-            $('#edit-profile-picture-modal').modal('hide')
+            _this.$('#edit-profile-picture-modal').modal('hide')
                 
-        $('#edit-profile-picture-modal').modal()
+        _this.$('#edit-profile-picture-modal').modal()
         

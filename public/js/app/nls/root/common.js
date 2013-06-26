@@ -30,11 +30,12 @@
       listings: "listings",
       Listing: "Listing",
       Listings: "Listings",
+      photo: "Photo",
       Photos: "Photos",
       Posts: "Posts",
-      status: "status",
-      question: "question",
-      tip: "tip"
+      status: "Status",
+      question: "Question",
+      tip: "Tip"
     },
     actions: {
       go: "Go",
@@ -71,6 +72,7 @@
       add_more: "Add more",
       add_another: "Add another",
       add_files: "Add files",
+      add_photo: "Add photo",
       add_photos: "Add photos",
       add_extra_details: "Add extra details",
       choose_file: "Choose file",
@@ -158,6 +160,9 @@
           return "You have ignored <strong>" + (_.escape(network)) + "</strong>'s request.";
         }
       }
+    },
+    posts: {
+      building: "Private post to your building"
     },
     status: {
       ok: "OK",

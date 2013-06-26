@@ -31,7 +31,11 @@
   height: 40px;
   line-height: 40px;
   margin: 0 auto;
-  background-image: url("@{iconPostSpritePath}");
+  background-image: url("@{iconPostSpritePath}") !important;
+}
+
+.icon-sprite {
+  background-image: url("@{iconPostSpritePath}") !important;
 }
 
 
@@ -51,27 +55,37 @@
 .icon-signout         { background-position: -144px -168px; }
 
 .icon-big {
-  &.icon-status       { background-position: -192px -930px }
   &.icon-people       { background-position: 0      0; }
-  &.icon-search       { background-position: -274px -75px; }
   &.icon-keys         { background-position: -46px  0; }  
   &.icon-chat         { background-position: -142px 0; }
-  &.icon-map-marker   { background-position: -81px -932px; }
   &.icon-building     { background-position: -225px 0; }
+  &.icon-picture      { background-position: -40px  -39px; }
+  &.icon-search       { background-position: -274px -75px; }
+  &.icon-map-marker   { background-position: -81px  -932px; }
+  &.icon-status       { background-position: -192px -930px }
+}
+
+.icon-sprite {
+  &.icon-building     { background-position: -128px -9px; }
 }
 
 .icon-post {
   &.icon-status       { background-position: 0      0; }
-  &.icon-question     { background-position: -40px  0; }
+  &.icon-photo        { background-position: -40px  0; }
   &.icon-tip          { background-position: -80px  0; }
-  &.icon-building     { background-position: -120px 0; }
-  &:hover,
-  &:active,
-  &.active {
+  &.icon-building     { background-position: -128px -9px; }
+}
+
+// :hover,
+// :active,
+.active {
+  > .icon-post {
     &.icon-status     { background-position: 0      -40px; }
-    &.icon-question   { background-position: -40px  -40px; }
+    &.icon-photo      { background-position: -40px  -40px; }
     &.icon-tip        { background-position: -80px  -40px; }
-    &.icon-building   { background-position: -120px -40px; }
+  }
+  > .icon-big {
+    &.icon-building   { background-position: -128px -52px; }
   }
 }
 

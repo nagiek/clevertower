@@ -103,9 +103,9 @@ define [
         stop: (e, data) =>
 
           Parse.Promise.when(uploads).then =>
-            @photos.add arguments
+            @photos.add photo for photo in arguments
             Parse.Cloud.run 'AddPhotoActivity', { 
-              photoUrl: arguments[0].get "name"
+              image: arguments[0].get "name"
               length: arguments.length
               propertyId: @model.id
               # center: _this.model.get("center")
@@ -129,7 +129,7 @@ define [
       delete this
 
     addOne : (photo) =>
-      view = new PhotoView(model: photo)
+      view = new PhotoView model: photo
       @$list.append view.render().el
       
     # Add all items in the Properties collection at once.

@@ -68,10 +68,10 @@
       previewAsCanvas: true
       
       # The ID of the upload template:
-      # uploadTemplateId: "template-upload"
+      uploadTemplateId: "src/js/templates/photo/pending.jst"
       
       # The ID of the download template:
-      # downloadTemplateId: "template-download"
+      downloadTemplateId: "src/js/templates/file/download.jst"
       
       # The container for the list of files. If undefined, it is set to
       # an element with class "files" inside of the widget element:
@@ -367,7 +367,7 @@
       # transition events are not triggered,
       # so we have to resolve manually:
       ((loadImage and loadImage(file, (img) ->
-        img.className = 'span4';
+        img.className = 'fade in';
         node.append img
         that._forceReflow node
         that._transition(node).done ->
@@ -383,7 +383,7 @@
     _renderPreviews: (data) ->
       that = this
       options = @options
-      data.context.find(".preview span").each (index, element) ->
+      data.context.find(".preview").each (index, element) ->
         file = data.files[index]
         if options.previewSourceFileTypes.test(file.type) and ($.type(options.previewSourceMaxFileSize) isnt "number" or file.size < options.previewSourceMaxFileSize)
           that._processingQueue = that._processingQueue.pipe(->
@@ -502,8 +502,8 @@
       options = @options
       options.templatesContainer = @document[0].createElement(options.filesContainer.prop("nodeName"))
 
-      options.uploadTemplate = JST["src/js/templates/photo/pending.jst"]
-      options.downloadTemplate = JST["src/js/templates/file/download.jst"]
+      options.uploadTemplate = JST[options.uploadTemplateId]
+      options.downloadTemplate = JST[options.downloadTemplateId]
 
     _initFilesContainer: ->
       options = @options
@@ -534,7 +534,7 @@
 
     _create: ->
       @_super()
-      @_refreshOptionsList.push "filesContainer" # , "uploadTemplateId", "downloadTemplateId"
+      @_refreshOptionsList.push "filesContainer" , "uploadTemplateId", "downloadTemplateId"
       unless @_processingQueue
         @_processingQueue = $.Deferred().resolveWith(this).promise()
         @process = ->

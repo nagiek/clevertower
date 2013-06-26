@@ -76,7 +76,7 @@ define [
           if @view.display is "small"
             vars.content = """
                           <div class="photo photo-thumbnail stay-left">
-                            <img class="" src="#{cover}" alt="#{i18nCommon.nouns.cover_photo}">
+                            <img src="#{cover}" alt="#{i18nCommon.nouns.cover_photo}">
                           </div>
                           <div class="photo-float thumbnail-float caption">
                             <strong>#{title}</strong>
@@ -107,11 +107,23 @@ define [
           #   when 'tip'
           #   when 'building'
 
-          vars.content = """
-                        <blockquote>
-                          #{title}
-                        </blockquote>
-                        """
+          if @model.get "image"
+            vars.content = """
+                          <div class="row">
+                            <div class="photo photo-span4">
+                              <img src="#{@model.get("image")}" alt="#{i18nCommon.nouns.cover_photo}">
+                            </div>
+                          </div>
+                          <div class="caption">
+                            <strong>#{title}</strong>
+                          </div>
+                          """
+          else
+            vars.content = """
+                          <blockquote>
+                            #{title}
+                          </blockquote>
+                          """
           if @model.get("body") then vars.content += @model.get("body")
           vars.content += """
                         
@@ -120,11 +132,10 @@ define [
 
         when "new_photo"
           vars.icon = 'photo'
-          cover = @model.get('property').cover("span6")
           if @view.display is "small"
             vars.content = """
                           <div class="photo photo-thumbnail stay-left">
-                            <img class="" src="#{cover}" alt="#{i18nCommon.nouns.cover_photo}">
+                            <img src="#{@model.get("image")}" alt="#{i18nCommon.nouns.cover_photo}">
                           </div>
                           <div class="photo-float thumbnail-float caption">
                             <strong>#{title}</strong>
@@ -135,7 +146,7 @@ define [
             vars.content = """
                           <div class="row">
                             <div class="photo photo-span4">
-                              <img src="#{cover}" alt="#{i18nCommon.nouns.cover_photo}">
+                              <img src="#{@model.get("image")}" alt="#{i18nCommon.nouns.cover_photo}">
                             </div>
                           </div>
                           <div class="caption">

@@ -9,7 +9,12 @@ define [
   "i18n!nls/property"
   "i18n!nls/common"
   "templates/post/new"
+  "templates/post/pending_photo"
+  "templates/post/photo"
   'gmaps'
+  'jquery.fileupload'
+  'jquery.fileupload-fp'
+  'jquery.fileupload-ui'
 ], ($, _, Parse, Post, Activity, ActivityView, i18nUser, i18nProperty, i18nCommon) ->
 
   class NewPostView extends Parse.View
@@ -21,10 +26,12 @@ define [
     events:
       "submit form"                     : "save"
       "focus #post-title"               : "showPostForm"
-      "change #show-body"               : "toggleBodyView"
-      "change #centered-on-property"    : "toggleCenterOnProperty"
+      # "change #show-body"               : "toggleBodyView"
+      # "change #centered-on-property"    : "toggleCenterOnProperty"
+      "click #building-post"            : "toggleBuildingPost"
       "click #post-type li input"       : "handlePostClick"
-      "change #property-options select" : "centerOnNetworkProperty"
+      "change #property-options select" : "setProperty"
+      "click .photo-destroy"            : "unsetImage"
     
     initialize: (attrs) ->
 
@@ -36,14 +43,36 @@ define [
       if Parse.User.current().get("network")
         @listenTo Parse.User.current().get("network").properties, "add", @handlePropertyAdd
 
+      @listenTo @model, "change:image", @renderImage
+
+      @listenTo @model, "change:property", =>
+        if @model.get "property"
+          @marker.setVisible false
+          @$('#property-options').removeClass 'hide'
+          @pMarker = @model.get("property").marker
+          @pMarker.setZIndex 100
+          @view.map.setOptions
+            draggable: false
+            center: @model.get("property").GPoint()
+            zoom: 14
+        else
+          @marker.setVisible true
+          @pMarker.setZIndex 1
+          @$('#property-options').addClass 'hide'
+          @view.map.setOptions
+            draggable: true
+
       @listenTo @view, "dragend", @updateCenter
       @updateCenter()
 
-      @on "property:change", (property) =>
-        @model.set "property", property
-        if property
-          @view.map.setCenter property.GPoint()
-          @view.map.setZoom 14
+    renderImage: =>
+      if @model.get("image")
+        @$('#preview-post-photo').html JST["src/js/templates/post/photo.jst"](image: @model.get("image"), i18nCommon: i18nCommon)
+      else 
+        @$('#preview-post-photo').html ""
+
+    unsetImage: =>
+      @model.unset("image")
 
     updateCenter : => center = @view.map.getCenter(); @model.set "center", new Parse.GeoPoint(center.lat(), center.lng())
 
@@ -54,10 +83,27 @@ define [
         if @shown then @hidePostForm() else @showPostForm()
       else
         @changePostType()
-        @checkMarkerVisibility()
+
+    toggleBuildingPost: ->
+      return if @empty
+      @showPostForm()
+      unless @model.get "property"
+        @$('#building-post').addClass 'active'
+        if Parse.User.current().get "network"
+          @model.set "property", Parse.User.current().get("network").properties.models[0]
+        else if Parse.User.current().get "property"
+          @model.set "property", Parse.User.current().get("property")
+      else
+        @$('#building-post').removeClass 'active'
+        @model.unset "property"
+
+    setProperty : =>
+      p = @$('#property-options select :selected').val()
+      property = Parse.User.current().get("network").properties.get(p)
+      unless property then property = Parse.User.current().get("property")
+      @model.set "property", property
 
     changePostType : ->
-      
       newPos = @getTypeIndex()
       pos = @$("#post-input-caret").data "position"
       rand = Math.floor Math.random() * i18nUser.form.share[0].length
@@ -65,28 +111,14 @@ define [
       @$("#post-input-caret").removeClass "phase-#{pos}"
       @$("#post-input-caret").data "position", newPos
 
-      if newPos is 3 and @empty
-        # @$("#post-title").prop "disabled", true
-        @$(".title-group").addClass "hide"
-        @$("#post-options").addClass "hide"
+      if @empty
         @$(".no-property").removeClass "hide"
-
-      else 
+      else
         @$(".no-property").addClass "hide"
         @$(".title-group").removeClass "hide"
         # @$("#post-title").removeProp 'disabled'
         # @$("#post-options").removeClass "hide"
         @$("#post-title").prop 'placeholder', i18nUser.form.share[newPos][rand]
-
-    checkMarkerVisibility: ->
-      return unless @shown
-      if @getTypeIndex() is 3
-        # TODO: unable to set checkbox to 'checked' AND 'disabled'
-        @$("#centered-on-property").prop('checked', true).trigger("change") unless $("#redo-search").is(":checked")
-        # @$("#centered-on-property").prop('disabled', true)
-      else
-        @marker.setVisible true
-        # @$("#centered-on-property").removeProp("disabled")
 
     getTypeIndex: -> 
       index = @$("#post-type :checked").parent().index()
@@ -100,6 +132,7 @@ define [
         animation:  google.maps.Animation.DROP
         ZIndex:     101
         visible:    false
+        title:      "Select where you want to place this post."
 
       @empty = false
 
@@ -108,6 +141,8 @@ define [
         i18nProperty: i18nProperty
 
       @$el.html JST["src/js/templates/post/new.jst"](vars)
+      @$form = @$("> #post-form")
+
       @$('[rel=tooltip]').tooltip()
 
       if Parse.User.current().get("property")
@@ -121,19 +156,75 @@ define [
         # Render asynchronously, while we wait for the property
         # info to come in so we can determine our center & radius
         @$("#property-options").html "<select></select>"
-        if Parse.User.current().get("network")
-          @listenTo Parse.User.current().get("network").properties, "add reset", @populatePropertySelectFromNetwork
-          if Parse.User.current().get("network").properties.length is 0 
-            @handleNoProperty()
-          else
-            @populatePropertySelectFromNetwork()
-            rand = Math.floor Math.random() * i18nUser.form.share.length
-            @$("#post-type :nth-child(#{rand + 1}) input").prop('checked', true)
-            @changePostType()
+        @listenTo Parse.User.current().get("network").properties, "add reset", @populatePropertySelectFromNetwork
+        unless Parse.User.current().get("network").properties.length is 0
+          @populatePropertySelectFromNetwork()
+          rand = Math.floor Math.random() * i18nUser.form.share.length
+          @$("#post-type :nth-child(#{rand + 1}) input").prop('checked', true)
+          @changePostType()
+        else
+          @handleNoProperty()
       else
         @handleNoProperty()
-       
-      @
+
+      # Init the form upload.
+      _this = @ # Keep for below
+        
+      # Initiate the file upload.
+      @$form.fileupload
+        autoUpload: true
+        type: "POST"
+        dataType: "json"
+        fileInput: '#attach-photo'
+        # nameContainer:_this.$('#preview-post-photo-name')
+        filesContainer: _this.$('#preview-post-photo')
+        multipart: false # Tell Fileupload to keep file as binary, as Parse only takes binary files.
+        context: @$form[0]
+        uploadTemplateId: "src/js/templates/post/pending_photo.jst"
+        downloadTemplateId: "src/js/templates/post/photo.jst"
+        add: (e, data) ->
+          _this.showPostForm()
+
+          # Copy/Paste from jquery.fileupload-ui
+          that = $(this).data("blueimp-fileupload") or $(this).data("fileupload")
+          that._trigger "photo:add", e, data
+          options = that.options
+          files = data.files
+          $(this).fileupload("process", data).done ->
+            that._adjustMaxNumberOfFiles -files.length
+            data.maxNumberOfFilesAdjusted = true
+            data.files.valid = data.isValidated = that._validate(files)
+            data.context = that._renderUpload(files).data("data", data)
+            # replace existing picture.
+            options.filesContainer.html data.context
+            that._renderPreviews data
+            that._forceReflow data.context
+            that._transition(data.context).done ->
+              data.submit()  if (that._trigger("added", e, data) isnt false) and (options.autoUpload or data.autoUpload) and data.autoUpload isnt false and data.isValidated
+        submit: (e, data) ->
+          data.url = "https://api.parse.com/1/files/" + data.files[0].name
+        send: (e, data) ->
+          delete data.headers['Content-Disposition']; # Parse does not accept this header.
+        done: (e, data) ->
+          file = data.result
+
+          _this.model.set image: file.url
+
+        stop: (e) ->
+          that = $(this).data("blueimp-fileupload") or $(this).data("fileupload")
+          deferred = that._addFinishedDeferreds()
+          $.when.apply($, that._getFinishedDeferreds()).done ->
+            that._trigger "stopped", e
+
+          # that._transition(
+          $(this).find(".fileupload-progress").addClass('hide')
+          # )
+          .done ->
+            $(this).find(".progress").attr("aria-valuenow", "0").find(".bar").css "width", "0%"
+            $(this).find(".progress-extended").html "&nbsp;"
+            deferred.resolve()
+            $(this).find(".fileupload-progress")
+          that._trigger "photo:remove", e
 
     populatePropertySelectFromNetwork : ->
       if Parse.User.current().get("network").properties.length > 0
@@ -147,8 +238,9 @@ define [
     handleNoProperty : ->
       @empty = true
       # Set to building-type, to show the user that they still need to join/add a property
-      @$("#post-type :nth-child(4) input").prop('checked', true)
-      @$("#post-input-caret").data "position", 3
+      # @$("#post-type :nth-child(4) input").prop('checked', true)
+      # @$("#post-input-caret").data "position", 3
+      # @$("#centered-on-property").parent().append("<p class='empty'><small>(#{i18nProperty.empty.properties})</small></p>")
       if Parse.User.current().get("network")
         @$('.no-property').html """
                           <p>CleverTower is more fun when you're connected, but you haven't added any property yet.</p>
@@ -163,8 +255,7 @@ define [
                       #{i18nCommon.expressions.get_started}
                     </a>
                     """
-      @$("#centered-on-property").parent().append("<p class='empty'><small>(#{i18nProperty.empty.properties})</small></p>")
-      @changePostType()
+      # @changePostType()
 
     handlePossiblePropertyAdd : =>
       if Parse.User.current().get("network")
@@ -178,16 +269,16 @@ define [
     handlePropertyAdd : ->
       @empty = false
       @changePostType()
-      @$("#centered-on-property").parent().remove("p.empty")
+      # @$("#centered-on-property").parent().remove("p.empty")
 
     showPostForm : (e) => 
       newPos = @getTypeIndex()
-      return if @shown or newPos is 3 and @empty
+      return if @shown # or newPos is 3 and @empty
       @shown = true
       @$('#post-options').removeClass 'hide'
-      if @empty then @$("#centered-on-property").prop("disabled", true)
-      @marker.bindTo 'position', @view.map, 'center' 
-      @checkMarkerVisibility()
+      # if @empty then @$("#centered-on-property").prop("disabled", true)
+      @marker.bindTo 'position', @view.map, 'center'
+      @marker.setVisible true
       $("#redo-search").prop('checked', false).trigger("change") if $("#redo-search").is(":checked")
 
     hidePostForm : (e) => 
@@ -196,31 +287,10 @@ define [
       @$('#post-title').val('').blur()
       @$('#post-options').addClass 'hide'
       @marker.setVisible false
-    
-    toggleCenterOnProperty: (e) =>
 
-      if e.currentTarget.checked
-        @marker.setVisible false
-        @$('#property-options').removeClass 'hide'
-        
-        if Parse.User.current().get("property") 
-          @trigger "property:change", Parse.User.current().get("property")
-        else if Parse.User.current().get("network") then @centerOnNetworkProperty()
-
-      else
-        @marker.setVisible true
-        @$('#property-options').addClass 'hide'
-
-
-    centerOnNetworkProperty : =>
-      p = @$('#property-options select :selected').val()
-      @trigger "property:change", Parse.User.current().get("network").properties.get(p)
-
-
-    toggleBodyView : (e) =>
-      if e.currentTarget.checked then @$('.body-group').removeClass 'hide'
-      else @$('.body-group').addClass 'hide'
-
+    # toggleBodyView : (e) =>
+    #   if e.currentTarget.checked then @$('.body-group').removeClass 'hide'
+    #   else @$('.body-group').addClass 'hide'
 
     save : (e) ->
       e.preventDefault() if e
@@ -229,7 +299,6 @@ define [
       data = @$('form').serializeObject()
       @$('.error').removeClass('error')
 
-
       @model.save data.post,
         success: (model) => 
           model.set 
@@ -237,7 +306,7 @@ define [
             profile: Parse.User.current().get("profile")
           # Add to appropriate collection
           if model.get("property")
-            Parse.User.current().add new Activity(model.attributes)
+            Parse.User.current().activity.add new Activity(model.attributes)
           else Parse.App.activity.add new Activity(model.attributes)
 
           @view.refreshDisplay()
@@ -248,6 +317,9 @@ define [
           @shown = false
           @render()
         error: (model, error) => console.log error
+
+    # attachPhoto: ->
+
 
     clear: (e) =>
       @$el.html ""

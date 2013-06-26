@@ -92,9 +92,14 @@
           },
           stop: function(e, data) {
             Parse.Promise.when(uploads).then(function() {
-              _this.photos.add(arguments);
+              var photo, _i, _len;
+
+              for (_i = 0, _len = arguments.length; _i < _len; _i++) {
+                photo = arguments[_i];
+                _this.photos.add(photo);
+              }
               Parse.Cloud.run('AddPhotoActivity', {
-                photoUrl: arguments[0].get("name"),
+                image: arguments[0].get("name"),
                 length: arguments.length,
                 propertyId: _this.model.id
               }, {
