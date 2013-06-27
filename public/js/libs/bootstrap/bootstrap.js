@@ -1210,9 +1210,6 @@
         , delta
         , replace
 
-
-      console.log(offset);
-
       $tip
         .offset(offset)
         .addClass(placement)

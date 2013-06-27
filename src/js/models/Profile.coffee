@@ -25,6 +25,8 @@ define [
       bio                 : ""
       website             : ""
       phone               : ""
+      # Privacy
+      privacy_building    : true
 
     # Backbone default, as Parse function does not exist.
     url: -> "/users/#{@id}"
@@ -56,3 +58,11 @@ define [
         when "activities"   then new ActivityList [], profile: @
         when "tenants"      then new TenantList [], profile: @
       @[collectionName]
+
+    scrub: (attrs) ->
+      bools = ['privacy_building']
+
+      for attr in bools
+        attrs[attr] = if attrs[attr] is "on" or attrs[attr] is "1" then true else false
+      
+      attrs

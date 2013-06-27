@@ -41,10 +41,9 @@ define
     birthday:                   "Birthday"
     avatar:                     "Picture"
   privacy:      
-    context:                    "Tenants in my building..."
-    visible:      
-      label:                    "...Can see I live here"
-      description:              "Other tenants will be able to see your public profile."
+    building:      
+      label:                    "Tenants in my building can see I live here."
+      description:              "Your unit, lease, and other confidential data will not be revealed."
     unit:     
       label:                    "...Can see my unit"
       description:              "Other tenants will be able to see which unit you live in."

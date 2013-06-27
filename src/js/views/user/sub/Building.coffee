@@ -75,4 +75,6 @@ define [
 
       if t.get("lease").id is Parse.User.current().get("lease").id
         @$rList.append "<li class='profile'>" + JST["src/js/templates/profile/thumbnail.jst"](vars) + "</li>"
-      else @$tList.append "<li class='profile'>" +JST["src/js/templates/profile/thumbnail.jst"](vars) + "</li>"
+      else 
+        unless t.get("privacy_building")
+          @$tList.append "<li class='profile'>" +JST["src/js/templates/profile/thumbnail.jst"](vars) + "</li>"

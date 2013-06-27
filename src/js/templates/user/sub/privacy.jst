@@ -1,29 +1,16 @@
-<form class="form-horizontal" method="post" id="privacy-form">
-  <fieldset>
-    <legend><%= i18nUser.privacy.context %></legend>
-    <div class="control-group">
-      <div class="controls">
-        <label for="user[privacy_visible]" class="checkbox">
-          <input type="checkbox" name="user[privacy_visible]" <%= privacy_visible ? checked="checked" : '' %>>
-          <%= i18nUser.privacy.visible.label %>
-        </label>
-        <p class="help-block"><%= i18nUser.privacy.visible.description %></p>
-      </div>
+<form method="post" id="privacy-form">
+  <div class="control-group">
+    <div class="controls">
+      <label for="profile[privacy_building]" class="checkbox">
+        <input type="checkbox" name="profile[privacy_building]" <%= privacy_building ? checked="checked" : '' %>>
+        <%= i18nUser.privacy.building.label %>
+      </label>
+      <p class="help-block"><%= i18nUser.privacy.building.description %></p>
     </div>
-
-    <div class="control-group">
-      <div class="controls">
-        <label for="user[privacy_unit]" class="checkbox">
-          <input type="checkbox" name="user[privacy_unit]" <%= privacy_unit ? checked="checked" : '' %>>
-          <%= i18nUser.privacy.unit.label %>
-        </label>
-        <p class="help-block"><%= i18nUser.privacy.unit.description %></p>
-      </div>
-    </div>
-  </fieldset>
+  </div>
 
   <div class="form-actions">
     <button class="save btn btn-primary"><%= i18nCommon.actions.save %></button>
-    <a href="<%= cancel_path %>" class="back btn"><%= i18nUser.actions.back_to_profile %></a>
+    <a href="<%= baseUrl %>" class="back btn"><%= i18nUser.actions.back_to_profile %></a>
   </div>
 </form>
