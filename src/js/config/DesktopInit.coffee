@@ -35,12 +35,12 @@ require.config
     masonry:                  "libs/jquery/jquery.masonry"
     rangeSlider:              "libs/jquery/jquery.rangeSlider"
     slideshowify:              "libs/jquery/jquery.slideshowify"
-    "jquery.fileupload-pr":   "app/plugins/jquery-fileupload-pr" # Profile  (single)
-    "jquery.fileupload-ui":   "app/plugins/jquery-fileupload-ui" # UI       (multiple)
-    "jquery.fileupload-fp":   "app/plugins/jquery-fileupload-fp" # File Processing
+    "jquery.fileupload-pr":   "app/plugins/jquery-fileupload-pr"  # Profile  (single)
+    "jquery.fileupload-ui":   "app/plugins/jquery-fileupload-ui"  # UI       (multiple)
+    "jquery.fileupload-fp":   "app/plugins/jquery-fileupload-fp"  # File Processing
     "jquery.fileupload":      "app/plugins/jquery-fileupload"
-    "load-image":             "//blueimp.github.com/JavaScript-Load-Image/load-image.min"             # "libs/jquery/load-image.min"
-    "canvas-to-blob":         "//blueimp.github.com/JavaScript-Canvas-to-Blob/canvas-to-blob.min"     # "libs/jquery/canvas-to-blob.min"
+    "load-image":             "libs/plugins/load-image"            # "//blueimp.github.io/JavaScript-Load-Image/js/load-image.min"
+    "canvas-to-blob":         "libs/plugins/canvas-to-blob"        # "//blueimp.github.io/JavaScript-Canvas-to-Blob/js/canvas-to-blob.min"      
                               
     # Underscore plugins      
     # ---------------
