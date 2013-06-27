@@ -1,7 +1,7 @@
-<a href="<%= publicUrl %>" class="thumbnail clearfix activity <%= type %><% if (linkedToProperty) { %><%= " property-linked property-" + propertyId %><% } %>">
+<a href="<%= publicUrl %>" class="thumbnail clearfix activity <%= type %><% if (linkedToProperty) { %><%= " property-linked property-" + propertyId %><% } %>" data-index="<%= pos %>" data-collection="<% if (linkedToProperty) { %>user<% } else { %>external<% } %>">
   <div class="content"><%= content %></div>
   <ul class="activity-info inline inline-condensed">
-    <li class="position"><%= pos %></li>
+    <li class="position"><%= pos + 1 %></li>
     <li><i class="icon icon-<%= icon %>"></i></li>
   </ul>
 </a>

@@ -19,9 +19,13 @@ define [
     el: "#main"
 
     events:
-      'click #filters > button'   : 'changeType'
-      'click #displays > button'  : 'changeDisplay'
-      'change #redo-search'       : 'changeSearchPrefs'
+      'click #filters > button'     : 'changeType'
+      'click #displays > button'    : 'changeDisplay'
+      'click .thumbnails > li > a'  : 'showModal'
+      'click .thumbnails > li > a'  : 'showModal'
+      'change #redo-search'         : 'changeSearchPrefs'
+      'click .modal .left'          : 'prevModal'
+      'click .modal .right'         : 'nextModal'
     
     initialize : (attrs) ->
       @location = attrs.location || "" # "Montreal--QC--Canada"
@@ -39,8 +43,11 @@ define [
         @location = data.location
         @placesService.getDetails reference: data.reference, @googleSearch
 
-      @on "model:viewDetails", @clear
+      @on "model:view", @showModal
       @on "dragend", @checkIfShouldSearch
+      @on "view:change", @clear
+
+      @$("#view-content-modal").on "hide", @hideModal
 
       # Create a timer to buffer window re-draws.
       @time = null
@@ -583,9 +590,177 @@ define [
         lat < @ne._latitude and 
         @sw._longitude < lng and 
         lng < @ne._longitude
-      
 
     clear : => 
       @stopListening()
       @undelegateEvents()
       delete this
+
+    showModal : (e) =>
+      @modal = true
+      data = $(e.currentTarget).data()
+      @index = data.index
+      @collection = data.collection
+      model = if @collection is "user"
+        Parse.User.current().activity.at(@index)
+      else Parse.App.activity.at(@index)
+      @renderModalContent(model)
+      @$("#view-content-modal").modal(keyboard: false)
+      $(document).on "keyup", @controlModalIfOpen
+
+    controlModalIfOpen : (e) =>
+      return unless @modal
+      console.log e.which
+      switch e.which 
+        when 27 then @$("#view-content-modal").modal('hide')
+        when 37 then @prevModal()
+        when 39 then @nextModal()
+
+    hideModal : =>
+      return unless @modal
+      @modal = false
+      $(document).off "keyup"
+
+    nextModal : =>
+      return unless @modal
+      @index++
+      model = if @collection is "user"
+        if @index > Parse.User.current().activity.length then @index = 0
+        Parse.User.current().activity.at(@index)
+      else
+        if @index >= Parse.App.activity.length then @index = 0
+        Parse.App.activity.at(@index)
+      @renderModalContent(model)
+
+    prevModal : =>
+      @index--
+      model = if @collection is "user"
+        if @index < 0 then @index = Parse.User.current().activity.length
+        Parse.User.current().activity.at(@index)
+      else
+        if @index < 0 then @index = Parse.App.activity.length
+        Parse.App.activity.at(@index)
+      return unless @modal
+
+    clear: =>
+      @$("#view-content-modal").off "hide"
+      @undelegateEvents()
+      @stopListening()
+      delete this
+
+    renderModalContent : (model) ->
+      title = model.get("title")
+      if model.get('profile') 
+        profilePic = model.get('profile').cover("thumb")
+        name = model.get('profile').name()
+        url = model.get('profile').url()
+      else 
+        profilePic = model.get('property').cover("thumb")
+        name = model.get('property').get("title")
+        url = model.get('property').publicUrl()
+      profileInfo = """
+              <div class="profile clearfix">
+                <a href="#{url}">
+                  <div class="photo photo-thumbnail stay-left">
+                    <img src="#{profilePic}" alt="Profile" class="img-rounded profile-picture">
+                  </div>
+                  <strong class="photo-float thumbnail-float">#{name}</strong>
+                </a>
+              </div>
+               """
+      switch model.get("activity_type")
+        when "new_listing"
+          cover = model.get('property').cover("span6")
+          content = """
+                    <div class="row-fluid">
+                      <div class="photo-container span8">
+                        <div class="photo">
+                          <img src="#{model.get("image")}" alt="#{i18nCommon.nouns.cover_photo}">
+                        </div>
+                        <a class="left modal-control-area" href="#">
+                          <span class="modal-control">&lsaquo;</span>
+                        </a>
+                        <a class="right modal-control-area" href="#">
+                          <span class="modal-control">&rsaquo;</span>
+                        </a>
+                      </div>
+                      <div class="caption span4">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        #{profileInfo}
+                        <strong>#{title}</strong>
+                        <div class="rent stay-right">#{rent}</div>
+                      </div>
+                    </div>
+                    """
+        when "new_post"
+
+          if model.get "image"
+            content = """
+                      <div class="row-fluid">
+                        <div class="photo-container span8">
+                          <div class="photo">
+                            <img src="#{model.get("image")}" alt="#{i18nCommon.nouns.cover_photo}">
+                          </div>
+                          <a class="left modal-control-area" href="#">
+                            <span class="modal-control">&lsaquo;</span>
+                          </a>
+                          <a class="right modal-control-area" href="#">
+                            <span class="modal-control">&rsaquo;</span>
+                          </a>
+                        </div>
+                        <div class="caption span4">
+                          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                          #{profileInfo}
+                          <p class="desc">#{title}</p>
+                        </div>
+                      </div>
+                      """
+          else
+            content = """
+                      <div class="row-fluid">
+                        <div class="position-relative span8">
+                          <blockquote>
+                            #{title}
+                          </blockquote>
+                          <a class="left modal-control-area" href="#">
+                            <span class="modal-control">&lsaquo;</span>
+                          </a>
+                          <a class="right modal-control-area" href="#">
+                            <span class="modal-control">&rsaquo;</span>
+                          </a>
+                        </div>
+                        <div class="caption span4">
+                          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                          #{profileInfo}
+                        </div>
+                      </div>
+                      """
+        when "new_photo"
+          icon = 'photo'
+          content = """
+                    <div class="row-fluid">
+                      <div class="photo-container span8">
+                        <div class="photo">
+                          <img src="#{model.get("image")}" alt="#{i18nCommon.nouns.cover_photo}">
+                        </div>
+                        <a class="left modal-control-area" href="#">
+                          <span class="modal-control">&lsaquo;</span>
+                        </a>
+                        <a class="right modal-control-area" href="#">
+                          <span class="modal-control">&rsaquo;</span>
+                        </a>
+                      </div>
+                      <div class="caption span6">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <strong>#{title}</strong>
+                        #{footer}
+                      </div>
+                    </div>
+                    """
+
+      # content += """
+      #             <a class="modal-control left" href="#">&lsaquo;</a>
+      #             <a class="modal-control right" href="#">&rsaquo;</a>
+      #            """
+
+      @$("#view-content-modal").html content

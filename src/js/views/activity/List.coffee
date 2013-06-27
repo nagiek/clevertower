@@ -82,7 +82,6 @@ define [
                             #{title}
                           </blockquote>
                           """
-          if @model.get("body") then vars.content += @model.get("body")
           vars.content += """
                         
                         #{footer}

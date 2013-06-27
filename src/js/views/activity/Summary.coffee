@@ -20,7 +20,7 @@ define [
     events:
       "mouseover > a" : "highlightMarker"
       "mouseout > a"  : "unHighlightMarker"
-      "click a" : "goToProperty"
+      # "click a" : "goToProperty"
 
     initialize: (attrs) ->
       
@@ -39,7 +39,7 @@ define [
     # Re-render the contents of the Unit item.
     render: ->
       title = @model.get("title")
-      rent = "$" + @model.get("rent")
+
       if @model.get('profile') 
         profilePic = @model.get('profile').cover("tiny")
         name = @model.get('profile').name()
@@ -56,7 +56,7 @@ define [
                """
 
       vars =
-        pos: @pos() + 1
+        pos: @pos() # This will be incremented in the template.
         linkedToProperty: @linkedToProperty
         publicUrl: "#"
         type: @model.get("activity_type")
@@ -72,6 +72,7 @@ define [
       switch @model.get("activity_type")
         when "new_listing"
           cover = @model.get('property').cover("span6")
+          rent = "$" + @model.get("rent")
           vars.icon = 'listing'
           if @view.display is "small"
             vars.content = """
@@ -124,7 +125,6 @@ define [
                             #{title}
                           </blockquote>
                           """
-          if @model.get("body") then vars.content += @model.get("body")
           vars.content += """
                         
                         #{footer}
@@ -221,12 +221,13 @@ define [
 
     goToProperty: (e) =>
       e.preventDefault()
-      require ["views/property/Public"], (PublicPropertyView) => 
-        p = @model.get("property")
-        # Could assign a place from last search, but we don't know for sure.
-        new PublicPropertyView(model: p).render()
-        Parse.history.navigate p.publicUrl()
-        @view.trigger "model:viewDetails"
+      @view.trigger "model:view", @model
+      # require ["views/property/Public"], (PublicPropertyView) => 
+      #   p = @model.get("property")
+      #   # Could assign a place from last search, but we don't know for sure.
+      #   new PublicPropertyView(model: p).render()
+      #   Parse.history.navigate p.publicUrl()
+        
 
     highlightMarker : =>
       @$('> a').addClass('active')
