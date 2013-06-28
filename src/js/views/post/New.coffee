@@ -66,13 +66,12 @@ define [
       @updateCenter()
 
     renderImage: =>
-      if @model.get("image")
-        @$('#preview-post-photo').html JST["src/js/templates/post/photo.jst"](image: @model.get("image"), i18nCommon: i18nCommon)
-      else 
-        @$('#preview-post-photo').html ""
+      @$('#preview-post-photo').html if @model.get("image") then JST["src/js/templates/post/photo.jst"](image: @model.get("image"), i18nCommon: i18nCommon) else ""
+      @trigger "view:resize"
 
     unsetImage: =>
       @model.unset("image")
+      @trigger "view:resize"
 
     updateCenter : => center = @view.map.getCenter(); @model.set "center", new Parse.GeoPoint(center.lat(), center.lng())
 
@@ -200,6 +199,7 @@ define [
             that._renderPreviews data
             that._forceReflow data.context
             that._transition(data.context).done ->
+              _this.trigger "view:resize"
               data.submit()  if (that._trigger("added", e, data) isnt false) and (options.autoUpload or data.autoUpload) and data.autoUpload isnt false and data.isValidated
         submit: (e, data) ->
           data.url = "https://api.parse.com/1/files/" + data.files[0].name
@@ -275,6 +275,7 @@ define [
       newPos = @getTypeIndex()
       return if @shown # or newPos is 3 and @empty
       @shown = true
+      @trigger "view:resize"
       @$('#post-options').removeClass 'hide'
       # if @empty then @$("#centered-on-property").prop("disabled", true)
       @marker.bindTo 'position', @view.map, 'center'
@@ -284,6 +285,7 @@ define [
     hidePostForm : (e) => 
       return unless @shown
       @shown = false
+      @trigger "view:resize"
       @$('#post-title').val('').blur()
       @$('#post-options').addClass 'hide'
       @marker.setVisible false

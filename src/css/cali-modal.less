@@ -43,13 +43,20 @@
     font-weight: 100;
     display: table-cell;
     vertical-align: middle;
-    padding: 40px;
+    padding: 0 40px;
     border-color: @gray;
     border-width: 10px;
   }
   .caption {
     height: 400px;
-    padding: 10px;
+    // Remove left padding, as we are within a .span which includes a margin.
+    padding: 10px 20px 20px 0;
+  }
+  .close {
+    margin-right: -10px;
+  }
+  header {
+    margin-bottom: 18px;
   }
   .modal-control-area {
     height: 100%;

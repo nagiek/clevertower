@@ -2,6 +2,7 @@ define [
   "jquery"
   "underscore"
   "backbone"
+  "moment"
   'collections/ActivityList'
   "views/listing/Search"
   "views/post/New"
@@ -12,23 +13,25 @@ define [
   'masonry'
   'jqueryui'
   "gmaps"
-], ($, _, Parse, ActivityList, ListingSearchView, NewPostView, ActivitySummaryView, i18nListing, i18nCommon) ->
+], ($, _, Parse, moment, ActivityList, ListingSearchView, NewPostView, ActivitySummaryView, i18nListing, i18nCommon) ->
 
   class ActivityIndexView extends Parse.View
   
     el: "#main"
 
     events:
-      'click #filters > button'     : 'changeType'
-      'click #displays > button'    : 'changeDisplay'
-      'click .thumbnails > li > a'  : 'showModal'
-      'click .thumbnails > li > a'  : 'showModal'
-      'change #redo-search'         : 'changeSearchPrefs'
-      'click .modal .left'          : 'prevModal'
-      'click .modal .right'         : 'nextModal'
+      'click #filters > button'         : 'changeType'
+      'click #displays > button'        : 'changeDisplay'
+      'change #redo-search'             : 'changeSearchPrefs'
+      'click .pagination > ul > li > a' : 'changePage'
+      'click .thumbnails > li > a'      : 'showModal'
+      'hide #view-content-modal'        : 'hideModal'
+      'click .modal .caption a'         : 'closeModal'
+      'click .modal .left'              : 'prevModal'
+      'click .modal .right'             : 'nextModal'
     
     initialize : (attrs) ->
-      @location = attrs.location || "" # "Montreal--QC--Canada"
+      @location = attrs.location || ""
       @locationAppend = if attrs.params.lat and attrs.params.lng then "?lat=#{attrs.params.lat}&lng=#{attrs.params.lng}" else ''
       @page = attrs.params.page || 1
       @center = new google.maps.LatLng attrs.params.lat, attrs.params.lng if attrs.params.lat and attrs.params.lng
@@ -38,6 +41,7 @@ define [
       @listenTo Parse.Dispatcher, "user:login", => 
         @getUserActivity()
         @userView = new NewPostView(view: @).render()
+        @listenTo @userView, "view:resize", @bindMapPosition
 
       @listenTo Parse.App.search, "google:search", (data) =>
         @location = data.location
@@ -46,8 +50,6 @@ define [
       @on "model:view", @showModal
       @on "dragend", @checkIfShouldSearch
       @on "view:change", @clear
-
-      @$("#view-content-modal").on "hide", @hideModal
 
       # Create a timer to buffer window re-draws.
       @time = null
@@ -142,6 +144,7 @@ define [
       display = e.currentTarget.attributes["data-display"].value
 
       return if display is @display
+      @$("ul.thumbnails").removeClass(@display).addClass(display)
       @display = display
 
       @trigger "view:changeDisplay", @display
@@ -213,7 +216,7 @@ define [
       @$pagination = @$(".content > .pagination ul")
       # Record our fixed block.
       @$block = @$('#map-container')
-      @$block.original_position = @$block.offset()
+      @bindMapPosition()
 
       @placesService = new google.maps.places.PlacesService(document.getElementById(@mapId))
       if @center then @renderMap()
@@ -296,6 +299,7 @@ define [
                 scaledSize: null
                 
         @userView = new NewPostView(view: @).render()
+        @listenTo @userView, "view:resize", @bindMapPosition
 
       @dragListener = google.maps.event.addListener @map, 'dragend', => @trigger "dragend"
       @zoomListener = google.maps.event.addListener @map, 'zoom_changed', @checkIfShouldSearch
@@ -479,8 +483,6 @@ define [
         # remaining pages
         userCount = 0 unless userCount
         @pages = Math.ceil((count + userCount)/ @resultsPerPage)
-
-        @$('.pagination > ul > li > a').off 'click'
         @$pagination.html ""
 
         if count + userCount is 0
@@ -511,8 +513,6 @@ define [
         n = @page - @chunk + 1 + if @chunk > 1 then 1 else 0
         @$pagination.find(":nth-child(#{n})").addClass('active')
 
-      @$('.pagination > ul > li > a').on 'click', @changePage
-
 
     # Change the page within the current pagination.
     changePage : (e) =>
@@ -538,6 +538,9 @@ define [
         Parse.App.activity.reset()
         @search()
 
+    bindMapPosition: =>
+      @$block.original_position = @$block.offset()
+
     
     # Track positioning and visibility.
     tracker: =>
@@ -545,8 +548,6 @@ define [
       # Track position relative to the viewport and set position.
       vOffset = (document.documentElement.scrollTop or document.body.scrollTop)
       
-      # @@@K Hack
-      # trigger = 58
       if vOffset > @$block.original_position.top
         @$block.addClass "float-block-fixed"
       else
@@ -561,7 +562,7 @@ define [
 
         # Reset the block and calculate new position
         @$block.removeClass "float-block-fixed"
-        @$block.original_position = @$block.offset()
+        @bindMapPosition()
 
         @tracker()
 
@@ -591,11 +592,6 @@ define [
         @sw._longitude < lng and 
         lng < @ne._longitude
 
-    clear : => 
-      @stopListening()
-      @undelegateEvents()
-      delete this
-
     showModal : (e) =>
       @modal = true
       data = $(e.currentTarget).data()
@@ -610,13 +606,16 @@ define [
 
     controlModalIfOpen : (e) =>
       return unless @modal
-      console.log e.which
       switch e.which 
         when 27 then @$("#view-content-modal").modal('hide')
         when 37 then @prevModal()
         when 39 then @nextModal()
 
+    closeModal : =>
+      @$("#view-content-modal").modal('hide')
+
     hideModal : =>
+      console.log 'hide'
       return unless @modal
       @modal = false
       $(document).off "keyup"
@@ -633,17 +632,19 @@ define [
       @renderModalContent(model)
 
     prevModal : =>
+      return unless @modal
       @index--
       model = if @collection is "user"
-        if @index < 0 then @index = Parse.User.current().activity.length
+        if @index < 0 then @index = Parse.User.current().activity.length - 1
         Parse.User.current().activity.at(@index)
       else
-        if @index < 0 then @index = Parse.App.activity.length
+        if @index < 0 then @index = Parse.App.activity.length - 1
         Parse.App.activity.at(@index)
-      return unless @modal
+      @renderModalContent(model)
 
     clear: =>
-      @$("#view-content-modal").off "hide"
+      $(window).off "resize scroll"
+      $(document.documentElement).off "resize scroll"
       @undelegateEvents()
       @stopListening()
       delete this
@@ -659,14 +660,15 @@ define [
         name = model.get('property').get("title")
         url = model.get('property').publicUrl()
       profileInfo = """
-              <div class="profile clearfix">
-                <a href="#{url}">
-                  <div class="photo photo-thumbnail stay-left">
-                    <img src="#{profilePic}" alt="Profile" class="img-rounded profile-picture">
-                  </div>
-                  <strong class="photo-float thumbnail-float">#{name}</strong>
-                </a>
-              </div>
+              <header class="clearfix">
+                <div class="photo photo-thumbnail stay-left">
+                  <a href="#{url}"><img src="#{profilePic}" alt="Profile" class="img-rounded profile-picture"></a>
+                </div>
+                <div class="photo-float thumbnail-float">
+                  <p><a href="#{url}"><strong>#{name}</strong></a></p>
+                  <p><small>#{moment(model.createdAt).fromNow()}</small></p>
+                </div>
+              </header>
                """
       switch model.get("activity_type")
         when "new_listing"
@@ -685,7 +687,9 @@ define [
                         </a>
                       </div>
                       <div class="caption span4">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <div class="clearfix">
+                          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        </div>
                         #{profileInfo}
                         <strong>#{title}</strong>
                         <div class="rent stay-right">#{rent}</div>
@@ -709,7 +713,9 @@ define [
                           </a>
                         </div>
                         <div class="caption span4">
-                          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                          <div class="clearfix">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                          </div>
                           #{profileInfo}
                           <p class="desc">#{title}</p>
                         </div>
@@ -730,7 +736,9 @@ define [
                           </a>
                         </div>
                         <div class="caption span4">
-                          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                          <div class="clearfix">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                          </div>
                           #{profileInfo}
                         </div>
                       </div>
@@ -751,7 +759,9 @@ define [
                         </a>
                       </div>
                       <div class="caption span6">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <div class="clearfix">
+                          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        </div>
                         <strong>#{title}</strong>
                         #{footer}
                       </div>

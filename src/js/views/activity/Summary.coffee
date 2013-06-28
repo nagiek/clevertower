@@ -116,7 +116,8 @@ define [
                             </div>
                           </div>
                           <div class="caption">
-                            <strong>#{title}</strong>
+                            <p><strong>#{title}</strong></p>
+                            #{footer}
                           </div>
                           """
           else
@@ -124,11 +125,10 @@ define [
                           <blockquote>
                             #{title}
                           </blockquote>
+                          <div class="caption">
+                            #{footer}
+                          </div>
                           """
-          vars.content += """
-                        
-                        #{footer}
-                        """
 
         when "new_photo"
           vars.icon = 'photo'
@@ -138,7 +138,7 @@ define [
                             <img src="#{@model.get("image")}" alt="#{i18nCommon.nouns.cover_photo}">
                           </div>
                           <div class="photo-float thumbnail-float caption">
-                            <strong>#{title}</strong>
+                            <p><strong>#{title}</strong></p>
                             #{footer}
                           </div>
               """
@@ -150,7 +150,7 @@ define [
                             </div>
                           </div>
                           <div class="caption">
-                            <strong>#{title}</strong>
+                            <p><strong>#{title}</strong></p>
                             #{footer}
                           </div>
                           """
@@ -163,7 +163,7 @@ define [
                           <img class="" src="#{cover}" alt="#{i18nCommon.nouns.cover_photo}">
                         </div>
                         <div class="photo-float thumbnail-float caption">
-                          <strong>#{title}</strong>
+                            <p><strong>#{title}</strong></p>
                           #{footer}
                         </div>
           """
