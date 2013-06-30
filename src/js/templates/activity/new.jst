@@ -1,0 +1,206 @@
+<form id="activity-form" class="well well-small">
+  <div class="photo photo-tiny stay-left">
+    <img id="activity-profile-pic" src="<%= profilePic %>" alt="<%= i18nCommon.classes.Profile %>">
+  </div>
+  <!--   
+  <ul id="activity-type" class="radio-icons inline">
+    <li>
+      <input id="activity-type-status" name="activity-type" type="radio" value="status">
+      <label for="activity-type-status">
+        <i class="icon icon-activity icon-status" rel="tooltip" data-original-title="<%= i18nCommon.classes.status %>"></i>
+      </label>
+    </li>
+    <li>
+      <input id="activity-type-photo" name="activity-type" type="radio" value="photo">
+      <label for="activity-type-photo">
+        <i class="icon icon-activity icon-photo" rel="tooltip" data-original-title="<%= i18nCommon.classes.Photo %>"></i>
+      </label>
+    </li>
+    <li>
+      <input id="activity-type-tip" name="activity-type" type="radio" value="tip">
+      <label for="activity-type-tip">
+        <i class="icon icon-activity icon-tip" rel="tooltip" data-original-title="<%= i18nCommon.classes.tip %>"></i>
+      </label>
+    </li> 
+    <li>
+      <input id="activity-type-building" name="activity-type" type="radio" value="building">
+      <label for="activity-type-building">
+        <i class="icon icon-activity icon-building" rel="tooltip" data-original-title="<%= i18nCommon.nouns.building %>"></i>
+      </label>
+    </li>
+  </ul>
+  -->
+  <div class="photo-float tiny-float">
+    <div class="title-group control-group">
+      <label for="activity-title" class="control-label element-invisible"><%= i18nCommon.fields.title %></label>
+      <div class="controls position-relative with-caret">
+        <b id="activity-input-caret" class="input-caret"></b>
+        <div class="form-large">
+          <textarea class="input-condensed input-block-level" name="activity[title]" id="activity-title" rows="4"></textarea>
+        </div>
+        <ul id="activity-buttons" class="unstyled">
+          <li class="clearfix" rel="tooltip" data-placement="top" data-original-title="<%= i18nCommon.actions.add_photo %>">
+            <a href="#" id="add-photo" class="fileinput-button">
+              <i class="icon icon-big icon-picture"></i>
+              <input type="file" name="files[]" accept="photo/*">
+            </a>
+          </li>
+          <li class="clearfix" rel="tooltip" data-placement="top" data-original-title="<%= i18nCommon.activity.building %>">
+            <a href="#" id="add-property">
+              <i class="icon icon-big icon-sprite icon-building"></i>
+            </a>
+          </li>
+          <li class="clearfix" rel="tooltip" data-placement="top" data-original-title="<%= i18nCommon.actions.add_time %>">
+            <a href="#" id="add-time">
+              <i class="icon icon-big icon-sprite icon-time"></i>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div id="activity-options" class="hide clearfix control-group with-caret">
+      <!--
+      <label for="show-body" class="checkbox">
+        <input type="checkbox" id="show-body"><%= i18nCommon.actions.add_extra_details %>
+      </label>
+      <label for="centered-on-property" class="checkbox">
+        <input type="checkbox" id="centered-on-property"><%= i18nCommon.form.center_on_property %>
+      </label>
+      -->
+      <div id="event-options" class="control-group hide">
+        <div class="controls">
+          <input type="text" class="input-small start-date datepicker" name="activity[start_date]" maxlength="12" data-date-format="<%= i18nCommon.dates.datepicker_format %>" placeholder="<%= i18nCommon.dates.start_date %>" />
+          <select name="activity[start_time]">
+            <option value="00:00">00:00</option>
+            <option value="00:30">00:30</option>
+            <option value="00:00">01:00</option>
+            <option value="00:30">01:30</option>
+            <option value="00:00">02:00</option>
+            <option value="00:30">02:30</option>
+            <option value="00:00">03:00</option>
+            <option value="00:30">03:30</option>
+            <option value="00:00">04:00</option>
+            <option value="00:30">04:30</option>
+            <option value="00:00">05:00</option>
+            <option value="00:30">05:30</option>
+            <option value="00:00">06:00</option>
+            <option value="00:30">06:30</option>
+            <option value="00:00">07:00</option>
+            <option value="00:30">07:30</option>
+            <option value="00:00">08:00</option>
+            <option value="00:30">08:30</option>
+            <option value="00:00">09:00</option>
+            <option value="00:30">09:30</option>
+            <option value="00:00">10:00</option>
+            <option value="00:30">10:30</option>
+            <option value="00:00">11:00</option>
+            <option value="00:30">11:30</option>
+            <option value="00:00">12:00</option>
+            <option value="00:30">12:30</option>
+            <option value="00:00">13:00</option>
+            <option value="00:30">13:30</option>
+            <option value="00:00">14:00</option>
+            <option value="00:30">14:30</option>
+            <option value="00:00">15:00</option>
+            <option value="00:30">15:30</option>
+            <option value="00:00">16:00</option>
+            <option value="00:30">16:30</option>
+            <option value="00:00">17:00</option>
+            <option value="00:30">17:30</option>
+            <option value="00:00">18:00</option>
+            <option value="00:30">18:30</option>
+            <option value="00:00">19:00</option>
+            <option value="00:30">19:30</option>
+            <option value="00:00">20:00</option>
+            <option value="00:30">20:30</option>
+            <option value="00:00">21:00</option>
+            <option value="00:30">21:30</option>
+            <option value="00:00">22:00</option>
+            <option value="00:30">22:30</option>
+            <option value="00:00">23:00</option>
+            <option value="00:30">23:30</option>
+          </select>
+          <label for="toggle-end-date" class="checkbox inline-block">
+            <input type="checkbox" id="toggle-end-date"><%= i18nCommon.dates.add_end_date %>
+          </label>
+        </div>
+        <div id="end-date" class="controls hide">
+          <input type="text" class="input-small end-date datepicker"   name="activity[end_date]"   maxlength="12" data-date-format="<%= i18nCommon.dates.datepicker_format %>" placeholder="<%= i18nCommon.dates.end_date %>" />
+          <select name="activity[end_time]">
+            <option value="00:00">00:00</option>
+            <option value="00:30">00:30</option>
+            <option value="00:00">01:00</option>
+            <option value="00:30">01:30</option>
+            <option value="00:00">02:00</option>
+            <option value="00:30">02:30</option>
+            <option value="00:00">03:00</option>
+            <option value="00:30">03:30</option>
+            <option value="00:00">04:00</option>
+            <option value="00:30">04:30</option>
+            <option value="00:00">05:00</option>
+            <option value="00:30">05:30</option>
+            <option value="00:00">06:00</option>
+            <option value="00:30">06:30</option>
+            <option value="00:00">07:00</option>
+            <option value="00:30">07:30</option>
+            <option value="00:00">08:00</option>
+            <option value="00:30">08:30</option>
+            <option value="00:00">09:00</option>
+            <option value="00:30">09:30</option>
+            <option value="00:00">10:00</option>
+            <option value="00:30">10:30</option>
+            <option value="00:00">11:00</option>
+            <option value="00:30">11:30</option>
+            <option value="00:00">12:00</option>
+            <option value="00:30">12:30</option>
+            <option value="00:00">13:00</option>
+            <option value="00:30">13:30</option>
+            <option value="00:00">14:00</option>
+            <option value="00:30">14:30</option>
+            <option value="00:00">15:00</option>
+            <option value="00:30">15:30</option>
+            <option value="00:00">16:00</option>
+            <option value="00:30">16:30</option>
+            <option value="00:00">17:00</option>
+            <option value="00:30">17:30</option>
+            <option value="00:00">18:00</option>
+            <option value="00:30">18:30</option>
+            <option value="00:00">19:00</option>
+            <option value="00:30">19:30</option>
+            <option value="00:00">20:00</option>
+            <option value="00:30">20:30</option>
+            <option value="00:00">21:00</option>
+            <option value="00:30">21:30</option>
+            <option value="00:00">22:00</option>
+            <option value="00:30">22:30</option>
+            <option value="00:00">23:00</option>
+            <option value="00:30">23:30</option>
+          </select>
+        </div>
+      </div>
+      <div id="property-options" class="pull-left hide">
+        <div class="controls"></div>
+        <label for="post-as-property" class="checkbox hide">
+          <input type="checkbox" id="post-as-property"><%= i18nCommon.form.post_as_property %>
+        </label>
+        <label for="post-private" class="checkbox">
+          <input type="checkbox" id="post-private" checked="checked"><%= i18nCommon.adjectives.private %>
+        </label>
+      </div>
+      <!-- <div class=""></div> -->
+      <div class="pull-right">
+        <button class="btn btn-primary stay-right"><%= i18nCommon.actions.post %></button>
+      </div>
+    </div>
+    <!--
+    <div class="body-group control-group hide">
+      <label for="activity-body" class="control-label element-invisible"><%= i18nCommon.fields.body %></label>
+      <div class="controls">
+        <textarea class="input-block-level" name="activity[body]" id="activity-body" placeholder="<%= i18nCommon.nouns.extra_details %>"></textarea>
+      </div>
+    </div>
+    -->
+    <div id="preview-activity-photo" class="preview template-upload"></div>
+    <div class="no-property hide"></div>
+  </div>
+</form>

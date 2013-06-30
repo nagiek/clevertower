@@ -373,32 +373,6 @@ Parse.Cloud.define "AddManagers", (req, res) ->
     error: -> res.error "bad_query"
   error: -> res.error "bad_query"
 
-
-# AddPhotoActivity
-Parse.Cloud.define "AddPhotoActivity", (req, res) ->
-
-  # .include("property.network")
-  (new Parse.Query "Property").get req.params.propertyId,
-  success: (property) ->
-
-    Activity = Parse.Object.extend("Activity")
-    activity = new Activity
-    activityACL = new Parse.ACL
-    activityACL.setPublicReadAccess true
-    activity.save
-      activity_type: "new_photo"
-      public: true
-      image: req.params.image
-      center: property.get "center"
-      property: property
-      network: property.get "network"
-      ACL: activityACL
-    ,
-    success: -> res.success activity
-    error: -> res.error "bad_save"
-  error : -> res.error "bad_query"
-
-
 # User validation
 Parse.Cloud.beforeSave "Profile", (req, res) ->
   
@@ -1130,23 +1104,18 @@ Parse.Cloud.afterSave "Listing", (req) ->
   if !req.object.existed() and req.object.get "public"
 
     # Create activity
-    (new Parse.Query "Profile").equalTo('user', req.user).first()
-    .then (profile) ->
-      activity = new Parse.Object("Activity")
-      activityACL = new Parse.ACL
-      activityACL.setPublicReadAccess true
-      activity.save
-        activity_type: "new_listing"
-        public: true
-        rent: req.object.get "rent"
-        center: req.object.get "center"
-        listing: req.object
-        unit: req.object.get "unit"
-        property: req.object.get "property"
-        network: req.object.get "network"
-        title: req.object.get "title"
-        profile: profile
-        ACL: activityACL
+    activity = new Parse.Object("Activity")
+    activity.save
+      activity_type: "new_listing"
+      public: true
+      rent: req.object.get "rent"
+      center: req.object.get "center"
+      listing: req.object
+      unit: req.object.get "unit"
+      property: req.object.get "property"
+      network: req.object.get "network"
+      title: req.object.get "title"
+      profile: req.user.get "profile"
 
 
 # Tenant validation
@@ -1283,6 +1252,7 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
               property: property
               network: network
               profile: profile
+              accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb"
               ACL: activityACL
 
           else
@@ -1343,6 +1313,7 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
               property: property
               network: network
               profile: profile
+              accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb"
               ACL: activityACL
 
           else
@@ -1831,110 +1802,64 @@ Parse.Cloud.afterSave "Notification", (req) ->
 #   res.success()
 
 # Post validation
-Parse.Cloud.beforeSave "Post", (req, res) ->
+Parse.Cloud.beforeSave "Activity", (req, res) ->
 
-  return res.success() unless req.object.existed()
+  return res.success() if req.object.existed()
 
-  (new Parse.Query "Profile").equalTo("user", req.user).first()
-  .then (profile) ->
+  if req.object.get "accessToken" is "AZeRP2WAmbuyFY8tSWx8azlPEb"
+    # We can use unset here.
+    req.object.unset "accessToken"
+    return res.success()
 
-    req.object.set "profile", profile
+  # Create activity
+  activityACL = new Parse.ACL
+  activityACL.setReadAccess req.user, true
+  activityACL.setWriteAccess req.user, true
 
-    isPublic = if req.object.get "post_type" is "building" then false else true
+  if req.object.get "property"
 
-    # Create activity
-    postACL = new Parse.ACL
-    postACL.setReadAccess req.user, true
-    postACL.setWriteAccess req.user, true
-
-    if req.object.get("property")
-      # Query for the property
-      (new Parse.Query "Property").include("network").get req.object.get("property").id,
-      success: (property) ->
-        network = property.get "network"
-        req.object.set "center", property.get("center")
-
-        if isPublic
-          postACL.setPublicReadAccess true
-        else
-          propRole = property.get("role")
-          mgrRole = property.get("mgrRole")
-          postACL.setRoleReadAccess propRole, true if propRole
-          postACL.setRoleReadAccess mgrRole, true if mgrRole
-          if network
-            netRole = network.get("role")
-            postACL.setRoleReadAccess netRole, true if netRole
-        req.object.set "ACL", postACL
-        res.success(req.object)
-      error: -> res.error "bad_query"
-
-    else 
-      if isPublic
-        postACL.setPublicReadAccess true
-        req.object.set "ACL", postACL
-      res.success()
-  , -> res.error "bad_query"
-
-# Post afterSave
-Parse.Cloud.afterSave "Post", (req, res) ->
-  
-  unless req.object.existed()
-
+    # Access the roles.
     Parse.Cloud.useMasterKey()
 
-    if req.object.get("property")
+    # Query for the property
+    (new Parse.Query "Property").include("network").get req.object.get("property").id,
+    success: (property) ->
+      propRole = property.get "role"
+      mgrRole = property.get "mgrRole"
+      network = property.get "network"
 
-      (new Parse.Query "Property").include('role').include('network.role').get req.object.get("property").id,
-      success: (property) ->
-
-          propRole = property.get "role"
-          mgrRole = property.get "mgrRole"
-          network = property.get "network"
-
-          # Create activity
-          activity = new Parse.Object "Activity"
-          activityACL = new Parse.ACL
-          activityACL.setRoleReadAccess propRole, true if propRole
-          activityACL.setRoleReadAccess mgrRole, true if mgrRole
-          if network
-            netRole = network.get "role"
-            activityACL.setRoleReadAccess netRole, true if netRole
-          activityACL.setReadAccess req.user, true
-          activityACL.setPublicReadAccess true if req.object.get "public"
-
-          activity.save
-            activity_type: "new_post"
-            post_type: req.object.get "post_type"
-            image: req.object.get "image"
-            title: req.object.get "title"
-            body: req.object.get "body"
-            public: req.object.get "public"
-            center: property.get "center"
-            property: property
-            network: property.get "network"
-            profile: req.user.get "profile"
-            lease: req.user.get "lease" 
-            unit: req.user.get "unit"
-            post: req.object
-            ACL: activityACL
-
-    else
       # Create activity
-      activity = new Parse.Object "Activity"
-      activityACL = new Parse.ACL
-      activityACL.setPublicReadAccess true
+      if req.object.get "public"
+        activityACL.setPublicReadAccess true 
+      else 
+        activityACL.setRoleReadAccess propRole, true if propRole
+        activityACL.setRoleReadAccess mgrRole, true if mgrRole
+        if network
+          netRole = network.get "role"
+          activityACL.setRoleReadAccess netRole, true if netRole
 
-      activity.save
-        activity_type: "new_post"
-        image: req.object.get "image"
-        post_type: req.object.get "post_type"
-        title: req.object.get "title"
-        body: req.object.get "body"
-        public: true
-        center: req.object.get "center"
-        profile: req.user.get "profile"
-        post: req.object
+      req.object.set
+        property: property
+        center: property.get "center"
+        network: property.get "network"
+        # Don't attach the profile by default.
+        # profile: req.user.get "profile"
+        # Why would we have this?
+        # lease: req.user.get "lease" 
+        # unit: req.user.get "unit"
         ACL: activityACL
+
+      res.success()
+    error: -> res.error "bad_query"
+
+  else 
+    activityACL.setPublicReadAccess true
+    req.object.set
+      # Make sure the profile is set if we don't have a property.
+      profile: req.user.get "profile"
+      public: true
+      ACL: activityACL
+    res.success()
 
 # # Task validation
 # Parse.Cloud.beforeSave "Task", (req, res) ->

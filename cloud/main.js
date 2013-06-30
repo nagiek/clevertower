@@ -347,38 +347,6 @@
     });
   });
 
-  Parse.Cloud.define("AddPhotoActivity", function(req, res) {
-    return (new Parse.Query("Property")).get(req.params.propertyId, {
-      success: function(property) {
-        var Activity, activity, activityACL;
-
-        Activity = Parse.Object.extend("Activity");
-        activity = new Activity;
-        activityACL = new Parse.ACL;
-        activityACL.setPublicReadAccess(true);
-        return activity.save({
-          activity_type: "new_photo",
-          "public": true,
-          image: req.params.image,
-          center: property.get("center"),
-          property: property,
-          network: property.get("network"),
-          ACL: activityACL
-        }, {
-          success: function() {
-            return res.success(activity);
-          },
-          error: function() {
-            return res.error("bad_save");
-          }
-        });
-      },
-      error: function() {
-        return res.error("bad_query");
-      }
-    });
-  });
-
   Parse.Cloud.beforeSave("Profile", function(req, res) {
     if (!req.object.existed()) {
       req.object.set("createdBy", req.user);
@@ -1099,26 +1067,21 @@
   });
 
   Parse.Cloud.afterSave("Listing", function(req) {
-    if (!req.object.existed() && req.object.get("public")) {
-      return (new Parse.Query("Profile")).equalTo('user', req.user).first().then(function(profile) {
-        var activity, activityACL;
+    var activity;
 
-        activity = new Parse.Object("Activity");
-        activityACL = new Parse.ACL;
-        activityACL.setPublicReadAccess(true);
-        return activity.save({
-          activity_type: "new_listing",
-          "public": true,
-          rent: req.object.get("rent"),
-          center: req.object.get("center"),
-          listing: req.object,
-          unit: req.object.get("unit"),
-          property: req.object.get("property"),
-          network: req.object.get("network"),
-          title: req.object.get("title"),
-          profile: profile,
-          ACL: activityACL
-        });
+    if (!req.object.existed() && req.object.get("public")) {
+      activity = new Parse.Object("Activity");
+      return activity.save({
+        activity_type: "new_listing",
+        "public": true,
+        rent: req.object.get("rent"),
+        center: req.object.get("center"),
+        listing: req.object,
+        unit: req.object.get("unit"),
+        property: req.object.get("property"),
+        network: req.object.get("network"),
+        title: req.object.get("title"),
+        profile: req.user.get("profile")
       });
     }
   });
@@ -1221,6 +1184,7 @@
                   property: property,
                   network: network,
                   profile: profile,
+                  accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb",
                   ACL: activityACL
                 }));
               } else {
@@ -1285,6 +1249,7 @@
                   property: property,
                   network: network,
                   profile: profile,
+                  accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb",
                   ACL: activityACL
                 }));
               } else {
@@ -1624,77 +1589,31 @@
     });
   });
 
-  Parse.Cloud.beforeSave("Post", function(req, res) {
-    if (!req.object.existed()) {
+  Parse.Cloud.beforeSave("Activity", function(req, res) {
+    var activityACL;
+
+    if (req.object.existed()) {
       return res.success();
     }
-    return (new Parse.Query("Profile")).equalTo("user", req.user).first().then(function(profile) {
-      var isPublic, postACL;
-
-      req.object.set("profile", profile);
-      isPublic = req.object.get("post_type" === "building") ? false : true;
-      postACL = new Parse.ACL;
-      postACL.setReadAccess(req.user, true);
-      postACL.setWriteAccess(req.user, true);
-      if (req.object.get("property")) {
-        return (new Parse.Query("Property")).include("network").get(req.object.get("property").id, {
-          success: function(property) {
-            var mgrRole, netRole, network, propRole;
-
-            network = property.get("network");
-            req.object.set("center", property.get("center"));
-            if (isPublic) {
-              postACL.setPublicReadAccess(true);
-            } else {
-              propRole = property.get("role");
-              mgrRole = property.get("mgrRole");
-              if (propRole) {
-                postACL.setRoleReadAccess(propRole, true);
-              }
-              if (mgrRole) {
-                postACL.setRoleReadAccess(mgrRole, true);
-              }
-              if (network) {
-                netRole = network.get("role");
-                if (netRole) {
-                  postACL.setRoleReadAccess(netRole, true);
-                }
-              }
-            }
-            req.object.set("ACL", postACL);
-            return res.success(req.object);
-          },
-          error: function() {
-            return res.error("bad_query");
-          }
-        });
-      } else {
-        if (isPublic) {
-          postACL.setPublicReadAccess(true);
-          req.object.set("ACL", postACL);
-        }
-        return res.success();
-      }
-    }, function() {
-      return res.error("bad_query");
-    });
-  });
-
-  Parse.Cloud.afterSave("Post", function(req, res) {
-    var activity, activityACL;
-
-    if (!req.object.existed()) {
+    if (req.object.get("accessToken" === "AZeRP2WAmbuyFY8tSWx8azlPEb")) {
+      req.object.unset("accessToken");
+      return res.success();
+    }
+    activityACL = new Parse.ACL;
+    activityACL.setReadAccess(req.user, true);
+    activityACL.setWriteAccess(req.user, true);
+    if (req.object.get("property")) {
       Parse.Cloud.useMasterKey();
-      if (req.object.get("property")) {
-        return (new Parse.Query("Property")).include('role').include('network.role').get(req.object.get("property").id, {
-          success: function(property) {
-            var activity, activityACL, mgrRole, netRole, network, propRole;
+      return (new Parse.Query("Property")).include("network").get(req.object.get("property").id, {
+        success: function(property) {
+          var mgrRole, netRole, network, propRole;
 
-            propRole = property.get("role");
-            mgrRole = property.get("mgrRole");
-            network = property.get("network");
-            activity = new Parse.Object("Activity");
-            activityACL = new Parse.ACL;
+          propRole = property.get("role");
+          mgrRole = property.get("mgrRole");
+          network = property.get("network");
+          if (req.object.get("public")) {
+            activityACL.setPublicReadAccess(true);
+          } else {
             if (propRole) {
               activityACL.setRoleReadAccess(propRole, true);
             }
@@ -1707,45 +1626,27 @@
                 activityACL.setRoleReadAccess(netRole, true);
               }
             }
-            activityACL.setReadAccess(req.user, true);
-            if (req.object.get("public")) {
-              activityACL.setPublicReadAccess(true);
-            }
-            return activity.save({
-              activity_type: "new_post",
-              post_type: req.object.get("post_type"),
-              image: req.object.get("image"),
-              title: req.object.get("title"),
-              body: req.object.get("body"),
-              "public": req.object.get("public"),
-              center: property.get("center"),
-              property: property,
-              network: property.get("network"),
-              profile: req.user.get("profile"),
-              lease: req.user.get("lease"),
-              unit: req.user.get("unit"),
-              post: req.object,
-              ACL: activityACL
-            });
           }
-        });
-      } else {
-        activity = new Parse.Object("Activity");
-        activityACL = new Parse.ACL;
-        activityACL.setPublicReadAccess(true);
-        return activity.save({
-          activity_type: "new_post",
-          image: req.object.get("image"),
-          post_type: req.object.get("post_type"),
-          title: req.object.get("title"),
-          body: req.object.get("body"),
-          "public": true,
-          center: req.object.get("center"),
-          profile: req.user.get("profile"),
-          post: req.object,
-          ACL: activityACL
-        });
-      }
+          req.object.set({
+            property: property,
+            center: property.get("center"),
+            network: property.get("network"),
+            ACL: activityACL
+          });
+          return res.success();
+        },
+        error: function() {
+          return res.error("bad_query");
+        }
+      });
+    } else {
+      activityACL.setPublicReadAccess(true);
+      req.object.set({
+        profile: req.user.get("profile"),
+        "public": true,
+        ACL: activityACL
+      });
+      return res.success();
     }
   });
 

@@ -52,8 +52,6 @@
       rent: "Monthly Fee",
       expenses: "Expenses",
       payments: "Payments",
-      start_date: "Start Date",
-      end_date: "End Date",
       security_deposit: "Security Deposit",
       keys: "Keys",
       parking_fee: "Monthly Fee",

@@ -5,15 +5,15 @@ define [
   "moment"
   'collections/ActivityList'
   "views/listing/Search"
-  "views/post/New"
-  "views/activity/summary"
+  "views/activity/New"
+  "views/activity/Summary"
   "i18n!nls/listing"
   "i18n!nls/common"
   'templates/activity/index'
   'masonry'
   'jqueryui'
   "gmaps"
-], ($, _, Parse, moment, ActivityList, ListingSearchView, NewPostView, ActivitySummaryView, i18nListing, i18nCommon) ->
+], ($, _, Parse, moment, ActivityList, ListingSearchView, NewActivityView, ActivitySummaryView, i18nListing, i18nCommon) ->
 
   class ActivityIndexView extends Parse.View
   
@@ -40,8 +40,8 @@ define [
       # Give the user the chance to contribute
       @listenTo Parse.Dispatcher, "user:login", => 
         @getUserActivity()
-        @userView = new NewPostView(view: @).render()
-        @listenTo @userView, "view:resize", @bindMapPosition
+        @newPostView = new NewActivityView(view: @).render()
+        @listenTo @newPostView, "view:resize", @bindMapPosition
 
       @listenTo Parse.App.search, "google:search", (data) =>
         @location = data.location
@@ -216,7 +216,6 @@ define [
       @$pagination = @$(".content > .pagination ul")
       # Record our fixed block.
       @$block = @$('#map-container')
-      @bindMapPosition()
 
       @placesService = new google.maps.places.PlacesService(document.getElementById(@mapId))
       if @center then @renderMap()
@@ -298,14 +297,16 @@ define [
                 anchor: null
                 scaledSize: null
                 
-        @userView = new NewPostView(view: @).render()
-        @listenTo @userView, "view:resize", @bindMapPosition
+        @newPostView = new NewActivityView(view: @).render()
+        @listenTo @newPostView, "view:resize", @bindMapPosition
 
       @dragListener = google.maps.event.addListener @map, 'dragend', => @trigger "dragend"
       @zoomListener = google.maps.event.addListener @map, 'zoom_changed', @checkIfShouldSearch
 
       # Search once the map is ready.
       google.maps.event.addListenerOnce @map, 'idle', @performSearchWithinMap
+
+      @bindMapPosition()
 
     initWithCenter : (place, status) =>
       @center = place.geometry.location if status is google.maps.places.PlacesServiceStatus.OK
@@ -538,15 +539,16 @@ define [
         Parse.App.activity.reset()
         @search()
 
-    bindMapPosition: =>
-      @$block.original_position = @$block.offset()
-
+    bindMapPosition: => @$block.original_position = @$block.offset()
     
     # Track positioning and visibility.
     tracker: =>
 
       # Track position relative to the viewport and set position.
       vOffset = (document.documentElement.scrollTop or document.body.scrollTop)
+
+      # Take the top padding into account.
+      vOffset += 60 # 40 navBar + 20 padding
       
       if vOffset > @$block.original_position.top
         @$block.addClass "float-block-fixed"
@@ -615,7 +617,6 @@ define [
       @$("#view-content-modal").modal('hide')
 
     hideModal : =>
-      console.log 'hide'
       return unless @modal
       @modal = false
       $(document).off "keyup"

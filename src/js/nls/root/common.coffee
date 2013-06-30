@@ -6,7 +6,8 @@ define
     status:               "Status"
     name:                 "Name"
     posted:               "Posted"
-  classes:                
+  classes:
+    Profile:              "Profile"
     lease:                "lease"
     Lease:                "Lease"
     Leases:               "Leases"
@@ -70,6 +71,7 @@ define
     add_another:          "Add another"
     add_files:            "Add files"
     add_photo:            "Add photo"
+    add_time:             "Add event time"
     add_photos:           "Add photos"
     add_extra_details:    "Add extra details"
     choose_file:          "Choose file"
@@ -85,6 +87,9 @@ define
     datepicker_format:    "mm/dd/yyyy" # Same as above, but for datepicker widget
     per_month:            "per month"
     date:                 "Date"
+    start_date:           "Start Date"
+    end_date:             "End Date"
+    add_end_date:         "Add end date"
     day:                  "Day"
     month:                "Month"
     year:                 "Year"
@@ -117,8 +122,8 @@ define
       invited: (network, property) -> "<strong>#{_.escape(person)}</strong> wants to manage <strong>#{_.escape(property)}</strong>."
       accept: (network) -> "You have accepted <strong>#{_.escape(network)}</strong>'s request."
       ignore: (network) -> "You have ignored <strong>#{_.escape(network)}</strong>'s request."
-  posts:
-    building:             "Private post to your building"
+  activity:
+    building:             "Post to your building"
   status:
     ok:                   "OK"
     unsaved:              "Unsaved"
@@ -193,6 +198,7 @@ define
     not_specified:        "Not specified"
   form:                   
     find_contacts_in:     'Find contacts in'
+    post_as_property:     "Post as property"
     center_on_property:   "Center on property"
     operations:           "Operations"
     info:                 "Info"
@@ -212,6 +218,9 @@ define
     no_undo:              "This action cannot be undone."
   errors:                 
     bad_save:             "Something went wrong. Changes were not saved."
+    no_start_date:        "You cannot create an event without a start date."
+    no_data:              "No data sent."
+    no_end_date:          "You have not specified an end date."
     access_denied:        "Access denied"
     no_permission:        "You do not have permission to do that."
     unknown:              "An unknown error has occured."

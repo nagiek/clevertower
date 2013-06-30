@@ -48,6 +48,11 @@
       view_public: "See Public View",
       view_tenant: "See Tenant View"
     },
+    activity: {
+      added_photos: function(count) {
+        return "We added " + count + " photos.";
+      }
+    },
     network: {
       edit: "Edit network",
       setup: "Set up network",

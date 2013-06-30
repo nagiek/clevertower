@@ -47,7 +47,6 @@ define [
         dates = @model.activities.groupBy (a) -> moment(a.createdAt).format("LL")
         _.each dates, (set, date) =>
           @$activityList.append "<li class='nav-header'>#{date}</li>"
-          console.log set
           _.each set, @addOneActivity
           @$activityList.append "<li class='divider'></li>"
 

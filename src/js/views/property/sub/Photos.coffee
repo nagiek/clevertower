@@ -4,6 +4,7 @@ define [
   "backbone"
   "models/Property"
   "models/Photo"
+  "models/Activity"
   "collections/PhotoList"
   "views/photo/Show"
   "i18n!nls/property"
@@ -13,7 +14,7 @@ define [
   'jquery.fileupload'
   'jquery.fileupload-fp'
   'jquery.fileupload-ui'
-], ($, _, Parse, Property, Photo, PhotoList, PhotoView, i18nProperty, i18nCommon) ->
+], ($, _, Parse, Property, Photo, Activity, PhotoList, PhotoView, i18nProperty, i18nCommon) ->
 
   class PropertyPhotosView extends Parse.View
   
@@ -104,15 +105,15 @@ define [
 
           Parse.Promise.when(uploads).then =>
             @photos.add photo for photo in arguments
-            Parse.Cloud.run 'AddPhotoActivity', { 
+
+            # TODO: Have this be a modal prompt to confirm.
+            activity = new Activity
               image: arguments[0].get "name"
-              length: arguments.length
-              propertyId: @model.id
-              # center: _this.model.get("center")
-              # networkId: _this.model.get("network").id
-            },
-              success: (model) => Parse.App.activity.add model if Parse.App.activity
-              error: (error) => console.log error
+              title: i18nProperty.activity.added_photos(arguments.length)
+              public: true
+              property: @model
+            activity.save().then => Parse.App.activity.add activity if Parse.App.activity,
+            (error) => console.log error
 
             # Reset for next photos
             uploads = []

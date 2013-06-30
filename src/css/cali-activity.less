@@ -29,6 +29,14 @@
   .rent {
   	font-size: 16px;
   }
+  blockquote {
+    font-size: 24px;
+    line-height: 24px;
+    font-weight: 100;
+    display: table-cell;
+    vertical-align: middle;
+    padding: 15px;
+  }
   .activity-info {
     position: absolute;
     right:9px;
@@ -45,3 +53,84 @@
     background-color: @green;
   }
 }
+
+#activity-type {
+  li {
+    padding:0;
+    width:24%;
+  }
+  input[type="radio"] {
+    &:checked + label {
+      /* style for the checked/selected state */
+      .icon-activity {
+        &.icon-status     { background-position: 0      -40px; }
+        &.icon-photo      { background-position: -40px  -40px; }
+        &.icon-tip        { background-position: -80px  -40px; }
+        &.icon-building   { background-position: -120px -40px; }
+      }
+    }
+  }
+}
+
+#activity-title {
+  padding-right: 30px;
+}
+
+#activity-buttons {
+  position: absolute;
+  top: 1px;
+  right: 6px;
+  // li {
+  //   position: static;
+  // }
+  // .tooltip {
+  //   position: absolute;
+  // }
+}
+
+// #activity-options {
+//   background-color:#DDDDDD;
+//   .border-radius(0 0 4px 4px);
+//   padding-top: 2px;
+// } 
+
+// #activity-input-caret {
+//   .transition(~"left ease .15s");
+//   &:before { left: 20px; }
+//   &:after  { left: 20px - 2px; }
+//   &.phase-0 { left: 0; }
+//   &.phase-1 { left: 25%; }
+//   &.phase-2 { left: 50%; }
+//   &.phase-3 { left: 75%; }
+// }
+
+// @media (min-width: 767px) and (max-width: 979px) {
+//   #activity-type {
+//     li {
+//       width:23%;
+//     }
+//   }
+//   #activity-input-caret {
+//     &:before { left: 5px; }
+//     &:after  { left: 5px - 2px; }
+//   }
+// }
+
+// @media (min-width: 979px) and (max-width: 1200px) {
+//   #activity-type {
+//     li {
+//       width:23%;
+//     }
+//   }
+//   #activity-input-caret {
+//     &:before { left: 20px; }
+//     &:after  { left: 20px - 2px; }
+//   }
+// }
+
+// @media (min-width: 1200px) {
+//   #activity-input-caret {
+//     &:before { left: 30px; }
+//     &:after  { left: 30px - 2px; }
+//   }
+// }

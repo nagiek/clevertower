@@ -3,7 +3,7 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", "models/Property", "models/Photo", "collections/PhotoList", "views/photo/Show", "i18n!nls/property", "i18n!nls/common", "templates/property/sub/photos", 'jqueryuiwidget', 'jquery.fileupload', 'jquery.fileupload-fp', 'jquery.fileupload-ui'], function($, _, Parse, Property, Photo, PhotoList, PhotoView, i18nProperty, i18nCommon) {
+  define(["jquery", "underscore", "backbone", "models/Property", "models/Photo", "models/Activity", "collections/PhotoList", "views/photo/Show", "i18n!nls/property", "i18n!nls/common", "templates/property/sub/photos", 'jqueryuiwidget', 'jquery.fileupload', 'jquery.fileupload-fp', 'jquery.fileupload-ui'], function($, _, Parse, Property, Photo, Activity, PhotoList, PhotoView, i18nProperty, i18nCommon) {
     var PropertyPhotosView, _ref;
 
     return PropertyPhotosView = (function(_super) {
@@ -92,25 +92,24 @@
           },
           stop: function(e, data) {
             Parse.Promise.when(uploads).then(function() {
-              var photo, _i, _len;
+              var activity, photo, _i, _len;
 
               for (_i = 0, _len = arguments.length; _i < _len; _i++) {
                 photo = arguments[_i];
                 _this.photos.add(photo);
               }
-              Parse.Cloud.run('AddPhotoActivity', {
+              activity = new Activity({
                 image: arguments[0].get("name"),
-                length: arguments.length,
-                propertyId: _this.model.id
-              }, {
-                success: function(model) {
-                  if (Parse.App.activity) {
-                    return Parse.App.activity.add(model);
-                  }
-                },
-                error: function(error) {
-                  return console.log(error);
+                title: i18nProperty.activity.added_photos(arguments.length),
+                "public": true,
+                property: _this.model
+              });
+              activity.save().then(function() {
+                if (Parse.App.activity) {
+                  return Parse.App.activity.add(activity);
                 }
+              }, function(error) {
+                return console.log(error);
               });
               return uploads = [];
             });

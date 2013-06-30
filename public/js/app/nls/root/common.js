@@ -9,6 +9,7 @@
       posted: "Posted"
     },
     classes: {
+      Profile: "Profile",
       lease: "lease",
       Lease: "Lease",
       Leases: "Leases",
@@ -73,6 +74,7 @@
       add_another: "Add another",
       add_files: "Add files",
       add_photo: "Add photo",
+      add_time: "Add event time",
       add_photos: "Add photos",
       add_extra_details: "Add extra details",
       choose_file: "Choose file",
@@ -88,6 +90,9 @@
       datepicker_format: "mm/dd/yyyy",
       per_month: "per month",
       date: "Date",
+      start_date: "Start Date",
+      end_date: "End Date",
+      add_end_date: "Add end date",
       day: "Day",
       month: "Month",
       year: "Year",
@@ -161,8 +166,8 @@
         }
       }
     },
-    posts: {
-      building: "Private post to your building"
+    activity: {
+      building: "Post to your building"
     },
     status: {
       ok: "OK",
@@ -246,6 +251,7 @@
     },
     form: {
       find_contacts_in: 'Find contacts in',
+      post_as_property: "Post as property",
       center_on_property: "Center on property",
       operations: "Operations",
       info: "Info",
@@ -269,6 +275,9 @@
     },
     errors: {
       bad_save: "Something went wrong. Changes were not saved.",
+      no_start_date: "You cannot create an event without a start date.",
+      no_data: "No data sent.",
+      no_end_date: "You have not specified an end date.",
       access_denied: "Access denied",
       no_permission: "You do not have permission to do that.",
       unknown: "An unknown error has occured.",

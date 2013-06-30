@@ -72,7 +72,6 @@ define
       #                           "Share something with your building."
       # ]
     ]
-
     bulk_edit:                  "Edit users"
     building:                   
       label:                    "Visibility: Building"

@@ -25,17 +25,17 @@
   }
 }
 
-.icon-post {
+.icon-activity {
   display: block;
   width: 40px;
   height: 40px;
   line-height: 40px;
   margin: 0 auto;
-  background-image: url("@{iconPostSpritePath}") !important;
+  background-image: url("@{iconActivitySpritePath}") !important;
 }
 
 .icon-sprite {
-  background-image: url("@{iconPostSpritePath}") !important;
+  background-image: url("@{iconActivitySpritePath}") !important;
 }
 
 
@@ -66,10 +66,11 @@
 }
 
 .icon-sprite {
-  &.icon-building     { background-position: -128px -9px; }
+  &.icon-building     { background-position: -131px -9px; }
+  &.icon-time         { background-position: -165px -9px; }
 }
 
-.icon-post {
+.icon-activity {
   &.icon-status       { background-position: 0      0; }
   &.icon-photo        { background-position: -40px  0; }
   &.icon-tip          { background-position: -80px  0; }
@@ -79,13 +80,14 @@
 // :hover,
 // :active,
 .active {
-  > .icon-post {
+  > .icon-activity {
     &.icon-status     { background-position: 0      -40px; }
     &.icon-photo      { background-position: -40px  -40px; }
     &.icon-tip        { background-position: -80px  -40px; }
   }
   > .icon-big {
-    &.icon-building   { background-position: -128px -52px; }
+    &.icon-building   { background-position: -131px -52px; }
+    &.icon-time       { background-position: -165px -53px; }
   }
 }
 

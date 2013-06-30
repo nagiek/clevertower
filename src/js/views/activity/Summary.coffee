@@ -116,7 +116,13 @@ define [
                             </div>
                           </div>
                           <div class="caption">
-                            <p><strong>#{title}</strong></p>
+                          """
+            vars.content += "<p><strong>#{title}</strong></p>" if @model.get "title"
+            if @model.get "isEvent"
+              vars.content += "<p><strong>#{moment(@model.get("startDate")).format("LLL")}"
+              vars.content += " - #{moment(@model.get("endDate")).format("h:mm")}" if @model.get "endDate"
+              vars.content += "</strong></p>"
+            vars.content += """
                             #{footer}
                           </div>
                           """
@@ -126,6 +132,12 @@ define [
                             #{title}
                           </blockquote>
                           <div class="caption">
+                          """
+            if @model.get "isEvent"
+              vars.content += "<p><strong>#{moment(@model.get("startDate")).format("LLL")}"
+              vars.content += " - #{moment(@model.get("endDate")).format("h:mm")}" if @model.get "endDate"
+              vars.content += "</strong></p>"
+            vars.content += """
                             #{footer}
                           </div>
                           """
@@ -138,7 +150,9 @@ define [
                             <img src="#{@model.get("image")}" alt="#{i18nCommon.nouns.cover_photo}">
                           </div>
                           <div class="photo-float thumbnail-float caption">
-                            <p><strong>#{title}</strong></p>
+                            """
+            vars.content += "<p><strong>#{title}</strong></p>" if @model.get "title"
+            vars.content += """
                             #{footer}
                           </div>
               """
@@ -150,7 +164,9 @@ define [
                             </div>
                           </div>
                           <div class="caption">
-                            <p><strong>#{title}</strong></p>
+                            """
+            vars.content += "<p><strong>#{title}</strong></p>" if @model.get "title"
+            vars.content += """
                             #{footer}
                           </div>
                           """
