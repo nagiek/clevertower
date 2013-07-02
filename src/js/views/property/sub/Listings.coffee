@@ -47,6 +47,7 @@ define [
         i18nProperty: i18nProperty
         i18nCommon:   i18nCommon
         i18nListing:  i18nListing
+        baseUrl:      @baseUrl
       @$el.html JST["src/js/templates/property/sub/listings.jst"](vars)
       @$list = @$("#listings-table tbody")
       @$("[rel=popover]").popover(delay: show: 500, hide: 100)

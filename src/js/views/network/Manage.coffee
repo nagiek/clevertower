@@ -20,8 +20,8 @@ define [
       @model = Parse.User.current().get("network")
 
       @listenTo @model.properties, 'add reset', @updatePropertyCount
-      @listenTo @model.listings, 'add reset', @updateListingCount
       @listenTo @model.managers, 'add reset', @updateManagerCount
+      @listenTo @model.listings, 'add reset', @updateListingCount
       @listenTo @model.tenants, 'add reset', @updateTenantCount
       
       @listenTo @model, 'destroy', -> Parse.Dispatcher.trigger "user:logout"
@@ -52,8 +52,8 @@ define [
 
     updatePropertyCount: => @$("#properties-link .count").html @model.properties.length
     updateManagerCount: => @$("#managers-link .count").html @model.managers.length
+    updateListingCount: => @$("#listings-link .count").html @model.listings.length
     updateTenantCount: => @$("#tenants-link .count").html @model.tenants.length
-    updateListingCount: => @$("#listings-link .count").html @model.properties.length
 
     changeSubView: (path, params) =>
 

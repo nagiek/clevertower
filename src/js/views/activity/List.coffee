@@ -17,8 +17,39 @@ define [
     tagName: "li"
     className: "row"
 
+    events:
+      "click .like-button"  : "likeOrLogin"
+      # "click a" : "goToProperty"
+
     initialize: (attrs) ->
+      @active = attrs.active || false
+      @currentProfile = attrs.currentProfile || false
       
+    likeOrLogin: (e) =>
+      if Parse.User.current()
+        unless @active
+          @$(".like-button").addClass "active"
+          @model.increment likeCount: +1
+          Parse.User.current().get("profile").relation("likes").add @model
+          Parse.User.current().get("profile").likes.add @model
+          @active = true
+          Parse.Object.saveAll [@model, Parse.User.current().get("profile")]
+        else
+          @model.increment likeCount: -1
+          Parse.User.current().get("profile").relation("likes").remove @model
+          Parse.User.current().get("profile").likes.remove @model
+          @active = false
+          Parse.Object.saveAll [@model, Parse.User.current().get("profile")]
+          @clear() if @currentProfile
+        
+      else
+        $("#signup-modal").modal()
+
+    clear: ->
+      @undelegateEvents()
+      @remove()
+      delete this
+
     # Re-render the contents of the Unit item.
     render: ->
       title = @model.get("title")
@@ -33,6 +64,7 @@ define [
               <footer></footer>
                """
       vars =
+        active: @active
         publicUrl: @model.publicUrl()
         type: @model.get("activity_type")
         i18nCommon: i18nCommon
@@ -92,7 +124,7 @@ define [
                           """
             if @model.get "isEvent"
               vars.content += "<p><strong>#{moment(@model.get("startDate")).format("LLL")}"
-              vars.content += " - #{moment(@model.get("endDate")).format("h:mm")}" if @model.get "endDate"
+              vars.content += " - #{moment(@model.get("endDate")).format("h:mm a")}" if @model.get "endDate"
               vars.content += "</strong></p>"
             vars.content += """
                             #{footer}

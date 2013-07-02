@@ -3,6 +3,7 @@ define [
   'underscore',
   'backbone',
   'models/Property'
+  'gmaps'
 ], ($, _, Parse, Property) ->
 
   class PropertyList extends Parse.Collection
@@ -12,6 +13,7 @@ define [
 
     query: new Parse.Query("Property")
 
+    GPoint : -> new google.maps.LatLng @center._latitude ,@center._longitude
     center: new Parse.GeoPoint 43.6481, -79.4042
     radius: 15000
 
@@ -20,7 +22,6 @@ define [
       @query.equalTo("network", attrs.network) if attrs and attrs.network
 
     getSetting: ->
-      
       if @length > 0
         centers = @map (p) -> p.get("center")
         hiLat = loLat = centers[0]._latitude

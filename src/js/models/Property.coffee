@@ -8,10 +8,11 @@ define [
   "collections/ApplicantList"
   "collections/ListingList"
   "collections/PhotoList"
+  "collections/ActivityList"
   "models/Unit"
   "models/Lease"
   "underscore.inflection"
-], (_, Parse, UnitList, LeaseList, InquiryList, TenantList, ApplicantList, ListingList, PhotoList, Unit, Lease, Listing, inflection) ->
+], (_, Parse, UnitList, LeaseList, InquiryList, TenantList, ApplicantList, ListingList, PhotoList, ActivityList, Unit, Lease, Listing, inflection) ->
 
   Property = Parse.Object.extend "Property",
   # class Property extends Parse.Object
@@ -21,6 +22,9 @@ define [
     defaults:
       # Location
       center                        : new Parse.GeoPoint
+      offset                        : 
+        lat                         : 50
+        lng                         : 50
       formatted_address             : ''
       address_components            : []
       location_type                 : "APPROXIMATE"
@@ -155,12 +159,14 @@ define [
       basedOnNetwork = user and network and @get("network") and @get("network").id is network.id
 
       @[collectionName] = switch collectionName
-        when "units" 
-          new UnitList [], property: @
         when "leases"
           new LeaseList [], property: @
         when "photos"
           new PhotoList [], property: @
+        when "activity"
+          if basedOnNetwork then network.activity else new ActivityList [], property: @
+        when "units" 
+          if basedOnNetwork then network.units else new UnitList [], property: @
         when "inquiries"
           if basedOnNetwork then network.inquiries else new InquiryList [], property: @
         when "listings"

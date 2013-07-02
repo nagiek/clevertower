@@ -1,5 +1,11 @@
-<header>
-  <h2><%= i18nCommon.classes.Tenants %></h2>
+<header class="clearfix">
+  <h2 class="pull-left tablet-left"><%= i18nCommon.classes.Tenants %></h2>
+  <ul class="unstyled inline pull-right tablet-right">
+    <li><a href="/leases/new" id="new-lease-link" class="btn">
+      <i class="icon icon-plus"></i>
+      <%= i18nLease.actions.add_new_lease %>
+    </a></li>
+  </ul>
 </header>
 
 <ul class="nav nav-tabs">

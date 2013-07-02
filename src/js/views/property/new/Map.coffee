@@ -98,31 +98,33 @@ define [
 
     geocode : (e) =>      
       e.preventDefault()
-      @geocoder.geocode address: @$searchInput.val(), (results, status) =>
-        if status is google.maps.GeocoderStatus.OK
-          $(".wizard-actions .next").removeProp("disabled") if $(".wizard-actions .next").is("[disabled]")
-          if Parse.User.current() and Parse.User.current().get("network")
-            for p in Parse.User.current().get("network").properties.models
-              if results[0].geometry.location.equals p.GPoint()
-                msg = i18nProperty.errors.taken_by_network p.id
-                return new Alert event: 'geocode', fade: false, message: msg, type: 'error'
+      @geocoder.geocode address: @$searchInput.val(), @handleGeocodeResults
+
+    handleGeocodeResults: (results, status) =>
+      if status is google.maps.GeocoderStatus.OK
+        $(".wizard-actions .next").removeProp("disabled") if $(".wizard-actions .next").is("[disabled]")
+        if Parse.User.current() and Parse.User.current().get("network")
+          for p in Parse.User.current().get("network").properties.models
+            if results[0].geometry.location.equals p.GPoint()
+              msg = i18nProperty.errors.taken_by_network p.id
+              return new Alert event: 'geocode', fade: false, message: msg, type: 'error'
 
 
-            # This is preventing us from creating another lease in the same building.
-            # 
-            # else if Parse.User.current().get("property")
-            #   if results[0].geometry.location.equals Parse.User.current().get("property").GPoint()
-            #     msg = i18nProperty.errors.taken_by_user Parse.User.current().get("property").id
-            #     return new Alert event: 'geocode', fade: false, message: msg, type: 'error'
+          # This is preventing us from creating another lease in the same building.
+          # 
+          # else if Parse.User.current().get("property")
+          #   if results[0].geometry.location.equals Parse.User.current().get("property").GPoint()
+          #     msg = i18nProperty.errors.taken_by_user Parse.User.current().get("property").id
+          #     return new Alert event: 'geocode', fade: false, message: msg, type: 'error'
 
-          @model.set @parse(results[0])
-          @$searchInput.val @model.get('formatted_address')
-          
-          @results.setCenter new Parse.GeoPoint(results[0].geometry.location.lat(), results[0].geometry.location.lng())
-          @results.fetch()
+        @model.set @parse(results[0])
+        @$searchInput.val @model.get('formatted_address')
+        
+        @results.setCenter new Parse.GeoPoint(results[0].geometry.location.lat(), results[0].geometry.location.lng())
+        @results.fetch()
 
-        else
-          alert "Geocoding failed: " + status
+      else
+        alert "Geocoding failed: " + status
 
     geolocate : (e) =>
       e.preventDefault()
@@ -132,17 +134,18 @@ define [
           # Set current user location, if available
           navigator.geolocation.getCurrentPosition (position) =>
             @model.set "center", new Parse.GeoPoint(position.coords)
-            @geocode latLng: @model.GPoint()
+            @geocoder.geocode latLng: @model.GPoint(), @handleGeocodeResults
       
         # If browser geolication is not supoprted, try ip location
         else if google.loader.ClientLocation
           @model.set "center", new Parse.GeoPoint(google.loader.ClientLocation)
-          @geocode latLng: @model.GPoint()
-          
+          @geocoder.geocode latLng: @model.GPoint(), @handleGeocodeResults
+        else
+          @model.set "center", new Parse.GeoPoint()
+          alert i18nProperty.errors.no_geolocaiton
       else
         @model.set "center", new Parse.GeoPoint()
         alert i18nProperty.errors.no_geolocaiton
-        @geocode latLng: @model.GPoint()
 
 
     # Results Handling

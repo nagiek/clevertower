@@ -26,14 +26,9 @@
       <% } %>
       <ul class="nav nav-tabs">
         <li class="active"><a id="activities-link" href="/users/<%= objectId %>" data-target="#activities"><%= i18nCommon.nouns.public_activity %></a></li>
-        <% if (current) { %>
-          <li><a id="likes-link" href="/users/<%= objectId %>/likes" data-target="#likes">
-            <%= i18nCommon.nouns.likes %>
-          </a></li>
-          <li><a id="listings-link" href="/users/<%= objectId %>/listings" data-target="#listings">
-            <%= i18nCommon.classes.Listings %>
-          </a></li>
-        <% } %>
+        <li><a id="likes-link" href="/users/<%= objectId %>/likes" data-target="#likes">
+          <%= i18nCommon.nouns.likes %>
+        </a></li>
       </ul>
 
       <div class="tab-content">
@@ -42,13 +37,11 @@
             <li><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" /></li>
           </ul>
         </div>
-        <% if (current) { %>
-          <div id="likes" class="tab-pane">
-            <ul class="unstyled">
-              <li><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" /></li>
-            </ul>
-          </div>
-        <% } %>
+        <div id="likes" class="tab-pane">
+          <ul class="unstyled">
+            <li><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" /></li>
+          </ul>
+        </div>
     </div>
   </section>
 </div>

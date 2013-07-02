@@ -1,11 +1,15 @@
 (function() {
-  define(['underscore', 'backbone', "collections/UnitList", "collections/LeaseList", "collections/InquiryList", "collections/TenantList", "collections/ApplicantList", "collections/ListingList", "collections/PhotoList", "models/Unit", "models/Lease", "underscore.inflection"], function(_, Parse, UnitList, LeaseList, InquiryList, TenantList, ApplicantList, ListingList, PhotoList, Unit, Lease, Listing, inflection) {
+  define(['underscore', 'backbone', "collections/UnitList", "collections/LeaseList", "collections/InquiryList", "collections/TenantList", "collections/ApplicantList", "collections/ListingList", "collections/PhotoList", "collections/ActivityList", "models/Unit", "models/Lease", "underscore.inflection"], function(_, Parse, UnitList, LeaseList, InquiryList, TenantList, ApplicantList, ListingList, PhotoList, ActivityList, Unit, Lease, Listing, inflection) {
     var Property;
 
     Property = Parse.Object.extend("Property", {
       className: "Property",
       defaults: {
         center: new Parse.GeoPoint,
+        offset: {
+          lat: 50,
+          lng: 50
+        },
         formatted_address: '',
         address_components: [],
         location_type: "APPROXIMATE",
@@ -111,10 +115,6 @@
         basedOnNetwork = user && network && this.get("network") && this.get("network").id === network.id;
         this[collectionName] = (function() {
           switch (collectionName) {
-            case "units":
-              return new UnitList([], {
-                property: this
-              });
             case "leases":
               return new LeaseList([], {
                 property: this
@@ -123,6 +123,24 @@
               return new PhotoList([], {
                 property: this
               });
+            case "activity":
+              if (basedOnNetwork) {
+                return network.activity;
+              } else {
+                return new ActivityList([], {
+                  property: this
+                });
+              }
+              break;
+            case "units":
+              if (basedOnNetwork) {
+                return network.units;
+              } else {
+                return new UnitList([], {
+                  property: this
+                });
+              }
+              break;
             case "inquiries":
               if (basedOnNetwork) {
                 return network.inquiries;

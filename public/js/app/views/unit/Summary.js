@@ -28,8 +28,9 @@
       UnitSummaryView.prototype.initialize = function(attrs) {
         var _this = this;
 
-        this.baseUrl = attrs.baseUrl;
-        this.isMgr = attrs.isMgr;
+        this.view = attrs.view;
+        this.baseUrl = this.view.baseUrl;
+        this.isMgr = this.view.isMgr;
         this.listenTo(this.model, "change:title", function() {
           return _this.$('.unit-link').html(_this.model.get("title"));
         });
@@ -52,7 +53,6 @@
         var end_date, vars;
 
         vars = _.merge(this.model.toJSON(), {
-          moment: moment,
           objectId: this.model.id ? this.model.id : false,
           i18nCommon: i18nCommon,
           i18nUnit: i18nUnit,
@@ -60,6 +60,7 @@
           i18nListing: i18nListing,
           baseUrl: this.baseUrl,
           isMgr: this.isMgr,
+          editing: this.view.editing,
           isNew: this.model.isNew()
         });
         if (vars.activeLease = this.model.get("activeLease")) {
@@ -112,7 +113,7 @@
           return;
         }
         this.update(e);
-        return this.model.collection.prepopulate();
+        return this.model.collection.prepopulate(this.model.get("property"));
       };
 
       return UnitSummaryView;

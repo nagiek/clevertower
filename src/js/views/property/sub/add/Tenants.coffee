@@ -25,7 +25,7 @@ define [
       if attrs.params and attrs.params.lease
         @model.prep('leases')
         @model.leases.fetch() if @model.leases.length is 0
-        @vars.leaseId = attrs.params.lease
+        @vars.leaseId = attrs.params.leaseId
       
       
     render : ->

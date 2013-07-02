@@ -42,6 +42,9 @@ define [
     initialize : (attrs) ->
 
       @property = attrs.property
+      # unitId = prepopulated choice for managers
+      # unit = tenant's one and only unit.
+      @unitId = attrs.unitId
       @unit = attrs.unit
       @baseUrl = attrs.baseUrl
       @forNetwork = attrs.forNetwork
@@ -85,16 +88,16 @@ define [
         @model.id = model.id
 
         if @forNetwork and Parse.User.current()
-          @property.leases.add @model
+          if @property then @property.leases.add @model else Parse.User.current().get("network").leases.add @model
           new Parse.Query("Tenant").equalTo("lease", @model).include("profile").find()
           .then (objs) -> 
-            @property.tenants.add objs
+            if @property then @property.tenants.add @model else Parse.User.current().get("network").tenants.add @model
             # Add tenants to the network collection, if it exists.
             Parse.User.current().get("network").tenants.add objs if Parse.User.current().get("network")
           
           require ["views/lease/Show"], (ShowLeaseView) =>
             # Alert the user and move on
-            new ShowLeaseView(model: @model, property: @property, forNetwork: @forNetwork, baseUrl: @baseUrl).render()
+            new ShowLeaseView(model: @model, property: @model.get("property"), forNetwork: @forNetwork, baseUrl: @baseUrl).render()
             Parse.history.navigate "#{@baseUrl}/leases/#{model.id}"
             @clear()
 
@@ -114,10 +117,16 @@ define [
       @listenTo @model, 'destroy', @clear
       
       # # We may on public page instead of network.
-      # unless @unit
-      #   @property.prep("units") 
-      #   @listenTo @property.units, "add", @addOne
-      #   @listenTo @property.units, "reset", @addAll
+      unless @unit
+        if @property
+          @property.prep("units")
+          @listenTo @property.units, "add", @addOne
+          @listenTo @property.units, "reset", @addAll
+        else 
+          Parse.User.current().get("network").prep("units")
+          @listenTo Parse.User.current().get("network").units, "add", @addOne
+          @listenTo Parse.User.current().get("network").units, "reset", @addAll
+
               
       @current = new Date().setDate(1)
       @dates =
@@ -151,23 +160,38 @@ define [
       @$endDate = @$('.end-date')
       @$('.datepicker').datepicker()
       
-      unless @unit
-        @$unitSelect = @$('.unit-select')
-        if @property.units.length is 0 then @property.units.fetch() else @addAll()
+      @$unitSelect = @$('.unit-select')
+      if @unit
+        @addOne @unit
+      else
+        if @property
+          if @property.units.where(property: @property).length is 0 then @property.units.fetch() else @addAll()
+        else
+          if Parse.User.current().get("network").units.length is 0 then Parse.User.current().get("network").units.fetch() else @addAll()
       @
 
     addOne : (u) =>
-      HTML = "<option value='#{u.id}'" + (if @model.get("unit") and @model.get("unit").id is u.id then "selected='selected'" else "") + ">#{u.get('title')}</option>"
+      selected = if @unitId and @unitId is u.id then " selected='selected'"
+      else if @model.get("unit") and @model.get("unit").id is u.id then " selected='selected'"
+      else ""
+      HTML = "<option value='#{u.id}'" + selected + ">#{u.get('title')}</option>"
       @$unitSelect.append HTML
       # @$unitSelect.children(':last').before HTML
 
     addAll : =>
-      if @$unitSelect.children().length > 2
-        @$unitSelect.html """
-          <option value=''>#{i18nCommon.form.select.select_value}</option>
-          <option value='-1'>#{i18nUnit.constants.new_unit}</option>
-        """
-      @property.units.each @addOne
+      @$unitSelect.html "<option value=''>#{i18nCommon.form.select.select_value}</option>" # if @$unitSelect.children().length > 2
+
+      if @property
+        _.each @property.units.where(property: @property), @addOne
+        @$unitSelect.append "<option class='new-unit-option' value='-1'>#{i18nUnit.constants.new_unit}</option>"
+      else
+        # Group by property.
+        properties = Parse.User.current().get("network").units.groupBy (u) -> u.get("property").id
+        _.each properties, (set, property) =>
+          @$unitSelect.append "<optgroup label='#{Parse.User.current().get("network").properties.get(property).get('title')}'>"
+          _.each set, @addOne
+          @$unitSelect.append "<option class='new-unit-option' value='#{property}'>#{i18nUnit.constants.new_unit}</option>"
+          @$unitSelect.append "</optgroup>"
 
 
     # Split into separate functions for other uses, such as joining.
@@ -181,17 +205,20 @@ define [
 
       # Set unit
       if data.unit and data.unit.id isnt ""
-        if @unit
-          console.log @unit
-          @unit.set @unit.scrub(data.unit.attributes)
-          attrs.unit = @unit
-        else 
+        if @property
           if data.unit.id is "-1"
             unit = new Unit data.unit.attributes
             unit.set "property", @property
           else 
             unit = @property.units.get data.unit.id
-          attrs.unit = unit
+        else 
+          property = Parse.User.current().get("network").properties.get(data.unit.id)
+          if property
+            unit = new Unit data.unit.attributes
+            unit.set "property", property
+          else 
+            unit = Parse.User.current().get("network").units.get data.unit.id
+        attrs.unit = unit
       
       # Validate tenants (assignment done in Cloud)
       userValid = true
@@ -218,8 +245,9 @@ define [
         
 
     showUnitIfNew : (e) =>
+      className = @$("option:selected", this)[0].className
       # Use show() and hide(), because default input->display:inline-block overrides 'hide' class
-      if e.target.value is "-1" then @$('.new-unit').show() else @$('.new-unit').hide()
+      if className is "new-unit-option" then @$('.new-unit').show() else @$('.new-unit').hide()
 
     # adjustEndDate : ->
     #   console.log e

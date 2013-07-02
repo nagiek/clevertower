@@ -1,7 +1,8 @@
-<a href="<%= publicUrl %>" class="thumbnail clearfix activity <%= type %><% if (linkedToProperty) { %><%= " property-linked property-" + propertyId %><% } %>" data-index="<%= pos %>" data-collection="<% if (linkedToProperty) { %>user<% } else { %>external<% } %>">
-  <div class="content"><%= content %></div>
-  <ul class="activity-info inline inline-condensed">
+<div class="thumbnail clearfix activity <%= type %>">
+  <a href="<%= publicUrl %>" class="content<% if (linkedToProperty) { %><%= " property-linked property-" + propertyId %><% } %>" data-index="<%= pos %>" data-collection="<% if (linkedToProperty) { %>user<% } else { %>external<% } %>"><%= content %></a>
+  <ul class="activity-info inline">
+    <li><a href="#" class="like-button<% if (active) { %> active<% } %>"><i class="icon icon-sprite icon-like"></i></a></li>
     <li class="position"><%= pos + 1 %></li>
     <li><i class="icon icon-<%= icon %>"></i></li>
   </ul>
-</a>
+</siv>

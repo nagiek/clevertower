@@ -6,6 +6,7 @@
   </div>
   
   <div class="photo-float medium-float elastic-float">
+    <!--
     <div class="btn-toolbar stay-right">
       <div class="btn-group">
         <a href="#" class="btn btn-small dropdown-toggle" rel="tooltip" data-toggle="dropdown" data-original-title="<%= i18nProperty.menu.day_to_day %>">
@@ -24,7 +25,6 @@
         <h4 class="element-invisible"><%= i18nProperty.menu.building %></h4>
         <%= JST["src/js/templates/property/menu/building.jst"]({publicUrl: publicUrl, baseUrl: baseUrl, i18nProperty: i18nProperty}) %>
       </div>
-      <!--
       <div class="btn-group">
         <a href="#" class="btn btn-small dropdown-toggle" rel="tooltip" data-toggle="dropdown" data-original-title="<%= i18nProperty.menu.reports %>">
           <i class="icon icon-file"></i>
@@ -42,8 +42,8 @@
         <h4 class="element-invisible"><%= i18nProperty.menu.actions %></h4>
         <%= JST["src/js/templates/property/menu/actions.jst"]({baseUrl: baseUrl, i18nProperty: i18nProperty}) %>
       </div>
-       -->
     </div>
+    -->
     
     <h2>
       <a href="/properties/<%= objectId %>"><%= title %></a>
@@ -55,21 +55,12 @@
     </h2>
     
     <dl>
-      <!-- <div class="span"> -->
-        <dt><a href="/properties/<%= objectId %>/listings"><%= i18nCommon.classes.listings %></a></dt>
-        <dd><%= listings %></dd>
-      <!-- </div> -->
-      <!-- <div class="span"> -->
-<!--         <dt><a href="/properties/<%= objectId %>/finance"><%= i18nCommon.classes.finances %></a></dt>
-        <dd>
-          <span class="incomes"><%= incomes %></span>
-          <span class="expenses"><%= expenses %></span>
-        </dd> -->
-      <!-- </div> -->
-      <!-- <div class="span"> -->
-        <dt><a href="/properties/<%= objectId %>/listings"><%= i18nProperty.structure.vacancies %></a></dt>
-        <dd><%= vacant_units %> <%= i18nCommon.prepositions.of %> <%= unitsLength %></dd>
-      <!-- </div> -->
+      <dt><a href="/properties/<%= objectId %>/listings"><%= i18nCommon.classes.Listings %></a></dt>
+      <dd class="listings-count"><%= listings %></dd>
+      <dt><a href="/properties/<%= objectId %>/tenants"><%= i18nCommon.classes.Tenants %></a></dt>
+      <dd class="tenants-count"><%= tenants %></dd>
+      <dt><a href="/properties/<%= objectId %>"><%= i18nProperty.structure.vacancies %></a></dt>
+      <dd><span class="vacant-count"><%= vacant_units %></span> <%= i18nCommon.prepositions.of %> <span class="units-count"><%= units %></span></dd>
     </dl>
   </div>
 </div>

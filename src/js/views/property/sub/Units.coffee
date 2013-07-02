@@ -37,11 +37,6 @@ define [
       @listenTo @model.units, "reset", @addAll
 
       @listenTo @model.units, "invalid", (error) =>
-        # Mark up form
-        switch error.message
-          when 'title_missing'
-            @$('.title-group .control-group').addClass('error')
-
         msg = if error.code? i18nCommon.errors[error.message] else i18nUnit.errors[error.message]
         new Alert(event: 'unit-invalid', fade: false, message: msg, type: 'error')
       
@@ -65,11 +60,7 @@ define [
       @$actions   = @$(".form-actions")
       @$undo      = @$actions.find('.undo')
 
-      if @model.units.length is 0 
-        @model.units.fetch()
-        @switchToEdit()
-      else
-        @addAll()
+      if @model.units.length is 0 then @model.units.fetch() else @addAll()
       @
     
     clear: (e) =>
@@ -89,16 +80,19 @@ define [
     # Add all items in the Units collection at once.
     addAll: (collection, filter) =>
       # Define @$list here, as we may 
-      @$list = @$("#units-table tbody")
+      @$list = @$("#units-table > tbody")
       @$list.html ''
       if @model.units.length > 0 then @model.units.each @addOne
-      else @$list.html '<tr class="empty"><td colspan="8">' + i18nProperty.empty.units + '</td></tr>'
+      else
+        @model.units.prepopulate(@model)
+        @switchToEdit()
+      # else @$list.html '<tr class="empty"><td colspan="8">' + i18nProperty.empty.units + '</td></tr>'
 
     # Add a single todo item to the list by creating a view for it, and
     # appending its element to the `<ul>`.
     addOne: (unit) =>
       @$list.find('tr.empty').remove()
-      view = new UnitView(model: unit, baseUrl: @baseUrl, isMgr: @isMgr)
+      view = new UnitView(model: unit, view: @)
       @$list.append view.render().el
       view.$('.view-specific').toggleClass('hide') if @editing
       @$list.last().find('.title').focus()
@@ -109,7 +103,7 @@ define [
       x = 1 unless x?
 
       until x <= 0
-        @model.units.prepopulate()
+        @model.units.prepopulate(@model)
         x--
 
       @$undo.removeProp 'disabled'
@@ -136,4 +130,5 @@ define [
           new Alert(event: 'units-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success')
           @model.units.trigger "save:success"
         error: (error) =>
-          @model.units.trigger "invalid", unit, error
+          console.log error
+          @model.units.trigger "invalid", error

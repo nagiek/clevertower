@@ -70,6 +70,13 @@
         other: function(name) {
           return "" + (_.escape(name)) + " has no activity.";
         }
+      },
+      likes: {
+        self: "You haven't liked anything yet!",
+        index: "Nothing's been liked so far.",
+        other: function(name) {
+          return "" + (_.escape(name)) + " has no likes.";
+        }
       }
     },
     form: {

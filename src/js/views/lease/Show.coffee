@@ -22,20 +22,26 @@ define [
       @property = attrs.property
       @baseUrl = attrs.baseUrl
       
+      @listenTo @property.units, "reset", @updateTitle
+
       @model.prep('tenants')
       
       @listenTo @model.tenants, "add",   @addOne
       @listenTo @model.tenants, "reset", @addAll
       
     # Re-render the contents of the Unit item.
+
+    updateTitle: ->
+      unit = @property.units.get @model.get("unit").id
+      @$("#unit-title").html unit.get("title") if unit
+
     render: ->    
 
       isMgr = Parse.User.current().get("network") and Parse.User.current().get("network").id is @model.get("network").id 
 
       vars = _.merge @model.toJSON(), 
         # References
-        unitId: @model.get("unit").id
-        title: @model.get("unit").get("title")
+        title: @property.units.get(@model.get("unit").id).get("title")
         tenants: false
         isMgr: isMgr
         # Parse turns dates into an object, which we must override.

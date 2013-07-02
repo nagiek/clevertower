@@ -5,7 +5,11 @@ obj || (obj = {});
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
 with (obj) {
-__p += '<td class="title-group">\n  <div class="view-specific view-show">\n    ';
+__p += '<td class="title-group">\n  <div class="view-specific view-show';
+ if (editing) { ;
+__p += ' hide';
+ } ;
+__p += ' ">\n    ';
  if (objectId) { ;
 __p += '\n      ' +
 ((__t = ( title )) == null ? '' : __t) +
@@ -23,7 +27,11 @@ __p += '\n    ';
  } ;
 __p += '\n  </div>\n  ';
  if (objectId) { ;
-__p += '<div class="view-specific view-edit hide">';
+__p += '<div class="view-specific view-edit';
+ if (!editing) { ;
+__p += ' hide';
+ } ;
+__p += '">';
  } ;
 __p += '\n    <div class="control-group">\n  \t\t<div class="controls">\n  \t\t\t<input type="text" maxlength="8" name="title" class="span1 title" value="' +
 ((__t = ( title )) == null ? '' : __t) +
@@ -49,7 +57,11 @@ __p += '\n      <span class="label label-important">' +
  } ;
 __p += '\n  ';
  } ;
-__p += '\n</td>\n<td class="view-specific view-show">\n  ';
+__p += '\n</td>\n<td class="view-specific view-show';
+ if (editing) { ;
+__p += ' hide';
+ } ;
+__p += '">\n  ';
  if (activeLease && end_date) { ;
 __p += '\n    ' +
 ((__t = ( end_date )) == null ? '' : __t) +
@@ -57,7 +69,11 @@ __p += '\n    ' +
  } ;
 __p += '\n</td>\n';
  if (isMgr) { ;
-__p += '\n  <td class="view-specific view-show">\n    ';
+__p += '\n  <td class="view-specific view-show';
+ if (editing) { ;
+__p += ' hide';
+ } ;
+__p += '">\n    ';
  if (activeLease && activeLease.get("rent")) { ;
 __p += '\n      ' +
 ((__t = ( activeLease.get("rent") )) == null ? '' : __t) +
@@ -65,7 +81,11 @@ __p += '\n      ' +
  } ;
 __p += '\n  </td>\n';
  } ;
-__p += '\n<td class="view-specific view-edit hide">\n  <div class="control-group">\n\t\t<div class="controls">\n\t\t\t<select name="bedrooms">\n\t\t\t  <option value="0" ' +
+__p += '\n<td class="view-specific view-edit';
+ if (!editing) { ;
+__p += ' hide';
+ } ;
+__p += '">\n  <div class="control-group">\n\t\t<div class="controls">\n\t\t\t<select name="bedrooms">\n\t\t\t  <option value="0" ' +
 ((__t = ( bedrooms == 0 ? 'selected' : '' )) == null ? '' : __t) +
 '>' +
 ((__t = ( i18nUnit.form.bedrooms.zero )) == null ? '' : __t) +
@@ -89,7 +109,11 @@ __p += '\n<td class="view-specific view-edit hide">\n  <div class="control-group
 ((__t = ( bedrooms == 5 ? 'selected' : '' )) == null ? '' : __t) +
 '>' +
 ((__t = ( i18nUnit.form.bedrooms.five )) == null ? '' : __t) +
-'</option>\n\t\t\t</select>\n\t\t</div>\n\t</div>\n</td>\n<td class="view-specific view-edit hide">\n  <div class="control-group">\n\t\t<div class="controls">\n\t\t\t<select name="bathrooms">\n\t\t\t  <option value="0" ' +
+'</option>\n\t\t\t</select>\n\t\t</div>\n\t</div>\n</td>\n<td class="view-specific view-edit';
+ if (!editing) { ;
+__p += ' hide';
+ } ;
+__p += '">\n  <div class="control-group">\n\t\t<div class="controls">\n\t\t\t<select name="bathrooms">\n\t\t\t  <option value="0" ' +
 ((__t = ( bathrooms == 0 ? 'selected' : '' )) == null ? '' : __t) +
 '>' +
 ((__t = ( i18nUnit.form.bathrooms.zero )) == null ? '' : __t) +
@@ -117,33 +141,53 @@ __p += '\n<td class="view-specific view-edit hide">\n  <div class="control-group
 ((__t = ( bathrooms == 3.5 ? 'selected' : '' )) == null ? '' : __t) +
 '>' +
 ((__t = ( i18nUnit.form.bathrooms.threeandahalf )) == null ? '' : __t) +
-'</option>\n\t\t\t</select>\n\t\t</div>\n\t</div>\n</td>\n<td class="view-specific view-edit hide">\n  <div class="control-group">\n\t\t<div class="controls input-append">\n\t\t\t<input type="text" maxlength="6" name="square_feet" class="span1" value="' +
+'</option>\n\t\t\t</select>\n\t\t</div>\n\t</div>\n</td>\n<td class="view-specific view-edit';
+ if (!editing) { ;
+__p += ' hide';
+ } ;
+__p += '">\n  <div class="control-group">\n\t\t<div class="controls input-append">\n\t\t\t<input type="text" maxlength="6" name="square_feet" class="span1" value="' +
 ((__t = ( square_feet )) == null ? '' : __t) +
 '">\n\t\t\t<div class="add-on">' +
 ((__t = ( i18nUnit.form.squarefeetsymbol )) == null ? '' : __t) +
 '</div>\n\t\t</div>\n\t</div>\n</td>\n<td>\n  ';
  if (objectId) { ;
-__p += '\n    <a class="btn btn-mini add-lease view-specific view-show"\n       href="' +
+__p += '\n    <a class="btn btn-mini add-lease view-specific view-show';
+ if (editing) { ;
+__p += ' hide';
+ } ;
+__p += '"\n       href="' +
 ((__t = ( baseUrl )) == null ? '' : __t) +
-'/add/lease?unit=' +
+'/add/lease?unitId=' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '" \n       rel="tooltip" \n       data-original-title="' +
 ((__t = ( i18nLease.actions.add_new_lease )) == null ? '' : __t) +
-'">\n      <i class="icon-plus"></i>\n    </a>\n    <a class="btn btn-mini add-listing view-specific view-show"\n       href="' +
+'">\n      <i class="icon-plus"></i>\n    </a>\n    <a class="btn btn-mini add-listing view-specific view-show';
+ if (editing) { ;
+__p += ' hide';
+ } ;
+__p += '"\n       href="' +
 ((__t = ( baseUrl )) == null ? '' : __t) +
-'/add/listing?unit=' +
+'/add/listing?unitId=' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '"\n       rel="tooltip" \n       data-original-title="' +
 ((__t = ( i18nListing.actions.add_listing )) == null ? '' : __t) +
 '">\n      <i class="icon-listing"></i>\n    </a>\n    ';
  if (activeLease) { ;
-__p += '\n      <a class="btn btn-mini add-tenants view-specific view-show"\n         href="' +
+__p += '\n      <a class="btn btn-mini add-tenants view-specific view-show';
+ if (editing) { ;
+__p += ' hide';
+ } ;
+__p += '"\n         href="' +
 ((__t = ( baseUrl )) == null ? '' : __t) +
-'/add/tenants?lease=' +
+'/add/tenants?leaseId=' +
 ((__t = ( activeLease.id )) == null ? '' : __t) +
 '" \n         rel="tooltip" \n         data-original-title="' +
 ((__t = ( i18nLease.actions.add_tenants )) == null ? '' : __t) +
-'">\n        <i class="icon-user"></i>\n      </a>\n      <a class="btn btn-mini extend view-specific view-show"\n         href="' +
+'">\n        <i class="icon-user"></i>\n      </a>\n      <a class="btn btn-mini extend view-specific view-show';
+ if (editing) { ;
+__p += ' hide';
+ } ;
+__p += '"\n         href="' +
 ((__t = ( baseUrl )) == null ? '' : __t) +
 '/leases/' +
 ((__t = ( activeLease.id )) == null ? '' : __t) +
@@ -151,7 +195,11 @@ __p += '\n      <a class="btn btn-mini add-tenants view-specific view-show"\n   
 ((__t = ( i18nLease.actions.extend )) == null ? '' : __t) +
 '">\n        <i class="icon-repeat"></i>\n      </a>\n    ';
  } ;
-__p += '\n    <button class="btn btn-mini btn-danger delete view-specific view-edit hide"\n            rel="tooltip"\n            data-original-title="' +
+__p += '\n    <button class="btn btn-mini btn-danger delete view-specific view-edit';
+ if (!editing) { ;
+__p += ' hide';
+ } ;
+__p += '"\n            rel="tooltip"\n            data-original-title="' +
 ((__t = ( i18nCommon.actions.delete )) == null ? '' : __t) +
 '">\n      <i class="icon-trash icon-white"></i>\n    </button>\n  ';
  } else { ;

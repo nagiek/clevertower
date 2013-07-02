@@ -16,6 +16,7 @@
         this.addOne = __bind(this.addOne, this);
         this.processResults = __bind(this.processResults, this);
         this.geolocate = __bind(this.geolocate, this);
+        this.handleGeocodeResults = __bind(this.handleGeocodeResults, this);
         this.geocode = __bind(this.geocode, this);
         this.checkForSubmit = __bind(this.checkForSubmit, this);        _ref = GMapView.__super__.constructor.apply(this, arguments);
         return _ref;
@@ -121,41 +122,41 @@
       };
 
       GMapView.prototype.geocode = function(e) {
-        var _this = this;
-
         e.preventDefault();
         return this.geocoder.geocode({
           address: this.$searchInput.val()
-        }, function(results, status) {
-          var msg, p, _i, _len, _ref1;
+        }, this.handleGeocodeResults);
+      };
 
-          if (status === google.maps.GeocoderStatus.OK) {
-            if ($(".wizard-actions .next").is("[disabled]")) {
-              $(".wizard-actions .next").removeProp("disabled");
-            }
-            if (Parse.User.current() && Parse.User.current().get("network")) {
-              _ref1 = Parse.User.current().get("network").properties.models;
-              for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-                p = _ref1[_i];
-                if (results[0].geometry.location.equals(p.GPoint())) {
-                  msg = i18nProperty.errors.taken_by_network(p.id);
-                  return new Alert({
-                    event: 'geocode',
-                    fade: false,
-                    message: msg,
-                    type: 'error'
-                  });
-                }
+      GMapView.prototype.handleGeocodeResults = function(results, status) {
+        var msg, p, _i, _len, _ref1;
+
+        if (status === google.maps.GeocoderStatus.OK) {
+          if ($(".wizard-actions .next").is("[disabled]")) {
+            $(".wizard-actions .next").removeProp("disabled");
+          }
+          if (Parse.User.current() && Parse.User.current().get("network")) {
+            _ref1 = Parse.User.current().get("network").properties.models;
+            for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+              p = _ref1[_i];
+              if (results[0].geometry.location.equals(p.GPoint())) {
+                msg = i18nProperty.errors.taken_by_network(p.id);
+                return new Alert({
+                  event: 'geocode',
+                  fade: false,
+                  message: msg,
+                  type: 'error'
+                });
               }
             }
-            _this.model.set(_this.parse(results[0]));
-            _this.$searchInput.val(_this.model.get('formatted_address'));
-            _this.results.setCenter(new Parse.GeoPoint(results[0].geometry.location.lat(), results[0].geometry.location.lng()));
-            return _this.results.fetch();
-          } else {
-            return alert("Geocoding failed: " + status);
           }
-        });
+          this.model.set(this.parse(results[0]));
+          this.$searchInput.val(this.model.get('formatted_address'));
+          this.results.setCenter(new Parse.GeoPoint(results[0].geometry.location.lat(), results[0].geometry.location.lng()));
+          return this.results.fetch();
+        } else {
+          return alert("Geocoding failed: " + status);
+        }
       };
 
       GMapView.prototype.geolocate = function(e) {
@@ -166,22 +167,22 @@
           if (navigator.geolocation) {
             return navigator.geolocation.getCurrentPosition(function(position) {
               _this.model.set("center", new Parse.GeoPoint(position.coords));
-              return _this.geocode({
+              return _this.geocoder.geocode({
                 latLng: _this.model.GPoint()
-              });
+              }, _this.handleGeocodeResults);
             });
           } else if (google.loader.ClientLocation) {
             this.model.set("center", new Parse.GeoPoint(google.loader.ClientLocation));
-            return this.geocode({
+            return this.geocoder.geocode({
               latLng: this.model.GPoint()
-            });
+            }, this.handleGeocodeResults);
+          } else {
+            this.model.set("center", new Parse.GeoPoint());
+            return alert(i18nProperty.errors.no_geolocaiton);
           }
         } else {
           this.model.set("center", new Parse.GeoPoint());
-          alert(i18nProperty.errors.no_geolocaiton);
-          return this.geocode({
-            latLng: this.model.GPoint()
-          });
+          return alert(i18nProperty.errors.no_geolocaiton);
         }
       };
 

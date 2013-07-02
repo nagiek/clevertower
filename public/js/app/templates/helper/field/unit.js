@@ -89,8 +89,6 @@ __p += '</label>\n    <div class="controls">\n      <input type="hidden" name="u
 ((__t = ( required )) == null ? '' : __t) +
 '">\n        <option value="">' +
 ((__t = ( i18nCommon.form.select.select_value )) == null ? '' : __t) +
-'</option>\n        <option value="-1">' +
-((__t = ( i18nUnit.constants.new_unit )) == null ? '' : __t) +
 '</option>\n      </select>\n\n      <input type="text" name="unit[attributes][title]" placeholder="' +
 ((__t = ( i18nUnit.form.unit_number )) == null ? '' : __t) +
 '" class="new-unit input-xsmall" maxlength="16" style="display:none;">\n    </div>\n  </div>\n  ';

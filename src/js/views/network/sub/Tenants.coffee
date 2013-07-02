@@ -7,10 +7,11 @@ define [
   'models/Profile'
   'views/helper/Alert'
   'views/tenant/Summary'
+  "i18n!nls/lease"
   "i18n!nls/group"
   "i18n!nls/common"
   'templates/network/sub/tenants'
-], ($, _, Parse, TenantList, Tenant, Profile, Alert, TenantView, i18nGroup, i18nCommon) ->
+], ($, _, Parse, TenantList, Tenant, Profile, Alert, TenantView, i18nLease, i18nGroup, i18nCommon) ->
 
   class NetworkTenantsView extends Parse.View
     
@@ -34,6 +35,7 @@ define [
     render: =>
       
       vars = 
+        i18nLease: i18nLease
         i18nGroup: i18nGroup
         i18nCommon: i18nCommon
         baseUrl: @baseUrl

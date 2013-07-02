@@ -2,6 +2,7 @@ define [
   "jquery"
   "underscore"
   "backbone"
+  "views/activity/List"
   "views/photo/Public"
   "views/listing/PublicSummary"
   "i18n!nls/property"
@@ -11,7 +12,7 @@ define [
   "i18n!nls/common"
   'templates/property/public'
   "gmaps"
-], ($, _, Parse, PhotoView, ListingView, i18nProperty, i18nListing, i18nUnit, i18nGroup, i18nCommon) ->
+], ($, _, Parse, ActivityView, PhotoView, ListingView, i18nProperty, i18nListing, i18nUnit, i18nGroup, i18nCommon) ->
 
   class PublicPropertyView extends Parse.View
 
@@ -27,8 +28,12 @@ define [
 
       @mapId = "mapCanvas"
 
+      @model.prep "activity"
       @model.prep "photos"
       @model.prep "listings"
+
+      @listenTo @model.activity, "add", @addOneActivity
+      @listenTo @model.activity, "reset", @addAllActivity
 
       @listenTo @model.photos, "add", @addOnePhoto
       @listenTo @model.photos, "reset", @addAllPhotos
@@ -76,30 +81,47 @@ define [
           position: center
           map:      map
 
-      @$list = $("#photos > ul")
+      @$activity = $("#activity > ul")
+      @$photos = $("#photos > ul")
       @$listings = $("#listings > table > tbody")
       
-      if @model.photos.length is 0 then @model.photos.fetch() else @addAll()
+      if @model.activity.length is 0 then @model.activity.fetch() else @addAllActivity()
+      if @model.photos.length is 0 then @model.photos.fetch() else @addAllPhotos()
       if @model.listings.length is 0 then @model.listings.fetch() else @addAllListings()
 
       @
+
+    # Activity
+    # ------
+
+    addOneActivity : (activity) =>
+      view = new ActivityView(model: activity)
+      @$activity.append view.render().el
+      
+    addAllActivity: (collection, filter) =>
+
+      @$activity.html ""
+      unless @model.activity.length is 0
+        @model.activity.each @addOneActivity
+      else
+        @$activity.before '<p class="empty">' + i18nProperty.tenant_empty.activity + '</p>'
 
     # Photos
     # ------
 
     addOnePhoto : (photo) =>
       view = new PhotoView(model: photo)
-      @$list.append view.render().el
+      @$photos.append view.render().el
       
     addAllPhotos: (collection, filter) =>
 
       $('#photos-link .count').html @model.photos.length
 
-      @$list.html ""
+      @$photos.html ""
       unless @model.photos.length is 0
         @model.photos.each @addOnePhoto
       else
-        @$list.before '<p class="empty">' + i18nProperty.tenant_empty.photos + '</p>'
+        @$photos.before '<p class="empty">' + i18nProperty.tenant_empty.photos + '</p>'
 
     # Listings
     # --------

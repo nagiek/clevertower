@@ -1,6 +1,6 @@
 <header class="row">
   <hgroup class="span">
-    <h2><%= i18nLease.attributes.lease_on_unit %> <a href="<%= baseUrl %>/units/<%= unitId %>"><%=title %></a></h2>
+    <h2><%= i18nLease.attributes.lease_on_unit %> <span id="unit-title"><%= title %></span></h2>
     <h4><%= start_date %> - <%= end_date %></h4>
   </hgroup>
   <ul class="span offset1 inline">
@@ -10,7 +10,7 @@
       </a>
     </li>
     <li>
-      <a href="<%= baseUrl %>/add/tenants?lease=<%= objectId %>" class="btn add-tenants"
+      <a href="<%= baseUrl %>/add/tenants?leaseId=<%= objectId %>" class="btn add-tenants"
           rel="tooltip"
           data-original-title="<%= i18nLease.actions.add_tenants %>">
         <i class="icon-user"></i>

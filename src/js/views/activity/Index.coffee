@@ -13,7 +13,7 @@ define [
   'masonry'
   'jqueryui'
   "gmaps"
-], ($, _, Parse, moment, ActivityList, ListingSearchView, NewActivityView, ActivitySummaryView, i18nListing, i18nCommon) ->
+], ($, _, Parse, moment, ActivityList, ListingSearchView, NewActivityView, ActivityView, i18nListing, i18nCommon) ->
 
   class ActivityIndexView extends Parse.View
   
@@ -24,13 +24,14 @@ define [
       'click #displays > button'        : 'changeDisplay'
       'change #redo-search'             : 'changeSearchPrefs'
       'click .pagination > ul > li > a' : 'changePage'
-      'click .thumbnails > li > a'      : 'showModal'
+      'click .thumbnails a.content'     : 'showModal'
       'hide #view-content-modal'        : 'hideModal'
       'click .modal .caption a'         : 'closeModal'
       'click .modal .left'              : 'prevModal'
       'click .modal .right'             : 'nextModal'
     
     initialize : (attrs) ->
+
       @location = attrs.location || ""
       @locationAppend = if attrs.params.lat and attrs.params.lng then "?lat=#{attrs.params.lat}&lng=#{attrs.params.lng}" else ''
       @page = attrs.params.page || 1
@@ -39,7 +40,11 @@ define [
 
       # Give the user the chance to contribute
       @listenTo Parse.Dispatcher, "user:login", => 
+        # Get the activity in the user properties.
         @getUserActivity()
+        # Get the user's personal likes.
+        Parse.User.current().get("profile").likes.fetch()
+        # Post view
         @newPostView = new NewActivityView(view: @).render()
         @listenTo @newPostView, "view:resize", @bindMapPosition
 
@@ -73,7 +78,14 @@ define [
       @listenTo Parse.App.activity, "reset", @addAll
       @listenTo Parse.App.activity, "add", @addOne
 
-      @getUserActivity() if Parse.User.current()
+      if Parse.User.current()
+        # Get the activity in the user properties.
+        @getUserActivity()
+
+        # Get the user's personal likes.
+        if Parse.User.current().get("profile").likes.length is 0
+          Parse.User.current().get("profile").likes.fetch()
+
       @render()
 
     refreshDisplay : ->
@@ -188,7 +200,7 @@ define [
 
         else if Parse.User.current().get("network")
           Parse.User.current().get("network").properties.getSetting()
-          @center = @GPoint Parse.User.current().get("network").properties.center
+          @center = Parse.User.current().get("network").properties.GPoint()
           @radius = Parse.User.current().get("network").properties.radius
 
         else
@@ -248,11 +260,11 @@ define [
       @
 
     renderMap : =>
-
       if @radius
-        if @radius > 1000000 then zoom = 4
-        else if @radius > 300000 then zoom = 5
-        else if @radius > 500000 then zoom = 6
+        if @radius > 1000000 then zoom = 3
+        else if @radius > 700000 then zoom = 4
+        else if @radius > 400000 then zoom = 5
+        else if @radius > 200000 then zoom = 6
         else if @radius > 72500 then zoom = 8
         else if @radius > 35000 then zoom = 9
         else if @radius > 18800 then zoom = 10
@@ -401,19 +413,21 @@ define [
           
 
     addOne: (a) =>
-      view = new ActivitySummaryView
+      view = new ActivityView
         model: a
         view: @
+        active: Parse.User.current() and Parse.User.current().get("profile").likes.contains a
       if a.createdAt is undefined then view.$el.addClass "fade in"
       @$list.prepend view.render().el
 
     addOnePropertyActivity: (a) => 
-      view = new ActivitySummaryView
+      view = new ActivityView
         model: a
         marker: a.get("property").marker
         pos: a.get("property").pos()
         view: @
         linkedToProperty: true
+        active: Parse.User.current() and Parse.User.current().get("profile").likes.contains a
       view.className += " fade in" unless a.createdAt
       @$list.prepend view.render().el
 
@@ -572,8 +586,6 @@ define [
         @time = null
       , 250
 
-    GPoint : (GeoPoint) -> new google.maps.LatLng GeoPoint._latitude, GeoPoint._longitude
-
     # These break everything. 
     # undelegateEvents is called after init. No idea why.
     # undelegateEvents : =>
@@ -718,7 +730,13 @@ define [
                             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                           </div>
                           #{profileInfo}
-                          <p class="desc">#{title}</p>
+                          """
+            content += "<p class='desc'>#{title}</p>"
+            if model.get "isEvent"
+              content += "<p><strong>#{moment(model.get("startDate")).format("LLL")}"
+              content += " - #{moment(model.get("endDate")).format("h:mm a")}" if model.get "endDate"
+              content += "</strong></p>"
+            content += """
                         </div>
                       </div>
                       """
@@ -741,6 +759,13 @@ define [
                             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                           </div>
                           #{profileInfo}
+                          """
+            content += "<p class='desc'>#{title}</p>"
+            if model.get "isEvent"
+              content += "<p><strong>#{moment(model.get("startDate")).format("LLL")}"
+              content += " - #{moment(model.get("endDate")).format("h:mm a")}" if model.get "endDate"
+              content += "</strong></p>"
+            content += """
                         </div>
                       </div>
                       """

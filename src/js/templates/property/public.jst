@@ -23,12 +23,18 @@
       </div>
 
       <ul class="nav nav-tabs">
-        <li class="active"><a href="#listings" id="listings-link"><%= i18nCommon.classes.Listings %> <small class="count"></small></a></li>
+        <li class="active"><a href="#activity" id="activity-link"><%= i18nCommon.nouns.public_activity %></a></li>
+        <li><a href="#listings" id="listings-link"><%= i18nCommon.classes.Listings %> <small class="count"></small></a></li>
         <li><a href="#photos" id="photos-link"><%= i18nCommon.classes.Photos %> <small class="count"></small></a></li>
       </ul>
 
       <div class="tab-content">
-        <div class="tab-pane active" id="listings">
+        <div class="tab-pane active" id="activity">
+          <ul class="row no-bullet">
+            <li><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" /></li>
+          </ul>
+        </div>
+        <div class="tab-pane" id="listings">
           <table class="table">
             <thead>
               <th><%= i18nCommon.classes.Listing %></th>
@@ -36,11 +42,15 @@
               <th><%= i18nCommon.fields.posted %></th>
               <th><span class="element-invisible"><%=i18nCommon.form.Operations%></span></th>
             </thead>
-            <tbody></tbody>
+            <tbody>
+              <tr><td colspan="4"><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" /></td></tr>
+            </tbody>
           </table>
         </div>
         <div class="tab-pane" id="photos">
-          <ul class="row no-bullet"></ul>
+          <ul class="row no-bullet">
+            <li><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" /></li>
+          </ul>
         </div>
       </div>
 

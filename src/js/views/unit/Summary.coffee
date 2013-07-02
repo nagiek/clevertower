@@ -28,8 +28,9 @@ define [
       
     initialize: (attrs) ->
 
-      @baseUrl = attrs.baseUrl
-      @isMgr = attrs.isMgr
+      @view = attrs.view
+      @baseUrl = @view.baseUrl
+      @isMgr = @view.isMgr
 
       @listenTo @model, "change:title", =>
         @$('.unit-link').html @model.get "title"
@@ -51,10 +52,7 @@ define [
     # Re-render the contents of the Unit item.
     render: ->
 
-      
-
       vars = _.merge @model.toJSON(),
-        moment: moment
         objectId: if @model.id then @model.id else false
         i18nCommon: i18nCommon
         i18nUnit: i18nUnit
@@ -62,6 +60,7 @@ define [
         i18nListing: i18nListing
         baseUrl: @baseUrl
         isMgr: @isMgr
+        editing: @view.editing
         isNew: @model.isNew()
 
       if vars.activeLease = @model.get("activeLease") 
@@ -101,4 +100,4 @@ define [
     newOnEnter: (e) =>
       return  unless e.keyCode is 13
       @update(e)
-      @model.collection.prepopulate()
+      @model.collection.prepopulate(@model.get("property"))

@@ -7,13 +7,9 @@ function print() { __p += __j.call(arguments, '') }
 with (obj) {
 __p += '<header class="row">\n  <hgroup class="span">\n    <h2>' +
 ((__t = ( i18nLease.attributes.lease_on_unit )) == null ? '' : __t) +
-' <a href="' +
-((__t = ( baseUrl )) == null ? '' : __t) +
-'/units/' +
-((__t = ( unitId )) == null ? '' : __t) +
-'">' +
-((__t = (title )) == null ? '' : __t) +
-'</a></h2>\n    <h4>' +
+' <span id="unit-title">' +
+((__t = ( title )) == null ? '' : __t) +
+'</span></h2>\n    <h4>' +
 ((__t = ( start_date )) == null ? '' : __t) +
 ' - ' +
 ((__t = ( end_date )) == null ? '' : __t) +
@@ -25,7 +21,7 @@ __p += '<header class="row">\n  <hgroup class="span">\n    <h2>' +
 ((__t = ( i18nCommon.actions.edit )) == null ? '' : __t) +
 '\n      </a>\n    </li>\n    <li>\n      <a href="' +
 ((__t = ( baseUrl )) == null ? '' : __t) +
-'/add/tenants?lease=' +
+'/add/tenants?leaseId=' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '" class="btn add-tenants"\n          rel="tooltip"\n          data-original-title="' +
 ((__t = ( i18nLease.actions.add_tenants )) == null ? '' : __t) +

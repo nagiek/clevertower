@@ -9,11 +9,6 @@ define [
   "i18n!nls/property"
   "i18n!nls/common"
   "templates/network/sub/properties"
-  "templates/property/menu"
-  "templates/property/menu/show"
-  "templates/property/menu/reports"
-  "templates/property/menu/building"
-  "templates/property/menu/actions"
 ], ($, _, Parse, PropertyList, Network, Property, SummaryPropertyView, i18nProperty, i18nCommon) ->
 
   class ManagePropertiesView extends Parse.View

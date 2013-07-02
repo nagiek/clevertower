@@ -9,7 +9,7 @@ __p += '<div class="property span8">\n  <div class="photo photo-medium photo-ela
 ((__t = ( objectId )) == null ? '' : __t) +
 '">\n      <img src="' +
 ((__t = ( cover )) == null ? '' : __t) +
-'" alt="Profile" class="profile-picture">\n    </a>\n  </div>\n  \n  <div class="photo-float medium-float elastic-float">\n    <div class="btn-toolbar stay-right">\n      <div class="btn-group">\n        <a href="#" class="btn btn-small dropdown-toggle" rel="tooltip" data-toggle="dropdown" data-original-title="' +
+'" alt="Profile" class="profile-picture">\n    </a>\n  </div>\n  \n  <div class="photo-float medium-float elastic-float">\n    <!--\n    <div class="btn-toolbar stay-right">\n      <div class="btn-group">\n        <a href="#" class="btn btn-small dropdown-toggle" rel="tooltip" data-toggle="dropdown" data-original-title="' +
 ((__t = ( i18nProperty.menu.day_to_day )) == null ? '' : __t) +
 '">\n          <i class="icon icon-eye-open"></i>\n          <b class="caret"></b>\n        </a>\n        <h4 class="element-invisible">' +
 ((__t = ( i18nProperty.menu.day_to_day )) == null ? '' : __t) +
@@ -21,7 +21,7 @@ __p += '<div class="property span8">\n  <div class="photo photo-medium photo-ela
 ((__t = ( i18nProperty.menu.building )) == null ? '' : __t) +
 '</h4>\n        ' +
 ((__t = ( JST["src/js/templates/property/menu/building.jst"]({publicUrl: publicUrl, baseUrl: baseUrl, i18nProperty: i18nProperty}) )) == null ? '' : __t) +
-'\n      </div>\n      <!--\n      <div class="btn-group">\n        <a href="#" class="btn btn-small dropdown-toggle" rel="tooltip" data-toggle="dropdown" data-original-title="' +
+'\n      </div>\n      <div class="btn-group">\n        <a href="#" class="btn btn-small dropdown-toggle" rel="tooltip" data-toggle="dropdown" data-original-title="' +
 ((__t = ( i18nProperty.menu.reports )) == null ? '' : __t) +
 '">\n          <i class="icon icon-file"></i>\n          <b class="caret"></b>\n        </a>\n        <h4 class="element-invisible">' +
 ((__t = ( i18nProperty.menu.reports )) == null ? '' : __t) +
@@ -33,7 +33,7 @@ __p += '<div class="property span8">\n  <div class="photo photo-medium photo-ela
 ((__t = ( i18nProperty.menu.actions )) == null ? '' : __t) +
 '</h4>\n        ' +
 ((__t = ( JST["src/js/templates/property/menu/actions.jst"]({baseUrl: baseUrl, i18nProperty: i18nProperty}) )) == null ? '' : __t) +
-'\n      </div>\n       -->\n    </div>\n    \n    <h2>\n      <a href="/properties/' +
+'\n      </div>\n    </div>\n    -->\n    \n    <h2>\n      <a href="/properties/' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '">' +
 ((__t = ( title )) == null ? '' : __t) +
@@ -43,31 +43,29 @@ __p += '\n        <a href="#" class="badge badge-info" rel="tooltip" data-origin
 ((__t = (i18nProperty.actions.setup_property)) == null ? '' : __t) +
 '">\n          <i class="icon icon-lightning icon-white"></i>\n        </a>\n      ';
  } ;
-__p += '\n    </h2>\n    \n    <dl>\n      <!-- <div class="span"> -->\n        <dt><a href="/properties/' +
+__p += '\n    </h2>\n    \n    <dl>\n      <dt><a href="/properties/' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '/listings">' +
-((__t = ( i18nCommon.classes.listings )) == null ? '' : __t) +
-'</a></dt>\n        <dd>' +
+((__t = ( i18nCommon.classes.Listings )) == null ? '' : __t) +
+'</a></dt>\n      <dd class="listings-count">' +
 ((__t = ( listings )) == null ? '' : __t) +
-'</dd>\n      <!-- </div> -->\n      <!-- <div class="span"> -->\n<!--         <dt><a href="/properties/' +
+'</dd>\n      <dt><a href="/properties/' +
 ((__t = ( objectId )) == null ? '' : __t) +
-'/finance">' +
-((__t = ( i18nCommon.classes.finances )) == null ? '' : __t) +
-'</a></dt>\n        <dd>\n          <span class="incomes">' +
-((__t = ( incomes )) == null ? '' : __t) +
-'</span>\n          <span class="expenses">' +
-((__t = ( expenses )) == null ? '' : __t) +
-'</span>\n        </dd> -->\n      <!-- </div> -->\n      <!-- <div class="span"> -->\n        <dt><a href="/properties/' +
+'/tenants">' +
+((__t = ( i18nCommon.classes.Tenants )) == null ? '' : __t) +
+'</a></dt>\n      <dd class="tenants-count">' +
+((__t = ( tenants )) == null ? '' : __t) +
+'</dd>\n      <dt><a href="/properties/' +
 ((__t = ( objectId )) == null ? '' : __t) +
-'/listings">' +
+'">' +
 ((__t = ( i18nProperty.structure.vacancies )) == null ? '' : __t) +
-'</a></dt>\n        <dd>' +
+'</a></dt>\n      <dd><span class="vacant-count">' +
 ((__t = ( vacant_units )) == null ? '' : __t) +
-' ' +
+'</span> ' +
 ((__t = ( i18nCommon.prepositions.of )) == null ? '' : __t) +
-' ' +
-((__t = ( unitsLength )) == null ? '' : __t) +
-'</dd>\n      <!-- </div> -->\n    </dl>\n  </div>\n</div>';
+' <span class="units-count">' +
+((__t = ( units )) == null ? '' : __t) +
+'</span></dd>\n    </dl>\n  </div>\n</div>';
 
 }
 return __p

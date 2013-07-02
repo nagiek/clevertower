@@ -37,6 +37,7 @@
         var _this = this;
 
         this.property = attrs.property;
+        this.unitId = attrs.unitId;
         this.unit = attrs.unit;
         this.baseUrl = attrs.baseUrl;
         this.forNetwork = attrs.forNetwork;
@@ -97,9 +98,17 @@
           });
           _this.model.id = model.id;
           if (_this.forNetwork && Parse.User.current()) {
-            _this.property.leases.add(_this.model);
+            if (_this.property) {
+              _this.property.leases.add(_this.model);
+            } else {
+              Parse.User.current().get("network").leases.add(_this.model);
+            }
             new Parse.Query("Tenant").equalTo("lease", _this.model).include("profile").find().then(function(objs) {
-              this.property.tenants.add(objs);
+              if (this.property) {
+                this.property.tenants.add(this.model);
+              } else {
+                Parse.User.current().get("network").tenants.add(this.model);
+              }
               if (Parse.User.current().get("network")) {
                 return Parse.User.current().get("network").tenants.add(objs);
               }
@@ -107,7 +116,7 @@
             return require(["views/lease/Show"], function(ShowLeaseView) {
               new ShowLeaseView({
                 model: _this.model,
-                property: _this.property,
+                property: _this.model.get("property"),
                 forNetwork: _this.forNetwork,
                 baseUrl: _this.baseUrl
               }).render();
@@ -130,6 +139,17 @@
           }
         });
         this.listenTo(this.model, 'destroy', this.clear);
+        if (!this.unit) {
+          if (this.property) {
+            this.property.prep("units");
+            this.listenTo(this.property.units, "add", this.addOne);
+            this.listenTo(this.property.units, "reset", this.addAll);
+          } else {
+            Parse.User.current().get("network").prep("units");
+            this.listenTo(Parse.User.current().get("network").units, "add", this.addOne);
+            this.listenTo(Parse.User.current().get("network").units, "reset", this.addAll);
+          }
+        }
         this.current = new Date().setDate(1);
         return this.dates = {
           start: this.model.get("start_date") ? moment(this.model.get("start_date")).format("L") : moment(this.current).format("L"),
@@ -158,33 +178,62 @@
         this.$startDate = this.$('.start-date');
         this.$endDate = this.$('.end-date');
         this.$('.datepicker').datepicker();
-        if (!this.unit) {
-          this.$unitSelect = this.$('.unit-select');
-          if (this.property.units.length === 0) {
-            this.property.units.fetch();
+        this.$unitSelect = this.$('.unit-select');
+        if (this.unit) {
+          this.addOne(this.unit);
+        } else {
+          if (this.property) {
+            if (this.property.units.where({
+              property: this.property
+            }).length === 0) {
+              this.property.units.fetch();
+            } else {
+              this.addAll();
+            }
           } else {
-            this.addAll();
+            if (Parse.User.current().get("network").units.length === 0) {
+              Parse.User.current().get("network").units.fetch();
+            } else {
+              this.addAll();
+            }
           }
         }
         return this;
       };
 
       NewLeaseView.prototype.addOne = function(u) {
-        var HTML;
+        var HTML, selected;
 
-        HTML = ("<option value='" + u.id + "'") + (this.model.get("unit") && this.model.get("unit").id === u.id ? "selected='selected'" : "") + (">" + (u.get('title')) + "</option>");
+        selected = this.unitId && this.unitId === u.id ? " selected='selected'" : this.model.get("unit") && this.model.get("unit").id === u.id ? " selected='selected'" : "";
+        HTML = ("<option value='" + u.id + "'") + selected + (">" + (u.get('title')) + "</option>");
         return this.$unitSelect.append(HTML);
       };
 
       NewLeaseView.prototype.addAll = function() {
-        if (this.$unitSelect.children().length > 2) {
-          this.$unitSelect.html("<option value=''>" + i18nCommon.form.select.select_value + "</option>\n<option value='-1'>" + i18nUnit.constants.new_unit + "</option>");
+        var properties,
+          _this = this;
+
+        this.$unitSelect.html("<option value=''>" + i18nCommon.form.select.select_value + "</option>");
+        if (this.property) {
+          _.each(this.property.units.where({
+            property: this.property
+          }), this.addOne);
+          return this.$unitSelect.append("<option class='new-unit-option' value='-1'>" + i18nUnit.constants.new_unit + "</option>");
+        } else {
+          properties = Parse.User.current().get("network").units.groupBy(function(u) {
+            return u.get("property").id;
+          });
+          return _.each(properties, function(set, property) {
+            _this.$unitSelect.append("<optgroup label='" + (Parse.User.current().get("network").properties.get(property).get('title')) + "'>");
+            _.each(set, _this.addOne);
+            _this.$unitSelect.append("<option class='new-unit-option' value='" + property + "'>" + i18nUnit.constants.new_unit + "</option>");
+            return _this.$unitSelect.append("</optgroup>");
+          });
         }
-        return this.property.units.each(this.addOne);
       };
 
       NewLeaseView.prototype.save = function(e) {
-        var attrs, data, email, unit, userValid, _i, _len, _ref1,
+        var attrs, data, email, property, unit, userValid, _i, _len, _ref1,
           _this = this;
 
         e.preventDefault();
@@ -193,19 +242,23 @@
         this.$('.error').removeClass('error');
         attrs = this.model.scrub(data.lease);
         if (data.unit && data.unit.id !== "") {
-          if (this.unit) {
-            console.log(this.unit);
-            this.unit.set(this.unit.scrub(data.unit.attributes));
-            attrs.unit = this.unit;
-          } else {
+          if (this.property) {
             if (data.unit.id === "-1") {
               unit = new Unit(data.unit.attributes);
               unit.set("property", this.property);
             } else {
               unit = this.property.units.get(data.unit.id);
             }
-            attrs.unit = unit;
+          } else {
+            property = Parse.User.current().get("network").properties.get(data.unit.id);
+            if (property) {
+              unit = new Unit(data.unit.attributes);
+              unit.set("property", property);
+            } else {
+              unit = Parse.User.current().get("network").units.get(data.unit.id);
+            }
           }
+          attrs.unit = unit;
         }
         userValid = true;
         if (data.emails && data.emails !== '') {
@@ -241,7 +294,10 @@
       };
 
       NewLeaseView.prototype.showUnitIfNew = function(e) {
-        if (e.target.value === "-1") {
+        var className;
+
+        className = this.$("option:selected", this)[0].className;
+        if (className === "new-unit-option") {
           return this.$('.new-unit').show();
         } else {
           return this.$('.new-unit').hide();

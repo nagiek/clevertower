@@ -1,5 +1,5 @@
 <td class="title-group">
-  <div class="view-specific view-show">
+  <div class="view-specific view-show<% if (editing) { %> hide<% } %> ">
     <% if (objectId) { %>
       <%= title %>
       <% if (activeLease) { %>
@@ -7,7 +7,7 @@
       <% } %>
     <% } %>
   </div>
-  <% if (objectId) { %><div class="view-specific view-edit hide"><% } %>
+  <% if (objectId) { %><div class="view-specific view-edit<% if (!editing) { %> hide<% } %>"><% } %>
     <div class="control-group">
   		<div class="controls">
   			<input type="text" maxlength="8" name="title" class="span1 title" value="<%= title %>">
@@ -26,19 +26,19 @@
     <% } %>
   <% } %>
 </td>
-<td class="view-specific view-show">
+<td class="view-specific view-show<% if (editing) { %> hide<% } %>">
   <% if (activeLease && end_date) { %>
     <%= end_date %>
   <% } %>
 </td>
 <% if (isMgr) { %>
-  <td class="view-specific view-show">
+  <td class="view-specific view-show<% if (editing) { %> hide<% } %>">
     <% if (activeLease && activeLease.get("rent")) { %>
       <%= activeLease.get("rent") %>
     <% } %>
   </td>
 <% } %>
-<td class="view-specific view-edit hide">
+<td class="view-specific view-edit<% if (!editing) { %> hide<% } %>">
   <div class="control-group">
 		<div class="controls">
 			<select name="bedrooms">
@@ -52,7 +52,7 @@
 		</div>
 	</div>
 </td>
-<td class="view-specific view-edit hide">
+<td class="view-specific view-edit<% if (!editing) { %> hide<% } %>">
   <div class="control-group">
 		<div class="controls">
 			<select name="bathrooms">
@@ -67,7 +67,7 @@
 		</div>
 	</div>
 </td>
-<td class="view-specific view-edit hide">
+<td class="view-specific view-edit<% if (!editing) { %> hide<% } %>">
   <div class="control-group">
 		<div class="controls input-append">
 			<input type="text" maxlength="6" name="square_feet" class="span1" value="<%= square_feet %>">
@@ -77,33 +77,33 @@
 </td>
 <td>
   <% if (objectId) { %>
-    <a class="btn btn-mini add-lease view-specific view-show"
-       href="<%= baseUrl %>/add/lease?unit=<%= objectId %>" 
+    <a class="btn btn-mini add-lease view-specific view-show<% if (editing) { %> hide<% } %>"
+       href="<%= baseUrl %>/add/lease?unitId=<%= objectId %>" 
        rel="tooltip" 
        data-original-title="<%= i18nLease.actions.add_new_lease %>">
       <i class="icon-plus"></i>
     </a>
-    <a class="btn btn-mini add-listing view-specific view-show"
-       href="<%= baseUrl %>/add/listing?unit=<%= objectId %>"
+    <a class="btn btn-mini add-listing view-specific view-show<% if (editing) { %> hide<% } %>"
+       href="<%= baseUrl %>/add/listing?unitId=<%= objectId %>"
        rel="tooltip" 
        data-original-title="<%= i18nListing.actions.add_listing %>">
       <i class="icon-listing"></i>
     </a>
     <% if (activeLease) { %>
-      <a class="btn btn-mini add-tenants view-specific view-show"
-         href="<%= baseUrl %>/add/tenants?lease=<%= activeLease.id %>" 
+      <a class="btn btn-mini add-tenants view-specific view-show<% if (editing) { %> hide<% } %>"
+         href="<%= baseUrl %>/add/tenants?leaseId=<%= activeLease.id %>" 
          rel="tooltip" 
          data-original-title="<%= i18nLease.actions.add_tenants %>">
         <i class="icon-user"></i>
       </a>
-      <a class="btn btn-mini extend view-specific view-show"
+      <a class="btn btn-mini extend view-specific view-show<% if (editing) { %> hide<% } %>"
          href="<%= baseUrl %>/leases/<%= activeLease.id %>/extend"
          rel="tooltip" 
          data-original-title="<%= i18nLease.actions.extend %>">
         <i class="icon-repeat"></i>
       </a>
     <% } %>
-    <button class="btn btn-mini btn-danger delete view-specific view-edit hide"
+    <button class="btn btn-mini btn-danger delete view-specific view-edit<% if (!editing) { %> hide<% } %>"
             rel="tooltip"
             data-original-title="<%= i18nCommon.actions.delete %>">
       <i class="icon-trash icon-white"></i>

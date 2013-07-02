@@ -708,31 +708,32 @@
     if (!req.object.get("title")) {
       return res.error('no_title');
     }
-    if (!req.object.existed()) {
-      return (new Parse.Query("Property")).get(req.object.get("property").id, {
-        success: function(property) {
-          var propertyACL;
-
-          propertyACL = property.getACL();
-          propertyACL.setPublicReadAccess(false);
-          if (!(property.get("network") && property.get("network") === req.user.get("network"))) {
-            propertyACL.setReadAccess(req.user.id, true);
-            propertyACL.setWriteAccess(req.user.id, true);
-          }
-          req.object.set({
-            user: req.user,
-            property: property,
-            ACL: propertyACL
-          });
-          return res.success();
-        },
-        error: function() {
-          return res.error("bad_query");
-        }
-      });
-    } else {
+    if (req.object.existed()) {
       return res.success();
     }
+    Parse.Cloud.useMasterKey();
+    return (new Parse.Query("Property")).get(req.object.get("property").id, {
+      success: function(property) {
+        var propertyACL;
+
+        propertyACL = property.getACL();
+        propertyACL.setPublicReadAccess(false);
+        if (!(property.get("network") && property.get("network") === req.user.get("network"))) {
+          propertyACL.setReadAccess(req.user.id, true);
+          propertyACL.setWriteAccess(req.user.id, true);
+        }
+        req.object.set({
+          user: req.user,
+          property: property,
+          network: property.get("network"),
+          ACL: propertyACL
+        });
+        return res.success();
+      },
+      error: function() {
+        return res.error("bad_query");
+      }
+    });
   });
 
   Parse.Cloud.beforeSave("Inquiry", function(req, res) {

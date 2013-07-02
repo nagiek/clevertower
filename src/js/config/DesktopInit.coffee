@@ -331,8 +331,16 @@ require [
     Parse.Promise.when(userPromise, @notifications.query.find())
     .then (user, notifs) => 
 
+      # Notifications.
       @notifications.add notifs
-      @set "profile", user.get "profile"
+
+      # Profile.
+      profile = user.get "profile"
+      profile.likes = new ActivityList([], {})
+      profile.likes.query = profile.relation("likes").query()
+      @set "profile", profile
+
+      # Living.
       @set "lease", user.get "lease"
       # Need to get the Unit functions when managing our lease.
       if user.get("unit")
@@ -353,6 +361,8 @@ require [
     # Create & fill our collections
     # Can't use a Promise here, as fetch does not return a promise.
     network.prep("properties").fetch()
+    network.prep("units").fetch()
+    network.prep("activity").fetch()
     network.prep("managers").fetch()
     network.prep("tenants").fetch()
     network.prep("listings").fetch()

@@ -18,8 +18,9 @@ define [
     className: "span4 fade in"
 
     events:
-      "mouseover > a" : "highlightMarker"
-      "mouseout > a"  : "unHighlightMarker"
+      "mouseover a"       : "highlightMarker"
+      "mouseout a"        : "unHighlightMarker"
+      "click .like-button"  : "likeOrLogin"
       # "click a" : "goToProperty"
 
     initialize: (attrs) ->
@@ -27,6 +28,13 @@ define [
       @linkedToProperty = if attrs.linkedToProperty then true else false
       @marker = attrs.marker
       @view = attrs.view
+      @active = attrs.active || false
+
+      if Parse.User.current()
+        @listenTo Parse.User.current().get("profile").likes, "reset", @checkIfActive
+
+      @listenTo Parse.Dispatcher, "user:login", =>
+        @listenTo Parse.User.current().get("profile").likes, "reset", @checkIfActive
 
       @listenTo @model, "refresh", @refresh
       @listenTo @model, "remove", @clear
@@ -35,7 +43,12 @@ define [
       @listenTo @view, "model:viewDetails", @clear
 
       @id = "activity-#{@model.id}"
-      
+    
+    checkIfActive: ->
+      if Parse.User.current().get("profile").likes.contains @model
+        @active = true
+        @$("#like-button").addClass "active"
+
     # Re-render the contents of the Unit item.
     render: ->
       title = @model.get("title")
@@ -56,6 +69,7 @@ define [
                """
 
       vars =
+        active: @active
         pos: @pos() # This will be incremented in the template.
         linkedToProperty: @linkedToProperty
         publicUrl: "#"
@@ -120,7 +134,7 @@ define [
             vars.content += "<p><strong>#{title}</strong></p>" if @model.get "title"
             if @model.get "isEvent"
               vars.content += "<p><strong>#{moment(@model.get("startDate")).format("LLL")}"
-              vars.content += " - #{moment(@model.get("endDate")).format("h:mm")}" if @model.get "endDate"
+              vars.content += " - #{moment(@model.get("endDate")).format("h:mm a")}" if @model.get "endDate"
               vars.content += "</strong></p>"
             vars.content += """
                             #{footer}
@@ -135,7 +149,7 @@ define [
                           """
             if @model.get "isEvent"
               vars.content += "<p><strong>#{moment(@model.get("startDate")).format("LLL")}"
-              vars.content += " - #{moment(@model.get("endDate")).format("h:mm")}" if @model.get "endDate"
+              vars.content += " - #{moment(@model.get("endDate")).format("h:mm a")}" if @model.get "endDate"
               vars.content += "</strong></p>"
             vars.content += """
                             #{footer}
@@ -244,6 +258,23 @@ define [
       #   new PublicPropertyView(model: p).render()
       #   Parse.history.navigate p.publicUrl()
         
+    likeOrLogin: (e) =>
+      if Parse.User.current()
+        unless @active
+          @$(".like-button").addClass "active"
+          @model.increment likeCount: +1
+          Parse.User.current().get("profile").relation("likes").add @model
+          Parse.User.current().get("profile").likes.add @model
+          @active = true
+        else
+          @$(".like-button").removeClass "active"
+          @model.increment likeCount: -1
+          Parse.User.current().get("profile").relation("likes").remove @model
+          Parse.User.current().get("profile").likes.remove @model
+          @active = false
+        Parse.Object.saveAll [@model, Parse.User.current().get("profile")]
+      else
+        $("#signup-modal").modal()
 
     highlightMarker : =>
       @$('> a').addClass('active')

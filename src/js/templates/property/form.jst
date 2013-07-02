@@ -40,7 +40,7 @@
     <div class="control-group span">
       <label for="property-description" class="control-label"><%= i18nProperty.fields.description %></label>
       <div class="controls">
-        <textarea rows="12" name="property[description]" id="property-description" class="span3"><%= property.description ? property.description : ''  %></textarea>
+        <textarea rows="6" name="property[description]" id="property-description" class="span4"><%= property.description ? property.description : ''  %></textarea>
       </div>
     </div>
     <div class="control-group span1">
@@ -65,7 +65,7 @@
     </div>
     <div class="control-group span4">
       <label for="property-amenities" class="control-label"><%= i18nProperty.form.amenities %></label>
-      <div class="controls two-column">
+      <div class="controls three-column">
         <label for="property-air_conditioning" class="checkbox">
           <input type="checkbox" name="property[air_conditioning]" id="property-air_conditioning" <%= property.air_conditioning ? checked="checked" : '' %>><%= i18nProperty.fields.air_conditioning %>
         </label>

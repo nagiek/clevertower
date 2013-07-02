@@ -1,32 +1,31 @@
 <form id="units" method="post">
   <header class="clearfix">
     <h2 class="pull-left"><%= i18nProperty.menu.building %></h2>
-      <!-- <div class="well form-inline form-condensed pull-left">
-        <div class="control-group">
-          <div class="control-label"><%= i18nCommon.dates.date %></div>
-          <div class="controls">
-            <input id="date" type="text" class="input-small" value="<%= today %>">
-          </div>
+    <!-- <div class="well form-inline form-condensed pull-left">
+      <div class="control-group">
+        <div class="control-label"><%= i18nCommon.dates.date %></div>
+        <div class="controls">
+          <input id="date" type="text" class="input-small" value="<%= today %>">
         </div>
-      </div> -->
-      <div class="well well-small form-inline form-condensed pull-right">
-        <button id="units-edit" class="btn"><%= i18nUnit.actions.edit_units %></button>
-      	<div class="control-group">
-      		<div class="control-label text-center"><%= i18nUnit.actions.add_x_units %></div>
-      		<div class="controls input-append">
-      			<input id="x" type="number" size="2" maxlength="2" class="span1" value="1">
-      			<button id="add-x" class="btn btn-info"><%= i18nCommon.actions.go %></button>
-      		</div>
-      	</div>
-      	<button class="btn undo" disabled="disabled"><%= i18nCommon.actions.undo %></button>
-        <button class="save btn btn-primary"><%= i18nCommon.actions.save %></button>
       </div>
-      <ul class="inline pull-right">
-        <li><a class="btn" href="<%= baseUrl %>/add/lease">
-          <i class="icon-plus"></i> <%= i18nProperty.menu.add_lease %>
-        </a></li>
-      </ul>
+    </div> -->
+    <div class="well well-small form-inline form-condensed pull-right">
+      <button id="units-edit" class="btn"><%= i18nUnit.actions.edit_units %></button>
+    	<div class="control-group">
+    		<div class="control-label text-center"><%= i18nUnit.actions.add_x_units %></div>
+    		<div class="controls input-append">
+    			<input id="x" type="number" size="2" maxlength="2" class="span1" value="1">
+    			<button id="add-x" class="btn btn-info"><%= i18nCommon.actions.go %></button>
+    		</div>
+    	</div>
+    	<button class="btn undo" disabled="disabled"><%= i18nCommon.actions.undo %></button>
+      <button class="save btn btn-primary"><%= i18nCommon.actions.save %></button>
     </div>
+    <ul class="inline pull-right">
+      <li><a class="btn" href="<%= baseUrl %>/add/lease">
+        <i class="icon-plus"></i> <%= i18nProperty.menu.add_lease %>
+      </a></li>
+    </ul>
   </header>
 
   <table id="units-table" class="table table-condensed form-condensed">

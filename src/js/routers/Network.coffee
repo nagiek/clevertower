@@ -14,6 +14,9 @@ define [
       "properties/:id"              : "propertiesManage"
       "properties/:id/*splat"       : "propertiesManage"
       "properties/:id/*splat"       : "propertiesManage"
+      "listings/new"                : "listingsNew"
+      "leases/new"                  : "leasesNew"
+      "tenants/new"                 : "tenantsNew"
       "network/*splat"              : "networkManage"
       "users/:id"                   : "profileShow"
       "users/:id/*splat"            : "profileShow"
@@ -139,6 +142,33 @@ define [
             error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
         else
           view.changeSubView(vars.path, vars.params)
+
+    # New
+    # --------------
+    
+    listingsNew: =>
+      view = @view
+      require ["views/listing/new"], (NewListingView) =>
+        if !view or view !instanceof NewListingView
+          @view = new NewListingView(forNetwork: true, baseUrl: "/network/listings")
+          @view.setElement "#main"
+          @view.render()
+
+    leasesNew: =>
+      view = @view
+      require ["views/lease/new"], (NewLeaseView) =>
+        if !view or view !instanceof NewLeaseView
+          @view = new NewLeaseView(forNetwork: true, baseUrl: "/network/tenants")
+          @view.setElement "#main"
+          @view.render()
+
+    tenantsNew: =>
+      view = @view
+      require ["views/tenant/new"], (NewTenantView) =>
+        if !view or view !instanceof NewTenantView
+          @view = new NewTenantView(forNetwork: true, baseUrl: "/network/tenants")
+          @view.setElement "#main"
+          @view.render()
 
     # Network
     # --------------

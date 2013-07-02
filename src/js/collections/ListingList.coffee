@@ -20,7 +20,7 @@ define [
       else if attrs.unit
         @unit = attrs.unit
         @query.equalTo "unit", @unit
-      else 
+      else if attrs.network
         @network = attrs.network
         @query.equalTo "network", @network
       

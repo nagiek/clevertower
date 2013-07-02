@@ -53,6 +53,10 @@ define
       self:                     "You haven't done anything yet!"
       index:                    "Nothing's happened so far."
       other:         (name) -> "#{_.escape(name)} has no activity."
+    likes:
+      self:                     "You haven't liked anything yet!"
+      index:                    "Nothing's been liked so far."
+      other:         (name) -> "#{_.escape(name)} has no likes."
   form:                         
     share: [
       [ # status:

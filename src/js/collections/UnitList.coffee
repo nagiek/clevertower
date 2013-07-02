@@ -12,20 +12,15 @@ define [
     model: Unit
     
     initialize: (models, attrs) ->
-      @property = attrs.property
-      # today = new Date
-      # innerQuery = new Parse.Query(Lease)
-      # innerQuery.equalTo "property", @property
-      # innerQuery.lessThan "start_date", today
-      # innerQuery.greaterThan "end_date", today
       
-      @query = new Parse.Query(Unit)
-      .equalTo("property", @property)
-      .include("activeLease")
+      @query = new Parse.Query(Unit).include("activeLease")
 
-
-    url:  ->
-      "/properties/#{@property.get "id"}/units"
+      if attrs.property
+        @property = attrs.property
+        @query.equalTo "property", @property
+      else if attrs.network
+        @network = attrs.network
+        @query.equalTo "network", @network
       
     comparator: (unit) ->
       title = unit.get "title"
@@ -35,13 +30,13 @@ define [
         Number(title.substr 0, title.length - 1) + char.charCodeAt()/128
       else
         Number title
-        
-    prepopulate: =>
-      if @length is 0 then unit = new Unit property: @property 
+    
+    # We may not have a @property, so be specific.
+    prepopulate: (property) =>
+      if @length is 0 then unit = new Unit property: property 
       else 
         unit = @at(@length - 1).clone()
 
-        unit.set "has_lease", false
         unit.unset "activeLease"
         
         title = unit.get 'title'

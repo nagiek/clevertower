@@ -26,7 +26,6 @@ define [
     
     events:
       'submit form'                 : 'save'
-
       'click .starting-this-month'  : 'setThisMonth'
       'click .starting-next-month'  : 'setNextMonth'
       'click .july-to-june'         : 'setJulyJune'
@@ -37,7 +36,11 @@ define [
     initialize : (attrs) ->
 
       @property = attrs.property
+
+      # unitId = prepopulated choice for managers
+      # unit = tenant's one and only unit.
       @unit = attrs.unit
+      @unitId = attrs.unitId
       @baseUrl = attrs.baseUrl
       @forNetwork = attrs.forNetwork
       
@@ -71,22 +74,20 @@ define [
             @$('.date-group').addClass('error')
       
       @on "save:success", (model) =>
-        console.log model
 
         new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
-        @model.id = model.id
 
         # Add the tenants to the network
         user = Parse.User.current() 
         network = user.get("network") if user
         if user and network
-          @property.listings.add @model
+          if @property then @property.listings.add @model else Parse.User.current().get("network").listings.add @model
           new Parse.Query("Tenant").equalTo("listing", @model).include("profile").find()
           .then (objs) -> network.tenants.add objs
         
         require ["views/listing/Show"], (ShowListingView) =>
           # Alert the user and move on
-          new ShowListingView(model: @model, property: @property).render()
+          new ShowListingView(model: model, property: model.get("property")).render()
           Parse.history.navigate "#{@baseUrl}/listings/#{model.id}"
           @clear()
                 
@@ -94,9 +95,14 @@ define [
       
       # @unit = @model.get("unit")
       unless @unit
-        @property.prep("units")
-        @listenTo @property.units, "add", @addOne
-        @listenTo @property.units, "reset", @addAll
+        if @property
+          @property.prep("units")
+          @listenTo @property.units, "add", @addOne
+          @listenTo @property.units, "reset", @addAll
+        else 
+          Parse.User.current().get("network").prep("units")
+          @listenTo Parse.User.current().get("network").units, "add", @addOne
+          @listenTo Parse.User.current().get("network").units, "reset", @addAll
               
       @current = new Date().setDate(1)
       @dates =
@@ -127,25 +133,38 @@ define [
       @$endDate = @$('.end-date')
       $('.datepicker').datepicker()
       
-      if @unit        
+      if @unit
         @addOne @unit
       else
-        if @property.units.length is 0 then @property.units.fetch() else @addAll()
+        if @property
+          if @property.units.where(property: @property).length is 0 then @property.units.fetch() else @addAll()
+        else
+          if Parse.User.current().get("network").units.length is 0 then Parse.User.current().get("network").units.fetch() else @addAll()
       @
 
     addOne : (u) =>
-      HTML = "<option value='#{u.id}'" + (if @model.get("unit") and @model.get("unit").id == u.id then "selected='selected'" else "") + ">#{u.get('title')}</option>"
+      selected = if @unitId and @unitId is u.id then " selected='selected'"
+      else if @model.get("unit") and @model.get("unit").id is u.id then " selected='selected'"
+      else ""
+      HTML = "<option value='#{u.id}'" + selected + ">#{u.get('title')}</option>"
       @$unitSelect.append HTML
       # @$unitSelect.children(':last').before HTML
 
     addAll : =>
-      if @$unitSelect.children().length > 2
-        @$unitSelect.html """
-          <option value=''>#{i18nCommon.form.select.select_value}</option>
-          <option value='-1'>#{i18nUnit.constants.new_unit}</option>
-        """
+      @$unitSelect.html "<option value=''>#{i18nCommon.form.select.select_value}</option>" # if @$unitSelect.children().length > 2
 
-      @property.units.each @addOne
+      if @property
+        _.each @property.units.where(property: @property), @addOne
+        @$unitSelect.append "<option class='new-unit-option' value='-1'>#{i18nUnit.constants.new_unit}</option>"
+      else
+        # Group by property.
+        properties = Parse.User.current().get("network").units.groupBy (u) -> u.get("property").id
+        _.each properties, (set, property) =>
+          @$unitSelect.append "<optgroup label='#{Parse.User.current().get("network").properties.get(property).get('title')}'>"
+          _.each set, @addOne
+          @$unitSelect.append "<option class='new-unit-option' value='#{property}'>#{i18nUnit.constants.new_unit}</option>"
+          @$unitSelect.append "</optgroup>"
+      
 
     save : (e) =>
       e.preventDefault() if e
@@ -166,11 +185,19 @@ define [
 
       # Set unit
       if data.unit and data.unit.id isnt ""
-        if data.unit.id is "-1"
-          unit = new Unit data.unit.attributes
-          unit.set "property", @property
+        if @property
+          if data.unit.id is "-1"
+            unit = new Unit data.unit.attributes
+            unit.set "property", @property
+          else 
+            unit = @property.units.get data.unit.id
         else 
-          unit = @property.units.get data.unit.id
+          property = Parse.User.current().get("network").properties.get(data.unit.id)
+          if property
+            unit = new Unit data.unit.attributes
+            unit.set "property", property
+          else 
+            unit = Parse.User.current().get("network").units.get data.unit.id
         attrs.unit = unit
 
       @model.save attrs,
@@ -179,9 +206,10 @@ define [
         error: (model, error) => 
           @model.trigger "invalid", error
         
-
     showUnitIfNew : (e) =>
-      if e.target.value is "-1" then @$('.new-unit').removeClass 'hide' else @$('.new-unit').addClass 'hide'
+      className = @$("option:selected", this)[0].className
+      # Use show() and hide(), because default input->display:inline-block overrides 'hide' class
+      if className is "new-unit-option" then @$('.new-unit').show() else @$('.new-unit').hide()
 
     # adjustEndDate : ->
     #   console.log e

@@ -9,6 +9,7 @@
       posted: "Posted"
     },
     classes: {
+      Activity: "Activity",
       Profile: "Profile",
       lease: "lease",
       Lease: "Lease",
@@ -28,7 +29,6 @@
       notifications: "Notifications",
       Applicants: "Applicants",
       Inquiries: "Inquiries",
-      listings: "listings",
       Listing: "Listing",
       Listings: "Listings",
       photo: "Photo",

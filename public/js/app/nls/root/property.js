@@ -84,6 +84,7 @@
       private_network: "Maybe the network is set to private?"
     },
     tenant_empty: {
+      activity: "This property has not had any activity.",
       photos: "This property has not added any photos.",
       listings: "There are no advertised vacancies in the property."
     },

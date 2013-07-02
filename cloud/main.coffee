@@ -738,33 +738,38 @@ Parse.Cloud.beforeSave "Unit", (req, res) ->
   return res.error 'no_property' unless req.object.get "property"
   return res.error 'no_title' unless req.object.get "title"
   
-  unless req.object.existed()
-    # if req.object.get("property")
-    (new Parse.Query "Property").get req.object.get("property").id,
-    success: (property) -> 
+  return res.success() if req.object.existed()
 
-      # Base the ACL off the property ACL. 
-      # Do not use the network as it may not exist.
-      propertyACL = property.getACL()
+  # Gain access to the network.
+  Parse.Cloud.useMasterKey()
 
-      propertyACL.setPublicReadAccess false
+  # if req.object.get("property")
+  (new Parse.Query "Property").get req.object.get("property").id,
+  success: (property) -> 
 
-      # Add write access to the unit for the user if the user is
-      # adding it to the property, and he is not part of the network.
-      # 
-      # This could be better and check the role, but... yeah...
-      unless property.get("network") and property.get("network") is req.user.get("network")
-        propertyACL.setReadAccess req.user.id, true
-        propertyACL.setWriteAccess req.user.id, true
+    # Base the ACL off the property ACL. 
+    # Do not use the network as it may not exist.
+    propertyACL = property.getACL()
 
-      req.object.set
-        user: req.user
-        property: property
-        ACL: propertyACL
-      res.success()
-    error: -> res.error "bad_query"
-    # else res.success()
-  else res.success()
+    propertyACL.setPublicReadAccess false
+
+    # Add write access to the unit for the user if the user is
+    # adding it to the property, and he is not part of the network.
+    # 
+    # This could be better and check the role, but... yeah...
+    # 
+    # ACL will get extra permissions if there is an activeLease.
+    unless property.get("network") and property.get("network") is req.user.get("network")
+      propertyACL.setReadAccess req.user.id, true
+      propertyACL.setWriteAccess req.user.id, true
+
+    req.object.set
+      user: req.user
+      property: property
+      network: property.get "network"
+      ACL: propertyACL
+    res.success()
+  error: -> res.error "bad_query"
 
 
 # Inquiry validation

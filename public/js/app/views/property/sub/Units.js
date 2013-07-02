@@ -43,10 +43,6 @@
         this.listenTo(this.model.units, "invalid", function(error) {
           var msg;
 
-          switch (error.message) {
-            case 'title_missing':
-              _this.$('.title-group .control-group').addClass('error');
-          }
           msg = (typeof error.code === "function" ? error.code(i18nCommon.errors[error.message]) : void 0) ? void 0 : i18nUnit.errors[error.message];
           return new Alert({
             event: 'unit-invalid',
@@ -77,7 +73,6 @@
         this.$undo = this.$actions.find('.undo');
         if (this.model.units.length === 0) {
           this.model.units.fetch();
-          this.switchToEdit();
         } else {
           this.addAll();
         }
@@ -110,12 +105,13 @@
       };
 
       PropertyUnitsView.prototype.addAll = function(collection, filter) {
-        this.$list = this.$("#units-table tbody");
+        this.$list = this.$("#units-table > tbody");
         this.$list.html('');
         if (this.model.units.length > 0) {
           return this.model.units.each(this.addOne);
         } else {
-          return this.$list.html('<tr class="empty"><td colspan="8">' + i18nProperty.empty.units + '</td></tr>');
+          this.model.units.prepopulate(this.model);
+          return this.switchToEdit();
         }
       };
 
@@ -125,8 +121,7 @@
         this.$list.find('tr.empty').remove();
         view = new UnitView({
           model: unit,
-          baseUrl: this.baseUrl,
-          isMgr: this.isMgr
+          view: this
         });
         this.$list.append(view.render().el);
         if (this.editing) {
@@ -144,7 +139,7 @@
           x = 1;
         }
         while (!(x <= 0)) {
-          this.model.units.prepopulate();
+          this.model.units.prepopulate(this.model);
           x--;
         }
         this.$undo.removeProp('disabled');
@@ -188,7 +183,8 @@
             return _this.model.units.trigger("save:success");
           },
           error: function(error) {
-            return _this.model.units.trigger("invalid", unit, error);
+            console.log(error);
+            return _this.model.units.trigger("invalid", error);
           }
         });
       };

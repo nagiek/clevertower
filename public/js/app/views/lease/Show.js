@@ -21,9 +21,19 @@
       ShowLeaseView.prototype.initialize = function(attrs) {
         this.property = attrs.property;
         this.baseUrl = attrs.baseUrl;
+        this.listenTo(this.property.units, "reset", this.updateTitle);
         this.model.prep('tenants');
         this.listenTo(this.model.tenants, "add", this.addOne);
         return this.listenTo(this.model.tenants, "reset", this.addAll);
+      };
+
+      ShowLeaseView.prototype.updateTitle = function() {
+        var unit;
+
+        unit = this.property.units.get(this.model.get("unit").id);
+        if (unit) {
+          return this.$("#unit-title").html(unit.get("title"));
+        }
       };
 
       ShowLeaseView.prototype.render = function() {
@@ -31,8 +41,7 @@
 
         isMgr = Parse.User.current().get("network") && Parse.User.current().get("network").id === this.model.get("network").id;
         vars = _.merge(this.model.toJSON(), {
-          unitId: this.model.get("unit").id,
-          title: this.model.get("unit").get("title"),
+          title: this.property.units.get(this.model.get("unit").id).get("title"),
           tenants: false,
           isMgr: isMgr,
           start_date: moment(this.model.get("start_date")).format("LL"),

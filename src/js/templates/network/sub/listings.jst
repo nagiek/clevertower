@@ -1,5 +1,11 @@
-<header>
-  <h2><%= i18nCommon.classes.Listings %></h2>
+<header class="clearfix">
+  <h2 class="pull-left tablet-left"><%= i18nCommon.classes.Listings %></h2>
+  <ul class="unstyled inline pull-right tablet-right">
+    <li><a href="/listings/new" id="new-listing-link" class="btn">
+      <i class="icon icon-plus"></i>
+      <%= i18nListing.actions.add_listing %>
+    </a></li>
+  </ul>
 </header>
 
 <table id="listings-table" class="table form-condensed">

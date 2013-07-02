@@ -249,10 +249,13 @@
       userPromise = (new Parse.Query("_User")).include('lease').include('unit').include('profile').include('property.role').include('property.mgrRole').include('network.role').equalTo("objectId", this.id).first();
       this.notifications = new NotificationList;
       return Parse.Promise.when(userPromise, this.notifications.query.find()).then(function(user, notifs) {
-        var network;
+        var network, profile;
 
         _this.notifications.add(notifs);
-        _this.set("profile", user.get("profile"));
+        profile = user.get("profile");
+        profile.likes = new ActivityList([], {});
+        profile.likes.query = profile.relation("likes").query();
+        _this.set("profile", profile);
         _this.set("lease", user.get("lease"));
         if (user.get("unit")) {
           _this.set("unit", new Unit(user.get("unit").attributes));
@@ -269,6 +272,8 @@
         _this = this;
 
       network.prep("properties").fetch();
+      network.prep("units").fetch();
+      network.prep("activity").fetch();
       network.prep("managers").fetch();
       network.prep("tenants").fetch();
       network.prep("listings").fetch();

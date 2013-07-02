@@ -27,6 +27,8 @@ define [
       phone               : ""
       # Privacy
       privacy_building    : true
+      # Arrays
+      likes               : true
 
     # Backbone default, as Parse function does not exist.
     url: -> "/users/#{@id}"
