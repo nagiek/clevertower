@@ -26,6 +26,7 @@
         "manage/*splat": "propertiesManage",
         "network/new": "networkNew",
         "network/:name": "networkShow",
+        "search": "search",
         "search/*splat": "search",
         "users/:id": "profileShow",
         "users/:id/*splat": "profileShow",
@@ -57,14 +58,10 @@
         });
         this.listenTo(Parse.history, "route", function(route) {
           $('#search-menu input.search').val("").blur();
-          _this.oldConstructor;
           if (_this.view) {
             if (_this.oldConstructor !== _this.view.constructor) {
               _this.oldConstructor = _this.view.constructor;
-              _this.view.trigger("view:change");
-              _this.view.undelegateEvents();
-              _this.view.stopListening();
-              return delete _this.view;
+              return _this.view.trigger("view:change");
             }
           }
         });
@@ -110,7 +107,7 @@
             return _this.view = new ActivityIndexView({
               location: vars.path,
               params: vars.params
-            });
+            }).render();
           }
         });
       };

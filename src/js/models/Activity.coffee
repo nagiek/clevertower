@@ -13,7 +13,10 @@ define [
       body        : ""
       post_type   : "status"
 
-    GPoint : -> new google.maps.LatLng @get("center")._latitude, @get("center")._longitude
+    GPoint : -> 
+      center = @get "center"
+      return new google.maps.LatLng 0,0 unless center
+      new google.maps.LatLng center._latitude, center._longitude
 
     # Index of model in its collection.
     pos : -> @collection.indexOf(@)

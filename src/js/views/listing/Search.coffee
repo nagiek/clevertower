@@ -17,8 +17,23 @@ define [
 
       @view = attrs.view
       @on "model:viewDetails", @clear
+      @display = 'small'
       @min = 0
       @max = 6000
+
+    events:
+      'click #displays > button'        : 'changeDisplay'
+
+    changeDisplay: (e) =>
+      e.preventDefault()
+      display = e.currentTarget.attributes["data-display"].value
+
+      return if display is @display
+      @view.$("ul.thumbnails").removeClass(@display).addClass(display)
+      @display = display
+
+      @view.trigger "view:refresh", @display
+      # @$list.masonry 'reload'
 
     render: ->
       vars = 

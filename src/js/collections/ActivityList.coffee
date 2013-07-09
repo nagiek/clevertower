@@ -11,7 +11,7 @@ define [
     model: Activity
 
     initialize: (models, attrs) ->
-      @query = new Parse.Query(Activity).descending("createdAt").include("profile")
+      @query = new Parse.Query(Activity).descending("createdAt").include("profile").limit(10)
 
       # Activity List is very personal to the user.
       if attrs.property then @query.equalTo("property", attrs.property)
@@ -23,3 +23,4 @@ define [
         .equalTo("public", true)
 
     setBounds: (sw, ne) -> @query.withinGeoBox('center', sw, ne)
+    countByProperty: -> @countBy (a) -> a.get("property").id

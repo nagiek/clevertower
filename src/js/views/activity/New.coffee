@@ -50,42 +50,7 @@ define [
         public: true
         isEvent: false
 
-      @listenTo @model, 'invalid', @handleError
-
-      @listenTo Parse.User.current(), "change:property change:network", @handlePossiblePropertyAdd
-      if Parse.User.current().get("network")
-        @listenTo Parse.User.current().get("network").properties, "add", @handlePropertyAdd
-
-      @listenTo @model, "change:image", @renderImage
-
-      @listenTo @model, "change:property", =>
-        if @model.get "property"
-          @$("#activity-profile-pic").prop "src", @model.get("property").cover("tiny") unless @model.get "profile"
-          @marker.setVisible false
-          @$('#property-options').removeClass 'hide'
-          @pMarker = @model.get("property").marker
-          @pMarker.setZIndex 100
-          @view.map.setOptions
-            draggable: false
-            center: @model.get("property").GPoint()
-            zoom: 14
-        else
-          @marker.setVisible true
-          @pMarker.setZIndex 1
-          @$('#property-options').addClass 'hide'
-          @view.map.setOptions
-            draggable: true
-
-      @listenTo @model, "change:profile", =>
-        if @model.get("property") and not @model.get("profile")
-          # Property profile pic
-          @$("#activity-profile-pic").prop "src", @model.get("property").cover("tiny")
-        else
-          # User profile pic
-          @$("#activity-profile-pic").prop "src", Parse.User.current().get("profile").cover("tiny")
-
-      @listenTo @view, "dragend", @updateCenter
-      @updateCenter()
+      @dragListener = google.maps.event.addListener @view.map, 'dragend', @updateCenter
 
     handleError: (error) =>
       @$('.error').removeClass('error')
@@ -137,7 +102,6 @@ define [
         @$('#add-time').addClass 'active'
         @model.set "isEvent", true
         @showActivityForm()
-        @trigger "view:resize"
       else 
         @$("#event-options").addClass "hide"
         @model.unset "start_date"
@@ -170,6 +134,7 @@ define [
         # Post publicly
         @$("#post-public").prop "checked", false 
         @model.set "public", true
+      @trigger "view:resize"
 
     setProperty : =>
       p = @$('#property-options select :selected').val()
@@ -189,7 +154,46 @@ define [
       index = @$("#activity-type :checked").parent().index()
       return if index then index else 0
 
+    undelegateEvents: ->
+      google.maps.event.removeListener @dragListener
+      super
+
     render: =>
+
+      # Model may change, so have to re-establish listeners on render.
+      @listenTo @model, 'invalid', @handleError
+
+      @listenTo Parse.User.current(), "change:property change:network", @handlePossiblePropertyAdd
+      if Parse.User.current().get("network")
+        @listenTo Parse.User.current().get("network").properties, "add", @handlePropertyAdd
+
+      @listenTo @model, "change:image", @renderImage
+
+      @listenTo @model, "change:property", =>
+        if @model.get "property"
+          @$("#activity-profile-pic").prop "src", @model.get("property").cover("tiny") unless @model.get "profile"
+          @marker.setVisible false
+          @$('#property-options').removeClass 'hide'
+          # @model.get("property").marker.setZIndex 100
+          @view.map.setOptions
+            draggable: false
+            center: @model.get("property").GPoint()
+            zoom: 14
+        else
+          @marker.setVisible true
+          @$('#property-options').addClass 'hide'
+          @view.map.setOptions
+            draggable: true
+
+      @listenTo @model, "change:profile", =>
+        if @model.get("property") and not @model.get("profile")
+          # Property profile pic
+          @$("#activity-profile-pic").prop "src", @model.get("property").cover("tiny")
+        else
+          # User profile pic
+          @$("#activity-profile-pic").prop "src", Parse.User.current().get("profile").cover("tiny")
+
+      @updateCenter()
 
       @marker = new google.maps.Marker
         position:   @view.map.getCenter()
@@ -297,13 +301,13 @@ define [
 
           # that._transition(
           $(this).find(".fileupload-progress").addClass('hide')
-          # )
-          .done ->
-            $(this).find(".progress").attr("aria-valuenow", "0").find(".bar").css "width", "0%"
-            $(this).find(".progress-extended").html "&nbsp;"
-            deferred.resolve()
-            $(this).find(".fileupload-progress")
+          # ).done ->
+          $(this).find(".progress").attr("aria-valuenow", "0").find(".bar").css "width", "0%"
+          $(this).find(".progress-extended").html "&nbsp;"
+          deferred.resolve()
+          $(this).find(".fileupload-progress")
           that._trigger "photo:remove", e
+      @
 
     populatePropertySelectFromNetwork : ->
       if Parse.User.current().get("network").properties.length > 0
@@ -401,27 +405,26 @@ define [
           return @model.trigger "invalid", error: message: i18nCommon.errors.no_end_date unless data.end_date
           attrs.endDate = new Date("#{data.end_date} #{data.end_time}") if data.end_date
 
-      @model.save attrs,
-        success: (model) => 
-          # Add to appropriate collection
-          if @model.get("property")
-            Parse.User.current().activity.add @model
-          else Parse.App.activity.add @model
+      @model.save(attrs).then (model) => 
+        # Add to appropriate collection
+        if @model.get("property")
+          Parse.User.current().activity.add @model, silent: true
+        else Parse.App.activity.add @model, silent: true
 
-          @view.refreshDisplay()
+        @trigger "model:save", @model
 
-          # Reset
-          @model = new Activity
-            activity_type: "new_post"
-            profile: Parse.User.current().get("profile")
-            public: true
-            isEvent: false
+        # Reset
+        @model = new Activity
+          activity_type: "new_post"
+          profile: Parse.User.current().get("profile")
+          public: true
+          isEvent: false
 
-          @listenTo @model, 'invalid', @handleError
-          @marker.setMap null
-          @shown = false
-          @render()
-        error: (model, error) => console.log error
+        @listenTo @model, 'invalid', @handleError
+        @marker.setMap null
+        @shown = false
+        @render()
+      , (model, error) => console.log error
 
     # attachPhoto: ->
 

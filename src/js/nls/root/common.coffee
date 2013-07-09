@@ -124,6 +124,7 @@ define
       ignore: (network) -> "You have ignored <strong>#{_.escape(network)}</strong>'s request."
   activity:
     building:             "Post to your building"
+    exhausted:            "There are no more items to display"
   status:
     ok:                   "OK"
     unsaved:              "Unsaved"

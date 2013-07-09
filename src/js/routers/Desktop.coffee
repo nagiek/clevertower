@@ -15,6 +15,7 @@ define [
       "manage/*splat"               : "propertiesManage"
       "network/new"                 : "networkNew"
       "network/:name"               : "networkShow"
+      "search"                      : "search"
       "search/*splat"               : "search"
       "users/:id"                   : "profileShow"
       "users/:id/*splat"            : "profileShow"
@@ -56,15 +57,14 @@ define [
       @listenTo Parse.history, "route", (route) =>
 
         $('#search-menu input.search').val("").blur()
-        @oldConstructor
 
         if @view 
           if @oldConstructor isnt @view.constructor
             @oldConstructor = @view.constructor
             @view.trigger("view:change")
-            @view.undelegateEvents()
-            @view.stopListening()
-            delete @view
+            # @view.undelegateEvents()
+            # @view.stopListening()
+            # delete @view
   
       
       # Use delegation to avoid initial DOM selection and allow all matching elements to bubble
@@ -93,7 +93,7 @@ define [
       require ["views/activity/index"], (ActivityIndexView) =>
         if !view or view !instanceof ActivityIndexView
           vars = @deparamAction splat
-          @view = new ActivityIndexView(location: vars.path, params: vars.params)
+          @view = new ActivityIndexView(location: vars.path, params: vars.params).render()
 
     # Network
     # --------------

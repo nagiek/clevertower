@@ -65,10 +65,18 @@
         }
       },
       GPoint: function() {
-        var lat, lng;
+        var center, lat, lng, offset;
 
-        lat = this.get("center")._latitude + (this.get("offset").lat - 50) * 250 * 7.871 / 100000000;
-        lng = this.get("center")._longitude + (this.get("offset").lng - 50) / 10000000;
+        center = this.get("center");
+        if (!center) {
+          return new google.maps.LatLng(0, 0);
+        }
+        offset = this.get("offset" || {
+          lat: 50,
+          lng: 50
+        });
+        lat = center._latitude + (offset.lat - 50) * 250 * 7.871 / 100000000;
+        lng = center._longitude + (offset.lng - 50) * 250 * 7.871 / 100000000;
         return new google.maps.LatLng(lat, lng);
       },
       url: function() {

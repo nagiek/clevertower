@@ -22,69 +22,45 @@ define [
 
     events:
       'click #filters > button'         : 'changeType'
-      # 'change #redo-search'             : 'changeSearchPrefs'
-      'click #redo-search'              : 'redoSearch'
-      # 'click .pagination > ul > li > a' : 'changePage'
+      'click #displays > button'        : 'changeDisplay'
+      'change #redo-search'             : 'changeSearchPrefs'
+      'click .pagination > ul > li > a' : 'changePage'
       'click .thumbnails a.content'     : 'showModal'
-      "mouseover .thumbnails .activity" : "highlightMarkerFromCard"
-      "mouseout .thumbnails .activity"  : "unhighlightMarkerFromCard"
       'hide #view-content-modal'        : 'hideModal'
       'click .modal .caption a'         : 'closeModal'
       'click .modal .left'              : 'prevModal'
       'click .modal .right'             : 'nextModal'
-      "click .like-button"              : "likeOrLogin"
     
-    initialize : (attrs) =>
+    initialize : (attrs) ->
 
       @location = attrs.location || ""
       @locationAppend = if attrs.params.lat and attrs.params.lng then "?lat=#{attrs.params.lat}&lng=#{attrs.params.lng}" else ''
       @page = attrs.params.page || 1
       @center = new google.maps.LatLng attrs.params.lat, attrs.params.lng if attrs.params.lat and attrs.params.lng
-      @updateScheduled = false
-      @moreToDisplay = true
+      @display = 'small'
 
       # Give the user the chance to contribute
       @listenTo Parse.Dispatcher, "user:login", => 
-        # Check for likes.
-        @listenTo Parse.User.current().get("profile").likes, "reset", @checkIfLiked
         # Get the activity in the user properties.
-        if @listenTo Parse.User.current().get("network") and Parse.User.current().get("network").properties.length is 0
-          @listenToOnce Parse.User.current().get("network").properties, "reset", @getUserActivity
-        else @getUserActivity()
+        @getUserActivity()
         # Get the user's personal likes.
         Parse.User.current().get("profile").likes.fetch()
         # Post view
         @newPostView = new NewActivityView(view: @).render()
         @listenTo @newPostView, "view:resize", @bindMapPosition
-        @listenTo @newPostView, "model:save", @prependNewPost
-
-      @listenTo Parse.Dispatcher, "user:logout", => 
-        _.each @listViews, (lv) -> 
-          _.each lv.pages, (page) ->
-            _.each page.item, (item) ->
-              if item.$el.data("collection") is "user"
-                item.marker.setMap null
-                google.maps.event.removeListener item.clickListener
-                google.maps.event.removeListener item.highlightListener
-                google.maps.event.removeListener item.unhighlightListener
-                item.remove()
-
 
       @listenTo Parse.App.search, "google:search", (data) =>
         @location = data.location
         @placesService.getDetails reference: data.reference, @googleSearch
 
       @on "model:view", @showModal
-      # @on "dragend", @handleMapMove
+      @on "dragend", @checkIfShouldSearch
       @on "view:change", @clear
-
-      @on "view:exhausted", ->        
-        @moreToDisplay = false
-        @$loading.html i18nCommon.activity.exhausted
 
       # Create a timer to buffer window re-draws.
       @time = null
 
+      @redoSearch = true
       @mapId = "mapCanvas"
 
       @resultsPerPage = 20
@@ -98,15 +74,12 @@ define [
         Parse.App.activity = new ActivityList([], {})
         Parse.App.activity.query
         .include("property")
-        .containedIn("activity_type", ["new_property", "new_listing", "new_post"])
+        .containedIn("activity_type", ["new_photo", "new_listing", "new_post"])
 
       @listenTo Parse.App.activity, "reset", @addAll
       @listenTo Parse.App.activity, "add", @addOne
 
       if Parse.User.current()
-        # Check for likes.
-        @listenTo Parse.User.current().get("profile").likes, "reset", @checkIfLiked
-
         # Get the activity in the user properties.
         @getUserActivity()
 
@@ -114,26 +87,13 @@ define [
         if Parse.User.current().get("profile").likes.length is 0
           Parse.User.current().get("profile").likes.fetch()
 
-    checkIfLiked: ->
-      Parse.User.current().get("profile").likes.each (l) =>
-        _.each @listViews, (lv) ->
-          activity = lv.find("#activity-#{l.id}")
-          if activity.length > 0
-            activity[0].data "liked", true
-            activity[0].find(".like-button").addClass "active"
-    
-    resetListViews: ->
-      # Clean up old stuff
-      _.each @listViews, (lv) -> lv.reset()
-      Parse.App.activity.reset()
-      @$list.find('> li.empty').remove()
+      @render()
 
-
-    # refreshDisplay : ->
-    #   Parse.App.activity.each (a) -> a.trigger "refresh"
-    #   if Parse.User.current() and Parse.User.current().activity
-    #     Parse.User.current().activity.each (a) -> a.trigger "refresh" 
-    #   # @$list.masonry 'reload'
+    refreshDisplay : ->
+      Parse.App.activity.each (a) -> a.trigger "refresh"
+      if Parse.User.current() and Parse.User.current().activity
+        Parse.User.current().activity.each (a) -> a.trigger "refresh" 
+      # @$list.masonry 'reload'
 
     changeType: (e) ->
       e.preventDefault()
@@ -142,30 +102,73 @@ define [
       filter = btn.data "filter"
       return if filter is @filter
       @filter = filter
-      @specificSearchControls.clear() if @specificSearchControls
-
       if @filter
 
+        @specificSearchControls.clear() if @specificSearchControls
         # "Specific" filter
         Parse.App.activity.query.containedIn "activity_type", [@filter]
-        Parse.User.current().activity.query.containedIn "activity_type", [@filter] if Parse.User.current()
 
         switch @filter
           when "new_listing" then @specificSearchControls = new ListingSearchView(view: @).render()
 
+        # Groom the incoming data.
+        Parse.App.activity.remove Parse.App.activity.select((m) => @filter isnt m.get("activity_type"))
+
+        appQuery = Parse.App.activity.query
+        .notContainedIn("objectId", Parse.App.activity.map((l) -> l.id))
+        .find()
+
+        # Remove the User activity, which is still showing.
+        # handleUserActivity() will not do it, as it only removes activity not shown on the map.
+        if Parse.User.current()
+
+          userActivityToRemove = Parse.User.current().activity.select((a) => a.get("activity_type") isnt @filter)
+          userActivityToRemove = userActivityToRemove.concat Parse.User.current().activity.select(@specificSearchControls.filter) if @specificSearchControls 
+          if userActivityToRemove.length > 0
+            _.each userActivityToRemove, (a) => a.trigger('remove') 
+          @handleUserActivity() 
+
+          userQuery = Parse.User.current().activity.query
+          .notContainedIn("objectId", Parse.User.current().activity.map((l) -> l.id))
+          .find() 
+        else 
+          userQuery = undefined
+
+        Parse.Promise.when(appQuery, userQuery)
+        .then (objs, userObjs) =>
+          Parse.App.activity.add objs if objs
+          Parse.User.current().activity.add userObjs if Parse.User.current() and userObjs
+          @refreshDisplay()
+
+      else
+        # "All" filter
+        # Total reset
+
+        if Parse.User.current()
+          # Don't actually reset the collection, but fire the event to clear all the views.
+          Parse.User.current().activity.trigger "reset"
+          @handleUserActivity()
+
+        Parse.App.activity.query.containedIn "activity_type", ["new_photo", "new_listing", "new_post"]
+        Parse.App.activity.fetch()
+
+    changeDisplay: (e) =>
+      e.preventDefault()
+      display = e.currentTarget.attributes["data-display"].value
+
+      return if display is @display
+      @$("ul.thumbnails").removeClass(@display).addClass(display)
+      @display = display
+
+      @trigger "view:changeDisplay", @display
+      # @$list.masonry 'reload'
+
+    changeSearchPrefs : (e) =>
+      if @redoSearch
+        @redoSearch = false
       else 
-        Parse.App.activity.query.containedIn "activity_type", ["new_listing", "new_post", "new_property"]
-        Parse.User.current().activity.query.containedIn "activity_type", ["new_listing", "new_post", "new_property"] if Parse.User.current()
-
-      @resetListViews()
-      @search()
-
-    # changeSearchPrefs : (e) =>
-    #   if @redoSearch
-    #     @redoSearch = false
-    #   else 
-    #     @redoSearch = true
-    #     @search()
+        @redoSearch = true
+        @search()
 
     getUserActivity : =>
       # Get the property from what we've already loaded.
@@ -219,80 +222,19 @@ define [
       @$('[rel=tooltip]').tooltip placement: 'bottom'
 
       @$list = @$(".content > .thumbnails")
-      if @$list.width() < 767 then @$list.html '<div class="list-view span8"></div>'
-      else @$list.html '<div class="list-view span4"></div><div class="list-view span4"></div>'
-      
       @listViews = []
-      @$listViews = @$list.find('.list-view')
-      @$listViews.each (i, el) => @listViews[i] = new infinity.ListView @$(el), 
-        lazy: ->
-          pageId = Number $(this).attr(infinity.PAGE_ID_ATTRIBUTE)
-          page = infinity.PageRegistry.lookup pageId
-          _.each page.items, (item, index) ->
-            return if item.loaded
-            item.$el.data "pageIndex", index
-            data = item.$el.data()
-            if data.image then item.$el.find(".photo img").prop 'src', data.image
-            if data.profile then item.$el.find(".caption img").prop 'src', data.profile
-            unless item.marker
-              originY = if data.collection is "user" then 25 else 0
-              item.marker = new google.maps.Marker
-                position: new google.maps.LatLng data.lat, data.lng
-                map: _this.map
-                ZIndex: 1
-                pageIndex: index
-                pageId: pageId
-                $ref: item.$el
-                highlightCard: _this.highlightCard
-                highlightMarker: _this.highlightMarker
-                unhighlightCard: _this.unhighlightCard
-                unhighlightMarker: _this.unhighlightMarker
-                animation: google.maps.Animation.DROP
-                icon: 
-                  url: "/img/icon/pins-sprite.png"
-                  size: new google.maps.Size(25, 32, "px", "px")
-                  origin: new google.maps.Point(originY, (data.index % 20) * 32)
-                  anchor: null
-                  scaledSize: null
-            
-            if data.collection is "external"
-              # Always add the listeners.
-              item.highlightListener = google.maps.event.addListener item.marker, "mouseover", _this.highlightCardFromMarker
-              item.unhighlightListener = google.maps.event.addListener item.marker, "mouseout", _this.unhighlightCardFromMarker
-
-            item.loaded = true
-
-        # Called when scrolling down on page stash.
-        stash: ->
-          page = infinity.PageRegistry.lookup $(this).attr(infinity.PAGE_ID_ATTRIBUTE)
-          _.each page.items, (item) ->
-            # item.marker.setAnimation null
-            if item.marker and item.$el.data("collection") is "external"
-              item.marker.setVisible false
-              google.maps.event.removeListener item.highlightListener
-              google.maps.event.removeListener item.unhighlightListener
-
-        # Called when scrolling up through pages.
-        add: ->
-          page = infinity.PageRegistry.lookup $(this).attr(infinity.PAGE_ID_ATTRIBUTE)
-          _.each page.items, (item) ->
-            if item.$el.data("collection") is "external"
-              item.marker.setAnimation google.maps.Animation.DROP
-              item.marker.setVisible true
-              # Always add the listeners.
-              item.highlightListener = google.maps.event.addListener item.marker, "mouseover", _this.highlightCardFromMarker
-              item.unhighlightListener = google.maps.event.addListener item.marker, "mouseout", _this.unhighlightCardFromMarker
-
-            
-
-          
+      if @$list.width > 767
+        @$list.html '<div class="list-view span8"></div>'
+      else 
+        @$list.html '<div class="list-view span4"></div><div class="list-view span4"></div>'
+      
+      @$listViews = @$list.find('list-view')
+      @$listViews.each (i) -> @listViews[i] = new infinity.ListView 
       # @$list.masonry
       #   selector : 'li'
       #   columnWidth: (containerWidth) -> containerWidth / 2
 
-      # @$pagination = @$(".content > .pagination ul")
-      @$loading = @$(".content > .loading")
-
+      @$pagination = @$(".content > .pagination .thumbnails")
       # Record our fixed block.
       @$block = @$('#map-container')
 
@@ -321,12 +263,9 @@ define [
       # Track scrolling & resizing for map
       $(window).resize @resize
       $(document.documentElement).resize @resize
-      $(window).scroll @mapTracker
-      $(document.documentElement).scroll @mapTracker
+      $(window).scroll @tracker
+      $(document.documentElement).scroll @tracker
 
-      # Track scrolling for infinity
-      $(window).scroll @loadTracker
-      $(document.documentElement).scroll @loadTracker
       @
 
     renderMap : =>
@@ -357,53 +296,33 @@ define [
 
         if Parse.User.current().get("property")
           Parse.User.current().get("property").marker = new google.maps.Marker
-            position:   Parse.User.current().get("property").GPoint()
-            map:        @map
-            ZIndex:     100
-            url:        Parse.User.current().get("property").publicUrl()
-            items:      []
-            highlightCard: @highlightCard
-            highlightMarker: @highlightMarker
-            unhighlightCard: @unhighlightCard
-            unhighlightMarker: @unhighlightMarker
+            position: Parse.User.current().get("property").GPoint()
+            map:      @map
+            ZIndex:   1
             icon: 
               url: "/img/icon/pins-sprite.png"
               size: new google.maps.Size(25, 32, "px", "px")
               origin: new google.maps.Point(50, 0)
               anchor: null
               scaledSize: null
-            Parse.User.current().get("property").highlightListener = google.maps.event.addListener Parse.User.current().get("property").marker, "mouseover", @highlightCardsFromPropertyMarker
-            Parse.User.current().get("property").unhighlightListener = google.maps.event.addListener Parse.User.current().get("property").marker, "mouseout", @unhhighlightCardsFromPropertyMarker
-            Parse.User.current().get("property").clickListener = google.maps.event.addListener Parse.User.current().get("property").marker, "click", @goToPropertyFromPropertyMarker
         else if Parse.User.current().get("network")
           Parse.User.current().get("network").properties.each (p) =>
             p.marker = new google.maps.Marker
-              position:   p.GPoint()
-              map:        @map
-              ZIndex:     100
-              url:        p.publicUrl()
-              items:      []
-              highlightCard: @highlightCard
-              highlightMarker: @highlightMarker
-              unhighlightCard: @unhighlightCard
-              unhighlightMarker: @unhighlightMarker
+              position: p.GPoint()
+              map:      @map
+              ZIndex:   1
               icon: 
                 url: "/img/icon/pins-sprite.png"
                 size: new google.maps.Size(25, 32, "px", "px")
                 origin: new google.maps.Point(50, p.pos() * 32)
                 anchor: null
                 scaledSize: null
-
-            p.highlightListener = google.maps.event.addListener p.marker, "mouseover", @highlightCardsFromPropertyMarker
-            p.unhighlightListener = google.maps.event.addListener p.marker, "mouseout", @unhighlightCardsFromPropertyMarker
-            p.clickListener = google.maps.event.addListener p.marker, "click", @goToPropertyFromPropertyMarker
                 
         @newPostView = new NewActivityView(view: @).render()
         @listenTo @newPostView, "view:resize", @bindMapPosition
-        @listenTo @newPostView, "model:save", @prependNewPost
 
-      # @dragListener = google.maps.event.addListener @map, 'dragend', => @trigger "dragend"
-      # @zoomListener = google.maps.event.addListener @map, 'zoom_changed', @checkIfShouldSearch
+      @dragListener = google.maps.event.addListener @map, 'dragend', => @trigger "dragend"
+      @zoomListener = google.maps.event.addListener @map, 'zoom_changed', @checkIfShouldSearch
 
       # Search once the map is ready.
       google.maps.event.addListenerOnce @map, 'idle', @performSearchWithinMap
@@ -432,46 +351,34 @@ define [
 
         @search()
 
-    redoSearch : =>
+    checkIfShouldSearch : =>
+      if @redoSearch
+        @chunk = 1
+        @page = 1
+        @search()
+  
+    search : =>
       center = @map.getCenter()
       @locationAppend = "?lat=#{center.lat()}&lng=#{center.lng()}"
       Parse.history.navigate "/search/#{@location}#{@locationAppend}"
+
       @performSearchWithinMap()
 
-    # Map-only handler
-    # handleMapMove : =>
-    #   if @redoSearch
-    #     center = @map.getCenter()
-    #     @locationAppend = "?lat=#{center.lat()}&lng=#{center.lng()}"
-    #     Parse.history.navigate "/search/#{@location}#{@locationAppend}"
-    #     @checkIfShouldSearch()
-
-    # Map and zoom handler
-    # checkIfShouldSearch : =>
-    #   if @redoSearch
-    #     @chunk = 1
-    #     @page = 1
-    #     # Reset map
-    #     Parse.App.activity.query.skip(0)
-    #     @performSearchWithinMap()    
-
     performSearchWithinMap: =>
-
-      @$loading.html "<img src='/img/misc/spinner.gif' class='spinner' alt='#{i18nCommon.verbs.loading}' />"
-
       bounds = @map.getBounds()
       @sw = new Parse.GeoPoint(bounds.getSouthWest().lat(), bounds.getSouthWest().lng())
       @ne = new Parse.GeoPoint(bounds.getNorthEast().lat(), bounds.getNorthEast().lng())
+
+      # Reset map
       Parse.App.activity.setBounds @sw, @ne
+      Parse.App.activity.query.skip(0)
 
-      @resetListViews()
-      @updatePaginiation()
-      @search()
+      @$list.find('> li.empty').remove()
+      # @$list.remove('> li.empty')
 
-    search : =>
-      @moreToDisplay = true
       @handleUserActivity() if Parse.User.current()
       @handleMapActivity()
+      @updatePaginiation()
 
     handleUserActivity : ->
       # Check if activity is visible or not.
@@ -483,62 +390,76 @@ define [
           if @withinBounds p.get("center") then @showPropertyActivity p else @hidePropertyActivity p
 
     handleMapActivity : ->
-      Parse.App.activity.query.skip(@resultsPerPage * (@page - 1)).limit(@resultsPerPage).find()
-      .then (objs) =>
-        if objs.length < @resultsPerPage then @trigger "view:exhausted"
-        if objs then Parse.App.activity.add objs
-        # @refreshDisplay()
 
-
-    # Adding from Collections
-    # -----------------------
-
-    prependNewPost: (a) =>
-      if a.get("property")
-        view = new ActivityView
-          model: a
-          # marker: a.get("property").marker
-          pos: a.get("property").pos()
-          view: @
-          linkedToProperty: true
-          liked: false
-        item = new infinity.ListItem view.render().$el
-        item.marker = a.get("property").marker
-        a.get("property").marker.items.push item
-        @listViews[@shortestColumnIndex()].prepend item
+      # Found Activity
+      if Parse.App.activity.length is 0
+        # Start from scratch
+        Parse.App.activity.query.limit(@resultsPerPage)
+        replaceQuery = Parse.App.activity.query
       else
-        view = new ActivityView
-          model: a
-          view: @
-          liked: false
-        @listViews[@shortestColumnIndex()].prepend view.render().$el
+        # Groom the incoming data.
+        activitiesToRemove = Parse.App.activity.select (a) =>
+          !@withinBounds(a.get("center")) or 
+          (@specificSearchControls and !@specificSearchControls.filter(a))
+
+        if activitiesToRemove.length > 0 or Parse.App.activity.length < @resultsPerPage
+          
+          # Find new things to replace
+          replaceQuery = Parse.App.activity.query
+          replaceQuery.notContainedIn("objectId", Parse.App.activity.map((l) -> l.id))
+
+          # Determine our limit
+          if activitiesToRemove.length > 0
+            Parse.App.activity.remove(activitiesToRemove) 
+            replaceQuery.limit(activitiesToRemove.length)
+          else
+            replaceQuery.limit(@resultsPerPage - Parse.App.activity.length)
+
+      replaceQuery.find()
+      .then (objs) =>
+        Parse.App.activity.add objs if objs
+        @refreshDisplay()
+          
 
     addOne: (a) =>
       view = new ActivityView
         model: a
         view: @
-        liked: Parse.User.current() and Parse.User.current().get("profile").likes.find (l) -> l.id is a.id
-      @listViews[@shortestColumnIndex()].append view.render().$el
-      # @$list.append view.render().el
+        active: Parse.User.current() and Parse.User.current().get("profile").likes.contains a
+      if a.createdAt is undefined then view.$el.addClass "fade in"
+      @listView.append view.render().$el
+      # @$list.prepend view.render().el
 
-    addOnePropertyActivity: (a) =>
+    row: ->
+      while index < length
+        colIndex = 0
+        while colIndex < length
+          $currCol = $(columns[colIndex])
+          unless $minCol
+            $minCol = $currCol
+          else
+            $minCol = (if $minCol.height() > $currCol.height() then $currCol else $minCol)
+          colIndex++
+        @listView.append pug()
+        
+
+
+    addOnePropertyActivity: (a) => 
       view = new ActivityView
         model: a
-        # marker: a.get("property").marker
+        marker: a.get("property").marker
         pos: a.get("property").pos()
         view: @
         linkedToProperty: true
-        liked: Parse.User.current() and Parse.User.current().get("profile").likes.contains a
-      # @listViews[@shortestColumnIndex()].append view.render().$el
-      item = new infinity.ListItem view.render().$el
-      item.marker = a.get("property").marker
-      a.get("property").marker.items.push item
-      @listViews[@shortestColumnIndex()].append item
-      # @$list.append view.render().el
+        active: Parse.User.current() and Parse.User.current().get("profile").likes.contains a
+      view.className += " fade in" unless a.createdAt
+      @listView.append view.render().$el
+      # @$list.prepend view.render().el
 
     # Add all items in the Properties collection at once.
     addAll: (collection, filter) =>
-      Parse.App.activity.each @addOne if Parse.App.activity.length > 0
+      if Parse.App.activity.length > 0
+        Parse.App.activity.each @addOne
     
     # Show activity where we have already loaded the property
     showPropertyActivity: (property) =>
@@ -564,33 +485,6 @@ define [
         .each (a) ->
           property.shown = false
           a.trigger('remove')
-
-    # Pagination
-    # ----------
-
-    # Find the shortest column.
-    # Returns the infinity.ListView
-    shortestColumnIndex: ->
-      return 0 if @listViews.length is 1
-      minIndex = 0
-      minHeight = 0
-      @$listViews.each (i, el) => 
-        $currCol = @$(el)
-        if i is 0 then minHeight = $currCol.height()
-        else if minHeight > $currCol.height() then minIndex = i; minHeight = $currCol.height()
-      return minIndex
-
-    endOfDocument: ->
-      viewportBottom = $(window).scrollTop() + $(window).height()
-      @$loading.offset().top <= viewportBottom
-
-    loadTracker: =>
-      if(!@updateScheduled and @moreToDisplay)
-        setTimeout =>
-          if @endOfDocument() then @nextPage()
-          @updateScheduled = false
-        , 1000
-        @updateScheduled = true
 
     # Update the pagination with appropriate count, pages and page numbers 
     updatePaginiation : =>
@@ -629,110 +523,80 @@ define [
         # remaining pages
         userCount = 0 unless userCount
         @pages = Math.ceil((count + userCount)/ @resultsPerPage)
-        # @$pagination.html ""
+        @$pagination.html ""
+
         if count + userCount is 0
-          @$list.append '<li class="general empty">' + i18nListing.listings.empty.index + '</li>'
-          @trigger "view:exhausted"
+          @$list.prepend '<li class="general empty">' + i18nListing.listings.empty.index + '</li>'
         else 
-          collectionLength = Parse.App.activity.length 
-          if Parse.User.current()
-            if Parse.User.current().get("property")
-
-              collectionLength += if Parse.User.current().get("property").shown is true then Parse.User.current().activity.length else 0
-
-            else if Parse.User.current().get("network")
-
-              pCount = Parse.User.current().activity.countByProperty()
-              Parse.User.current().get("network").properties.each (p) -> 
-                collectionLength += pCount[p.id] if p.shown is true
-
-          if count + userCount < collectionLength 
-            @trigger "view:exhausted"
-        #   @renderPaginiation()
+          @renderPaginiation()
           
     
-    # renderPaginiation : (e) =>
+    renderPaginiation : (e) =>
 
-    #   pages = @pages - @chunk + 1
+      pages = @pages - @chunk + 1
 
-    #   if pages > @chunkSize then pages = @chunkSize; next = true
+      if pages > @chunkSize then pages = @chunkSize; next = true
 
-    #   if @chunk > 1 then @$pagination.append "<li><a href='#' class='prev' data-page='prev'>...</a></li>"
+      if @chunk > 1 then @$pagination.append "<li><a href='#' class='prev' data-page='prev'>...</a></li>"
 
-    #   url = "/search/#{@location}" 
-    #   for page in [@chunk..@chunk + pages - 1] by 1
-    #     if page > 1
-    #       append = @locationAppend + (if @locationAppend.length > 0 then "&" else "?") + "page=#{page}"
-    #     else 
-    #       append = @locationAppend
-    #     @$pagination.append "<li><a data-page='#{page}' href='#{url}#{append}'>#{page}</a></li>"
-    #   if next then @$pagination.append "<li><a href='#' class='next' data-page='next'>...</a></li>"
+      url = "/search/#{@location}" 
+      for page in [@chunk..@chunk + pages - 1] by 1
+        if page > 1
+          append = @locationAppend + (if @locationAppend.length > 0 then "&" else "?") + "page=#{page}"
+        else 
+          append = @locationAppend
+        @$pagination.append "<li><a data-page='#{page}' href='#{url}#{append}'>#{page}</a></li>"
+      if next then @$pagination.append "<li><a href='#' class='next' data-page='next'>...</a></li>"
 
-    #   if @chunk <= @page and @page < @chunk + @chunkSize
-    #     # @chunk > 1 means that prev chunks exist, and a prev button is displayed
-    #     n = @page - @chunk + 1 + if @chunk > 1 then 1 else 0
-    #     @$pagination.find(":nth-child(#{n})").addClass('active')
+      if @chunk <= @page and @page < @chunk + @chunkSize
+        # @chunk > 1 means that prev chunks exist, and a prev button is displayed
+        n = @page - @chunk + 1 + if @chunk > 1 then 1 else 0
+        @$pagination.find(":nth-child(#{n})").addClass('active')
 
-
-    # # Change the page within the current pagination.
-    # changePage : (e) =>
-    #   e.preventDefault()
-    #   selected = e.currentTarget.attributes["data-page"].value
-
-    #   if selected is 'next' or selected is 'prev'
-    #     # Change the chunk
-    #     @chunk = if selected is 'next' then @chunk + @chunkSize else @chunk - @chunkSize
-    #     @renderPaginiation()
-        
-    #   else
-    #     # Change the page within the chunk
-    #     @page = selected
-    #     @$pagination.find("li > .active").removeClass('active')
-
-    #     n = Math.round(@page / @chunkSize) + if @chunk > 1 then 1 else 0
-    #     @$pagination.find(":nth-child(#{n})").addClass('active')
-        
-    #     Parse.App.activity.query.skip(@resultsPerPage * (@page - 1))
-
-    #     # Reset and get new
-    #     Parse.App.activity.reset()
-    #     @search()
 
     # Change the page within the current pagination.
-    nextPage : =>
-      @page += 1
-      @search()
+    changePage : (e) =>
+      e.preventDefault()
+      selected = e.currentTarget.attributes["data-page"].value
 
+      if selected is 'next' or selected is 'prev'
+        # Change the chunk
+        @chunk = if selected is 'next' then @chunk + @chunkSize else @chunk - @chunkSize
+        @renderPaginiation()
+        
+      else
+        # Change the page within the chunk
+        @page = selected
+        @$pagination.find("li > .active").removeClass('active')
 
-    # MAP
-    # ----------
+        n = Math.round(@page / @chunkSize) + if @chunk > 1 then 1 else 0
+        @$pagination.find(":nth-child(#{n})").addClass('active')
+        
+        Parse.App.activity.query.skip(@resultsPerPage * (@page - 1))
+
+        # Reset and get new
+        Parse.App.activity.reset()
+        @search()
 
     bindMapPosition: => @$block.original_position = @$block.offset()
     
     # Track positioning and visibility.
-    mapTracker: =>
-      # Ensure minimum time between adjustments.
-      return if @mapTime
-      @mapTime = setTimeout =>
+    tracker: =>
 
-        # Track position relative to the viewport and set position.
-        vOffset = (document.documentElement.scrollTop or document.body.scrollTop)
+      # Track position relative to the viewport and set position.
+      vOffset = (document.documentElement.scrollTop or document.body.scrollTop)
 
-        # Take the top padding into account.
-        vOffset += 60 # 40 navBar + 20 padding
-        
-        if vOffset > @$block.original_position.top
-          @$block.addClass "float-block-fixed"
-        else
-          @$block.removeClass "float-block-fixed"
-
-        # Reset timer
-        @mapTime = null
-      , 150
+      # Take the top padding into account.
+      vOffset += 60 # 40 navBar + 20 padding
+      
+      if vOffset > @$block.original_position.top
+        @$block.addClass "float-block-fixed"
+      else
+        @$block.removeClass "float-block-fixed"
   
     # Track resizing.
     resize : =>
-
+      
       # Ensure minimum time between adjustments.
       return if @time
       @time = setTimeout =>
@@ -741,25 +605,20 @@ define [
         @$block.removeClass "float-block-fixed"
         @bindMapPosition()
 
-        @mapTracker()
+        @tracker()
 
         # Reset timer
         @time = null
       , 250
 
-    undelegateEvents : =>
-      # Break
-      # @off "model:viewDetails"
-      # @off "dragend"
-      # @off "view:change"
-
-      _.each @listViews, (lv) -> lv.cleanup()
-
-      $(window).off "resize scroll"
-      $(document.documentElement).off "resize scroll"
-      # google.maps.event.removeListener @dragListener
-      # google.maps.event.removeListener @zoomListener
-      super
+    # These break everything. 
+    # undelegateEvents is called after init. No idea why.
+    # undelegateEvents : =>
+    #   @off "model:viewDetails"
+    #   @off "dragend"
+    #   google.maps.event.removeListener @dragListener
+    #   google.maps.event.removeListener @zoomListener
+    #   super
 
     withinBounds : (center) ->
 
@@ -772,100 +631,17 @@ define [
         @sw._longitude < lng and 
         lng < @ne._longitude
 
-
-    # Model-specific
-    # --------------
-
-    likeOrLogin: (e) =>
-      button = @$(e.currentTarget)
-      activity = button.closest(".activity")
-      data = activity.data()
-      model = if data.collection is "user"
-        Parse.User.current().activity.at(data.index)
-      else Parse.App.activity.at(data.index)
-
-      if Parse.User.current()
-        unless data.liked
-          button.addClass "active"
-          model.increment likeCount: +1
-          Parse.User.current().get("profile").relation("likes").add model
-          Parse.User.current().get("profile").likes.add model
-          activity.data "liked", true
-        else
-          button.removeClass "active"
-          model.increment likeCount: -1
-          Parse.User.current().get("profile").relation("likes").remove model
-          Parse.User.current().get("profile").likes.remove model
-          activity.data "liked", false
-        Parse.Object.saveAll [model, Parse.User.current().get("profile")]
-      else
-        $("#signup-modal").modal()
-
-    highlightMarkerFromCard : (e) ->
-      $ref = $(e.currentTarget)
-      page = infinity.PageRegistry.lookup $ref.parent().attr(infinity.PAGE_ID_ATTRIBUTE)
-      pageIndex = $ref.data().pageIndex
-
-      @highlightCard $ref
-      @highlightMarker page.items[pageIndex].marker
-
-    unhighlightMarkerFromCard : (e) ->
-      $ref = $(e.currentTarget)
-      page = infinity.PageRegistry.lookup $ref.parent().attr(infinity.PAGE_ID_ATTRIBUTE)
-      pageIndex = $ref.data().pageIndex
-
-      @unhighlightCard $ref
-      @unhighlightMarker page.items[pageIndex].marker
-
-    highlightCardsFromPropertyMarker : ->
-      _.each this.items, (item) => this.highlightCard item.$el
-      this.highlightMarker this # page.items[pageIndex].marker
-
-    unhighlightCardsFromPropertyMarker : ->
-      _.each this.items, (item) => this.unhighlightCard item.$el
-      this.unhighlightMarker this # page.items[pageIndex].marker
-
-    goToPropertyFromPropertyMarker : -> Parse.history.navigate this.url, true
-
-    highlightCardFromMarker : (e) ->
-      page = infinity.PageRegistry.lookup this.pageId
-      pageIndex = this.pageIndex
-
-      this.highlightCard this.$ref
-      this.highlightMarker page.items[pageIndex].marker
-
-    unhighlightCardFromMarker : (e) ->
-      page = infinity.PageRegistry.lookup this.pageId
-      pageIndex = this.pageIndex
-
-      this.unhighlightCard this.$ref
-      this.unhighlightMarker page.items[pageIndex].marker
-
-
-    highlightCard : ($ref) => $ref.addClass('active')
-    unhighlightCard : ($ref) => $ref.removeClass('active')
-    highlightMarker : (marker) -> 
-      marker.icon.origin = new google.maps.Point(marker.icon.origin.x + 25, marker.icon.origin.y)
-      marker.setIcon marker.icon
-    unhighlightMarker : (marker) ->
-      marker.icon.origin = new google.maps.Point(marker.icon.origin.x - 25, marker.icon.origin.y)
-      marker.setIcon marker.icon
-
-    # Modal
-    # -----
-
     showModal : (e) =>
       @modal = true
-      data = $(e.currentTarget).parent().data()
-      # Keep track of where we are, for subsequent navigation.
+      data = $(e.currentTarget).data()
       @index = data.index
       @collection = data.collection
       model = if @collection is "user"
         Parse.User.current().activity.at(@index)
       else Parse.App.activity.at(@index)
-      @renderModalContent model
+      @renderModalContent(model)
       @$("#view-content-modal").modal(keyboard: false)
-      $(document).on "keydown", @controlModalIfOpen
+      $(document).on "keyup", @controlModalIfOpen
 
     controlModalIfOpen : (e) =>
       return unless @modal
@@ -880,7 +656,7 @@ define [
     hideModal : =>
       return unless @modal
       @modal = false
-      $(document).off "keydown"
+      $(document).off "keyup"
 
     nextModal : =>
       return unless @modal
@@ -905,20 +681,22 @@ define [
       @renderModalContent(model)
 
     clear: =>
+      $(window).off "resize scroll"
+      $(document.documentElement).off "resize scroll"
       @undelegateEvents()
       @stopListening()
       delete this
 
     renderModalContent : (model) ->
       title = model.get("title")
-      if model.get('property') and not model.get('profile')
-        profilePic = model.get('property').cover("thumb")
-        name = model.get('property').get("title")
-        url = model.get('property').publicUrl()
-      else 
+      if model.get('profile') 
         profilePic = model.get('profile').cover("thumb")
         name = model.get('profile').name()
         url = model.get('profile').url()
+      else 
+        profilePic = model.get('property').cover("thumb")
+        name = model.get('property').get("title")
+        url = model.get('property').publicUrl()
       profileInfo = """
               <header class="clearfix">
                 <div class="photo photo-thumbnail stay-left">
@@ -1007,6 +785,7 @@ define [
                           </div>
                           #{profileInfo}
                           """
+            content += "<p class='desc'>#{title}</p>"
             if model.get "isEvent"
               content += "<p><strong>#{moment(model.get("startDate")).format("LLL")}"
               content += " - #{moment(model.get("endDate")).format("h:mm a")}" if model.get "endDate"

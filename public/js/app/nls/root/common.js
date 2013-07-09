@@ -167,7 +167,8 @@
       }
     },
     activity: {
-      building: "Post to your building"
+      building: "Post to your building",
+      exhausted: "There are no more items to display"
     },
     status: {
       ok: "OK",

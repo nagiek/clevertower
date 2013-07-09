@@ -15,6 +15,7 @@
       serializeObject: "app/plugins/serialize_object",
       filePicker: "app/plugins/file_picker",
       masonry: "libs/jquery/jquery.masonry",
+      infinity: "libs/jquery/infinity",
       rangeSlider: "libs/jquery/jquery.rangeSlider",
       slideshowify: "libs/jquery/jquery.slideshowify",
       "jquery.fileupload-pr": "app/plugins/jquery-fileupload-pr",
@@ -79,6 +80,7 @@
   });
 
   define("gmaps", ["async!//maps.googleapis.com/maps/api/js?v=3.11&libraries=places&sensor=false&key=" + window.GAPI_KEY], function() {
+    google.maps.visualRefresh = true;
     return window.google.maps;
   });
 
@@ -179,6 +181,9 @@
       this.$el.remove();
       this.stopListening();
       return this;
+    };
+    Parse.Collection.prototype.countBy = function() {
+      return _.countBy.apply(_, [this.models].concat(_.toArray(arguments)));
     };
     Parse.initialize(window.APPID, window.JSKEY);
     Parse.onNetwork = onNetwork;

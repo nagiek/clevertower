@@ -31,9 +31,9 @@ define [
 
       # Check if we are on a subdomain or not.
       # We measure hostArray.length > 2 instead of 1 because it is after shift
-      homePrefix = if hostArray.length > 1 then '//' + hostArray.join(".") else "/"
+      homePrefix = if hostArray.length > 1 then '//' + hostArray.join(".") else ""
 
-      @$('#home-nav a').prop "href", homePrefix
+      @$('#home-nav a').prop "href", homePrefix + "/search"
 
       if Parse.User.current()
 

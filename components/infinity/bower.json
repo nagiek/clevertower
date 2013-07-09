@@ -1,0 +1,9 @@
+{
+  "name": "infinity",
+  "version": "0.0.0",
+  "commit": "91ff66d79ef5c9f2d01367f973cc8d51119e603d",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/airbnb/infinity"
+  }
+}

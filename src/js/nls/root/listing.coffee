@@ -18,7 +18,8 @@ define
     map:                              "Map"
     list:                             "List"
     photo:                            "Photo"
-  map:            
+  map:
+    redo_search:                      "Redo search"
     redo_search_in_area:              "Redo search in this area"
   dates:            
     starting_this_month:              "Starting This Month"

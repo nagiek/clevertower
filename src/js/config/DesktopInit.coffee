@@ -33,6 +33,7 @@ require.config
     filePicker:               "app/plugins/file_picker"
     # toggler:                  "app/plugins/toggler"
     masonry:                  "libs/jquery/jquery.masonry"
+    infinity:                 "libs/jquery/infinity"
     rangeSlider:              "libs/jquery/jquery.rangeSlider"
     slideshowify:              "libs/jquery/jquery.slideshowify"
     "jquery.fileupload-pr":   "app/plugins/jquery-fileupload-pr"  # Profile  (single)
@@ -82,6 +83,7 @@ require.config
     jqueryuiwidget: ["jquery"]
     jquerymobile: ["jquery"]
     typeahead: ["jquery"]
+    # infinity: ["jquery"]
     
     # datepickermobile: ["jquerymobile", "jqueryui"]
     backbone:
@@ -129,7 +131,8 @@ define "gapi", ["async!//apis.google.com/js/client.js?onload="], ->
 
 # convert Google Maps into an AMD module
 define "gmaps", ["async!//maps.googleapis.com/maps/api/js?v=3.11&libraries=places&sensor=false&key=#{window.GAPI_KEY}"], ->
-
+  # New look.
+  google.maps.visualRefresh = true
   # return the gmaps namespace for brevity
   window.google.maps
 
@@ -246,6 +249,8 @@ require [
     @stopListening()
     @
 
+  # Add missing countBy method.
+  Parse.Collection::countBy = -> _.countBy.apply _, [this.models].concat(_.toArray(arguments))
 
   # App
   # ---------
