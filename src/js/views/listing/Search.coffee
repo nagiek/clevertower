@@ -57,15 +57,18 @@ define [
           @min = ui.values[0]
           @max = ui.values[1]
           Parse.App.activity.query.greaterThanOrEqualTo("rent", @min).lessThanOrEqualTo("rent", @max)
-          @view.search()
+          Parse.User.current().activity.query.greaterThanOrEqualTo("rent", @min).lessThanOrEqualTo("rent", @max) if Parse.User.current()
+          @view.redoSearch()
+      console.log Parse.App.activity.query
       @
 
     clear : => 
       @$("#price-slider").slider("destroy")
-      @$el.html ""
+      @$el.empty()
       @stopListening()
       @undelegateEvents()
       delete Parse.App.activity.query._where.rent
+      delete Parse.User.current().activity.query._where.rent if Parse.User.current()
       delete this
 
     # keep if model passes

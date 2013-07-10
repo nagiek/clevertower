@@ -110,7 +110,7 @@ define [
 
       @$activity.html ""
 
-      visible = @model.activity.select (a) => a.get("property").id is @model.id
+      visible = @model.activity.select (a) => console.log a; a.get("property").id is @model.id
       if visible.length > 0 then _.each visible, @addOneActivity
       else @$activity.before '<p class="empty">' + i18nProperty.tenant_empty.activity + '</p>'
 

@@ -7,7 +7,6 @@ define [
   'collections/ActivityList'
   "views/listing/Search"
   "views/activity/New"
-  "views/activity/Summary"
   "i18n!nls/listing"
   "i18n!nls/common"
   'templates/activity/index'
@@ -16,16 +15,15 @@ define [
   # 'masonry'
   # 'jqueryui'
   "gmaps"
-], ($, _, Parse, infinity, moment, ActivityList, ListingSearchView, NewActivityView, ActivityView, i18nListing, i18nCommon) ->
+], ($, _, Parse, infinity, moment, ActivityList, ListingSearchView, NewActivityView, i18nListing, i18nCommon) ->
 
   class ActivityIndexView extends Parse.View
   
     el: "#main"
 
     events:
-      'click #filters > button'         : 'changeType'
-      # 'change #redo-search'             : 'changeSearchPrefs'
-      'click #redo-search'              : 'redoSearch'
+      'click #filters > button'         : 'changeFilter'
+      'click #search-map'               : 'searchMap'
       # 'click .pagination > ul > li > a' : 'changePage'
       'click .thumbnails a.content'     : 'showModal'
       "mouseover .thumbnails .activity" : "highlightMarkerFromCard"
@@ -78,11 +76,11 @@ define [
       # @on "dragend", @handleMapMove
       @on "view:change", @clear
 
-      @on "view:exhausted", ->        
+      @on "view:exhausted", =>
         @moreToDisplay = false
         @$loading.html i18nCommon.activity.exhausted
 
-      @on "view:empty", ->        
+      @on "view:empty", =>
         @moreToDisplay = false
         @$loading.html ""
 
@@ -137,7 +135,7 @@ define [
     #     Parse.User.current().activity.each (a) -> a.trigger "refresh" 
     #   # @$list.masonry 'reload'
 
-    changeType: (e) ->
+    changeFilter: (e) ->
       e.preventDefault()
       
       btn = @$(e.currentTarget)
@@ -159,15 +157,7 @@ define [
         Parse.App.activity.query.containedIn "activity_type", ["new_listing", "new_post", "new_property"]
         Parse.User.current().activity.query.containedIn "activity_type", ["new_listing", "new_post", "new_property"] if Parse.User.current()
 
-      @resetListViews()
-      @search()
-
-    # changeSearchPrefs : (e) =>
-    #   if @redoSearch
-    #     @redoSearch = false
-    #   else 
-    #     @redoSearch = true
-    #     @search()
+      @redoSearch()
 
     getUserActivity : =>
       # Get the property from what we've already loaded.
@@ -179,15 +169,22 @@ define [
         @listenTo Parse.User.current().activity, 'add', @addOnePropertyActivity
         Parse.App.activity.query.notEqualTo "property", Parse.User.current().get("property")
 
-        # Visibility counter
-        Parse.User.current().get("property").shown = false
-
       else if Parse.User.current().get("network")
 
         # Activity list for *network*
         Parse.User.current().activity.query.equalTo "network", Parse.User.current().get("network")
         @listenTo Parse.User.current().activity, 'add', @addOnePropertyActivity
         Parse.App.activity.query.notEqualTo "network", Parse.User.current().get("network")
+
+      @resetUserActivity()
+
+    resetUserActivity : =>
+
+      if Parse.User.current().get("property")
+        # Visibility counter
+        Parse.User.current().get("property").shown = false
+
+      else if Parse.User.current().get("network")
 
         # Visibility counter
         Parse.User.current().get("network").properties.each (p) -> p.shown = false
@@ -432,13 +429,23 @@ define [
         @chunk = 1
         @page = 1
 
-        @search()
+        @performSearchWithinMap()
 
-    redoSearch : =>
+    searchMap : =>
       center = @map.getCenter()
       @locationAppend = "?lat=#{center.lat()}&lng=#{center.lng()}"
       Parse.history.navigate "/search/#{@location}#{@locationAppend}"
       @performSearchWithinMap()
+
+    redoSearch : =>
+
+      @chunk = 1
+      @page = 1
+
+      @resetUserActivity()
+      @resetListViews()
+      @updatePaginiation()
+      @search()
 
     # Map-only handler
     # handleMapMove : =>
@@ -459,8 +466,6 @@ define [
 
     performSearchWithinMap: =>
 
-      @$loading.html "<img src='/img/misc/spinner.gif' class='spinner' alt='#{i18nCommon.verbs.loading}' />"
-
       bounds = @map.getBounds()
       @sw = new Parse.GeoPoint(bounds.getSouthWest().lat(), bounds.getSouthWest().lng())
       @ne = new Parse.GeoPoint(bounds.getNorthEast().lat(), bounds.getNorthEast().lng())
@@ -471,6 +476,7 @@ define [
       @search()
 
     search : =>
+      @$loading.html "<img src='/img/misc/spinner.gif' class='spinner' alt='#{i18nCommon.verbs.loading}' />"
       @moreToDisplay = true
       @handleUserActivity() if Parse.User.current()
       @handleMapActivity()
@@ -518,7 +524,7 @@ define [
         data-lng="#{model.GPoint().lng()}"
         data-collection="#{collection}"
         data-profile="#{model.profilePic("tiny")}"
-        data-image="#{model.image()}"
+        data-image="#{model.image("span4")}"
       />
       """
 
@@ -529,6 +535,7 @@ define [
         start: moment(model.get("startDate")).format("LLL")
         end: moment(model.get("endDate")).format("LLL")
         postDate: moment(model.createdAt).fromNow()
+        postImage: model.image("span4") # Keep this in for template logic.
         liked: liked
         icon: model.icon()
         name: model.name()
@@ -989,6 +996,7 @@ define [
         end: moment(model.get("endDate")).format("LLL")
         postDate: moment(model.createdAt).fromNow()
         liked: model.liked()
+        postImage: model.image("large")
         icon: model.icon()
         name: model.name()
         profilePic: model.profilePic("thumb")

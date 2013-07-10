@@ -157,6 +157,7 @@ define
   nouns:
     home:                 "Home"
     cover_photo:          "Cover Photo"
+    size:                 "Size"
     link:                 "link"
     building:             "Building"
     history:              "History"

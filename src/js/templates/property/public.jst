@@ -1,18 +1,4 @@
 <div id="listing" class="container">
-  <header class="row">
-    <div class="span8">
-      <h1 class="pull-left"><%= property.title %></h1>
-      <ul class="breadcrumb pull-right">
-        <li><a href="/search/<%= place %>"><%= property.locality %></a></li>
-      </ul>
-    </div>
-    <ul class="span4 actions unstyled">
-      <li class="center"><button id="new-lease" class="btn"><%= i18nGroup.tenant.do_you_live_here %></button></li>
-    </ul>
-  </header>
-
-
-  <% if (property.description) { %><%= property.description %><% } %>
 
   <div class="row">
     <div class="span8">
@@ -22,10 +8,23 @@
         </div>
       </div>
 
+      <header class="clearfix">
+        <hgroup class="pull-left">
+          <h1 class="inline"><%= property.title %></h1><span class="h2">, </span>
+          <h4 class="inline"><a href="/search/<%= place %>"><%= property.locality %></a></h4>
+        </hgroup>
+        <ul class="pull-right actions unstyled">
+          <li class="center"><button id="new-lease" class="btn"><%= i18nGroup.tenant.do_you_live_here %></button></li>
+        </ul>
+      </header>
+
       <ul class="nav nav-tabs">
         <li class="active offset2"><a href="#activity" id="activity-link"><%= i18nCommon.nouns.public_activity %></a></li>
         <li><a href="#listings" id="listings-link"><%= i18nCommon.classes.Listings %> <small class="count"></small></a></li>
         <li><a href="#photos" id="photos-link"><%= i18nCommon.classes.Photos %> <small class="count"></small></a></li>
+        <% if (property.description) { %>
+          <li><a href="#about" id="about-link"><%= i18nCommon.prepositions.About %></a></li>
+        <% } %>
       </ul>
 
       <div class="tab-content">
@@ -52,6 +51,11 @@
             <li><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" /></li>
           </ul>
         </div>
+        <% if (property.description) { %>
+          <div class="tab-pane" id="about">
+            <p><%= property.description %></p>
+          </div>
+        <% } %>
       </div>
 
     </div>

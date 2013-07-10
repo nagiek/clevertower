@@ -20,7 +20,9 @@ define [
       'submit form': 'doNothing'
     
     initialize: (attrs) ->
-      Parse.Dispatcher.on "user:login", @clear
+      @listenTo Parse.Dispatcher, "user:login", ->
+        Parse.history.navigate "/", true
+        @clear()
 
     # typeahead widget takes care of navigation.
     doNothing : (e) -> e.preventDefault()
@@ -80,5 +82,6 @@ define [
     hideControls: => @$('.carousel-control').removeClass 'half-in'
 
     clear: =>
+      @stopListening()
       @undelegateEvents()
       delete this

@@ -1,12 +1,12 @@
 <div class="row-fluid">
-  <% if (image) { %>
+  <% if (postImage) { %>
     <div class="photo-container span8">
-      <div class="photo"><img src="<%= image %>" alt="<%= i18nCommon.nouns.cover_photo %>"></div>
+      <div class="photo"><img src="<%= postImage %>" alt="<%= i18nCommon.nouns.cover_photo %>"></div>
   <% } else { %>
     <div class="position-relative span8">
       <blockquote><%= title %></blockquote>
   <% } %>
-    <% if (rent) { %><div class="rent stay-right">$<%= rent %></div><% } %>
+    <% if (rent) { %><div class="rent">$<%= rent %></div><% } %>
     <a class="left modal-control-area" href="#">
       <span class="modal-control">&lsaquo;</span>
     </a>
@@ -42,7 +42,7 @@
       </div>
     </header>
     <div>
-      <% if (image) { %><p><strong><%= title %></strong></p><% } %>
+      <% if (postImage) { %><p><strong><%= title %></strong></p><% } %>
       <% if (isEvent) { %><p><strong><%= start %><% if (endDate) { %> - <%= end %><% } %></strong></p><% } %>
     </div>
   </div>

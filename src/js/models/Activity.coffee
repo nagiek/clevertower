@@ -65,12 +65,12 @@ define [
         when "new_property" then "building"
         when "new_photo" then "picture"        
         when "new_post" 
-          if @get "public" is false then "lock" else "globe"
+          if @get "public" then "globe" else "lock"
         else false
 
-    image: ->
+    image: (size) ->
       switch @get("activity_type")
-        when "new_listing", "new_property" then @get('property').cover("span6")
+        when "new_listing", "new_property" then @get('property').cover(size)
         when "new_post", "new_photo" then @get("image") || false
-        when "new_tenant", "new_manager" then @get('profile').cover("span6")
+        when "new_tenant", "new_manager" then @get('profile').cover(size)
         else false
