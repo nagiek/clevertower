@@ -31,10 +31,11 @@
       };
 
       PropertySummaryView.prototype.updateUnitCount = function() {
-        var units;
+        var units,
+          _this = this;
 
-        units = this.model.units.where({
-          property: this.model
+        units = this.model.units.select(function(u) {
+          return u.get("property").id === _this.model.id;
         });
         this.$(".unit-count").html(units.length);
         return this.$(".vacant-count").html(_.filter(units, function(u) {
@@ -43,31 +44,36 @@
       };
 
       PropertySummaryView.prototype.updateListingCount = function() {
-        return this.$(".listings-count").html(this.model.listings.where({
-          property: this.model
+        var _this = this;
+
+        return this.$(".listings-count").html(this.model.listings.select(function(l) {
+          return l.get("property").id === _this.model.id;
         }).length);
       };
 
       PropertySummaryView.prototype.updateTenantCount = function() {
-        return this.$(".tenants-count").html(this.model.tenants.where({
-          property: this.model
+        var _this = this;
+
+        return this.$(".tenants-count").html(this.model.tenants.select(function(t) {
+          return t.get("property").id === _this.model.id;
         }).length);
       };
 
       PropertySummaryView.prototype.render = function() {
-        var units, vars;
+        var units, vars,
+          _this = this;
 
-        units = this.model.units.where({
-          property: this.model
+        units = this.model.units.select(function(u) {
+          return u.get("property").id === _this.model.id;
         });
         vars = _.merge(this.model.toJSON(), {
           cover: this.model.cover('profile'),
           publicUrl: this.model.publicUrl(),
-          listings: this.model.listings.where({
-            property: this.model
+          listings: this.model.listings.select(function(l) {
+            return l.get("property").id === _this.model.id;
           }).length,
-          tenants: this.model.tenants.where({
-            property: this.model
+          tenants: this.model.tenants.select(function(t) {
+            return t.get("property").id === _this.model.id;
           }).length,
           units: units.length,
           vacant_units: _.filter(units, function(u) {

@@ -28,11 +28,11 @@ define [
       @listenTo @model.tenants, 'add reset', @updateTenantCount
 
     updateUnitCount: => 
-      units = @model.units.where(property: @model)
+      units = @model.units.select((u) => u.get("property").id is @model.id)
       @$(".unit-count").html units.length
       @$(".vacant-count").html _.filter(units, (u) -> u.get("activeLease") is undefined).length
-    updateListingCount: => @$(".listings-count").html @model.listings.where(property: @model).length
-    updateTenantCount: => @$(".tenants-count").html @model.tenants.where(property: @model).length
+    updateListingCount: => @$(".listings-count").html @model.listings.select((l) => l.get("property").id is @model.id).length
+    updateTenantCount: => @$(".tenants-count").html @model.tenants.select((t) => t.get("property").id is @model.id).length
       
     # show: (e) =>
     #   $('#main').append new ShowPropertyView(model:@model, e: e).render().el
@@ -41,13 +41,13 @@ define [
     # Re-render the contents of the property item.
     render: =>
       
-      units = @model.units.where(property: @model)
+      units = @model.units.select((u) => u.get("property").id is @model.id)
 
       vars = _.merge @model.toJSON(),
         cover:          @model.cover('profile')
         publicUrl:      @model.publicUrl()
-        listings:       @model.listings.where(property: @model).length
-        tenants:        @model.tenants.where(property: @model).length
+        listings:       @model.listings.select((l) => l.get("property").id is @model.id).length
+        tenants:        @model.tenants.select((t) => t.get("property").id is @model.id).length
         units:          units.length
         vacant_units:   _.filter(units, (u) -> u.get("activeLease") is undefined).length
         baseUrl:        "/properties/#{@model.id}"
