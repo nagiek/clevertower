@@ -1055,7 +1055,6 @@ Parse.Cloud.beforeSave "Listing", (req, res) ->
     unless req.object.existed()
       network = property.get "network"
 
-
       # Give public access to read the lease, and managers to read/write
       listingACL = new Parse.ACL()
       listingACL.setPublicReadAccess propertyIsPublic
@@ -1074,6 +1073,8 @@ Parse.Cloud.beforeSave "Listing", (req, res) ->
       listingACL.setReadAccess req.user, true
 
       req.object.set 
+        # Update with the property in case it wasn't set.
+        property: property
         # Update the listing with the location
         locality: property.get "locality"
         center: property.get "center"

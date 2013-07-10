@@ -25,18 +25,18 @@
     <small><%= i18nCommon.fields.posted %> <%= postDate %></small>   
     <% if (icon) { %><span><i class="icon icon-<%= icon %>"></i></span><% } %>
   </div>
-  <ul class="activity-actions inline stay-right">
+  <ul class="activity-actions inline stay-right align-bottom">
     <li>
       <a href="#" class="like-button<% if (liked) { %> active<% } %>" >
         <i class="icon icon-sprite icon-like"></i>
       </a>
-      <span class="like-count"><%= likeCount %></span>
+      <small class="like-count"><%= likeCount %></small>
     </li>
     <li>
       <a href="#" class="comment-button">
         <i class="icon icon-status"></i>
       </a>
-      <span class="comment-count"><%= commentCount %></span>
+      <small class="comment-count"><%= commentCount %></small>
     </li>
   </ul>
 </footer>

@@ -23,8 +23,8 @@ define [
     initialize: (attrs) ->
       
       @baseUrl = attrs.baseUrl
+      @onProperty = if attrs.onProperty then true else false
       @onUnit = if attrs.onUnit then true else false
-      @link_text = if @onUnit then i18nCommon.nouns.link else i18nCommon.classes.listing
 
       @model.prep('inquiries')
           
@@ -46,15 +46,28 @@ define [
       inquiries = @model.inquiries.select (i) => i.get("listing").id is @model.id
       lastLogin = Parse.User.current().get("lastLogin") || Parse.User.current().updatedAt
 
+      unless @onProperty
+        property = Parse.User.current().get("network").properties.get(@model.get("property").id)
+        unless property then @onProperty = false 
+        else 
+          propertyTitle = property.get("title")
+          propertyUrl = property.url()
+      else 
+        propertyTitle = false
+        propertyUrl = false
+
       vars = _.merge @model.toJSON(),
         count: inquiries.length
         newInquiries: _.select(inquiries, (i) -> i.createdAt > lastLogin).length
         start_date: moment(@model.get "start_date").format("LL")
         end_date: moment(@model.get "end_date").format("LL")
         status: i18nListing.fields.public[Number @model.get("public")]
-        link_text: @link_text
-        onUnit: @onUnit
+        link_text: if @onUnit then i18nCommon.nouns.link else i18nCommon.classes.listing
         baseUrl: @baseUrl
+        onProperty: @onProperty
+        propertyTitle: propertyTitle
+        propertyUrl: propertyUrl
+        onUnit: @onUnit
         unitId: @model.get("unit").id
         unitTitle: @model.get("unit").get("title")
         isNew: @model.isNew()

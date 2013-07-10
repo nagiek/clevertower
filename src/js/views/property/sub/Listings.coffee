@@ -61,7 +61,7 @@ define [
     addOne : (l) =>
       if l.get("property").id is @model.id
         @$("tr.empty").remove()
-        @$list.append (new ListingView(model: l, baseUrl: @baseUrl)).render().el
+        @$list.append (new ListingView(model: l, baseUrl: @baseUrl, onProperty: true)).render().el
 
     addAll : =>
       @$list.html ""

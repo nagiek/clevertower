@@ -1041,6 +1041,7 @@
           listingACL.setWriteAccess(req.user, true);
           listingACL.setReadAccess(req.user, true);
           req.object.set({
+            property: property,
             locality: property.get("locality"),
             center: property.get("center"),
             bedrooms: unit.get("bedrooms"),

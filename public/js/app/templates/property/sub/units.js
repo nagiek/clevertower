@@ -25,7 +25,7 @@ __p += '<form id="units" method="post">\n  <header class="clearfix">\n    <h2 cl
 ((__t = ( baseUrl )) == null ? '' : __t) +
 '/add/lease">\n        <i class="icon-plus"></i> ' +
 ((__t = ( i18nProperty.menu.add_lease )) == null ? '' : __t) +
-'\n      </a></li>\n    </ul>\n  </header>\n\n  <table id="units-table" class="table table-condensed form-condensed">\n    <thead>\n      <tr>\n        <th>' +
+'\n      </a></li>\n    </ul>\n  </header>\n\n  <table id="units-table" class="table form-condensed">\n    <thead>\n      <tr>\n        <th>' +
 ((__t = (i18nCommon.classes.Unit)) == null ? '' : __t) +
 '</th>\n        <th class="variable-begin">' +
 ((__t = (i18nUnit.fields.status)) == null ? '' : __t) +

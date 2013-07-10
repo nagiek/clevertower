@@ -85,11 +85,12 @@ define [
           new Parse.Query("Tenant").equalTo("listing", @model).include("profile").find()
           .then (objs) -> network.tenants.add objs
         
-        require ["views/listing/Show"], (ShowListingView) =>
-          # Alert the user and move on
-          new ShowListingView(model: model, property: model.get("property")).render()
-          Parse.history.navigate "#{@baseUrl}/listings/#{model.id}"
-          @clear()
+        Parse.history.navigate "#{@baseUrl}/#{model.id}", true
+        # require ["views/listing/Show"], (ShowListingView) =>
+        #   # Alert the user and move on
+        #   new ShowListingView(model: model, property: model.get("property")).render()
+        #   Parse.history.navigate "#{@baseUrl}/listings/#{model.id}"
+        #   @clear()
                 
       @listenTo @model, 'destroy', @clear
       
@@ -158,11 +159,11 @@ define [
         @$unitSelect.append "<option class='new-unit-option' value='-1'>#{i18nUnit.constants.new_unit}</option>"
       else
         # Group by property.
-        properties = Parse.User.current().get("network").units.groupBy (u) -> u.get("property").id
-        _.each properties, (set, property) =>
-          @$unitSelect.append "<optgroup label='#{Parse.User.current().get("network").properties.get(property).get('title')}'>"
-          _.each set, @addOne
-          @$unitSelect.append "<option class='new-unit-option' value='#{property}'>#{i18nUnit.constants.new_unit}</option>"
+        unitsByProperties = Parse.User.current().get("network").units.groupBy (u) -> u.get("property").id
+        Parse.User.current().get("network").properties.each (property) =>
+          @$unitSelect.append "<optgroup label='#{property.get('title')}'>"
+          _.each unitsByProperties[property.id], @addOne if unitsByProperties[property.id]
+          @$unitSelect.append "<option class='new-unit-option' value='#{property.id}'>#{i18nUnit.constants.new_unit}</option>"
           @$unitSelect.append "</optgroup>"
       
 
@@ -192,12 +193,15 @@ define [
           else 
             unit = @property.units.get data.unit.id
         else 
-          property = Parse.User.current().get("network").properties.get(data.unit.id)
+          property = Parse.User.current().get("network").properties.get data.unit.id
+          # Check if the unit is set to a property, shortcut for "make a new unit"
           if property
             unit = new Unit data.unit.attributes
             unit.set "property", property
+            attrs.property = property
           else 
             unit = Parse.User.current().get("network").units.get data.unit.id
+            attrs.property = unit.get "property"
         attrs.unit = unit
 
       @model.save attrs,

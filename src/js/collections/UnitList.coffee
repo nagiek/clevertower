@@ -33,10 +33,11 @@ define [
     
     # We may not have a @property, so be specific.
     prepopulate: (property) =>
-      if @length is 0 then unit = new Unit property: property 
+      units = @select((u) -> u.get("property").id is property.id)
+      if units.length is 0 then unit = new Unit property: property 
       else 
-        unit = @at(@length - 1).clone()
-
+        
+        unit = _.last(units).clone()
         unit.unset "activeLease"
         
         title = unit.get 'title'

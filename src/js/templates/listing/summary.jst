@@ -1,5 +1,6 @@
 <td>
-  <% if (!onUnit) { %><%= unitTitle %> |<% }%>
+  <% if (!onProperty) { %><a href="<%= propertyUrl %>"><%= propertyTitle %></a> |<% } %>
+  <% if (!onUnit) { %><%= unitTitle %> |<% } %>
   <a href="<%= baseUrl %>/listings/<%= objectId %>"><%= title %></a>
 </td>
 <td><%= rent %></td>
