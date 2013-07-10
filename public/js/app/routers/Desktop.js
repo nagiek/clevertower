@@ -172,8 +172,8 @@
           _this = this;
 
         place = "" + city + "--" + region + "--" + country;
-        return require(["views/property/Public"], function(PublicPropertyView) {
-          return new Parse.Query("Property").get(id, {
+        return require(["models/Property", "views/property/Public"], function(Property, PublicPropertyView) {
+          return new Parse.Query(Property).get(id, {
             success: function(model) {
               return _this.view = new PublicPropertyView({
                 model: model,

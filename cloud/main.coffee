@@ -1827,7 +1827,7 @@ Parse.Cloud.beforeSave "Activity", (req, res) ->
     Parse.Cloud.useMasterKey()
 
     # Query for the property
-    (new Parse.Query "Property").include("network").get req.object.get("property").id,
+    (new Parse.Query "Property").include("role").include("mgrRole").include("network.role").get req.object.get("property").id,
     success: (property) ->
       propRole = property.get "role"
       mgrRole = property.get "mgrRole"

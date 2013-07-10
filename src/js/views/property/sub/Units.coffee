@@ -82,7 +82,9 @@ define [
       # Define @$list here, as we may 
       @$list = @$("#units-table > tbody")
       @$list.html ''
-      if @model.units.length > 0 then @model.units.each @addOne
+
+      visible = @model.units.select (u) => u.get("property").id is @model.id
+      if visible.length > 0 then _.each visible, @addOne
       else
         @model.units.prepopulate(@model)
         @switchToEdit()

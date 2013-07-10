@@ -47,6 +47,7 @@ define [
       $("#{e.currentTarget.hash}-link").tab('show')
 
     render: ->
+
       vars =
         property: @model.toJSON()
         place: @place
@@ -80,6 +81,13 @@ define [
         marker = new google.maps.Marker
           position: center
           map:      map
+          animation: google.maps.Animation.DROP
+          icon: 
+            url: "/img/icon/pins-sprite.png"
+            size: new google.maps.Size(25, 32, "px", "px")
+            origin: new google.maps.Point(0, 0)
+            anchor: null
+            scaledSize: null
 
       @$activity = $("#activity > ul")
       @$photos = $("#photos > ul")
@@ -101,10 +109,10 @@ define [
     addAllActivity: (collection, filter) =>
 
       @$activity.html ""
-      unless @model.activity.length is 0
-        @model.activity.each @addOneActivity
-      else
-        @$activity.before '<p class="empty">' + i18nProperty.tenant_empty.activity + '</p>'
+
+      visible = @model.activity.select (a) => a.get("property").id is @model.id
+      if visible.length > 0 then _.each visible, @addOneActivity
+      else @$activity.before '<p class="empty">' + i18nProperty.tenant_empty.activity + '</p>'
 
     # Photos
     # ------
@@ -131,20 +139,22 @@ define [
       
     addAllListings: (collection, filter) =>
 
-      $('#listings-link .count').html @model.listings.length
-
       @$listings.html ""
-      unless @model.listings.length is 0
+
+      visible = @model.listings.select (a) => a.get("property").id is @model.id
+      $('#listings-link .count').html visible.length
+
+      if visible.length > 0 
 
         # Get listings with unknown # of bedrooms.
-        listings = @model.listings.filter (l) -> l.get("bedrooms") is undefined
+        listings = _.filter visible, (l) -> l.get("bedrooms") is undefined
         if listings.length > 0
           @$listings.append "<tr class='divider'><td colspan='4'>#{i18nUnit.fields.bedrooms}: #{i18nCommon.adjectives.not_specified}</td></tr>"
           _.each listings, @addOneListing
 
         # Get listings where we have a # of bedooms.
         for i in [0..6]
-          listings = @model.listings.filter (l) -> l.get("bedrooms") is i
+          listings = _.filter visible, (l) -> l.get("bedrooms") is i
           if listings.length > 0
             @$listings.append '<tr class="divider"><td colspan="4">' + i18nUnit.fields.bedrooms + ": #{i}</td></tr>"
             _.each listings, @addOneListing

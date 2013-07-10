@@ -30,9 +30,12 @@ define [
 
       return if display is @display
       @view.$("ul.thumbnails").removeClass(@display).addClass(display)
+
       @display = display
 
-      @view.trigger "view:refresh", @display
+      _.each @view.listViews, (lv) -> lv.repartition()
+
+      # @view.trigger "view:refresh", @display
       # @$list.masonry 'reload'
 
     render: ->

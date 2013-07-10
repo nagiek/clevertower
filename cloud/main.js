@@ -1605,7 +1605,7 @@
     activityACL.setWriteAccess(req.user, true);
     if (req.object.get("property")) {
       Parse.Cloud.useMasterKey();
-      return (new Parse.Query("Property")).include("network").get(req.object.get("property").id, {
+      return (new Parse.Query("Property")).include("role").include("mgrRole").include("network.role").get(req.object.get("property").id, {
         success: function(property) {
           var mgrRole, netRole, network, propRole;
 

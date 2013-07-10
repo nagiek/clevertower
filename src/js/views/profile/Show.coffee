@@ -19,6 +19,8 @@ define [
 
       @listenTo Parse.Dispatcher, "user:logout", @switchToPublic
 
+      if Parse.User.current().get("profile").likes.length is 0 then Parse.User.current().get("profile").likes.fetch()
+
       # Render immediately, as we will display a subview
       @render()
       @changeSubView attrs.path, attrs.params

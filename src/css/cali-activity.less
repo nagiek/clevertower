@@ -1,9 +1,11 @@
 #activity {
-  li {
-    padding: 15px;
-    border-bottom: solid 1px @grayLight;
-    &.divider {
-      margin: 18px 0;
+  > ul {
+    > li {
+      padding: 15px;
+      border-bottom: solid 1px @grayLight;
+      &.divider {
+        margin: 18px 0;
+      }
     }
   }
 }
@@ -20,6 +22,16 @@
   background-color: white;
   position: relative;
   margin-bottom: 18px;
+  .content {
+    .photo {
+      margin-bottom: 15px;
+    }
+  }
+  .caption {
+    padding:0 15px;
+    margin-bottom: 15px;
+  }
+
   a:hover {
     text-decoration: none;
   }
@@ -34,9 +46,9 @@
     font-size: 24px;
     line-height: 24px;
     font-weight: 100;
-    display: table-cell;
     vertical-align: middle;
     padding: 15px;
+    margin-bottom:15px;
   }
   .activity-info {
     position: absolute;
@@ -44,13 +56,38 @@
     bottom:9px;
   }
   .position {
-    padding: 5px;
-    line-height: 9px;
+    display: inline-block;
+    vertical-align: middle;
+    text-align: center;
+    width: 21px;
+    height: 23px;
+    line-height: 23px;
     font-size: 9px;
     background-color: @orange;
     color: @white;
     &.property-linked {
       background-color: @green;
+    }
+  }
+}
+
+.small {
+  .actvity {
+    // Make .photo-span4 behave as photo-thumbnail
+    .photo-span4 {
+      height:@thumbnailImgLength;
+      width:@thumbnailImgLength;
+      img {
+        height:@thumbnailImgLength;
+        min-width:@thumbnailImgLength;
+        max-width:@profileImgLength + 28px;
+      }
+    }
+    // Make .caption behave as .thumbnail-float/.photo-float
+    .caption {
+      float: none;
+      display:block;
+      margin-left: @thumbnailImgLength + @thumbnailImgPadding; 
     }
   }
 }

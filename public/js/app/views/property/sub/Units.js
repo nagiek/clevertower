@@ -105,10 +105,16 @@
       };
 
       PropertyUnitsView.prototype.addAll = function(collection, filter) {
+        var visible,
+          _this = this;
+
         this.$list = this.$("#units-table > tbody");
         this.$list.html('');
-        if (this.model.units.length > 0) {
-          return this.model.units.each(this.addOne);
+        visible = this.model.units.select(function(u) {
+          return u.get("property").id === _this.model.id;
+        });
+        if (visible.length > 0) {
+          return _.each(visible, this.addOne);
         } else {
           this.model.units.prepopulate(this.model);
           return this.switchToEdit();

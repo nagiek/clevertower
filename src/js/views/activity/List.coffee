@@ -4,46 +4,61 @@ define [
   "backbone"
   "moment"
   'models/Activity'
-  "i18n!nls/property"
-  "i18n!nls/listing"
-  "i18n!nls/user"
   "i18n!nls/common"
   'templates/activity/list'
   'gmaps'
-], ($, _, Parse, moment, Activity, i18nProperty, i18nListing, i18nUser, i18nCommon) ->
+], ($, _, Parse, moment, Activity, i18nCommon) ->
 
   class ActivityListView extends Parse.View
     
     tagName: "li"
-    className: "row"
+    className: "thumbnail clearfix activity fade in span4 offset2"
 
     events:
       "click .like-button"  : "likeOrLogin"
       # "click a" : "goToProperty"
 
     initialize: (attrs) ->
-      @active = attrs.active || false
+      @liked = attrs.liked || false
       @currentProfile = attrs.currentProfile || false
       
+      if Parse.User.current()
+        # Check for likes.
+        @listenTo Parse.User.current().get("profile").likes, "reset", @checkIfLiked
+
+      # Give the user the chance to contribute
+      @listenTo Parse.Dispatcher, "user:login", => 
+        # Check for likes.
+        @listenTo Parse.User.current().get("profile").likes, "reset", @checkIfLiked
+        @checkIfLiked()
+
+    checkIfLiked: ->
+      @markAsLiked() if Parse.User.current().get("profile").likes.find (l) => l.id is @model.id
+
     likeOrLogin: (e) =>
       if Parse.User.current()
-        unless @active
-          @$(".like-button").addClass "active"
+        unless @liked
+          likes = @$(".like-count").html()
+          @markAsLiked()
+          @$(".like-count").html(likes + 1)
           @model.increment likeCount: +1
           Parse.User.current().get("profile").relation("likes").add @model
           Parse.User.current().get("profile").likes.add @model
-          @active = true
+          @liked = true
           Parse.Object.saveAll [@model, Parse.User.current().get("profile")]
         else
           @model.increment likeCount: -1
+          @$(".like-count").html(likes - 1)
           Parse.User.current().get("profile").relation("likes").remove @model
           Parse.User.current().get("profile").likes.remove @model
-          @active = false
+          @liked = false
           Parse.Object.saveAll [@model, Parse.User.current().get("profile")]
           @clear() if @currentProfile
         
       else
         $("#signup-modal").modal()
+
+    markAsLiked: -> @$(".like-button").addClass "active"
 
     clear: ->
       @undelegateEvents()
@@ -52,150 +67,33 @@ define [
 
     # Re-render the contents of the Unit item.
     render: ->
-      title = @model.get("title")
-      rent = "$" + @model.get("rent")
-      if @model.get('profile') 
-        profilePic = @model.get('profile').cover("tiny")
-        name = @model.get('profile').name()
-      else 
-        profilePic = @model.get('property').cover("tiny")
-        name = @model.get('property').get("title")
-      footer = """
-              <footer></footer>
-               """
-      vars =
-        active: @active
-        publicUrl: @model.publicUrl()
-        type: @model.get("activity_type")
+
+      vars = _.merge @model.toJSON(), 
+        url: @model.url()
+        start: moment(@model.get("startDate")).format("LLL")
+        end: moment(@model.get("endDate")).format("LLL")
+        postDate: moment(@model.createdAt).fromNow()
+        liked: @liked
+        icon: @model.icon()
+        name: @model.name()
+        profilePic: @model.profilePic("tiny")
+        pos: @pos % 20 # This will be incremented in the template.
         i18nCommon: i18nCommon
-        i18nListing: i18nListing
-        i18nProperty: i18nProperty
-        i18nUser: i18nUser
 
-      switch @model.get("activity_type")
-        when "new_listing"
-          cover = @model.get('property').cover("span6")
-          vars.icon = 'listing'
-          vars.content = """
-                        <div class="photo photo-thumbnail stay-left">
-                          <img class="" src="#{cover}" alt="#{i18nCommon.nouns.cover_photo}">
-                        </div>
-                        <div class="photo-float thumbnail-float caption">
-                          <strong>#{title}</strong>
-                          <div class="rent stay-right">#{rent}</div>
-                          #{footer}
-                        </div>
-            """
+      # Default options. 
+      _.defaults vars,
+        rent: false
+        image: false
+        isEvent: false
+        endDate: false
+        likeCount: 0
+        commentCount: 0
 
-        when "new_post"
-
-          vars.icon = @model.get('activity_type')
-          # switch @model.get('activity_type')
-          #   when 'status'
-          #   when 'question'
-          #   when 'tip'
-          #   when 'building'
-
-          if @model.get "image"
-            vars.content = """
-                          <div class="row">
-                            <div class="photo photo-span4">
-                              <img src="#{@model.get("image")}" alt="#{i18nCommon.nouns.cover_photo}">
-                            </div>
-                          </div>
-
-                          <div class="caption">
-                          """
-            vars.content += "<p><strong>#{title}</strong></p>" if @model.get "title"
-            if @model.get "isEvent"
-              vars.content += "<p><strong>#{moment(@model.get("startDate")).format("LLL")}"
-              vars.content += " - #{moment(@model.get("endDate")).format("h:mm a")}" if @model.get "endDate"
-              vars.content += "</strong></p>"
-            vars.content += """
-                            #{footer}
-                          </div>
-                          """
-          else
-            vars.content = """
-                          <blockquote>
-                            #{title}
-                          </blockquote>
-                          <div class="caption">
-                          """
-            if @model.get "isEvent"
-              vars.content += "<p><strong>#{moment(@model.get("startDate")).format("LLL")}"
-              vars.content += " - #{moment(@model.get("endDate")).format("h:mm a")}" if @model.get "endDate"
-              vars.content += "</strong></p>"
-            vars.content += """
-                            #{footer}
-                          </div>
-                          """
-
-        when "new_photo"
-          vars.icon = 'photo'
-          if @view.display is "small"
-            vars.content = """
-                          <div class="photo photo-thumbnail stay-left">
-                            <img src="#{@model.get("image")}" alt="#{i18nCommon.nouns.cover_photo}">
-                          </div>
-                          <div class="photo-float thumbnail-float caption">
-                            """
-            vars.content += "<p><strong>#{title}</strong></p>" if @model.get "title"
-            vars.content += """
-                            #{footer}
-                          </div>
-                          """
-          else
-            vars.content = """
-                          <div class="row">
-                            <div class="photo photo-span4">
-                              <img src="#{@model.get("image")}" alt="#{i18nCommon.nouns.cover_photo}">
-                            </div>
-                          </div>
-                          <div class="caption">
-                            """
-            vars.content += "<p><strong>#{title}</strong></p>" if @model.get "title"
-            vars.content += """
-                            #{footer}
-                          </div>
-                          """
-
-        when "new_property"
-          vars.icon = 'building'
-          cover = @model.get('property').cover("span6")
-          vars.content = """
-                        <div class="photo photo-thumbnail stay-left">
-                          <img class="" src="#{cover}" alt="#{i18nCommon.nouns.cover_photo}">
-                        </div>
-                        <div class="photo-float thumbnail-float caption">
-                          <p><strong>#{title}</strong></p>
-                          #{footer}
-                        </div>
-          """
-        when "new_tenant"
-          vars.icon = 'person'
-          vars.content = """
-                        <div class="photo">
-                          <img src="#{@model.get('profile').cover("span6")}">
-                          <div class="caption">
-                            <h4>#{@model.get('profile').name()}</h4>
-                          </div>
-                        </div>
-                        """
-        when "new_manager"
-          vars.icon = 'plus'
-          vars.content = """
-                        <div class="photo">
-                          <img src="#{@model.get('profile').cover("span6")}">
-                          <div class="caption">
-                            <h4>#{@model.get('profile').name()}</h4>
-                          </div>
-                        </div>
-                        """
-        else
-          vars.icon = ''
-          vars.content = ""
+      # Override default title.
+      vars.title = @model.title()
       
       @$el.html JST["src/js/templates/activity/list.jst"](vars)
+
+      @checkIfLiked() if Parse.User.current()
 
       @

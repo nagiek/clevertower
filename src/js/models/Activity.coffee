@@ -9,9 +9,11 @@ define [
     className: "Activity"
 
     defaults:
-      title       : ""
-      body        : ""
-      post_type   : "status"
+      title:          ""
+      activity_type:  "new_post"
+      likeCount:      0
+      commentCount:   0
+      isEvent:        false
 
     GPoint : -> 
       center = @get "center"
@@ -22,7 +24,7 @@ define [
     pos : -> @collection.indexOf(@)
 
     # Index of model in its collection.
-    publicUrl : -> if @get("property") then @get("property").publicUrl() else "#"
+    url : -> "/posts/#{@id}"
 
     validate: (attrs = {}, options = {}) ->
       # Check all attribute existence, as validate is called on set
@@ -39,3 +41,36 @@ define [
           # Validate associated  attrs.unit.attributes
           return error if error = attrs.unit.validationError
       false
+
+
+    # Display functions
+    # -----------------
+
+    name: -> if @linkedToProperty() then @get('property').get("title") else @get('profile').name()
+    profilePic: (size) -> if @linkedToProperty() then @get('property').cover(size) else @get('profile').cover(size)
+    profileUrl: -> if @linkedToProperty() then @get('property').publicUrl() else @get('profile').url()
+    linkedToProperty: -> @get('property') and not @get('profile')
+    liked: -> Parse.User.current() and Parse.User.current().get("profile").likes.find (l) => l.id is @id
+
+    title: ->
+      switch @get "activity_type"
+        when "new_post", "new_listing" then @get("title")
+        when "new_property" then @get("property").get("title")
+        when "new_photo" then @get("property").get("title")
+        else false
+
+    icon: ->
+      switch @get "activity_type"
+        when "new_listing" then "listing"
+        when "new_property" then "building"
+        when "new_photo" then "picture"        
+        when "new_post" 
+          if @get "public" is false then "lock" else "globe"
+        else false
+
+    image: ->
+      switch @get("activity_type")
+        when "new_listing", "new_property" then @get('property').cover("span6")
+        when "new_post", "new_photo" then @get("image") || false
+        when "new_tenant", "new_manager" then @get('profile').cover("span6")
+        else false

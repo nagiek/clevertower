@@ -11,8 +11,10 @@ define [
   "i18n!nls/listing"
   "i18n!nls/common"
   'templates/activity/index'
-  'masonry'
-  'jqueryui'
+  'templates/activity/summary'
+  'templates/activity/modal'
+  # 'masonry'
+  # 'jqueryui'
   "gmaps"
 ], ($, _, Parse, infinity, moment, ActivityList, ListingSearchView, NewActivityView, ActivityView, i18nListing, i18nCommon) ->
 
@@ -48,11 +50,9 @@ define [
         # Check for likes.
         @listenTo Parse.User.current().get("profile").likes, "reset", @checkIfLiked
         # Get the activity in the user properties.
-        if @listenTo Parse.User.current().get("network") and Parse.User.current().get("network").properties.length is 0
-          @listenToOnce Parse.User.current().get("network").properties, "reset", @getUserActivity
-        else @getUserActivity()
+        @getUserActivity()
         # Get the user's personal likes.
-        Parse.User.current().get("profile").likes.fetch()
+        if Parse.User.current().get("profile").likes.length is 0 then Parse.User.current().get("profile").likes.fetch()
         # Post view
         @newPostView = new NewActivityView(view: @).render()
         @listenTo @newPostView, "view:resize", @bindMapPosition
@@ -82,6 +82,10 @@ define [
         @moreToDisplay = false
         @$loading.html i18nCommon.activity.exhausted
 
+      @on "view:empty", ->        
+        @moreToDisplay = false
+        @$loading.html ""
+
       # Create a timer to buffer window re-draws.
       @time = null
 
@@ -104,15 +108,13 @@ define [
       @listenTo Parse.App.activity, "add", @addOne
 
       if Parse.User.current()
-        # Check for likes.
         @listenTo Parse.User.current().get("profile").likes, "reset", @checkIfLiked
-
+        
         # Get the activity in the user properties.
         @getUserActivity()
 
         # Get the user's personal likes.
-        if Parse.User.current().get("profile").likes.length is 0
-          Parse.User.current().get("profile").likes.fetch()
+        if Parse.User.current().get("profile").likes.length is 0 then Parse.User.current().get("profile").likes.fetch()
 
     checkIfLiked: ->
       Parse.User.current().get("profile").likes.each (l) =>
@@ -121,7 +123,7 @@ define [
           if activity.length > 0
             activity[0].data "liked", true
             activity[0].find(".like-button").addClass "active"
-    
+
     resetListViews: ->
       # Clean up old stuff
       _.each @listViews, (lv) -> lv.reset()
@@ -232,8 +234,8 @@ define [
             return if item.loaded
             item.$el.data "pageIndex", index
             data = item.$el.data()
-            if data.image then item.$el.find(".photo img").prop 'src', data.image
-            if data.profile then item.$el.find(".caption img").prop 'src', data.profile
+            if data.image then item.$el.find(".content .photo img").prop 'src', data.image
+            if data.profile then item.$el.find("footer img").prop 'src', data.profile
             unless item.marker
               originY = if data.collection is "user" then 25 else 0
               item.marker = new google.maps.Marker
@@ -493,47 +495,110 @@ define [
     # Adding from Collections
     # -----------------------
 
+    renderTemplate: (model, liked, linked, pos) =>
+
+      # Create new element with extra details for infinity.js
+      if linked
+        collection = "user"
+        propertyId = model.get("property").id
+        propertyIndex = model.get("property").pos()
+      else
+        collection = "external"
+        propertyId = false
+        propertyIndex = false
+
+      $el = $ """
+      <div class="thumbnail clearfix activity fade in"
+        id="activity-#{model.id}"
+        data-liked="#{liked}"
+        data-property-index="#{propertyIndex}" 
+        data-property-id="#{propertyId}"
+        data-index="#{model.pos()}"
+        data-lat="#{model.GPoint().lat()}"
+        data-lng="#{model.GPoint().lng()}"
+        data-collection="#{collection}"
+        data-profile="#{model.profilePic("tiny")}"
+        data-image="#{model.image()}"
+      />
+      """
+
+      vars = _.merge model.toJSON(), 
+        url: model.url()
+        pos: pos % 20 # This will be incremented in the template.
+        linkedToProperty: linked
+        start: moment(model.get("startDate")).format("LLL")
+        end: moment(model.get("endDate")).format("LLL")
+        postDate: moment(model.createdAt).fromNow()
+        liked: liked
+        icon: model.icon()
+        name: model.name()
+        i18nCommon: i18nCommon
+
+      # Default options. 
+      _.defaults vars,
+        rent: false
+        image: false
+        isEvent: false
+        endDate: false
+        likeCount: 0
+        commentCount: 0
+
+      # Override default title.
+      vars.title = model.title()
+
+      $el.html JST["src/js/templates/activity/summary.jst"](vars)
+
+      $el
+
     prependNewPost: (a) =>
       if a.get("property")
-        view = new ActivityView
-          model: a
-          # marker: a.get("property").marker
-          pos: a.get("property").pos()
-          view: @
-          linkedToProperty: true
-          liked: false
-        item = new infinity.ListItem view.render().$el
+        # view = new ActivityView
+        #   model: a
+        #   # marker: a.get("property").marker
+        #   pos: a.get("property").pos()
+        #   view: @
+        #   linkedToProperty: true
+        #   liked: false
+        # item = new infinity.ListItem view.render().$el
+        item = new infinity.ListItem @renderTemplate(a, false, true, a.get("property").pos())
         item.marker = a.get("property").marker
         a.get("property").marker.items.push item
         @listViews[@shortestColumnIndex()].prepend item
       else
-        view = new ActivityView
-          model: a
-          view: @
-          liked: false
-        @listViews[@shortestColumnIndex()].prepend view.render().$el
+        # view = new ActivityView
+        #   model: a
+        #   view: @
+        #   liked: false
+        # # @listViews[@shortestColumnIndex()].prepend new infinity.ListItem view.render().$el
+        @listViews[@shortestColumnIndex()].prepend @renderTemplate(a, false, false, a.pos())
 
     addOne: (a) =>
-      view = new ActivityView
-        model: a
-        view: @
-        liked: Parse.User.current() and Parse.User.current().get("profile").likes.find (l) -> l.id is a.id
-      @listViews[@shortestColumnIndex()].append view.render().$el
+      # view = new ActivityView
+      #   model: a
+      #   view: @
+      #   liked: Parse.User.current() and Parse.User.current().get("profile").likes.find (l) -> l.id is a.id
+      liked = Parse.User.current() and Parse.User.current().get("profile").likes.find (l) -> l.id is a.id
+      # @listViews[@shortestColumnIndex()].append view.render().$el
+      @listViews[@shortestColumnIndex()].append @renderTemplate(a, liked, false, a.pos())
       # @$list.append view.render().el
 
     addOnePropertyActivity: (a) =>
-      view = new ActivityView
-        model: a
-        # marker: a.get("property").marker
-        pos: a.get("property").pos()
-        view: @
-        linkedToProperty: true
-        liked: Parse.User.current() and Parse.User.current().get("profile").likes.contains a
-      # @listViews[@shortestColumnIndex()].append view.render().$el
-      item = new infinity.ListItem view.render().$el
+      # view = new ActivityView
+      #   model: a
+      #   # marker: a.get("property").marker
+      #   pos: a.get("property").pos()
+      #   view: @
+      #   linkedToProperty: true
+      #   liked: Parse.User.current() and Parse.User.current().get("profile").likes.find (l) -> l.id is a.id
+
+      liked = Parse.User.current() and Parse.User.current().get("profile").likes.find (l) -> l.id is a.id
+
+      # item = new infinity.ListItem view.render().$el
+      item = new infinity.ListItem @renderTemplate(a, liked, true, a.get("property").pos())
       item.marker = a.get("property").marker
       a.get("property").marker.items.push item
       @listViews[@shortestColumnIndex()].append item
+
       # @$list.append view.render().el
 
     # Add all items in the Properties collection at once.
@@ -632,7 +697,7 @@ define [
         # @$pagination.html ""
         if count + userCount is 0
           @$list.append '<li class="general empty">' + i18nListing.listings.empty.index + '</li>'
-          @trigger "view:exhausted"
+          @trigger "view:empty"
         else 
           collectionLength = Parse.App.activity.length 
           if Parse.User.current()
@@ -779,6 +844,7 @@ define [
     likeOrLogin: (e) =>
       button = @$(e.currentTarget)
       activity = button.closest(".activity")
+      likes = Number activity.find(".like-count").html()
       data = activity.data()
       model = if data.collection is "user"
         Parse.User.current().activity.at(data.index)
@@ -787,12 +853,16 @@ define [
       if Parse.User.current()
         unless data.liked
           button.addClass "active"
+          console.log activity.find(".like-count")
+          activity.find(".like-count").html(likes + 1)
           model.increment likeCount: +1
           Parse.User.current().get("profile").relation("likes").add model
           Parse.User.current().get("profile").likes.add model
           activity.data "liked", true
         else
           button.removeClass "active"
+          console.log activity.find(".like-count")
+          activity.find(".like-count").html(likes - 1)
           model.increment likeCount: -1
           Parse.User.current().get("profile").relation("likes").remove model
           Parse.User.current().get("profile").likes.remove model
@@ -855,6 +925,7 @@ define [
     # -----
 
     showModal : (e) =>
+      e.preventDefault()
       @modal = true
       data = $(e.currentTarget).parent().data()
       # Keep track of where we are, for subsequent navigation.
@@ -910,139 +981,29 @@ define [
       delete this
 
     renderModalContent : (model) ->
-      title = model.get("title")
-      if model.get('property') and not model.get('profile')
-        profilePic = model.get('property').cover("thumb")
-        name = model.get('property').get("title")
-        url = model.get('property').publicUrl()
-      else 
-        profilePic = model.get('profile').cover("thumb")
-        name = model.get('profile').name()
-        url = model.get('profile').url()
-      profileInfo = """
-              <header class="clearfix">
-                <div class="photo photo-thumbnail stay-left">
-                  <a href="#{url}"><img src="#{profilePic}" alt="Profile" class="img-rounded profile-picture"></a>
-                </div>
-                <div class="photo-float thumbnail-float">
-                  <p><a href="#{url}"><strong>#{name}</strong></a></p>
-                  <p><small>#{moment(model.createdAt).fromNow()}</small></p>
-                </div>
-              </header>
-               """
-      switch model.get("activity_type")
-        when "new_listing"
-          cover = model.get('property').cover("span6")
-          content = """
-                    <div class="row-fluid">
-                      <div class="photo-container span8">
-                        <div class="photo">
-                          <img src="#{model.get("image")}" alt="#{i18nCommon.nouns.cover_photo}">
-                        </div>
-                        <a class="left modal-control-area" href="#">
-                          <span class="modal-control">&lsaquo;</span>
-                        </a>
-                        <a class="right modal-control-area" href="#">
-                          <span class="modal-control">&rsaquo;</span>
-                        </a>
-                      </div>
-                      <div class="caption span4">
-                        <div class="clearfix">
-                          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                        </div>
-                        #{profileInfo}
-                        <strong>#{title}</strong>
-                        <div class="rent stay-right">#{rent}</div>
-                      </div>
-                    </div>
-                    """
-        when "new_post"
 
-          if model.get "image"
-            content = """
-                      <div class="row-fluid">
-                        <div class="photo-container span8">
-                          <div class="photo">
-                            <img src="#{model.get("image")}" alt="#{i18nCommon.nouns.cover_photo}">
-                          </div>
-                          <a class="left modal-control-area" href="#">
-                            <span class="modal-control">&lsaquo;</span>
-                          </a>
-                          <a class="right modal-control-area" href="#">
-                            <span class="modal-control">&rsaquo;</span>
-                          </a>
-                        </div>
-                        <div class="caption span4">
-                          <div class="clearfix">
-                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                          </div>
-                          #{profileInfo}
-                          """
-            content += "<p class='desc'>#{title}</p>"
-            if model.get "isEvent"
-              content += "<p><strong>#{moment(model.get("startDate")).format("LLL")}"
-              content += " - #{moment(model.get("endDate")).format("h:mm a")}" if model.get "endDate"
-              content += "</strong></p>"
-            content += """
-                        </div>
-                      </div>
-                      """
-          else
-            content = """
-                      <div class="row-fluid">
-                        <div class="position-relative span8">
-                          <blockquote>
-                            #{title}
-                          </blockquote>
-                          <a class="left modal-control-area" href="#">
-                            <span class="modal-control">&lsaquo;</span>
-                          </a>
-                          <a class="right modal-control-area" href="#">
-                            <span class="modal-control">&rsaquo;</span>
-                          </a>
-                        </div>
-                        <div class="caption span4">
-                          <div class="clearfix">
-                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                          </div>
-                          #{profileInfo}
-                          """
-            if model.get "isEvent"
-              content += "<p><strong>#{moment(model.get("startDate")).format("LLL")}"
-              content += " - #{moment(model.get("endDate")).format("h:mm a")}" if model.get "endDate"
-              content += "</strong></p>"
-            content += """
-                        </div>
-                      </div>
-                      """
-        when "new_photo"
-          icon = 'photo'
-          content = """
-                    <div class="row-fluid">
-                      <div class="photo-container span8">
-                        <div class="photo">
-                          <img src="#{model.get("image")}" alt="#{i18nCommon.nouns.cover_photo}">
-                        </div>
-                        <a class="left modal-control-area" href="#">
-                          <span class="modal-control">&lsaquo;</span>
-                        </a>
-                        <a class="right modal-control-area" href="#">
-                          <span class="modal-control">&rsaquo;</span>
-                        </a>
-                      </div>
-                      <div class="caption span6">
-                        <div class="clearfix">
-                          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                        </div>
-                        <strong>#{title}</strong>
-                        #{footer}
-                      </div>
-                    </div>
-                    """
+      vars = _.merge model.toJSON(), 
+        url: model.url()
+        profileUrl: model.profileUrl()
+        start: moment(model.get("startDate")).format("LLL")
+        end: moment(model.get("endDate")).format("LLL")
+        postDate: moment(model.createdAt).fromNow()
+        liked: model.liked()
+        icon: model.icon()
+        name: model.name()
+        profilePic: model.profilePic("thumb")
+        i18nCommon: i18nCommon
 
-      # content += """
-      #             <a class="modal-control left" href="#">&lsaquo;</a>
-      #             <a class="modal-control right" href="#">&rsaquo;</a>
-      #            """
+      # Default options. 
+      _.defaults vars,
+        rent: false
+        image: false
+        isEvent: false
+        endDate: false
+        likeCount: 0
+        commentCount: 0
 
-      @$("#view-content-modal").html content
+      # Override default title.
+      vars.title = model.title()
+
+      @$("#view-content-modal").html JST["src/js/templates/activity/modal.jst"](vars)

@@ -92,7 +92,7 @@ define [
       else @model.set "profile", Parse.User.current().get("profile")
 
     togglePostPrivate: ->
-      if @model.get "public" then @model.set("public", false) else @model.set("public", true)
+      if $(this).is(":checked") then @model.set("public", false) else @model.set("public", true)
 
     toggleTime: ->
       unless @model.get "isEvent"
@@ -171,6 +171,10 @@ define [
 
       @listenTo @model, "change:property", =>
         if @model.get "property"
+
+          # We are private by default when posting to the property. Adjust model accordingly.
+          @togglePostPrivate()
+
           @$("#activity-profile-pic").prop "src", @model.get("property").cover("tiny") unless @model.get "profile"
           @marker.setVisible false
           @$('#property-options').removeClass 'hide'
@@ -180,6 +184,7 @@ define [
             center: @model.get("property").GPoint()
             zoom: 14
         else
+          @model.set "public", true
           @marker.setVisible true
           @$('#property-options').addClass 'hide'
           @view.map.setOptions
@@ -395,7 +400,7 @@ define [
       return @model.trigger "invalid", error: message: i18nCommon.errors.no_data unless data.title or @model.get("image")
 
       attrs = 
-        title: data.title      
+        title: data.title
 
       if @model.get("isEvent")
         
@@ -422,9 +427,10 @@ define [
 
         @listenTo @model, 'invalid', @handleError
         @marker.setMap null
+        @view.map.setOptions draggable: true
         @shown = false
         @render()
-      , (model, error) => console.log error
+      , (error) => console.log error
 
     # attachPhoto: ->
 

@@ -147,9 +147,10 @@ define [
 
     propertiesPublic: (country, region, city, id, slug) =>
       place = "#{city}--#{region}--#{country}"
-      require ["views/property/Public"], (PublicPropertyView) => 
-        new Parse.Query("Property").get id,
-          success: (model) => @view = new PublicPropertyView(model: model, place: place).render()
+      require ["models/Property", "views/property/Public"], (Property, PublicPropertyView) => 
+        new Parse.Query(Property).get id,
+          success: (model) =>
+            @view = new PublicPropertyView(model: model, place: place).render()
           error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
 
 

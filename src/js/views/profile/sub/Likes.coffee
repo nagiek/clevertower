@@ -17,14 +17,13 @@ define [
 
       unless @model.likes
         @model.likes = new ActivityList([], {})
-        @model.likes.query = profile.relation("likes").query()
+        @model.likes.query = @model.relation("likes").query()
       @listenTo @model.likes, "reset", @addAll
-
-      @$list = @$("> ul")
     
     render: ->      
 
       if @model.likes.length > 0 then @addAll else @model.likes.fetch()
+      @$list = @$("> ul")
       @
       
     # Activity
@@ -32,7 +31,7 @@ define [
     addOne : (a) =>
       view = new ActivityView
         model: a
-        active: @current or (Parse.User.current() and Parse.User.current().get("profile").likes.contains a)
+        liked: @current or (Parse.User.current() and Parse.User.current().get("profile").likes.contains a)
         currentProfile: @current
       @$list.append view.render().el
 

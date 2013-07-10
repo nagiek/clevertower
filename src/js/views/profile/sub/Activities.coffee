@@ -17,19 +17,20 @@ define [
       @model.prep('activities')
       @listenTo @model.activities, "reset", @addAll
 
-      @$list = @$("> ul")
-    
     render: ->      
 
       if @model.activities.length > 0 then @addAll else @model.activities.fetch()
-
+      @$list = @$("> ul")
       @
       
 
     # Activity
     # ---------
     addOne : (a) =>
-      @$list.append (new ActivityView(model: a)).render().el
+      view = new ActivityView
+        model: a
+        liked: Parse.User.current() and Parse.User.current().get("profile").likes.find (l) -> l.id is a.id
+      @$list.append view.render().el
 
     addAll : =>
       @$list.html ""
@@ -39,9 +40,9 @@ define [
         # Group by date.
         dates = @model.activities.groupBy (a) -> moment(a.createdAt).format("LL")
         _.each dates, (set, date) =>
-          @$list.append "<li class='nav-header'>#{date}</li>"
+          @$list.append "<li class='nav-header offset2'>#{date}</li>"
           _.each set, @addOne
-          @$list.append "<li class='divider'></li>"
+          @$list.append "<li class='divider clearfix'></li>"
 
       else @$list.html '<li class="empty">' + 
                                 if @current then i18nUser.empty.activities.self else i18nUser.empty.activities.other(name) +
