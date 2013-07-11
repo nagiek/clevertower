@@ -51,7 +51,7 @@ require.config
                               
     # Plugins                 
     # ---------------
-    typeahead:                "libs/typeahead.js/typeahead-computed"
+    typeahead:                "libs/typeahead.js/typeahead"
     pusher:                   "//d3dy5gmtp8yhk7.cloudfront.net/2.0/pusher.min"
     moment:                   "//cdnjs.cloudflare.com/ajax/libs/moment.js/2.0.0/moment.min"
     bootstrap:                "libs/bootstrap/bootstrap"    

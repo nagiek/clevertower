@@ -1,11 +1,11 @@
 /*!
- * typeahead.js 0.9.3
+ * typeahead.js 0.9.2
  * https://github.com/twitter/typeahead
  * Copyright 2013 Twitter, Inc. and other contributors; Licensed MIT
  */
 
 (function($) {
-    var VERSION = "0.9.3";
+    var VERSION = "0.9.2";
     var utils = {
         isMsie: function() {
             var match = /(msie) ([\w.]+)/i.exec(navigator.userAgent);
@@ -190,8 +190,6 @@
         var ls, methods;
         try {
             ls = window.localStorage;
-            ls.setItem("~~~", "!");
-            ls.removeItem("~~~");
         } catch (err) {
             ls = null;
         }
@@ -573,7 +571,6 @@
                 38: "up",
                 40: "down"
             };
-            this.$hint = $(o.hint);
             this.$input = $(o.input).on("blur.tt", this._handleBlur).on("focus.tt", this._handleFocus).on("keydown.tt", this._handleSpecialKeyEvent);
             if (!utils.isMsie()) {
                 this.$input.on("input.tt", this._compareQueryToInputValue);
@@ -612,9 +609,8 @@
                 }
             },
             destroy: function() {
-                this.$hint.off(".tt");
                 this.$input.off(".tt");
-                this.$hint = this.$input = this.$overflowHelper = null;
+                this.$input = this.$overflowHelper = null;
             },
             focus: function() {
                 this.$input.focus();
@@ -634,12 +630,7 @@
             setInputValue: function(value, silent) {
                 this.$input.val(value);
                 !silent && this._compareQueryToInputValue();
-            },
-            getHintValue: function() {
-                return this.$hint.val();
-            },
-            setHintValue: function(value) {
-                this.$hint.val(value);
+                return this.$input;
             },
             getLanguageDirection: function() {
                 return (this.$input.css("direction") || "ltr").toLowerCase();
@@ -721,7 +712,7 @@
             },
             _handleSelection: function($e) {
                 var $suggestion = $($e.currentTarget);
-                this.trigger("suggestionSelected", extractSuggestion($suggestion));
+                this.trigger("suggestionSelected", this.extractSuggestion($suggestion));
             },
             _show: function() {
                 this.$menu.css("display", "block");
@@ -730,7 +721,7 @@
                 this.$menu.hide();
             },
             _moveCursor: function(increment) {
-                var $suggestions, $cur, nextIndex, $underCursor;
+                var $suggestions, $cur, nextIndex;
                 if (!this.isVisible()) {
                     return;
                 }
@@ -745,20 +736,15 @@
                 } else if (nextIndex < -1) {
                     nextIndex = $suggestions.length - 1;
                 }
-                $underCursor = $suggestions.eq(nextIndex).addClass("tt-is-under-cursor");
-                this._ensureVisibility($underCursor);
-                this.trigger("cursorMoved", extractSuggestion($underCursor));
+                this._highlight(nextIndex);
+            },
+            _highlight: function(index) {
+                var $underCursor, $suggestions = this._getSuggestions();
+                $underCursor = $suggestions.eq(index).addClass("tt-is-under-cursor");
+                this.trigger("cursorMoved", this.extractSuggestion($underCursor));
             },
             _getSuggestions: function() {
                 return this.$menu.find(".tt-suggestions > .tt-suggestion");
-            },
-            _ensureVisibility: function($el) {
-                var menuHeight = this.$menu.height() + parseInt(this.$menu.css("paddingTop"), 10) + parseInt(this.$menu.css("paddingBottom"), 10), menuScrollTop = this.$menu.scrollTop(), elTop = $el.position().top, elBottom = elTop + $el.outerHeight(true);
-                if (elTop < 0) {
-                    this.$menu.scrollTop(menuScrollTop + elTop);
-                } else if (menuHeight < elBottom) {
-                    this.$menu.scrollTop(menuScrollTop + (elBottom - menuHeight));
-                }
             },
             destroy: function() {
                 this.$menu.off(".tt");
@@ -775,7 +761,6 @@
             close: function() {
                 if (this.isOpen) {
                     this.isOpen = false;
-                    this.isMouseOverDropdown = false;
                     this._hide();
                     this.$menu.find(".tt-suggestions > .tt-suggestion").removeClass("tt-is-under-cursor");
                     this.trigger("closed");
@@ -806,11 +791,14 @@
             },
             getSuggestionUnderCursor: function() {
                 var $suggestion = this._getSuggestions().filter(".tt-is-under-cursor").first();
-                return $suggestion.length > 0 ? extractSuggestion($suggestion) : null;
+                return $suggestion.length > 0 ? this.extractSuggestion($suggestion) : null;
             },
             getFirstSuggestion: function() {
                 var $suggestion = this._getSuggestions().first();
-                return $suggestion.length > 0 ? extractSuggestion($suggestion) : null;
+                return $suggestion.length > 0 ? this.extractSuggestion($suggestion) : null;
+            },
+            extractSuggestion: function($el) {
+                return $el.data("suggestion");
             },
             renderSuggestions: function(dataset, suggestions) {
                 var datasetClassName = "tt-dataset-" + dataset.name, wrapper = '<div class="tt-suggestion">%body</div>', compiledHtml, $suggestionsList, $dataset = this.$menu.find("." + datasetClassName), elBuilder, fragment, $el;
@@ -824,7 +812,6 @@
                     elBuilder = document.createElement("div");
                     fragment = document.createDocumentFragment();
                     utils.each(suggestions, function(i, suggestion) {
-                        suggestion.dataset = dataset.name;
                         compiledHtml = dataset.template(suggestion.datum);
                         elBuilder.innerHTML = wrapper.replace("%body", compiledHtml);
                         $el = $(elBuilder.firstChild).css(css.suggestion).data("suggestion", suggestion);
@@ -850,15 +837,12 @@
             }
         });
         return DropdownView;
-        function extractSuggestion($el) {
-            return $el.data("suggestion");
-        }
     }();
     var TypeaheadView = function() {
         var html = {
             wrapper: '<span class="twitter-typeahead"></span>',
             hint: '<input class="tt-hint" type="text" autocomplete="off" spellcheck="off" disabled>',
-            dropdown: '<span class="tt-dropdown-menu"></span>'
+            dropdown: '<span class="tt-dropdown-menu dropdown-menu input-xlarge"></span>'
         }, css = {
             wrapper: {
                 position: "relative",
@@ -899,7 +883,7 @@
             });
         }
         function TypeaheadView(o) {
-            var $menu, $input, $hint;
+            var $menu, $input;
             utils.bindAll(this);
             this.$node = buildDomStructure(o.input);
             this.datasets = o.datasets;
@@ -907,25 +891,17 @@
             this.eventBus = o.eventBus;
             $menu = this.$node.find(".tt-dropdown-menu");
             $input = this.$node.find(".tt-query");
-            $hint = this.$node.find(".tt-hint");
             this.dropdownView = new DropdownView({
                 menu: $menu
-            }).on("suggestionSelected", this._handleSelection).on("cursorMoved", this._clearHint).on("cursorMoved", this._setInputValueToSuggestionUnderCursor).on("cursorRemoved", this._setInputValueToQuery).on("cursorRemoved", this._updateHint).on("suggestionsRendered", this._updateHint).on("opened", this._updateHint).on("closed", this._clearHint).on("opened closed", this._propagateEvent);
+            }).on("suggestionSelected", this._handleSelection).on("cursorRemoved", this._updateHint).on("suggestionsRendered", this._updateHint).on("opened", this._updateHint).on("closed", this._clearHint).on("opened closed", this._propagateEvent);
             this.inputView = new InputView({
-                input: $input,
-                hint: $hint
-            }).on("focused", this._openDropdown).on("blured", this._closeDropdown).on("blured", this._setInputValueToQuery).on("enterKeyed tabKeyed", this._handleSelection).on("queryChanged", this._clearHint).on("queryChanged", this._clearSuggestions).on("queryChanged", this._getSuggestions).on("whitespaceChanged", this._updateHint).on("queryChanged whitespaceChanged", this._openDropdown).on("queryChanged whitespaceChanged", this._setLanguageDirection).on("escKeyed", this._closeDropdown).on("escKeyed", this._setInputValueToQuery).on("tabKeyed upKeyed downKeyed", this._managePreventDefault).on("upKeyed downKeyed", this._moveDropdownCursor).on("upKeyed downKeyed", this._openDropdown).on("tabKeyed leftKeyed rightKeyed", this._autocomplete);
+                input: $input
+            }).on("focused", this._openDropdown).on("blured", this._closeDropdown).on("blured", this._setInputValueToQuery).on("enterKeyed", this._handleSelection).on("queryChanged", this._clearSuggestions).on("queryChanged", this._getSuggestions).on("whitespaceChanged", this._updateHint).on("queryChanged whitespaceChanged", this._openDropdown).on("queryChanged whitespaceChanged", this._setLanguageDirection).on("escKeyed", this._closeDropdown).on("escKeyed", this._setInputValueToQuery).on("tabKeyed upKeyed downKeyed", this._managePreventDefault).on("upKeyed downKeyed", this._moveDropdownCursor).on("upKeyed downKeyed", this._openDropdown).on("tabKeyed leftKeyed rightKeyed", this._autocomplete);
         }
         utils.mixin(TypeaheadView.prototype, EventTarget, {
             _managePreventDefault: function(e) {
                 var $e = e.data, hint, inputValue, preventDefault = false;
                 switch (e.type) {
-                  case "tabKeyed":
-                    hint = this.inputView.getHintValue();
-                    inputValue = this.inputView.getInputValue();
-                    preventDefault = hint && hint !== inputValue;
-                    break;
-
                   case "upKeyed":
                   case "downKeyed":
                     preventDefault = !$e.shiftKey && !$e.ctrlKey && !$e.metaKey;
@@ -942,18 +918,10 @@
                 }
             },
             _updateHint: function() {
-                var suggestion = this.dropdownView.getFirstSuggestion(), hint = suggestion ? suggestion.value : null, dropdownIsVisible = this.dropdownView.isVisible(), inputHasOverflow = this.inputView.isOverflow(), inputValue, query, escapedQuery, beginsWithQuery, match;
-                if (hint && dropdownIsVisible && !inputHasOverflow) {
-                    inputValue = this.inputView.getInputValue();
-                    query = inputValue.replace(/\s{2,}/g, " ").replace(/^\s+/g, "");
-                    escapedQuery = utils.escapeRegExChars(query);
-                    beginsWithQuery = new RegExp("^(?:" + escapedQuery + ")(.*$)", "i");
-                    match = beginsWithQuery.exec(hint);
-                    this.inputView.setHintValue(inputValue + (match ? match[1] : ""));
+                var dropdownIsVisible = this.dropdownView.isVisible();
+                if (dropdownIsVisible) {
+                    this.dropdownView._highlight(0);
                 }
-            },
-            _clearHint: function() {
-                this.inputView.setHintValue("");
             },
             _clearSuggestions: function() {
                 this.dropdownView.clearSuggestions();
@@ -978,12 +946,11 @@
                 }
             },
             _handleSelection: function(e) {
-                var byClick = e.type === "suggestionSelected", suggestion = byClick ? e.data : this.dropdownView.getSuggestionUnderCursor();
+                var suggestion = this.dropdownView.getSuggestionUnderCursor();
                 if (suggestion) {
-                    this.inputView.setInputValue(suggestion.value);
-                    byClick ? this.inputView.focus() : e.data.preventDefault();
-                    byClick && utils.isMsie() ? utils.defer(this.dropdownView.close) : this.dropdownView.close();
-                    this.eventBus.trigger("selected", suggestion.datum, suggestion.dataset);
+                    Parse.history.navigate(suggestion.datum.url, true);
+                    this.inputView.setInputValue("").blur();
+                    this.eventBus.trigger("selected", suggestion.datum);
                 }
             },
             _getSuggestions: function() {
@@ -1013,7 +980,7 @@
                 if (hint !== "" && query !== hint) {
                     suggestion = this.dropdownView.getFirstSuggestion();
                     this.inputView.setInputValue(suggestion.value);
-                    this.eventBus.trigger("autocompleted", suggestion.datum, suggestion.dataset);
+                    this.eventBus.trigger("autocompleted", suggestion.datum);
                 }
             },
             _propagateEvent: function(e) {
@@ -1028,26 +995,15 @@
             setQuery: function(query) {
                 this.inputView.setQuery(query);
                 this.inputView.setInputValue(query);
-                this._clearHint();
                 this._clearSuggestions();
                 this._getSuggestions();
             }
         });
         return TypeaheadView;
         function buildDomStructure(input) {
-            var $wrapper = $(html.wrapper), $dropdown = $(html.dropdown), $input = $(input), $hint = $(html.hint);
+            var $wrapper = $(html.wrapper), $dropdown = $(html.dropdown), $input = $(input);
             $wrapper = $wrapper.css(css.wrapper);
             $dropdown = $dropdown.css(css.dropdown);
-            $hint.css(css.hint).css({
-                backgroundAttachment: $input.css("background-attachment"),
-                backgroundClip: $input.css("background-clip"),
-                backgroundColor: $input.css("background-color"),
-                backgroundImage: $input.css("background-image"),
-                backgroundOrigin: $input.css("background-origin"),
-                backgroundPosition: $input.css("background-position"),
-                backgroundRepeat: $input.css("background-repeat"),
-                backgroundSize: $input.css("background-size")
-            });
             $input.data("ttAttrs", {
                 dir: $input.attr("dir"),
                 autocomplete: $input.attr("autocomplete"),
@@ -1057,11 +1013,11 @@
             $input.addClass("tt-query").attr({
                 autocomplete: "off",
                 spellcheck: false
-            }).css(css.query);
+            });
             try {
                 !$input.attr("dir") && $input.attr("dir", "auto");
             } catch (e) {}
-            return $input.wrap($wrapper).parent().prepend($hint).append($dropdown);
+            return $input.wrap($wrapper).parent().append($dropdown);
         }
         function destroyDomStructure($node) {
             var $input = $node.find(".tt-query");
