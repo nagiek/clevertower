@@ -12,7 +12,7 @@ define [
   class ActivityListView extends Parse.View
     
     tagName: "li"
-    className: "thumbnail clearfix activity fade in span4 offset2"
+    className: "thumbnail clearfix activity fade in"
 
     events:
       "click .like-button"  : "likeOrLogin"

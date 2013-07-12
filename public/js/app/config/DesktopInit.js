@@ -1,6 +1,4 @@
 (function() {
-  var onNetwork, router;
-
   require.config({
     baseUrl: "/js",
     paths: {
@@ -84,11 +82,7 @@
     return window.google.maps;
   });
 
-  onNetwork = window.location.host.split(".").length > 2;
-
-  router = onNetwork ? "routers/Network" : "routers/Desktop";
-
-  require(["jquery", "underscore", "backbone", "facebook", "models/Property", "models/Unit", "models/Lease", "models/Profile", "collections/ListingFeaturedList", "collections/ActivityList", "collections/NotificationList", router, "underscore.string", "json2", "bootstrap", "serializeObject", "typeahead", "masonry"], function($, _, Parse, FB, Property, Unit, Lease, Profile, FeaturedListingList, ActivityList, NotificationList, AppRouter, _String) {
+  require(["jquery", "underscore", "backbone", "facebook", "models/Property", "models/Unit", "models/Lease", "models/Profile", "collections/ListingFeaturedList", "collections/ActivityList", "collections/NotificationList", "routers/Desktop", "underscore.string", "json2", "bootstrap", "serializeObject", "typeahead", "masonry"], function($, _, Parse, FB, Property, Unit, Lease, Profile, FeaturedListingList, ActivityList, NotificationList, AppRouter, _String) {
     var eventSplitter, eventsApi, listenEvents, listenMethods;
 
     eventSplitter = /\s+/;
@@ -186,7 +180,6 @@
       return _.countBy.apply(_, [this.models].concat(_.toArray(arguments)));
     };
     Parse.initialize(window.APPID, window.JSKEY);
-    Parse.onNetwork = onNetwork;
     Parse.App = {};
     Parse.App.featuredListings = new FeaturedListingList;
     Parse.App.countryCodes = {

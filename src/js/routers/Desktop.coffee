@@ -11,20 +11,34 @@ define [
       ""                            : "index"
       "properties/new"              : "propertiesNew"
       "places/:country/:region/:city/:id/:slug" : "propertiesPublic"
-      "manage"                      : "propertiesManage"
-      "manage/*splat"               : "propertiesManage"
+      "outside"                      : "search"
+      "outside/*splat"               : "search"
+      # "inside"                      : "propertiesManage"
+      # "inside/*splat"               : "propertiesManage"
       "network/new"                 : "networkNew"
-      "network/:name"               : "networkShow"
-      "search"                      : "search"
-      "search/*splat"               : "search"
+      # Network
+      "listings/new"                : "listingsNew"
+      "leases/new"                  : "leasesNew"
+      "tenants/new"                 : "tenantsNew"
+      "properties/new"              : "propertiesNew"
+      "properties/:id"              : "propertiesManage"
+      "properties/:id/*splat"       : "propertiesManage"
+      "properties/:id/*splat"       : "propertiesManage"
+      "inside/*splat"               : "insideManage"
+      "inside"                      : "insideManage"
+      # User
       "users/:id"                   : "profileShow"
       "users/:id/*splat"            : "profileShow"
       "notifications"               : "notifications"
       "account/setup"               : "accountSetup"
+      "account/signup"              : "signup"
+      "account/reset_password"      : "resetPassword"
+      "account/login"               : "login"
+      "account/logout"              : "logout"
       # "account/history/:category"   : "accountHistory"
       "account/*splat"              : "accountSettings"
       "oauth2callback"              : "oauth2callback"
-      "*actions"                    : "index"
+      "*actions"                    : "fourOhFour" # 404
 
     initialize: (options) ->
       Parse.history.start pushState: true
@@ -41,6 +55,7 @@ define [
           #     type:     'warning'
           #     fade:     true
           #     heading:  i18nProperty.errors.network_not_set
+          Parse.history.navigate "account/setup"
           @accountSetup()
         else
           # Reload the current path. Don't use navigate, as it will fail.
@@ -84,9 +99,14 @@ define [
           
     index: ->
       view = @view
-      require ["views/home/index"], (HomeIndexView) =>
-        if !view or view !instanceof HomeIndexView
-          @view = new HomeIndexView().render()
+      if Parse.User.current()
+        require ["views/activity/index"], (ActivityIndexView) =>
+          if !view or view !instanceof ActivityIndexView
+            @view = new ActivityIndexView(params: {}).render()  
+      else 
+        require ["views/home/anon"], (AnonHomeView) =>
+          if !view or view !instanceof AnonHomeView
+            @view = new AnonHomeView(params: {}).render()
 
     search: (splat) ->
       view = @view
@@ -104,6 +124,41 @@ define [
         @view.setElement "#main"
         @view.render()
 
+    insideManage: (splat) =>
+      view = @view
+      if Parse.User.current()
+        if Parse.User.current().get("network")
+          require ["views/network/Manage"], (NetworkView) => 
+            vars = @deparamAction splat
+            if !view or view !instanceof NetworkView
+              vars.model = Parse.User.current().get("network")
+              @view = new NetworkView(vars)
+            else
+              view.changeSubView(vars.path, vars.params)
+        else if Parse.User.current().get("property")
+          # If we can see the mgrRole, we must be part of it.
+          # Yes, this looks strange, but it works.
+          # 
+          # TODO: Or does it? Can't see propRole either. Check "AddTenants" function.
+          if Parse.User.current().get("property").get("mgrRole")
+            # Parse.User.current().get("property").get("mgrRole").getUsers().query().get Parse.User.current().id,
+            # success: =>
+            @propertiesManage Parse.User.current().get("property").id, splat
+          else
+          # error: =>
+            require ["views/lease/Manage"], (LeaseView) => 
+              if !view or view !instanceof LeaseView
+                vars.model = Parse.User.current().get("lease")
+                @view = new LeaseView(vars)
+              else
+                view.changeSubView(vars.path, vars.params)
+        else 
+          Parse.history.navigate "/account/setup"
+          @accountSetup()
+      else
+        @signupOrLogin()
+
+
     # Property
     # --------------
 
@@ -119,31 +174,39 @@ define [
 
     # DIFFERENT FROM NETWORK
     # FOR USER
-    propertiesManage: (splat) =>
+    propertiesManage: (id, splat) =>
+
       view = @view
       vars = @deparamAction splat
       # Check if we are managing the property or the lease.
-      # If we can see the mgrRole, we must be part of it.
-      # Yes, this looks strange, but it works.
-      # 
-      # TODO: Or does it? Can't see propRole either. Check "AddTenants" function.
-      if Parse.User.current().get("property").get("mgrRole")
-      # Parse.User.current().get("property").get("mgrRole").getUsers().query().get Parse.User.current().id,
-      # success: =>
+      if Parse.User.current().get("network") or Parse.User.current().get("property")
         require ["views/property/Manage"], (PropertyView) => 
           if !view or view !instanceof PropertyView
-            vars.model = Parse.User.current().get("property")
-            @view = new PropertyView(vars)
+
+            if Parse.User.current().get("network")
+              model = Parse.User.current().get("network").properties.get id
+            else if Parse.User.current().get("property")
+              model = Parse.User.current().get("property")
+
+            if model
+              vars.model = model
+              @view = new PropertyView(vars)
+            else
+              new Parse.Query("Property").get id,
+              success: (model) =>
+                # Network properties are being fetched. Might return before query finishes. 
+                # Can't add to collection without introducing possibility of duplicate add.
+                # @network.properties.add model
+                model.collection = Parse.User.current().get("network").properties
+                vars.model = model
+                @view = new PropertyView(vars)
+              error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
           else
             view.changeSubView(vars.path, vars.params)
+        
       else
-      # error: =>
-        require ["views/lease/Manage"], (LeaseView) => 
-          if !view or view !instanceof LeaseView
-            vars.model = Parse.User.current().get("lease")
-            @view = new LeaseView(vars)
-          else
-            view.changeSubView(vars.path, vars.params)
+        Parse.history.navigate "account/setup"
+        @accountSetup()
 
     propertiesPublic: (country, region, city, id, slug) =>
       place = "#{city}--#{region}--#{country}"
@@ -162,6 +225,9 @@ define [
       require ["models/Profile", "views/profile/Show"], (Profile, ShowProfileView) =>
         vars = @deparamAction splat
         if !view or view !instanceof ShowProfileView
+          # Default id is current user
+          if not id and Parse.User.current() then id = Parse.User.current().get("profile").id
+
           if Parse.User.current() and Parse.User.current().get("profile") and id is Parse.User.current().get("profile").id
             @view = new ShowProfileView path: vars.path, params: vars.params, model: Parse.User.current().get("profile"), current: true
           else
@@ -198,7 +264,43 @@ define [
         require ["views/notification/All"], (AllNotificationsView) =>
           @view = new AllNotificationsView().render()
       else
-        @signupOrLogin()  
+        @signupOrLogin()
+
+
+    # Auth
+    # --------------
+
+    signup : ->
+      unless Parse.User.current()
+        require ["views/user/Signup"], (SignupView) =>
+          @view = new SignupView().render()
+      else
+        Parse.history.navigate "users/#{Parse.User.current().get("profile").id}"
+        @profileShow()
+
+    login : ->
+      unless Parse.User.current()
+        require ["views/user/Login"], (LoginView) =>
+          @view = new LoginView().render()
+      else
+        Parse.history.navigate "users/#{Parse.User.current().get("profile").id}"
+        @profileShow()
+
+    resetPassword : ->
+      require ["views/user/Reset"], (ResetView) =>
+        @view = new ResetView().render()
+
+    logout : ->
+      if Parse.User.current()
+        Parse.User.logOut()
+        Parse.Dispatcher.trigger "user:change"
+        Parse.Dispatcher.trigger "user:logout"
+        Parse.history.navigate ""
+        @index()
+      else 
+        Parse.history.navigate "/account/login"
+        @login()
+
 
     # OAuth
     # --------------
@@ -243,6 +345,16 @@ define [
     # Utilities
     # --------------
   
+    fourOhFour : ->
+      require ["views/helper/Alert", 'i18n!nls/common'], (Alert, i18nCommon) -> 
+        new Alert
+          event:    'access-denied'
+          type:     'error'
+          fade:     true
+          heading:  i18nCommon.errors.fourOhFour
+          message:  i18nCommon.errors.not_found
+        Parse.history.navigate "/", true
+
     deparamAction : (splat) ->
       unless splat then return path: "", params: {}
       

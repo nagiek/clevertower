@@ -27,7 +27,8 @@ define [
         @pusher.subscribe "networks-#{Parse.User.current().get("network").id}" 
         @listenTo Parse.User.current().get("network").properties, "add", @subscribeProperty
 
-      @listenTo Parse.User.current().get("profile"), "sync", @updateNav
+      @listenTo Parse.User.current().get("profile"), "change:image_profile", @updatePic
+      @listenTo Parse.User.current().get("profile"), "change:first_name change:last_name", @updateName
       @render()
           
     registerUser : =>
@@ -68,6 +69,5 @@ define [
       @
 
 
-    updateNav: ->
-      @$('#profile-link img').prop "src", Parse.User.current().get("profile").cover("micro")
-      @$('#profile-link span').html Parse.User.current().get("profile").name()
+    updateNav: -> @$('#profile-link img').prop "src", Parse.User.current().get("profile").cover("micro")
+    updateName: -> @$('#profile-link span').html Parse.User.current().get("profile").name()

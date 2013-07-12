@@ -44,7 +44,7 @@ define [
 
     render : ->
       _this = this
-      @$el.html JST["src/js/templates/property/sub/photos.jst"](property: @model, i18nProperty: i18nProperty, i18nCommon: i18nCommon)
+      @$el.html JST["src/js/templates/property/sub/photos.jst"](i18nProperty: i18nProperty, i18nCommon: i18nCommon)
       @$list = $("#photo-list")
       @$fileForm = $("#fileupload")
 

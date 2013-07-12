@@ -8,11 +8,10 @@
       </div>
     </div>
     <div class="name-group control-group">
-      <label for="network-name" class="control-label"><%= i18nProperty.network.claim_domain %> <span class="required">*</span></label>
+      <label for="network-name" class="control-label"><%= i18nProperty.network.claim_username %> <span class="required">*</span></label>
       <div class="controls">
         <div class="input-append">
-          <input type="text" id="network-name" class="input-block input-large text-right" name="network[name]" maxlength="32" value="<%= network.name %>" required="required" />
-          <span class="add-on">.clevertower.com</span>
+          <input type="text" id="network-name" class="input-block input-large" name="network[name]" maxlength="32" value="<%= network.name %>" required="required" />
         </div>
         <p class="help-block"><%= i18nCommon.form.lowercase_only %></p>
       </div>

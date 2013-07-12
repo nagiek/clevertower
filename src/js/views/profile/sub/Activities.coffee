@@ -14,13 +14,12 @@ define [
     
     initialize: (attrs) ->
       @current = attrs.current
+      @$list = @$("ul")
       @model.prep('activities')
       @listenTo @model.activities, "reset", @addAll
 
     render: ->      
-
-      if @model.activities.length > 0 then @addAll else @model.activities.fetch()
-      @$list = @$("> ul")
+      if @model.activities.length > 0 then @addAll() else @model.activities.fetch()
       @
       
 
@@ -40,7 +39,7 @@ define [
         # Group by date.
         dates = @model.activities.groupBy (a) -> moment(a.createdAt).format("LL")
         _.each dates, (set, date) =>
-          @$list.append "<li class='nav-header offset2'>#{date}</li>"
+          @$list.append "<li class='nav-header'>#{date}</li>"
           _.each set, @addOne
           @$list.append "<li class='divider clearfix'></li>"
 

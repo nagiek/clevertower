@@ -14,16 +14,13 @@ define [
     
     initialize: (attrs) ->
       @current = attrs.current
+      @$list = @$("ul")
 
-      unless @model.likes
-        @model.likes = new ActivityList([], {})
-        @model.likes.query = @model.relation("likes").query()
       @listenTo @model.likes, "reset", @addAll
     
     render: ->      
 
-      if @model.likes.length > 0 then @addAll else @model.likes.fetch()
-      @$list = @$("> ul")
+      if @model.likes.length > 0 then @addAll() else @model.likes.fetch()
       @
       
     # Activity

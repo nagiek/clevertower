@@ -34,8 +34,9 @@ define [
     url: -> "/users/#{@id}"
 
     cover: (format) ->
+      if format is "micro" or format is "tiny" then format = "thumb"
       img = @get "image_#{format}"
-      img = "/img/fallback/avatar-#{format}.png" if img is '' or !img?
+      img = "/img/fallback/avatar-#{format}.png" unless img
       img
       
     name: ->

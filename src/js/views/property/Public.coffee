@@ -89,9 +89,9 @@ define [
             anchor: null
             scaledSize: null
 
-      @$activity = $("#activity > ul")
-      @$photos = $("#photos > ul")
-      @$listings = $("#listings > table > tbody")
+      @$activity = @$("#activity ul")
+      @$photos = @$("#photos ul")
+      @$listings = @$("#listings > table > tbody")
       
       if @model.activity.length is 0 then @model.activity.fetch() else @addAllActivity()
       if @model.photos.length is 0 then @model.photos.fetch() else @addAllPhotos()
@@ -110,7 +110,7 @@ define [
 
       @$activity.html ""
 
-      visible = @model.activity.select (a) => console.log a; a.get("property").id is @model.id
+      visible = @model.activity.select (a) => a.get("property").id is @model.id
       if visible.length > 0 then _.each visible, @addOneActivity
       else @$activity.before '<p class="empty">' + i18nProperty.tenant_empty.activity + '</p>'
 

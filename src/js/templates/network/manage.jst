@@ -5,31 +5,35 @@
       <div class="span4">
         <ul class="nav nav-list well">
           <li>
-            <a class="stay-right" href="/network/edit" rel="tooltip" data-original-title="<%= i18nCommon.actions.edit %>">
+            <a class="stay-right" href="/inside/edit" rel="tooltip" data-original-title="<%= i18nCommon.actions.edit %>">
               <i class="icon icon-edit"></i>
             </a>
             <h3><%= title %></h3>
           </li>
-          <li id="properties-link"><a href="/"><%= i18nCommon.classes.Properties %><span class="pull-right badge count"></span></a></li>
+          <li id="properties-link">
+            <a href="/inside"><%= i18nCommon.classes.Properties %>
+              <span class="pull-right badge count"></span>
+            </a>
+          </li>
           <li id="listings-link">
-            <a href="/network/listings"><%= i18nCommon.classes.Listings %>
+            <a href="/inside/listings"><%= i18nCommon.classes.Listings %>
               <span class="pull-right badge count"></span>
             </a>
           </li>
           <li id="tenants-link">
-            <a href="/network/tenants"><%= i18nCommon.classes.Tenants %>
+            <a href="/inside/tenants"><%= i18nCommon.classes.Tenants %>
               <span class="pull-right badge count"></span>
             </a>
           </li>
           <li class="divider"></li>
           <li id="managers-link">
-            <a href="/network/managers"><%= i18nCommon.classes.Managers %>
+            <a href="/inside/managers"><%= i18nCommon.classes.Managers %>
               <span class="pull-right badge count"></span>
             </a>
           </li>
           <!--
           <li id="reports-link">
-            <a href="/network/reports"><%= i18nProperty.menu.reports %>
+            <a href="/inside/reports"><%= i18nProperty.menu.reports %>
               <span class="pull-right badge count"></span>
             </a>
           </li>
@@ -37,7 +41,7 @@
           <li>
             <a href="<%= public_url %>">
               <span class="display-block"><%= i18nProperty.menu.view_public %></span>
-              <small><%= i18nCommon.prepositions.at %> clevertower.com/networks/<%= name %></small>
+              <small><%= i18nCommon.prepositions.at %> clevertower.com/insides/<%= name %></small>
             </a>
           </li>
           -->

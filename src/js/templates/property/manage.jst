@@ -1,11 +1,11 @@
 <div id="property" class="container">
   <div class="page-header clearfix">    
-    <div class="photo photo-thumbnail photo-elastic pull-left tablet-left">
+    <div id="property-picture" class="photo photo-thumbnail photo-elastic pull-left tablet-left">
       <a href="<%= baseUrl %>">
         <img src="<%= cover %>" alt="Profile" class="img-rounded profile-picture">
       </a>
-      <div class="photo-actions hide">
-        <button type="button" role="button" class="btn btn-small edit-profile-picture">
+      <div class="photo-actions">
+        <button type="button" role="button" id="edit-property-picture" class="btn btn-small">
           <i class="icon-edit"></i>
         </button>
       </div>
@@ -75,19 +75,18 @@
   <div class="content fade"></div>
 </div>
 
-<div id="edit-profile-picture-modal" class="modal form-modal hide fade">
-  <form id="profile-picture-upload-form" method="POST">
+<div id="edit-property-picture-modal" class="modal form-modal hide fade">
+  <form id="property-picture-upload-form" method="POST">
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-labelledby="edit-profile-picture-modal-label" aria-hidden="true">&times;</button>
-      <h3 id="edit-profile-picture-modal-label"><%= i18nProperty.actions.edit_picture %></h3>
+      <button type="button" class="close" data-dismiss="modal" aria-labelledby="edit-property-picture-modal-label" aria-hidden="true">&times;</button>
+      <h3 id="edit-property-picture-modal-label"><%= i18nCommon.actions.edit_picture %></h3>
     </div>
     <div class="modal-body">
       <div class="row-fluid control-group">
-        <div id="preview-profile-picture" class="preview template-upload">
+        <div id="preview-property-picture" class="preview template-upload">
           <img src="<%= cover %>" alt="Profile" class="profile-picture span4 offset1">
         </div>
-        <div id="profile-picture-controls" class="span6 offset1">
-          <div id="preview-profile-picture-name"></div>
+        <div id="property-picture-controls" class="span6 offset1">
           <div class="fileupload-buttonbar">
             <button type="button" id="file-input" class="btn fileinput-button">
                 <span><%= i18nCommon.actions.choose_file %></span>
@@ -115,7 +114,7 @@
       </div>    
     </div>
     <div class="modal-footer">
-      <button class="start btn btn-primary"><%= i18nCommon.actions.upload %></button>
+      <button class="save btn btn-primary"><%= i18nCommon.actions.upload %></button>
       <button class="btn" data-dismiss="modal"><%= i18nCommon.actions.close %></button>
     </div>
   </form>

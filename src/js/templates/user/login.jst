@@ -1,0 +1,37 @@
+<div class="container">
+  <div id="login" class="modal modal-form modal-large show">
+    <form id="login-form" class="form-xlarge">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-labelledby="login-label" aria-hidden="true">&times;</button>
+        <h3 id="login-label" class="inline-block"><%= i18nDevise.actions.login %></h3>
+        <p class="inline-block">(<a id="switch-signup" href="/account/signup"><%= i18nDevise.switch.signup %></a>)</p>
+      </div>
+      <div class="modal-body">
+        <button type="button" class="btn-facebook btn-large btn-block"><%= i18nDevise.actions.sign_in_with("Facebook") %></button>
+        <hr>
+        <fieldset>
+          <div class="alert alert-error" style="display:none"></div>        
+          <legend class="text-center">- <%= i18nCommon.conjuctions.or %> <%= i18nDevise.actions.sign_in_with("Email") %> -</legend>
+          <div class="row-fluid">
+            <div class="control-group username-group align-top span6">
+              <label for="login-username" class="control-label element-invisible"><%= i18nDevise.form.email %>:</label>
+              <div class="controls">
+                <input type="email" name="login-username" id="login-username" class="input-block-level" placeholder="<%= i18nDevise.form.email %>">
+              </div>
+            </div>
+            <div class="control-group password-group align-top span6">
+              <label for="login-password" class="control-label element-invisible"><%= i18nDevise.form.password %>:</label>
+              <div class="controls">
+                <input type="password" name="login-password" id="login-password" class="input-block-level" placeholder="<%= i18nDevise.form.password %>">
+              </div>
+              <p class="help-block"><small><a class="reset-password-link" href="/account/reset_password"><%= i18nDevise.actions.forgot_your_password %></a></small></p>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary btn-large btn-block"><%= i18nDevise.actions.login %></button>
+      </div>
+    </form>
+  </div>
+</div>

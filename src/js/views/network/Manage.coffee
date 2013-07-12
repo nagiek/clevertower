@@ -23,12 +23,20 @@ define [
       @listenTo @model.managers, 'add reset', @updateManagerCount
       @listenTo @model.listings, 'add reset', @updateListingCount
       @listenTo @model.tenants, 'add reset', @updateTenantCount
+
+      @listenTo Parse.Dispatcher, "user:logout", @clear
       
       @listenTo @model, 'destroy', -> Parse.Dispatcher.trigger "user:logout"
       
       # Render immediately, as we will display a subview
       @render()
       @changeSubView attrs.path, attrs.params
+
+    clear: =>
+      Parse.history.navigate "/", true
+      @undelegateEvents()
+      @stopListening()
+      delete this
 
     # Re-render the contents of the property item.
     render: =>

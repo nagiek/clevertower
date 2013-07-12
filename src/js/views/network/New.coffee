@@ -54,8 +54,9 @@ define [
         new Alert(event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success')
         
         # Navigate after a second.
-        domain = "#{location.protocol}//#{model.get("name")}.#{location.host}"
-        setTimeout window.location.replace domain, 1000
+        setTimeout Parse.history.navigate("/inside", true), 1000
+        # domain = "#{location.protocol}//#{model.get("name")}.#{location.host}"
+        # setTimeout window.location.replace domain, 1000
     
     showTab: (e) -> 
       e.preventDefault()
@@ -99,7 +100,9 @@ define [
       data = @$('form').serializeObject()
       @$('button.save').prop "disabled", "disabled"
 
-      @model.save data.network,
+      attrs = @model.scrub data.network
+
+      @model.save attrs,
       success: (model) =>
         @model.trigger "sync", model # This is triggered automatically in Backbone, but not Parse.
         @trigger "save:success", model, this

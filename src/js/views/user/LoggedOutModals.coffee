@@ -16,12 +16,12 @@ define [
     el: "body"
 
     events:
-      "submit form#login-form"              : "logIn"
-      "submit form#signup-form"             : "signUp"
+      "submit form#login-modal-form"        : "logIn"
+      "submit form#signup-modal-form"       : "signUp"
       "submit form#reset-password-form"     : "resetPassword"
-      "click #switch-signup"                : "switchToSignup"
-      "click #switch-login"                 : "switchToLogin"
-      "click .reset-password-link"          : "switchToResetPassword"
+      "click #switch-signup-modal"          : "switchToSignup"
+      "click #switch-login-modal"           : "switchToLogin"
+      "click #login-modal-form .reset-password-link" : "switchToResetPassword"
       "click .btn-facebook"                 : "logInWithFacebook"
 
     initialize: ->
@@ -62,24 +62,24 @@ define [
 
     logIn: (e) =>
       e.preventDefault()
-      @$("> #login-modal #login-form button").prop "disabled", "disabled"
-      email = @$("#login-username").val()
-      password = @$("#login-password").val()
+      @$("> #login-modal #login-modal-form button").prop "disabled", "disabled"
+      email = @$("#login-modal-username").val()
+      password = @$("#login-modal-password").val()
       Parse.User.logIn email, password,
         success: (user) =>
           @$('> #login-modal').modal('hide')
           Parse.Dispatcher.trigger "user:loginStart", user
 
         error: (user, error) =>
-          @$("> #login-modal #login-form button").removeProp "disabled"
-          @$('> #login-modal #login-form .username-group').addClass('error')
-          @$('> #login-modal #login-form .password-group').addClass('error')
+          @$("> #login-modal #login-modal-form button").removeProp "disabled"
+          @$('> #login-modal #login-modal-form .username-group').addClass('error')
+          @$('> #login-modal #login-modal-form .password-group').addClass('error')
 
           msg = switch error.code
             when -1   then i18nDevise.errors.fields_missing
             else i18nDevise.errors.invalid_login
           
-          @$("> #login-modal #login-form .alert-error").html(msg).show()
+          @$("> #login-modal #login-modal-form .alert-error").html(msg).show()
 
     logInWithFacebook : (e) =>  
       e.preventDefault()
@@ -93,14 +93,14 @@ define [
             
     signUp: (e) =>
       e.preventDefault()
-      @$("> #signup-modal #signup-form button").prop "disabled", "disabled"
-      email = @$("#signup-username").val()
-      password = @$("#signup-password").val()
-      user_type = if @$(".type-group :checked").prop('id') is 'signup-tenant' then 'tenant' else 'manager'
+      @$("> #signup-modal #signup-modal-form button").prop "disabled", "disabled"
+      email = @$("#signup-modal-username").val()
+      password = @$("#signup-modal-password").val()
+      user_type = if @$(".type-group :checked").prop('id') is 'signup-modal-tenant' then 'tenant' else 'manager'
       Parse.User.signUp email, password, { user_type: user_type, email: email, ACL: new Parse.ACL() },
         success: (user) =>
           @$('> #signup-modal').modal('hide')
-          @$("> #signup-modal #signup-form button").removeProp "disabled"
+          @$("> #signup-modal #signup-modal-form button").removeProp "disabled"
 
           # Skip the user-setup phase, as we will not have anything to add.
           # Only extra things we need are the profile and notifications.
@@ -116,8 +116,8 @@ define [
           Parse.history.navigate "/account/setup", trigger: true
 
         error: (user, error) =>
-          @$("> #signup-modal #signup-form .error").removeClass 'error'
-          @$("> #signup-modal #signup-form button").removeProp "disabled"
+          @$("> #signup-modal #signup-modal-form .error").removeClass 'error'
+          @$("> #signup-modal #signup-modal-form button").removeProp "disabled"
           msg = switch error.code
             when 125  then i18nDevise.errors.invalid_email_format
             when 202  then i18nDevise.errors.username_taken
@@ -128,22 +128,22 @@ define [
             when 125 or 202 
               @$('.username-group').addClass('error')
             when -1   
-              @$('> #signup-modal #signup-form username-group').addClass('error')
-              @$('> #signup-modal #signup-form password-group').addClass('error')
+              @$('> #signup-modal #signup-modal-form username-group').addClass('error')
+              @$('> #signup-modal #signup-modal-form password-group').addClass('error')
 
-          @$("> #signup-modal #signup-form .alert-error").html(msg).show()
+          @$("> #signup-modal #signup-modal-form .alert-error").html(msg).show()
 
 
     switchToSignup: (e) =>
       e.preventDefault()
       @$('> .modal.in').modal('hide')
       @$('> #signup-modal').modal()
-      @$("#signup-username").focus()
+      @$("#signup-modal-username").focus()
     switchToLogin: (e) =>
       e.preventDefault()
       @$('> .modal.in').modal('hide')
       @$('> #login-modal').modal()
-      @$("#login-username").focus()
+      @$("#login-modal-username").focus()
     switchToResetPassword: (e) =>
       e.preventDefault()
       @$('> .modal.in').modal('hide')

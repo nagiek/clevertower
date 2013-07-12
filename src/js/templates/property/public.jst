@@ -29,9 +29,11 @@
 
       <div class="tab-content">
         <div class="tab-pane active" id="activity">
-          <ul class="row no-bullet">
-            <li><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" /></li>
-          </ul>
+          <div class="row">
+            <ul class="span4 offset2 no-bullet">
+              <li class="loading center"><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" /></li>
+            </ul>
+          </div>
         </div>
         <div class="tab-pane" id="listings">
           <table class="table">
@@ -42,13 +44,13 @@
               <th><span class="element-invisible"><%=i18nCommon.form.Operations%></span></th>
             </thead>
             <tbody>
-              <tr><td colspan="4"><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" /></td></tr>
+              <tr><td colspan="4" class="center"><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" /></td></tr>
             </tbody>
           </table>
         </div>
         <div class="tab-pane" id="photos">
           <ul class="row no-bullet">
-            <li><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" /></li>
+            <li class="loading center"><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" /></li>
           </ul>
         </div>
         <% if (property.description) { %>

@@ -48,5 +48,9 @@ define [
 
       @[collectionName]
 
+    scrub: (attrs) ->
+      attrs.name = attrs.name.toLowerCase() if attrs.name
+      attrs
+
     publicUrl: -> "/networks/#{@id}"
     privateUrl: -> "#{location.protocol}//#{@get("name")}.#{location.host}"

@@ -24,35 +24,28 @@ define [
       @listenTo Parse.User.current().get("network"), "change:name", @render if Parse.User.current().get("network")
       
     render: =>  
-      @$('#home-nav a').html i18nCommon.verbs.explore
+      @$('#home-nav a').html i18nCommon.nouns.outside # i18nCommon.verbs.explore
+      @$('#network-nav a').html i18nCommon.nouns.inside # #{i18nCommon.verbs.manage}
 
-      hostArray = location.host.split(".")
-      hostArray.shift()
+      # hostArray = location.host.split(".")
+      # hostArray.shift()
 
       # Check if we are on a subdomain or not.
       # We measure hostArray.length > 2 instead of 1 because it is after shift
-      homePrefix = if hostArray.length > 1 then '//' + hostArray.join(".") else ""
+      # homePrefix = if hostArray.length > 1 then '//' + hostArray.join(".") else ""
 
-      @$('#home-nav a').prop "href", homePrefix + "/search"
+      # @$('#home-nav a').prop "href", "/outside" # homePrefix + 
 
-      if Parse.User.current()
+      # if Parse.User.current()
 
-        # Set the link to the network subdomain.
-        if Parse.User.current().get("network") 
-          networkUrl = if hostArray.length > 1 then "/" else Parse.User.current().get("network").privateUrl()
-        else if Parse.User.current().get("property")
+      #   # Set the link to the network subdomain.
+      #   if Parse.User.current().get("network") or Parse.User.current().get("property")
+      #   #   networkUrl = if hostArray.length > 1 then "/" else Parse.User.current().get("network").privateUrl()
+      #   # else if Parse.User.current().get("property")
+      #     networkUrl = "/inside"
+      #   # We have no network or property.
+      #   else networkUrl = "/account/setup"
 
-          # /manage contains a link to upgrade.
-          networkUrl = "/manage"
+      #   @$('#network-nav a').prop "href", networkUrl
 
-          # if Parse.User.current().get("mgrOfProp") and !Parse.User.current().get("property").get("network")
-          #   networkUrl = "/manage"
-          # else networkUrl = "/network/new"
-
-        # We have no network or property.
-        else networkUrl = "/account/setup"
-        @$('#network-nav').html "<a href='#{networkUrl}'>#{i18nCommon.verbs.manage}</a>"
-
-      else
-        @$('#network-nav').html ""
       @

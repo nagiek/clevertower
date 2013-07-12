@@ -34,7 +34,6 @@
 
         _this = this;
         this.$el.html(JST["src/js/templates/property/sub/photos.jst"]({
-          property: this.model,
           i18nProperty: i18nProperty,
           i18nCommon: i18nCommon
         }));

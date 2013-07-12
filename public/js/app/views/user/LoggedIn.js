@@ -27,7 +27,8 @@
           this.pusher.subscribe("networks-" + (Parse.User.current().get("network").id));
           this.listenTo(Parse.User.current().get("network").properties, "add", this.subscribeProperty);
         }
-        this.listenTo(Parse.User.current().get("profile"), "sync", this.updateNav);
+        this.listenTo(Parse.User.current().get("profile"), "change:image_profile", this.updatePic);
+        this.listenTo(Parse.User.current().get("profile"), "change:first_name change:last_name", this.updateName);
         return this.render();
       };
 
@@ -70,7 +71,10 @@
       };
 
       LoggedInView.prototype.updateNav = function() {
-        this.$('#profile-link img').prop("src", Parse.User.current().get("profile").cover("micro"));
+        return this.$('#profile-link img').prop("src", Parse.User.current().get("profile").cover("micro"));
+      };
+
+      LoggedInView.prototype.updateName = function() {
         return this.$('#profile-link span').html(Parse.User.current().get("profile").name());
       };
 

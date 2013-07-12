@@ -45,11 +45,23 @@ html(lang="en")
               img(src="/img/logo/logo.png", alt="logo")
             ul.nav#domain-menu
               li#home-nav
-                a(href="/search") Explore
+                a(href="/outside") Outside
               li#network-nav
+                a(href="/inside") Inside
             .nav-collapse.collapse
               ul.nav#search-menu
+                li
+                  form.form-search.navbar-search
+                    .controls
+                      .input-append
+                        input.input-large.typeahead.search.search-query(type="text", name="q", placeholder="Search", autocomplete="off", spellcheck="false", dir="auto")
+                        button.btn(type="submit", rel="tooltip", data-original-title="Search")
+                          i.icon.icon-search
               ul.nav.pull-right#user-menu
+                li
+                  a#login-link(href="#") Login
+                li
+                  a#signup-link(href="#") Sign up
 
     // Branding
     #brand-strip.hide

@@ -1,9 +1,9 @@
 <div id="login-modal" class="modal modal-form modal-large fade hide">
-  <form id="login-form" class="form-xlarge">
+  <form id="login-modal-form" class="form-xlarge">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-labelledby="login-modal-label" aria-hidden="true">&times;</button>
       <h3 id="login-modal-label" class="inline-block"><%= i18nDevise.actions.login %></h3>
-      <p class="inline-block">(<a id="switch-signup" href="#"><%= i18nDevise.switch.signup %></a>)</p>
+      <p class="inline-block">(<a id="switch-signup-modal" href="#"><%= i18nDevise.switch.signup %></a>)</p>
     </div>
     <div class="modal-body">
       <button type="button" class="btn-facebook btn-large btn-block"><%= i18nDevise.actions.sign_in_with("Facebook") %></button>
@@ -15,13 +15,13 @@
           <div class="control-group username-group align-top span6">
             <label for="login-username" class="control-label element-invisible"><%= i18nDevise.form.email %>:</label>
             <div class="controls">
-              <input type="email" name="login-username" id="login-username" class="input-block-level" placeholder="<%= i18nDevise.form.email %>">
+              <input type="email" name="login-username" id="login-modal-username" class="input-block-level" placeholder="<%= i18nDevise.form.email %>">
             </div>
           </div>
           <div class="control-group password-group align-top span6">
             <label for="login-password" class="control-label element-invisible"><%= i18nDevise.form.password %>:</label>
             <div class="controls">
-              <input type="password" name="login-password" id="login-password" class="input-block-level" placeholder="<%= i18nDevise.form.password %>">
+              <input type="password" name="login-password" id="login-modal-password" class="input-block-level" placeholder="<%= i18nDevise.form.password %>">
             </div>
             <p class="help-block"><small><a class="reset-password-link" href="#"><%= i18nDevise.actions.forgot_your_password %></a></small></p>
           </div>
@@ -35,11 +35,11 @@
 </div>
 
 <div id="signup-modal" class="modal modal-form modal-large modal-thin fade hide">
-  <form id="signup-form" class="form-xlarge">
+  <form id="signup-modal-form" class="form-xlarge">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-labelledby="signup-modal-label" aria-hidden="true">&times;</button>
       <h3 id="signup-modal-label" class="inline-block"><%= i18nDevise.actions.signup %></h3>
-      <p class="inline-block">(<a id="switch-login" href="#"><%= i18nDevise.switch.login %></a>)</p>
+      <p class="inline-block">(<a id="switch-login-modal" href="#"><%= i18nDevise.switch.login %></a>)</p>
     </div>
     <div class="modal-body">
       <button type="button" class="btn-facebook btn-large btn-block"><%= i18nDevise.actions.sign_up_with("Facebook") %></button>
@@ -50,13 +50,13 @@
         <div class="control-group username-group">
           <label for="signup-username" class="control-label element-invisible"><%= i18nDevise.form.email %>:</label>
           <div class="controls">
-            <input type="email" name="signup-username" id="signup-username" class="input-block-level" placeholder="<%= i18nDevise.form.email %>">
+            <input type="email" name="signup-username" id="signup-modal-username" class="input-block-level" placeholder="<%= i18nDevise.form.email %>">
           </div>
         </div>
         <div class="control-group password-group">
           <label for="signup-password" class="control-label element-invisible"><%= i18nDevise.form.password %>:</label>
           <div class="controls">
-            <input type="password" name="signup-password" id="signup-password" class="input-block-level" placeholder="<%= i18nDevise.form.password %>">
+            <input type="password" name="signup-password" id="signup-modal-password" class="input-block-level" placeholder="<%= i18nDevise.form.password %>">
           </div>
         </div>
         <div class="control-group type-group">
@@ -64,8 +64,8 @@
           <div class="controls inline-block">
             <div class="toggle">
             <label class="toggle-radio" for="signup-tenant"><%= i18nDevise.form.type.tenant %></label>
-            <input type="radio" name="type" id="signup-tenant" value="tenant" checked="checked">
-            <input type="radio" name="type" id="signup-manager" value="manager">
+            <input type="radio" name="type" id="signup-modal-tenant" value="tenant" checked="checked">
+            <input type="radio" name="type" id="signup-modal-manager" value="manager">
             <label class="toggle-radio" for="signup-manager"><%= i18nDevise.form.type.manager %></label>
           </div>
           </div>
@@ -79,7 +79,7 @@
 </div>
 
 <div id="reset-password-modal" class="modal modal-form modal-large fade hide">
-  <form id="reset-password-form" class="form-large">
+  <form id="reset-password-form" class="form-xlarge">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-labelledby="reset-password-modal-label" aria-hidden="true">&times;</button>
       <h3 id="reset-password-modal-label"><%= i18nDevise.actions.forgot_your_password %></h3>
@@ -88,7 +88,7 @@
       <div id="reset-email-group" class="control-group">
         <label for="email" class="control-label element-invisible"><%= i18nDevise.form.email %>:</label>
         <div class="controls">
-          <input type="email" name="email" id="reset-email" class="span input-tall input-block-level" size="22" placeholder="<%= i18nDevise.form.email %>">
+          <input type="email" name="email" id="reset-modal-email" class="span input-tall input-block-level" size="22" placeholder="<%= i18nDevise.form.email %>">
           <p class="help-block"><%= i18nDevise.form.instructions_to_email %></p>
         </div>
       </div>

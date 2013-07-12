@@ -50,8 +50,11 @@ define [
     save : (e) =>
       e.preventDefault()
       data = @$('form').serializeObject()
+      @$('button.save').prop "disabled", "disabled"
 
-      @model.save data.network,
+      attrs = @model.scrub data.network
+
+      @model.save attrs,
       success: (model) =>
         @model.trigger "sync", model # This is triggered automatically in Backbone, but not Parse.
         @trigger "save:success", model, this

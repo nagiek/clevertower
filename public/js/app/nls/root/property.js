@@ -5,7 +5,6 @@
       geolocate: "Geolocate Me",
       new_property: "New Property",
       setup_property: "Setup Property",
-      edit_picture: "Change Picture",
       go_to_network: "Go to network",
       add_a_property: "Add a property",
       join_or_create_to_start: "Join or create a property to get started",
@@ -56,7 +55,9 @@
     network: {
       edit: "Edit network",
       setup: "Set up network",
-      claim_domain: "Claim your domain name.",
+      claim_username: "Claim your network's unique username.",
+      claim_domain: "Claim your network's unique domain name.",
+      find_username: "Enter the unique username of the network you wish to join.",
       find_domain: "Enter the unique domain name of the network you wish to join.",
       must_be_done: "Before you can begin managing properties to CleverTower, you must create your network.\nOnly people who you invite to your network can edit properties.\nYou can change these settings at any time.",
       give_network_a_title: "Give your network a title.",

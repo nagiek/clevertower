@@ -139,8 +139,8 @@ define "gmaps", ["async!//maps.googleapis.com/maps/api/js?v=3.11&libraries=place
 
 # Alter the router depending on if we are on a subdomain or not, judging by the amount of "." chars.
 # This will bug out on "www" subdomain.
-onNetwork = window.location.host.split(".").length > 2
-router = if onNetwork then "routers/Network" else "routers/Desktop"
+# onNetwork = window.location.host.split(".").length > 2
+# router = if onNetwork then "routers/Network" else "routers/Desktop"
 require [
   "jquery"
   "underscore"
@@ -153,7 +153,7 @@ require [
   "collections/ListingFeaturedList"
   "collections/ActivityList"
   "collections/NotificationList"
-  router,
+  "routers/Desktop",
   "underscore.string"
   "json2"
   "bootstrap"
@@ -256,7 +256,6 @@ require [
   # ---------
 
   Parse.initialize window.APPID, window.JSKEY
-  Parse.onNetwork = onNetwork
   Parse.App = {}
 
   Parse.App.featuredListings = new FeaturedListingList 

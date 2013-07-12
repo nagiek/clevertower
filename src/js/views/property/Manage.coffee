@@ -21,7 +21,8 @@ define [
     el: '#main'
     
     events:
-      'click .edit-profile-picture': 'editProfilePicture'
+      'click #edit-property-picture': 'editProfilePicture'
+      "submit #property-picture-upload-form" : 'save'
 
     initialize: (attrs) ->
       
@@ -36,6 +37,8 @@ define [
       @listenTo Parse.Dispatcher, 'user:logout', @clear
 
       @baseUrl = if @model.get("network") then "/properties/#{@model.id}" else "/manage"
+
+      @file = false
       
       # Render immediately, as we will display a subview
       @render()
@@ -52,7 +55,7 @@ define [
         baseUrl: @baseUrl
       
       @$el.html JST["src/js/templates/property/manage.jst"](vars)
-      @$form = @$("#profile-picture-upload-form")
+      @$form = @$("#property-picture-upload-form")
       @$("[rel=tooltip]").tooltip()
       @
 
@@ -99,7 +102,7 @@ define [
   
     # Re-render the contents of the property item.
     refresh: ->
-      $('#preview-profile-picture img').prop('src', @model.cover('profile'))
+      @$('#property-picture img').prop('src', @model.cover('profile'))
     
     clear: =>
       @undelegateEvents()
@@ -110,17 +113,16 @@ define [
     editProfilePicture: ->
       
       _this = @ # Keep for below
-      
+
       require ['jquery.fileupload', 'jquery.fileupload-fp', 'jquery.fileupload-pr'],  =>
         
         # Initiate the file upload.
         @$form.fileupload
-          autoUpload: false
+          autoUpload: true
           type: "POST"
           dataType: "json"
           # fileInput: '#file-input'
-          nameContainer: $('#preview-profile-picture-name')
-          filesContainer: $('#preview-profile-picture')
+          filesContainer: _this.$('#preview-property-picture')
           multipart: false # Tell Fileupload to keep file as binary, as Parse only takes binary files.
           context: @$form[0]
           submit: (e, data) ->
@@ -128,9 +130,30 @@ define [
           send: (e, data) ->
             delete data.headers['Content-Disposition']; # Parse does not accept this header.
           done: (e, data) ->
-            file = data.result
-            _this.model.save image_thumb: file.url, image_profile: file.url, image_full: file.url
-            _this.$('#edit-profile-picture-modal').modal('hide')
-                
-        _this.$('#edit-profile-picture-modal').modal()
+            _this.file = data.result
+
+            # Defer to our photo rendering method.
+            that = _this.$(this).data("blueimp-fileupload") or $(this).data("fileupload")
+            that._transition(data.context)
+            
+            # data.context.each (index) ->
+            #   node = $(this)
+            #   that._transition(node).done ->
+            #     node.remove()
+
+            _this.$('#preview-property-picture img').prop('src', _this.file.url)
+
+            
+        @$('#edit-property-picture-modal').modal()
         
+    save: (e) =>
+      e.preventDefault()
+      if @file
+        @model.save image_thumb: @file.url, image_profile: @file.url, image_full: @file.url
+        @$('#edit-property-picture-modal').modal('hide')
+      else 
+        @$form.after """
+          <div class="alert alert-block alert-error fade in">
+            <p class="message">#{i18nCommon.errors.no_picture}</p>
+          </div>
+        """

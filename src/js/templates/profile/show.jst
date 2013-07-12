@@ -1,13 +1,28 @@
 <div class="container">
   <section class="row">
     <header class="span3">
-      <div class="photo row">
+      <div id="profile-picture" class="photo row">
         <img src="<%= cover %>" class="span3" alt="<%= name %>" width="270" height="270" />
+        <% if (current) { %>
+          <div class="photo-actions">
+            <button type="button" role="button" class="btn btn-small edit-profile-picture">
+              <i class="icon-edit"></i>
+            </button>
+          </div>
+        <% } %>
       </div>
     
       <h1 class="soften"><%= name %></h1>
 
-      <strong><%= i18nCommon.adjectives.joined %>:</strong> <%= createdAt %>
+      <hr class="divider">
+      <strong><%= i18nCommon.adjectives.joined %></strong> <%= joinDate %>
+      <hr class="divider">
+      <ul id="profile-stats" class="inline">
+        <li>
+          <div id="like-count" class="count"><%= likeCount %></div>
+          <h6><%= i18nCommon.nouns.likes %></h6>
+        </li>
+      </ul>
 
       <% if (bio) { %>
         <div><%= bio %></div>
@@ -33,15 +48,65 @@
 
       <div class="tab-content">
         <div id="activities" class="tab-pane active">
-          <ul class="row no-bullet">
-            <li class="offset2"><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" /></li>
-          </ul>
+          <div class="row">
+            <ul class="span4 offset2 no-bullet">
+              <li class="loading"><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" /></li>
+            </ul>
+          </div>
         </div>
         <div id="likes" class="tab-pane">
-          <ul class="row no-bullet">
-            <li class="offset2"><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" /></li>
-          </ul>
+          <div class="row">
+            <ul class="span4 offset2 no-bullet">
+              <li class="loading"><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" /></li>
+            </ul>
+          </div>
         </div>
     </div>
   </section>
+</div>
+
+<div id="edit-profile-picture-modal" class="modal form-modal hide fade">
+  <form id="profile-picture-upload-form" method="POST">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-labelledby="edit-profile-picture-modal-label" aria-hidden="true">&times;</button>
+      <h3 id="edit-profile-picture-modal-label"><%= i18nCommon.actions.edit_picture %></h3>
+    </div>
+    <div class="modal-body">
+      <div class="row-fluid control-group">
+        <div id="preview-profile-picture" class="preview template-upload">
+          <img src="<%= cover %>" alt="Profile" class="profile-picture span4 offset1">
+        </div>
+        <div id="profile-picture-controls" class="span6 offset1">
+          <div id="preview-profile-picture-name"></div>
+          <div class="fileupload-buttonbar">
+            <button type="button" id="file-input" class="btn fileinput-button">
+                <span><%= i18nCommon.actions.choose_file %></span>
+                <input type="file" name="files[]" accept="photo/*">
+            </button>
+          </div>
+          <!-- The global progress information -->
+          <div class="fileupload-progress fade hide">
+
+            <!-- The global progress bar -->
+            <div class="progress progress-success progress-striped active"
+              role="progressbar"
+              aria-valuemin="0"
+              aria-valuemax="100">
+              <div class="bar" style="width:0%;"></div>
+            </div>
+            <!-- The extended global progress information -->
+            <div class="progress-extended">&nbsp;</div>
+            
+          </div>
+
+          <!-- The loading indicator is shown during file processing -->
+          <div class="fileupload-loading"></div>
+        </div>
+      </div>    
+    </div>
+    <div class="modal-footer">
+      <button class="save btn btn-primary"><%= i18nCommon.actions.upload %></button>
+      <button class="btn" data-dismiss="modal"><%= i18nCommon.actions.close %></button>
+    </div>
+  </form>
 </div>

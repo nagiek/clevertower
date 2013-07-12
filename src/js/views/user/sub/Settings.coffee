@@ -99,8 +99,6 @@ define [
         i18nCommon: i18nCommon
         i18nDevise: i18nDevise
       vars.type = 'tenant' unless vars.type
-      
-      console.log 'render'
 
       @$el.html JST["src/js/templates/user/sub/settings.jst"](vars)
       

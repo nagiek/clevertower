@@ -56,9 +56,15 @@ define [
           filter: (parsedResponse) ->
             return [] if parsedResponse.results.length is 0
             _.map parsedResponse.results, (p) ->
+
+              url = if Parse.User.current() and Parse.User.current().get("network") and Parse.User.current().get("network").properties.get p.objectId
+                Property.url(p.objectId)
+              else 
+                Property.publicUrl Property.country(p.country), p.administrative_area_level_1, p.locality, p.objectId, Property.slug(p.title)
+
               value: p.title
               img_src: if p.image_tiny then p.image_tiny else "/img/fallback/property-tiny.png"
-              url: if Parse.onNetwork then Property.url(p.objectId) else Property.publicUrl(Property.country(p.country), p.administrative_area_level_1, p.locality,  p.objectId, Property.slug(p.title))
+              url: url
               tokens: _.union(p.title.split(" "), p.thoroughfare.split(" "), [p.locality])
         limit: 5
         template: _.template  """
@@ -151,7 +157,7 @@ define [
         #                       """
       ]
 
-      if Parse.onNetwork and Parse.User.current() and Parse.User.current().get("network")
+      if Parse.User.current() and Parse.User.current().get("network")
 
         @vars[0].local = Parse.User.current().get("network").properties.map (p) ->
             value: p.get("title")

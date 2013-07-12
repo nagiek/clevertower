@@ -15,8 +15,6 @@ define [
 
       @listenTo Parse.Dispatcher, "user:logout", @clear
 
-      console.log attrs
-
       # Render immediately, as we will display a subview
       @render()
       @changeSubView attrs.path, attrs.params
