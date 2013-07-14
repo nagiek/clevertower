@@ -1,4 +1,28 @@
 (function() {
+  Parse.Cloud.define("PromoteToFeatured", function(req, res) {
+    Parse.Cloud.useMasterKey();
+    return (new Parse.Query("Listing")).equalTo('objectId', req.params.objectId).first().then(function(obj) {
+      var attrs;
+
+      if (obj) {
+        attrs = {
+          cover: obj.get("image_profile"),
+          property: obj.get("property"),
+          rent: obj.get("rent"),
+          locality: obj.get("locality"),
+          title: obj.get("title")
+        };
+        return new Parse.Object("FeaturedListing").save(attrs).then(function() {
+          return res.success();
+        });
+      } else {
+        return res.error("bad_query");
+      }
+    }, function() {
+      return res.error("bad_query");
+    });
+  });
+
   Parse.Cloud.define("AddTenants", function(req, res) {
     var Mandrill, className, emails, status, _;
 

@@ -211,33 +211,6 @@
     return item;
   };
 
-
-  // ### reset
-  //
-  // Resets the ListView and cleans up after its contents.
-
-  ListView.prototype.reset = function() {
-    var index, length,
-    pages = this.pages;
-
-    for(index = 0, length = pages.length; index < length; index++) {
-      pages[index].remove()
-    }
-    this.startIndex = 0;
-    this.height = 0;
-    this.$el.height(0);
-    this.pages = [];
-    updateBuffer(this);
-  };
-
-  // ### repartition
-  //
-  // Rerepartitions the ListView.
-
-  ListView.prototype.repartition = function() {
-    repartition(this);
-  };
-
   // ### updatePagePosition
   //
   // Update the top/bottom coordinate values for the given array of Pages
@@ -388,6 +361,31 @@
   ListView.prototype.remove = function() {
     this.$el.remove();
     this.cleanup();
+  };
+
+  // ### reset
+  //
+  // Resets the ListView and cleans up after its contents.
+
+  ListView.prototype.reset = function() {
+    var index, length,
+    pages = this.pages;
+    for(index = 0, length = pages.length; index < length; index++) {
+      this.pages[index].remove()
+    }
+    this.startIndex = 0;
+    this.height = 0;
+    this.$el.height(0);
+    this.pages = [];
+    updateBuffer(this);
+  };
+
+  // ### repartition
+  //
+  // Repartitions the ListView.
+
+  ListView.prototype.repartition = function() {
+    repartition(this);
   };
 
 
@@ -603,6 +601,7 @@
   ListView.prototype.cleanup = function() {
     var pages = this.pages,
         page;
+    console.error("cleanup");
     DOMEvent.detach(this);
     while(page = pages.pop()) {
       page.cleanup();

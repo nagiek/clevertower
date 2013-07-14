@@ -49,7 +49,7 @@ define [
         i18nListing: i18nListing
 
       @$el.html JST["src/js/templates/listing/highlight.jst"](vars)
-      $('#backdrops').append "<div id='backdrop-#{@index}' class='backdrop fade' style='background-image: url(/img/listings/#{@model.get("cover")});'></div>"
+      $('#backdrops').append "<div id='backdrop-#{@index}' class='backdrop fade' style='background-image: url(#{@model.get("property").cover('large')});'></div>"
 
       @
 

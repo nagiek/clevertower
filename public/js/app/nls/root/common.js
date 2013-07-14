@@ -6,7 +6,8 @@
       email: "Email",
       status: "Status",
       name: "Name",
-      posted: "Posted"
+      posted: "Posted",
+      posted_at: "Posted at"
     },
     classes: {
       Activity: "Activity",

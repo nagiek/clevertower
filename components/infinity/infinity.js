@@ -351,6 +351,32 @@
     this.cleanup();
   };
 
+  // ### reset
+  //
+  // Resets the ListView and cleans up after its contents.
+
+  ListView.prototype.reset = function() {
+    var index, length,
+    pages = this.pages;
+
+    for(index = 0, length = pages.length; index < length; index++) {
+      pages[index].remove()
+    }
+    this.startIndex = 0;
+    this.height = 0;
+    this.$el.height(0);
+    this.pages = [];
+    updateBuffer(this);
+  };
+
+  // ### repartition
+  //
+  // Rerepartitions the ListView.
+
+  ListView.prototype.repartition = function() {
+    repartition(this);
+  };
+
 
   // ### convertToItem
   //

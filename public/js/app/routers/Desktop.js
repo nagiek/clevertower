@@ -23,8 +23,8 @@
         "": "index",
         "properties/new": "propertiesNew",
         "places/:country/:region/:city/:id/:slug": "propertiesPublic",
-        "outside": "search",
         "outside/*splat": "search",
+        "outside": "search",
         "network/new": "networkNew",
         "listings/new": "listingsNew",
         "leases/new": "leasesNew",
@@ -44,8 +44,7 @@
         "account/login": "login",
         "account/logout": "logout",
         "account/*splat": "accountSettings",
-        "oauth2callback": "oauth2callback",
-        "*actions": "fourOhFour"
+        "oauth2callback": "oauth2callback"
       };
 
       DesktopRouter.prototype.initialize = function(options) {
@@ -71,8 +70,11 @@
         this.listenTo(Parse.history, "route", function(route) {
           $('#search-menu input.search').val("").blur();
           if (_this.view) {
-            if (_this.oldConstructor !== _this.view.constructor) {
-              _this.oldConstructor = _this.view.constructor;
+            console.log(_this.oldCID);
+            console.log(_this.view.cid);
+            console.log(_this.oldCID !== _this.view.cid);
+            if (_this.oldCID && _this.oldCID !== _this.view.cid) {
+              _this.oldCID = _this.view.cid;
               return _this.view.trigger("view:change");
             }
           }
@@ -500,27 +502,18 @@
 
       DesktopRouter.prototype.accessDenied = function() {
         return require(["views/helper/Alert", 'i18n!nls/common'], function(Alert, i18nCommon) {
-          new Alert({
+          return new Alert({
             event: 'access-denied',
             type: 'error',
             fade: true,
             heading: i18nCommon.errors.access_denied,
             message: i18nCommon.errors.no_permission
           });
-          return Parse.history.navigate("/", true);
         });
       };
 
       DesktopRouter.prototype.signupOrLogin = function() {
-        return require(["views/helper/Alert", 'i18n!nls/common'], function(Alert, i18nCommon) {
-          new Alert({
-            event: 'routing-canceled',
-            type: 'warning',
-            fade: true,
-            heading: i18nCommon.errors.not_logged_in
-          });
-          return Parse.history.navigate("/", true);
-        });
+        return $("#login-modal").modal();
       };
 
       return DesktopRouter;

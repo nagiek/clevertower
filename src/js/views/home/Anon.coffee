@@ -2,11 +2,11 @@ define [
   "jquery"
   "underscore"
   "backbone"
-  "views/listing/highlight"
+  "views/listing/Featured"
   "i18n!nls/property"
   "i18n!nls/common"
   "templates/home/anon"
-], ($, _, Parse, ListingHighlightView, i18nProperty, i18nCommon) ->
+], ($, _, Parse, FeaturedListingView, i18nProperty, i18nCommon) ->
 
   class HomeAnonView extends Parse.View
   
@@ -46,7 +46,7 @@ define [
       @
 
     addOne: (l, i) =>
-      view = new ListingHighlightView
+      view = new FeaturedListingView
         model: l
         view: @
         index: i

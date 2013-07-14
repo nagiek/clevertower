@@ -8,6 +8,7 @@ define
     apply:                            "Apply"
     apply_to:                         "Apply to"
     withdraw:                         "withdraw"
+    promote:                          "Promote"
   attributes:           
     applied:                          "Applied"
     starting:                         "Starting"

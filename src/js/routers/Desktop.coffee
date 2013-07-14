@@ -11,8 +11,8 @@ define [
       ""                            : "index"
       "properties/new"              : "propertiesNew"
       "places/:country/:region/:city/:id/:slug" : "propertiesPublic"
-      "outside"                      : "search"
       "outside/*splat"               : "search"
+      "outside"                      : "search"
       # "inside"                      : "propertiesManage"
       # "inside/*splat"               : "propertiesManage"
       "network/new"                 : "networkNew"
@@ -38,7 +38,7 @@ define [
       # "account/history/:category"   : "accountHistory"
       "account/*splat"              : "accountSettings"
       "oauth2callback"              : "oauth2callback"
-      "*actions"                    : "fourOhFour" # 404
+      # "*actions"                    : "fourOhFour" # 404
 
     initialize: (options) ->
       Parse.history.start pushState: true
@@ -73,10 +73,13 @@ define [
 
         $('#search-menu input.search').val("").blur()
 
-        if @view 
-          if @oldConstructor isnt @view.constructor
-            @oldConstructor = @view.constructor
-            @view.trigger("view:change")
+        if @view
+          console.log @oldCID
+          console.log @view.cid
+          console.log @oldCID isnt @view.cid
+          if @oldCID and @oldCID isnt @view.cid
+            @oldCID = @view.cid
+            @view.trigger "view:change"
             # @view.undelegateEvents()
             # @view.stopListening()
             # delete @view
@@ -385,13 +388,14 @@ define [
           fade:     true
           heading:  i18nCommon.errors.access_denied
           message:  i18nCommon.errors.no_permission
-        Parse.history.navigate "/", true
+        # Parse.history.navigate "/", true
         
     signupOrLogin: ->
-      require ["views/helper/Alert", 'i18n!nls/common'], (Alert, i18nCommon) -> 
-        new Alert
-          event:    'routing-canceled'
-          type:     'warning'
-          fade:     true
-          heading:  i18nCommon.errors.not_logged_in
-        Parse.history.navigate "/", true
+      # require ["views/helper/Alert", 'i18n!nls/common'], (Alert, i18nCommon) -> 
+      #   new Alert
+      #     event:    'routing-canceled'
+      #     type:     'warning'
+      #     fade:     true
+      #     heading:  i18nCommon.errors.not_logged_in
+      #   Parse.history.navigate "/", true
+      $("#login-modal").modal()

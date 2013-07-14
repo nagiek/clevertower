@@ -123,9 +123,13 @@ define [
             activity[0].find(".like-button").addClass "active"
 
     resetListViews: ->
+
+      console.log "resetListViews"
+
       # Clean up old stuff
       _.each @listViews, (lv) -> lv.reset()
       Parse.App.activity.reset()
+      @resetUserActivity() if Parse.User.current()
       @$list.find('> li.empty').remove()
 
 
@@ -179,7 +183,6 @@ define [
       @resetUserActivity()
 
     resetUserActivity : =>
-
       if Parse.User.current().get("property")
         # Visibility counter
         Parse.User.current().get("property").shown = false
@@ -418,16 +421,13 @@ define [
 
       if status is google.maps.places.PlacesServiceStatus.OK
 
-        oldBounds = @map.getBounds()
+        # oldBounds = @map.getBounds()
         @center = place.geometry.location
         @map.setCenter @center
-        newBounds = @map.getBounds()
+        # newBounds = @map.getBounds()
 
         # Dump the collection if we are going somewhere different.
-        Parse.App.activity.reset() unless oldBounds.intersects newBounds
-
-        @chunk = 1
-        @page = 1
+        # Parse.App.activity.reset() unless oldBounds.intersects newBounds
 
         @performSearchWithinMap()
 
@@ -442,27 +442,9 @@ define [
       @chunk = 1
       @page = 1
 
-      @resetUserActivity()
       @resetListViews()
       @updatePaginiation()
       @search()
-
-    # Map-only handler
-    # handleMapMove : =>
-    #   if @redoSearch
-    #     center = @map.getCenter()
-    #     @locationAppend = "?lat=#{center.lat()}&lng=#{center.lng()}"
-    #     Parse.history.navigate "/search/#{@location}#{@locationAppend}"
-    #     @checkIfShouldSearch()
-
-    # Map and zoom handler
-    # checkIfShouldSearch : =>
-    #   if @redoSearch
-    #     @chunk = 1
-    #     @page = 1
-    #     # Reset map
-    #     Parse.App.activity.query.skip(0)
-    #     @performSearchWithinMap()    
 
     performSearchWithinMap: =>
 
@@ -471,9 +453,7 @@ define [
       @ne = new Parse.GeoPoint(bounds.getNorthEast().lat(), bounds.getNorthEast().lng())
       Parse.App.activity.setBounds @sw, @ne
 
-      @resetListViews()
-      @updatePaginiation()
-      @search()
+      @redoSearch()
 
     search : =>
       @$loading.html "<img src='/img/misc/spinner.gif' class='spinner' alt='#{i18nCommon.verbs.loading}' />"
@@ -860,7 +840,6 @@ define [
       if Parse.User.current()
         unless data.liked
           button.addClass "active"
-          console.log activity.find(".like-count")
           activity.find(".like-count").html(likes + 1)
           model.increment likeCount: +1
           Parse.User.current().get("profile").relation("likes").add model
@@ -868,7 +847,6 @@ define [
           activity.data "liked", true
         else
           button.removeClass "active"
-          console.log activity.find(".like-count")
           activity.find(".like-count").html(likes - 1)
           model.increment likeCount: -1
           Parse.User.current().get("profile").relation("likes").remove model
@@ -969,7 +947,7 @@ define [
       else
         if @index >= Parse.App.activity.length then @index = 0
         Parse.App.activity.at(@index)
-      @renderModalContent(model)
+      @renderModalContent model
 
     prevModal : =>
       return unless @modal
@@ -980,7 +958,7 @@ define [
       else
         if @index < 0 then @index = Parse.App.activity.length - 1
         Parse.App.activity.at(@index)
-      @renderModalContent(model)
+      @renderModalContent model
 
     clear: =>
       @undelegateEvents()
@@ -988,6 +966,10 @@ define [
       delete this
 
     renderModalContent : (model) ->
+
+      # Add a building link if applicable.
+      # Cache result
+      property = if model.get("property") and not model.linkedToProperty() then model.get("property") else false
 
       vars = _.merge model.toJSON(), 
         url: model.url()
@@ -1000,6 +982,10 @@ define [
         icon: model.icon()
         name: model.name()
         profilePic: model.profilePic("thumb")
+        propertyLinked: if property then true else false
+        propertyTitle: if property then property.get("title") else false
+        propertyCover: if property then property.cover("tiny") else false
+        propertyUrl: if property then property.publicUrl() else false
         i18nCommon: i18nCommon
 
       # Default options. 

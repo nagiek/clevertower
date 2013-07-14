@@ -1,6 +1,25 @@
 # Parse.Cloud functions are asynchronous!!
 # Always use promises with expensive functions, like queries.
 
+# PromoteToFeatured
+# ----------
+# Feature a given listing.
+Parse.Cloud.define "PromoteToFeatured", (req, res) ->
+  Parse.Cloud.useMasterKey()
+  (new Parse.Query "Listing").equalTo('objectId', req.params.objectId).first()
+    .then (obj) ->
+      if obj
+        attrs = 
+          cover: obj.get "image_profile"
+          property: obj.get "property"
+          rent: obj.get "rent"
+          locality: obj.get "locality"
+          title: obj.get "title"
+        new Parse.Object("FeaturedListing").save(attrs).then -> res.success()
+      else 
+        res.error "bad_query"
+    , -> res.error "bad_query"
+
 # AddTenants
 # ----------
 # This can be called by managers or tenants.

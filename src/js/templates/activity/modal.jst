@@ -25,25 +25,37 @@
       <div class="photo-float thumbnail-float">
         <p><a href="<%= profileUrl %>"><strong><%= name %></strong></a></p>
         <p><small><%= i18nCommon.fields.posted %> <%= postDate %></small></p>
-        <ul class="activity-actions inline">
-          <li>
-            <a href="#" class="like-button<% if (liked) { %> active<% } %>" >
-              <i class="icon icon-sprite icon-like"></i>
-            </a>
-            <span class="like-count"><%= likeCount %></span>
-          </li>
-          <li>
-            <a href="#" class="comment-button">
-              <i class="icon icon-status"></i>
-            </a>
-            <span class="comment-count"><%= commentCount %></span>
-          </li>
-        </ul>
       </div>
+      <ul class="activity-actions inline center">
+        <li>
+          <a href="#" class="like-button<% if (liked) { %> active<% } %>" >
+            <i class="icon icon-sprite icon-like"></i>
+          </a>
+          <span class="like-count"><%= likeCount %></span>
+        </li>
+        <li>
+          <a href="#" class="comment-button">
+            <i class="icon icon-status"></i>
+          </a>
+          <span class="comment-count"><%= commentCount %></span>
+        </li>
+      </ul>
     </header>
     <div>
       <% if (postImage) { %><p><strong><%= title %></strong></p><% } %>
       <% if (isEvent) { %><p><strong><%= start %><% if (endDate) { %> - <%= end %><% } %></strong></p><% } %>
     </div>
+    <% if (propertyTitle) { %>
+      <footer class="position-bottom">
+        <p>
+          <small><%= i18nCommon.fields.posted_at %>
+            <a class="clearfix" href="<%= propertyUrl %>">
+              <img src="<%= propertyCover %>" class="stay-left photo photo-micro img-circle" width="23" height="23">
+              <span class="photo-float micro-float"><%= propertyTitle %></span>
+            </a>
+          </small>
+        </p>
+      </footer>
+    <% } %>
   </div>
 </div>

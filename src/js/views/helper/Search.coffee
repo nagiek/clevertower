@@ -26,7 +26,7 @@ define [
 
         # Send our user to the right page. 
         # If we are already on a Search page, view will not be re-init'ed.
-        Parse.history.navigate "/search/#{data.location}", trigger: true 
+        Parse.history.navigate "/outside/#{data.location}", trigger: true 
         new Search(reference: data.reference, location: data.location).save()
 
       @listenTo Parse.Dispatcher, "user:change", @reset
@@ -129,7 +129,7 @@ define [
         limit: 5
         template: _.template  """
                               <% if (value) { %>
-                              <a href="/search/<%= url %>" data-reference="<%= reference %>" class="google">
+                              <a href="/outside/<%= url %>" data-reference="<%= reference %>" class="google">
                                 <strong><%= value %></strong>
                               </a>
                               <% } %>

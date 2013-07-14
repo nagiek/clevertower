@@ -15,6 +15,7 @@ define [
 
     events:
       'click .show-modal': 'showModal'
+      # 'click .promote': 'promote'
 
     initialize : (attrs) ->
       if Parse.User.current()
@@ -42,6 +43,11 @@ define [
       @$el.html JST["src/js/templates/listing/publicsummary.jst"](vars)
       @
 
+    # promote: =>
+    #   Parse.Cloud.run "PromoteToFeatured", objectId: @model.id,
+    #     success: (modelObject) => console.log "OK"
+    #     error: (error) => console.log error
+
     showModal: (e) =>
       e.preventDefault()
       if Parse.User.current()
@@ -49,4 +55,4 @@ define [
           @inquiry = new Inquiry listing: @model unless @inquiry
           new InquiryView(model: @inquiry).render().$el.modal()
       else
-        $('#signup-modal').modal()
+        $('#login-modal').modal()
