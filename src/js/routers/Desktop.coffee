@@ -74,9 +74,6 @@ define [
         $('#search-menu input.search').val("").blur()
 
         if @view
-          console.log @oldCID
-          console.log @view.cid
-          console.log @oldCID isnt @view.cid
           if @oldCID and @oldCID isnt @view.cid
             @oldCID = @view.cid
             @view.trigger "view:change"

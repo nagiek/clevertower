@@ -70,9 +70,6 @@
         this.listenTo(Parse.history, "route", function(route) {
           $('#search-menu input.search').val("").blur();
           if (_this.view) {
-            console.log(_this.oldCID);
-            console.log(_this.view.cid);
-            console.log(_this.oldCID !== _this.view.cid);
             if (_this.oldCID && _this.oldCID !== _this.view.cid) {
               _this.oldCID = _this.view.cid;
               return _this.view.trigger("view:change");

@@ -124,8 +124,6 @@ define [
 
     resetListViews: ->
 
-      console.log "resetListViews"
-
       # Clean up old stuff
       _.each @listViews, (lv) -> lv.reset()
       Parse.App.activity.reset()
@@ -421,15 +419,26 @@ define [
 
       if status is google.maps.places.PlacesServiceStatus.OK
 
-        # oldBounds = @map.getBounds()
-        @center = place.geometry.location
-        @map.setCenter @center
-        # newBounds = @map.getBounds()
+        # console.log status
+        # console.log place
+
+        # @center = place.geometry.location
+        # @map.setCenter @center
+
+        @map.fitBounds place.geometry.viewport
+
+        # bounds = @map.getBounds()
+        sw = place.geometry.viewport.getSouthWest()
+        ne = place.geometry.viewport.getNorthEast()
+        @sw = new Parse.GeoPoint sw.lat(), sw.lng()
+        @ne = new Parse.GeoPoint ne.lat(), ne.lng()
+
+        Parse.App.activity.setBounds @sw, @ne
 
         # Dump the collection if we are going somewhere different.
         # Parse.App.activity.reset() unless oldBounds.intersects newBounds
 
-        @performSearchWithinMap()
+        @redoSearch()
 
     searchMap : =>
       center = @map.getCenter()
