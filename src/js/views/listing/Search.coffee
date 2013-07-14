@@ -17,7 +17,7 @@ define [
 
       @view = attrs.view
       @on "model:viewDetails", @clear
-      @display = 'small'
+      @display = 'big'
       @min = 0
       @max = 6000
 
@@ -29,11 +29,11 @@ define [
       display = e.currentTarget.attributes["data-display"].value
 
       return if display is @display
-      @view.$("ul.thumbnails").removeClass(@display).addClass(display)
+      @view.$("#activities").removeClass(@display).addClass(display)
 
       @display = display
 
-      _.each @view.listViews, (lv) -> lv.repartition()
+      _.each @view.listViews, (lv) -> lv.resize()
 
       # @view.trigger "view:refresh", @display
       # @$list.masonry 'reload'
@@ -59,7 +59,6 @@ define [
           Parse.App.activity.query.greaterThanOrEqualTo("rent", @min).lessThanOrEqualTo("rent", @max)
           Parse.User.current().activity.query.greaterThanOrEqualTo("rent", @min).lessThanOrEqualTo("rent", @max) if Parse.User.current()
           @view.redoSearch()
-      console.log Parse.App.activity.query
       @
 
     clear : => 

@@ -1,8 +1,6 @@
 <div class="content">
   <% if (postImage) { %>
-    <div class="row">
-      <div class="photo photo-span4"><img src="<%= postImage %>" alt="<%= i18nCommon.nouns.cover_photo %>"></div>
-    </div>
+    <div class="photo photo-grid4"><img src="<%= postImage %>" alt="<%= i18nCommon.nouns.cover_photo %>"></div>
     <div class="caption">
       <% if (rent) { %><div class="rent stay-right">$<%= rent %></div><% } %>
       <p><strong><%= title %></strong></p>

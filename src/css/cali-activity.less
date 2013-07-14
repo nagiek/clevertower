@@ -11,9 +11,32 @@
 }
 
 #activities {
-  li {
+  > li {
     &.divider {
       margin: 18px 0;
+    }
+  }
+  &.small {
+    .activity {
+      // Make .photo-grid4 behave as photo-thumbnail
+      .photo-grid4 {
+        height:@thumbnailImgLength;
+        width:@thumbnailImgLength;
+        img {
+          height:@thumbnailImgLength;
+          min-width:@thumbnailImgLength;
+          max-width:@profileImgLength + 28px;
+          width: auto;
+        }
+      }
+      // Make .caption behave as .thumbnail-float/.photo-float
+      .caption {
+        float: none;
+        display:block;
+        margin-left: @thumbnailImgLength + @thumbnailImgPadding; 
+        padding-top: 15px;
+        padding-bottom: 15px;
+      }
     }
   }
 }
@@ -105,27 +128,6 @@
     text-align: right;
     font-size: 24px;
     text-shadow: 0 1px 10px #fff;
-  }
-}
-
-.small {
-  .actvity {
-    // Make .photo-span4 behave as photo-thumbnail
-    .photo-span4 {
-      height:@thumbnailImgLength;
-      width:@thumbnailImgLength;
-      img {
-        height:@thumbnailImgLength;
-        min-width:@thumbnailImgLength;
-        max-width:@profileImgLength + 28px;
-      }
-    }
-    // Make .caption behave as .thumbnail-float/.photo-float
-    .caption {
-      float: none;
-      display:block;
-      margin-left: @thumbnailImgLength + @thumbnailImgPadding; 
-    }
   }
 }
 

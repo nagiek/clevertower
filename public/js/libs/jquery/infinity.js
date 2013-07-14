@@ -384,7 +384,23 @@
   //
   // Repartitions the ListView.
 
-  ListView.prototype.repartition = function() {
+  ListView.prototype.resize = function() {
+    var index, length, index2, length2;
+
+    // Reset height
+    this.height = 0;
+    this.$el.height(0);
+
+    // Get the height of the new pages.
+    for(index = 0, length = this.pages.length; index < length; index++) {
+      for(index2 = 0, length2 = this.pages[index].items.length; index2 < length2; index2++) {
+        updateCoords(this.pages[index].items[index2], this.height);
+        this.height += this.pages[index].items[index2].height
+      }
+    }
+    
+    this.$el.height(this.height);
+
     repartition(this);
   };
 
@@ -403,7 +419,10 @@
 
   function convertToItem(listView, possibleItem, prepend) {
     var item;
-    if(possibleItem instanceof ListItem) { updateCoords(possibleItem, listView.height); return possibleItem; }
+    if(possibleItem instanceof ListItem) { 
+      updateCoords(possibleItem, listView.height);
+      return possibleItem;
+    }
     if(typeof possibleItem === 'string') possibleItem = $(possibleItem);
     item = new ListItem(possibleItem);
     cacheCoordsFor(listView, item, prepend);
