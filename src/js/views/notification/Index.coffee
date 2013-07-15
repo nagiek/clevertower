@@ -24,14 +24,14 @@ define [
       
       
     markMemosAsRead: =>
-      @$mCount.html(0).removeClass("badge-important")
+      @$mCount.html(0).addClass("hide")
       _.each Parse.User.current().notifications.unread(), (n) -> 
         n.add(read: [Parse.User.current().id])
         n.save null, patch: true
         # n.save()
 
     markWithActionsllAsRead: =>
-      @$fCount.html(0).removeClass("badge-important")
+      @$fCount.html(0).addClass("hide")
       _.each Parse.User.current().notifications.withAction(), (n) -> 
         n.add(read: [Parse.User.current().id])
         n.save null, patch: true
@@ -69,12 +69,12 @@ define [
 
       mSize = Parse.User.current().notifications.unreadMemos().length
       @$mCount.html mSize
-      if mSize > 0 then @$mCount.addClass("badge-important") else @$mCount.removeClass("badge-important")
+      if mSize > 0 then @$mCount.removeClass("hide") else @$mCount.addClass("hide")
 
       # Display all with action. They're important.
       fSize = Parse.User.current().notifications.unreadWithAction().length
       @$fCount.html fSize
-      if fSize > 0 then @$fCount.addClass("badge-important") else @$fCount.removeClass("badge-important")
+      if fSize > 0 then @$fCount.removeClass("hide") else @$fCount.addClass("hide")
 
     # Add a single todo item to the list by creating a view for it, and
     # appending its element to the `<ul>`.

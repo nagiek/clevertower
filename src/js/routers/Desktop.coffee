@@ -155,8 +155,11 @@ define [
         else 
           Parse.history.navigate "/account/setup"
           @accountSetup()
-      else
-        @signupOrLogin()
+      # Handling this in the NavMenu view. This URL is exposed, and
+      # should not be followed through, which is why it shouldn't be
+      # handled by @signupOrLogin
+      # else
+      #   @signupOrLogin()
 
 
     # Property

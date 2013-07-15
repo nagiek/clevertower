@@ -7,6 +7,117 @@
  * ul.links, .pager, .more-link, etc.
  */
 
+#panel {
+  display: none;
+  background-color: @grayDark;
+  background-image: url("@{imagesFolder}/background/bg-grey-wash-wall.png");
+  background-repeat: repeat;
+  .box-shadow(-10px -10px 50px rgba(33, 33, 33, 0.7) inset);
+
+  // Collapse styles
+  &.collapse {
+    float:left;
+    // height: 100% !important;
+    width: auto;
+  }
+
+  &.collapse.height {
+    position: relative;
+    height: 0;
+    overflow-x: hidden;
+    .transition(height 0.35s ease);
+  }
+
+  &.collapse.width {
+    position: relative;
+    width: 0;
+    overflow-x: hidden;
+    .transition(width 0.35s ease);
+  }
+  
+  &.collapse.in.width {
+    width: auto;
+  }
+  
+  &.collapse.in.height {
+    height: auto;
+  }
+
+  .collapse-inner {
+    position: relative;        
+    width: 250px;
+    min-height: 100%;
+  }
+
+  // Object styles
+  .nav {
+    > li {
+      display: block;
+      > a {
+        display: block;
+        font-size: @baseFontSize + 2px;
+        line-height: @baseLineHeight + 2px;
+        color: #dedede;
+        border-top: solid 1px #777;
+        border-bottom: solid 1px #555;
+        padding: 10px;
+        margin: 0 40px 0 5px;
+        &:hover {
+          background-color: transparent;
+          color: #fff;
+        }
+      }
+      &:first-child {
+        a {
+          border-top: none;
+        }
+      }
+      &:last-child {
+        a {
+          border-bottom: none;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  html {
+    overflow-x: hidden;
+  }
+  body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    // overflow: hidden;
+    overflow-x: hidden;
+  }
+
+  #frame {
+    position: absolute;
+    width: 200%;
+    min-height: 100%;
+    // height: 100%;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    overflow-x: hidden;
+  }
+
+  #view {
+    width: 50%;
+    min-height: 100%;
+    // height: 100%;
+    overflow-x: hidden;
+  }
+
+  #panel {
+    display: block;
+    height:100%;
+  }
+}
+
 hgroup {
   h2, h3, h4 {
     margin-top:0;

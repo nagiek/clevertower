@@ -6,26 +6,36 @@ define [
   "i18n!nls/common"
 ], ($, _, Parse, Network, i18nCommon) ->
 
+  # This handles the panel as well, which is outside its element.
   class UserNavView extends Parse.View
 
-    el: "#domain-menu"
+    el: "#primary-nav"
+
+    events:
+      "click #network-nav a" : "checkForLogin"
     
     initialize: ->
 
       # @listenTo Parse.Dispatcher, "user:logout", -> delete @model
 
-      @listenTo Parse.Dispatcher, "user:login", @bindListenEvents
-      @listenTo Parse.Dispatcher, "user:change", @render
+    #   @listenTo Parse.Dispatcher, "user:login", @bindListenEvents
+    #   @listenTo Parse.Dispatcher, "user:change", @render
 
-      @bindListenEvents() if Parse.User.current()
+    #   @bindListenEvents() if Parse.User.current()
     
-    bindListenEvents : ->
-      @listenTo Parse.User.current(), "change:network", @render
-      @listenTo Parse.User.current().get("network"), "change:name", @render if Parse.User.current().get("network")
+    # bindListenEvents : ->
+    #   @listenTo Parse.User.current(), "change:network", @render
+    #   @listenTo Parse.User.current().get("network"), "change:name", @render if Parse.User.current().get("network")
       
+    checkForLogin: -> $("#login-modal").modal() unless Parse.User.current()
+
     render: =>  
       @$('#home-nav a').html i18nCommon.nouns.outside # i18nCommon.verbs.explore
       @$('#network-nav a').html i18nCommon.nouns.inside # #{i18nCommon.verbs.manage}
+
+      # Panel.
+      $('#panel-home-nav a').html i18nCommon.nouns.outside # i18nCommon.verbs.explore
+      $('#panel-network-nav a').html i18nCommon.nouns.inside # #{i18nCommon.verbs.manage}
 
       # hostArray = location.host.split(".")
       # hostArray.shift()

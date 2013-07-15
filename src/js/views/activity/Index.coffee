@@ -119,8 +119,8 @@ define [
         _.each @listViews, (lv) ->
           activity = lv.find("#activity-#{l.id}")
           if activity.length > 0
-            activity[0].data "liked", true
-            activity[0].find(".like-button").addClass "active"
+            activity[0].$el.data "liked", true
+            activity[0].$el.find(".like-button").addClass "active"
 
     resetListViews: ->
 

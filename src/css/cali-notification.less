@@ -1,17 +1,44 @@
 .notifications-menu {
-  width: 330px;    
-  > li {
-    > a {
-      &.unclicked,
-      &:hover {
-        #gradient > .vertical(lighten(@blueLight, 5%), @blueLight);
-        background-color:@blueLight;
-        color:@black;
+  ul {
+    width: 330px;
+      > li {
+        > a {
+          &.unclicked,
+          &:hover {
+            #gradient > .vertical(lighten(@blueLight, 5%), @blueLight);
+            background-color:@blueLight;
+            color:@black;
+          }
+          &.unclicked:hover {
+            #gradient > .vertical(@blueLight, darken(@blueLight, 5%));
+            background-color:darken(@blueLight, 5%);
+          }
+        }
       }
-      &.unclicked:hover {
-        #gradient > .vertical(@blueLight, darken(@blueLight, 5%));
-        background-color:darken(@blueLight, 5%);
-      }
+  }
+}
+#memos {
+  right: -40px;
+  .notifications-menu {
+    &:before { right: 39px; }
+    &:after  { right: 40px; }
+  }
+}
+#friend-requests {
+  right: -20px;
+  .notifications-menu {
+    &:before { right: 19px; }
+    &:after  { right: 20px; }
+  }
+}
+
+
+@media (max-width: 480px) {
+  .notifications-menu {
+    left: 20px;
+    right:20px;
+    ul {
+      width: 100%;
     }
   }
 }

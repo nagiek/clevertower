@@ -6,8 +6,10 @@ define [
   "i18n!nls/devise"
   "i18n!nls/user"
   'templates/user/logged_out_menu'
+  'templates/user/logged_out_panel'
 ], ($, _, Parse, i18nCommon, i18nDevise, i18nUser) ->
 
+  # This handles the panel as well, which is outside its element.
   class LoggedOutMenuView extends Parse.View
 
     el: "#user-menu"
@@ -17,13 +19,17 @@ define [
       "click #login-link"  : "showLoginModal"
 
     initialize: ->
-      Parse.Dispatcher.on "user:login", (user) =>
-        @undelegateEvents()
-        delete this
+      @listenTo Parse.Dispatcher, "user:login", @clear
 
     render: =>
       @$el.html JST["src/js/templates/user/logged_out_menu.jst"](i18nCommon: i18nCommon, i18nDevise: i18nDevise)
+      $("#panel-user-menu").html JST["src/js/templates/user/logged_out_panel.jst"](i18nCommon: i18nCommon, i18nDevise: i18nDevise)
       @
+
+    clear: =>
+      @stopListening()
+      @undelegateEvents()
+      delete this
 
     showSignupModal: (e) =>
       e.preventDefault()

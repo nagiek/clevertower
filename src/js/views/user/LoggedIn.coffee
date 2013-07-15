@@ -10,8 +10,10 @@ define [
   "i18n!nls/user"
   "i18n!nls/common"
   "templates/user/logged_in_menu"
+  "templates/user/logged_in_panel"
 ], ($, _, Parse, Pusher, PropertyList, Profile, NotificationsView, i18nDevise, i18nUser, i18nCommon) ->
 
+  # This handles the panel as well, which is outside its element.
   class LoggedInView extends Parse.View
 
     el: "#user-menu"
@@ -30,11 +32,7 @@ define [
       @listenTo Parse.User.current().get("profile"), "change:image_profile", @updatePic
       @listenTo Parse.User.current().get("profile"), "change:first_name change:last_name", @updateName
       @render()
-          
-    registerUser : =>
-      # Load the properties if the user has just logged in.
-
-      
+                
     subscribeProperty: (obj) =>
       @pusher.subscribe "properties-#{obj.id}"
       
@@ -64,10 +62,15 @@ define [
         i18nCommon: i18nCommon
 
       @$el.html JST["src/js/templates/user/logged_in_menu.jst"](vars)
+      $("#panel-user-menu").html JST["src/js/templates/user/logged_in_menu.jst"](vars)
       @notificationsView = new NotificationsView
       @notificationsView.render()
       @
 
+    updateNav: -> 
+      @$('#profile-link img').prop "src", Parse.User.current().get("profile").cover("micro")
+      $('#panel-profile-link img').prop "src", Parse.User.current().get("profile").cover("micro")
 
-    updateNav: -> @$('#profile-link img').prop "src", Parse.User.current().get("profile").cover("micro")
-    updateName: -> @$('#profile-link span').html Parse.User.current().get("profile").name()
+    updateName: ->
+      @$('#profile-link span').html Parse.User.current().get("profile").name()
+      $('#panel-profile-link span').html Parse.User.current().get("profile").name()

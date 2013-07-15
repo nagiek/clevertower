@@ -6,7 +6,7 @@
 }
 
 .stay-right {
-  float:right;
+  float:right !important;
   .dropdown-menu {
     right:0;
     left:auto;
@@ -20,7 +20,7 @@
 }
 
 .stay-left {
-  float:left;
+  float:left !important;
 }
 
 .position-relative {
@@ -33,20 +33,22 @@
 
 .position-bottom {
   position:absolute;
-  bottom: 0; 
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
 
 .box-fill {
-  width:100%;
-  height:100%;
+  width:100% !important;;
+  height:100% !important;;
 }
 
 .width-fill {
-  width:100%;
+  width:100% !important;;
 }
 
 .height-fill {
-  height:100%;
+  height:100% !important;;
 }
 
 // LISTS
@@ -295,29 +297,17 @@ ul.inline, ol.inline {
 @media (max-width:767px) and (min-width:480px) {
   .tablet-left  { float:left; }
   .tablet-right { float:right; }
-  .tablet-hidden { display:none; }
+  .tablet-hidden { display:none !important; }
 }
 
 @media (max-width:480px) {
   .phone-left  { float:left; }
   .phone-right { float:right; }
-  .phone-hidden { display:none; }
+  .phone-hidden { display:none !important; }
 }
 
 @media (min-width:767px) {
-  .desktop-hidden { display:none; }
-}
-
-/**
- * Hide elements from all users.
- *
- * Used for elements which should not be immediately displayed to any user. An
- * example would be a collapsible fieldset that will be expanded with a click
- * from a user. The effect of this class can be toggled with the jQuery show()
- * and hide() functions.
- */
-.element-hidden {
-  display: none;
+  .desktop-hidden { display:none !important; }
 }
 
 /**

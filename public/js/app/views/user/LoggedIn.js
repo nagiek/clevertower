@@ -3,15 +3,14 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", "pusher", 'collections/PropertyList', 'models/Profile', 'views/notification/Index', "i18n!nls/devise", "i18n!nls/user", "i18n!nls/common", "templates/user/logged_in_menu"], function($, _, Parse, Pusher, PropertyList, Profile, NotificationsView, i18nDevise, i18nUser, i18nCommon) {
+  define(["jquery", "underscore", "backbone", "pusher", 'collections/PropertyList', 'models/Profile', 'views/notification/Index', "i18n!nls/devise", "i18n!nls/user", "i18n!nls/common", "templates/user/logged_in_menu", "templates/user/logged_in_panel"], function($, _, Parse, Pusher, PropertyList, Profile, NotificationsView, i18nDevise, i18nUser, i18nCommon) {
     var LoggedInView, _ref;
 
     return LoggedInView = (function(_super) {
       __extends(LoggedInView, _super);
 
       function LoggedInView() {
-        this.subscribeProperty = __bind(this.subscribeProperty, this);
-        this.registerUser = __bind(this.registerUser, this);        _ref = LoggedInView.__super__.constructor.apply(this, arguments);
+        this.subscribeProperty = __bind(this.subscribeProperty, this);        _ref = LoggedInView.__super__.constructor.apply(this, arguments);
         return _ref;
       }
 
@@ -31,8 +30,6 @@
         this.listenTo(Parse.User.current().get("profile"), "change:first_name change:last_name", this.updateName);
         return this.render();
       };
-
-      LoggedInView.prototype.registerUser = function() {};
 
       LoggedInView.prototype.subscribeProperty = function(obj) {
         return this.pusher.subscribe("properties-" + obj.id);
@@ -65,17 +62,20 @@
           i18nCommon: i18nCommon
         };
         this.$el.html(JST["src/js/templates/user/logged_in_menu.jst"](vars));
+        $("#panel-user-menu").html(JST["src/js/templates/user/logged_in_menu.jst"](vars));
         this.notificationsView = new NotificationsView;
         this.notificationsView.render();
         return this;
       };
 
       LoggedInView.prototype.updateNav = function() {
-        return this.$('#profile-link img').prop("src", Parse.User.current().get("profile").cover("micro"));
+        this.$('#profile-link img').prop("src", Parse.User.current().get("profile").cover("micro"));
+        return $('#panel-profile-link img').prop("src", Parse.User.current().get("profile").cover("micro"));
       };
 
       LoggedInView.prototype.updateName = function() {
-        return this.$('#profile-link span').html(Parse.User.current().get("profile").name());
+        this.$('#profile-link span').html(Parse.User.current().get("profile").name());
+        return $('#panel-profile-link span').html(Parse.User.current().get("profile").name());
       };
 
       return LoggedInView;

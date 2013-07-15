@@ -182,8 +182,6 @@
             Parse.history.navigate("/account/setup");
             return this.accountSetup();
           }
-        } else {
-          return this.signupOrLogin();
         }
       };
 

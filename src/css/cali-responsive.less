@@ -10,13 +10,28 @@
   }
 }
 
+@media (max-width: 979px) {
+  .navbar .navbar-inner {
+    padding:0 5px;
+  }
+}
 
 @media (max-width: 767px) {
+  // Move body padding styles from body to page.
+  // Don't target view, as it requires proper width-styling.
+  body {
+    padding: 0;
+  }
+  #page {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .navbar-fixed-top {
+    margin-left: 0;
+    margin-right: 0;
+  }
   .main {
     margin-top: 0;
-  }
-  .navbar-fixed-top .navbar-inner {
-    padding:0;
   }
   .input-prepend, 
   .input-append {
@@ -49,3 +64,15 @@
     }
   }
 }
+
+// @media (max-width: 480px) {
+//   .navbar {
+//     .navbar-inner {
+//       padding:0 20px;
+//     }
+//     .brand {
+//       float:none;
+//       text-align: center;
+//     }
+//   }
+// }

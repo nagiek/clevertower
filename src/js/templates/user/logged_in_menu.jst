@@ -1,10 +1,10 @@
-<li>
+<li class="phone-hidden">
   <a id="profile-link" class="clearfix" href="/users/<%= objectId %>">
     <img src="<%= src %>" class="stay-left photo photo-micro img-circle" alt="<%= photo_alt %>" width="23" height="23">
     <span class="photo-float micro-float"><%= name %></span>
   </a>
 </li>
-<li class="dropdown">
+<li class="dropdown phone-hidden list-item-icon">
   <a id="pLabel" data-target="#" data-toggle="dropdown" role="menu" class="dropdown-toggle">
     <i class="icon icon-cog"></i>
   </a>
@@ -19,23 +19,23 @@
     <li><a id="logout" href="#"><%= i18nDevise.actions.logout %></a></li>
   </ul>
 </li>
-<li id="memos" class="dropdown">
+<li id="memos" class="dropdown list-item-icon">
   <a id="mLabel" data-target="#" data-toggle="dropdown" role="menu" class="dropdown-toggle">
     <i class="icon icon-flag"></i>
-    <span id="memos-count" class="badge">0</span>
+    <span id="memos-count" class="badge badge-important hide">0</span>
   </a>
-  <div aria-labelledby="mLabel" role="menu" class="dropdown-menu pull-right">
-    <ul class="notifications-menu"></ul>
+  <div aria-labelledby="mLabel" role="menu" class="dropdown-menu notifications-menu pull-right">
+    <ul></ul>
     <a href="/notifications" class="dropdown-bottom"><%= i18nCommon.expressions.see_all %></a>
   </div>
 </li>
-<li id="friend-requests" class="dropdown">
+<li id="friend-requests" class="dropdown list-item-icon">
   <a id="fLabel" data-target="#" data-toggle="dropdown" role="menu" class="dropdown-toggle">
     <i class="icon icon-user"></i>
-    <span id="friend-requests-count" class="badge">0</span>
+    <span id="friend-requests-count" class="badge badge-important hide">0</span>
   </a>
-  <div aria-labelledby="fLabel" role="menu" class="dropdown-menu pull-right">
-    <ul class="notifications-menu"></ul>
+  <div aria-labelledby="fLabel" role="menu" class="dropdown-menu notifications-menu pull-right">
+    <ul></ul>
     <a href="/notifications" class="dropdown-bottom"><%= i18nCommon.expressions.see_all %></a>
   </div>
 </li>

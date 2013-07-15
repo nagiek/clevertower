@@ -6,7 +6,7 @@ var __t, __p = '', __e = _.escape;
 with (obj) {
 __p += '<li><a id="login-link" href="#">' +
 ((__t = ( i18nDevise.actions.login )) == null ? '' : __t) +
-'</a></li>\n<li><a id="signup-link" href="#">' +
+'</a></li>\n<li><a id="signup-link" class="phone-hidden" href="#">' +
 ((__t = ( i18nDevise.actions.signup )) == null ? '' : __t) +
 '</a></li>';
 

@@ -26,6 +26,30 @@
     text-shadow: none;
     margin-bottom:1px;
   }
+  .list-item-icon {
+    padding-left: 2px;
+    padding-right: 2px;
+    position: relative;
+    .badge {
+      position:absolute;
+      top:0;
+      right:0;
+      font-size: @fontSizeMini;
+      line-height: @lineHeightMini;
+      padding: @paddingMini;
+    }
+  }
+  .navbar-search {
+    float:none;
+    margin:5px 0 0;
+    .bar-append {
+      margin-right: 36px;
+      input {
+        width:100%;  
+      }
+      display: block;
+    }
+  }
   .brand {
     padding-top:4px;
     padding-bottom:4px;
@@ -48,11 +72,6 @@
       margin-top: (@microImgLength - @baseLineHeight) / 2;
     }
   }
-  .btn-facebook {
-    // padding-left
-    padding-top: 3px;
-    padding-bottom: 3px;
-  }
   .btn-large {
     padding:8px 14px;
   }
@@ -62,11 +81,15 @@
     font-size:@baseFontSize * 0.8;
     display:block;
   }
-  .btn-navbar,
+  .btn-navbar {
+    .icon-bar {
+      background-color: @grayDark;
+    }
+  }
   .btn-navbar:hover {
-    text-shadow: 0 -1px 0 rgba(0,0,0,.25);
-    color: @white;
-    .buttonBackground(@btnSuccessBackground, @btnSuccessBackgroundHighlight);
+    color: @grayDark;
+    // text-shadow: 0 -1px 0 rgba(0,0,0,.25);
+    // .buttonBackground(@btnSuccessBackground, @btnSuccessBackgroundHighlight);
   }
   
   .pull-right .dropdown-menu {
@@ -102,6 +125,31 @@
     }
   }
 }
+
+// Override default styles for 767px to 979px
+@media (min-width:767px) and (max-width:979px) {
+  .nav-collapse,
+  .nav-collapse.collapse {
+    clear: none;
+    height: auto;
+    overflow: visible;
+  }
+  .nav-collapse .navbar-search {
+    padding: 0;
+    border: none;
+  }
+}
+
+
+@media (min-width:767px) {
+  #search-menu {
+    width:270px; // input-xlarge width
+  }
+  .nav-collapse, .nav-collapse.collapse {
+    width: 100%;
+  }
+}
+
 
 @media (max-width:480px) {
   .navbar {
