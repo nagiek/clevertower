@@ -69,7 +69,7 @@ define [
 
     logInWithFacebook : (e) =>  
       e.preventDefault()
-      Parse.FacebookUtils.logIn "user_likes,email",
+      Parse.FacebookUtils.logIn Parse.App.fbPerms,
         success: (user) =>
           @$('> #login').modal('hide')
           # We don't know if this is a signup or a login.

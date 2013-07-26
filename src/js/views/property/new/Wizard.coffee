@@ -5,13 +5,19 @@ define [
   "models/Property"
   "models/Unit"
   "models/Lease"
+  "models/Concierge"
+  "models/Activity"
   "views/helper/Alert"
   "views/property/new/Map"
+  "views/property/new/New"
+  "views/property/new/Join"
+  "views/property/new/Picture"
+  "views/property/new/Share"
   "i18n!nls/property"
   "i18n!nls/common"
   "templates/property/new/map"
   "templates/property/new/wizard"
-], ($, _, Parse, Property, Unit, Lease, Alert, GMapView, i18nProperty, i18nCommon) ->
+], ($, _, Parse, Property, Unit, Lease, Concierge, Activity, Alert, GMapView, NewPropertyView, JoinPropertyView, PicturePropertyView, SharePropertyView, i18nProperty, i18nCommon) ->
 
   class PropertyWizardView extends Parse.View
   
@@ -19,8 +25,12 @@ define [
     # the App already present in the HTML.
     
     className: 'wizard'
-    
+
+    # Displayed form.
     state: 'address'
+
+    # Finish path for when we're done.
+    path: "/"
     
     events:
       'click .back'         : 'back'
@@ -61,18 +71,16 @@ define [
       @on "property:save", (property) =>
         # Add new property to collection
         Parse.User.current().get("network").properties.add property
-        Parse.history.navigate "/", trigger: true
-        # @clear()
 
-      @on "lease:save", (lease, isNew) =>
+      @on "lease:save", (lease) =>
         vars = 
           lease: lease
           unit: lease.get "unit"
           property: lease.get "property"
-          mgrOfProp: isNew
-        Parse.User.current().set(vars)
-        Parse.history.navigate "/account/building", true
-        @clear()
+        Parse.User.current().save(vars)
+        @path = "/account/building"
+
+      @on "wizard:finish", => Parse.history.navigate @path, true
 
 
     render : ->
@@ -80,6 +88,8 @@ define [
         i18nCommon: i18nCommon
         setup: !Parse.User.current() or (!Parse.User.current().get("property") and !Parse.User.current().get("network"))
       @$el.html JST['src/js/templates/property/new/wizard.jst'](vars)
+      @share = new SharePropertyView wizard: @, model: @model
+      # @$el.find(".wizard-forms").append @share.render().el
       @$el.find(".wizard-forms").append @map.render().el
       @map.renderMap()
       @
@@ -91,26 +101,24 @@ define [
       @$('button.join').prop "disabled", true
       @state = 'join'
       @existingProperty = existingProperty
-
-      require ["views/property/new/Join"], (JoinPropertyView) =>
-        @form = new JoinPropertyView wizard: @, property: @existingProperty
-        @map.$el.after @form.render().el
-        @animate 'forward'
+      
+      @form = new JoinPropertyView wizard: @, property: @existingProperty
+      @map.$el.after @form.render().el
+      @animate 'forward'
 
     manage : (existingProperty) =>
       @$('.error').removeClass('error')
       @$('button.next').prop "disabled", true
       @$('button.join').prop "disabled", true
 
-      require ["models/Concierge"], (Concierge) =>
-        concierge = new Concierge
-          property: existingProperty
-          profile: Parse.User.current().get("profile")
-          state: 'pending'
+      concierge = new Concierge
+        property: existingProperty
+        profile: Parse.User.current().get("profile")
+        state: 'pending'
 
-        alert = new Alert event: 'model-save', fade: false, message: i18nCommon.actions.request_sent, type: 'error'
-        concierge.save().then @clear , 
-          (error) -> alert.setError i18nCommon.errors.unknown_error
+      alert = new Alert event: 'model-save', fade: false, message: i18nCommon.actions.request_sent, type: 'error'
+      concierge.save().then -> @trigger "wizard:finish", 
+        (error) -> alert.setError i18nCommon.errors.unknown_error
 
 
     next : (e) =>
@@ -120,42 +128,111 @@ define [
       switch @state
         when 'address'
           center = @model.get "center"
-          return @model.trigger "invalid", {message: 'invalid_address'} if center._latitude is 0 and center._longitude is 0
-          if @model.get("thoroughfare"                ) is '' or 
-             @model.get("locality"                    ) is '' or
-             @model.get("administrative_area_level_1" ) is '' or
-             @model.get("country"                     ) is '' or
-             @model.get("postal_code"                 ) is ''
-            return @model.trigger "invalid", {message: 'insufficient_data'}
+          if center._latitude is 0 and center._longitude is 0
+            @model.trigger "invalid", {message: 'invalid_address'}
+          else unless @model.get("thoroughfare"            ) and # is '' or 
+                       @model.get("locality"                    ) and # is '' or
+                       @model.get("administrative_area_level_1" ) and # is '' or
+                       @model.get("country"                     ) and # is '' or
+                       @model.get("postal_code"                 )     # is ''
+            @model.trigger "invalid", {message: 'insufficient_data'}
+          else
+            @state = 'property'
+            @model.set 'title', @model.get('thoroughfare')
 
-          @state = 'property'
-          @model.set 'title', @model.get('thoroughfare')
-
-          if @forNetwork
-            require ["views/property/new/New"], (NewPropertyView) =>
+            if @forNetwork  
               @form = new NewPropertyView wizard: @, model: @model
               @map.$el.after @form.render().el
               @animate 'forward'
-          else        
-            require ["views/property/new/Join"], (JoinPropertyView) =>
+            else
               @form = new JoinPropertyView wizard: @, property: @model
               @map.$el.after @form.render().el
               @animate 'forward'
               
+
+        # New property steps
+        # ------------------
+
         when 'property'
           data = @form.$el.serializeObject()
           if data.lease
             attrs = @form.model.scrub data.lease
             attrs = @assignAdditionalToLease data, attrs
-            @form.model.save attrs,
-              success: (lease) =>        @trigger "lease:save", @form.model, false
-              error: (lease, error) =>   @form.model.trigger "invalid", error; console.log error
+            @form.model.save(attrs).then (lease) =>
+              # Might be necessary?
+              # @model = @form.model.get("property")
+              @trigger "lease:save", @form.model
+              @state = 'picture'
+              @picture = new PicturePropertyView wizard: @, model: @model
+              @form.$el.after @picture.render().el
+              @animate 'forward'
+            , (error) =>
+              @form.model.trigger "invalid", error; console.log error
 
           else 
             attrs = @model.scrub data.property
-            @model.save attrs,
-              success: (property) =>        @trigger "property:save", @model
-              error: (property, error) =>   @model.trigger "invalid", error; console.log error
+            @model.save(attrs).then (property) =>
+              @trigger "property:save", @model  
+              @state = 'picture'
+              @picture = new PicturePropertyView wizard: @, model: @model
+              @form.$el.after @picture.render().el
+              @animate 'forward'
+            , (error) => 
+              @model.trigger "invalid", error; console.log error
+
+        when 'picture'
+          @model.save().then (property) => 
+            @state = 'share'
+            @share = new SharePropertyView wizard: @, model: @model
+            @picture.$el.after @share.render().el
+            @animate 'forward'
+          , (error) =>
+            @model.trigger "invalid", error; console.log error
+
+        when 'share'
+          data = @share.$el.serializeObject()
+          attrs = @model.scrub data.property
+
+          @model.save(attrs).then (property) =>                      
+            # Share on CT?
+            if data.share.ct is "on" or data.share.ct is "1"
+              activity = new Activity
+              activityACL = new Parse.ACL
+              activityACL.setPublicReadAccess true
+              activity.save
+                activity_type: "new_property"
+                public: true
+                center: @model.get "center"
+                property: @model
+                network: Parse.User.current().get("network")
+                title: @model.get "title"
+                profile: Parse.User.current().get("profile")
+                ACL: activityACL
+
+              # Share on FB?
+              if data.share.fb is "on" or data.share.fb is "1"
+                if @forNetwork
+                  window.FB.api 'me/clevertower:become_a_landlord_in',
+                    'post',
+                    {
+                      city: window.location.origin + @model.city()
+                    },
+                    (response) -> console.log response
+                else
+                  window.FB.api 'me/clevertower:move_into',
+                  'post',
+                  {
+                    city: window.location.origin + @model.city()
+                  },
+                  (response) -> console.log response
+
+            @trigger "wizard:finish"
+          , (error) => 
+            @model.trigger "invalid", error; console.log error
+
+
+        # Join steps
+        # ----------
 
         when 'join'
           data = @form.$el.serializeObject()
@@ -163,16 +240,14 @@ define [
           attrs = @assignAdditionalToLease data, attrs
           
           @form.model.save attrs,
-              success: (lease) =>        @trigger "lease:save", @form.model, true
-              error: (lease, error) => @form.model.trigger "invalid", error; console.log error
+            success: (lease) =>      @trigger "lease:save", @form.model; @trigger "wizard:finish"
+            error: (error) => @form.model.trigger "invalid", error; console.log error
 
     back : (e) =>
       return if @state is 'address'
-      delete @existingProperty
-      @$('button.join').removeProp "disabled"
-      @state = 'address'
+      if @state is 'property' or @state is 'join'
+        @$('.back').prop "disabled", false
       @animate 'backward'
-      
 
     # cancel : (e) =>
     #   @trigger "wizard:cancel", this
@@ -226,19 +301,39 @@ define [
     animate : (dir) ->
       switch dir
         when 'forward'
-          @map.$el.animate left: "-150%", 500
-          @form.$el.animate left: "0", 500, 'swing', =>
-            @$('.next').removeProp "disabled"
-            @$('.next').html(i18nCommon.actions.save)
-            @$('.back').prop disabled: false
+          switch @state
+            when "property", "join"
+              @$('.back').removeProp "disabled"
+              @map.$el.animate left: "-150%", 500
+              @form.$el.animate left: "0", 500, 'swing', @buttonsForward
+            when "picture"
+              @form.$el.animate left: "-150%", 500
+              @picture.$el.animate left: "0", 500, 'swing', @buttonsForward
+            when "share"
+              @$('.next').html i18nCommon.actions.finish
+              @picture.$el.animate left: "-150%", 500
+              @share.$el.animate left: "0", 500, 'swing', @buttonsForward
         when 'backward'
-          @map.$el.animate left: "0%", 500
-          @form.$el.animate left: "150%", 500, 'swing', =>
-            @form.remove()
-            @form.undelegateEvents()
-            delete @form
-          @$('.back').prop disabled: 'disabled'
-          @$('.next').html(i18nCommon.actions.create)
+          switch @state
+            when "property", "join"
+              @map.$el.animate left: "0%", 500
+              @form.$el.animate left: "150%", 500, 'swing', => @form.clear();  @$('.back').prop disabled: 'disabled'
+              delete @existingProperty
+              @state = 'address'
+              @$('.back').prop "disabled", true
+            when "picture"
+              @form.$el.animate left: "0%", 500
+              @picture.$el.animate left: "150%", 500, 'swing', @picture.clear
+              @state = 'property'
+            when "share"
+              @$('.next').html i18nCommon.actions.next
+              @picture.$el.animate left: "0%", 500
+              @share.$el.animate left: "150%", 500, 'swing', @share.clear
+              @state = 'picture'
+
+    buttonsForward: =>
+      @$('.next').removeProp "disabled"
+      @$('.join').removeProp "disabled"
 
     clear : =>
       @stopListening()

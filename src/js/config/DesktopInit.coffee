@@ -15,7 +15,8 @@ require.config
     jqueryui:                 "libs/jqueryui/jquery-ui-1.10.3.custom.min",                  # includes core, widget, slider, datepicker
     # underscore:               "//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min"
     underscore:               "//cdnjs.cloudflare.com/ajax/libs/lodash.js/1.0.1/lodash.min" # "libs/underscore/lodash"
-    backbone:                 "//www.parsecdn.com/js/parse-1.2.8"                       # "libs/backbone/parse"
+    # backbone:                 "//www.parsecdn.com/js/parse-1.2.8"
+    backbone:                 "libs/parse/parse-1.2.8"
                               
     # Async Libraries         
     # ---------------         
@@ -260,9 +261,15 @@ require [
 
   Parse.App.featuredListings = new FeaturedListingList 
 
+  Parse.App.fbPerms = "email, publish_actions"
+
   Parse.App.countryCodes = 
     CA: "Canada"
     US: "United States"
+
+  Parse.App.cities = 
+    "Montreal--QC--Canada": 'Originally called Ville-Marie, or "City of Mary", it is named after Mount Royal, the triple-peaked hill located in the heart of the city.'
+    "Toronto--ON--Canada": 'Canada’s most cosmopolitan city is situated on beautiful Lake Ontario, and is the cultural heart of south central Ontario and of English-speaking Canada. '
 
 
   # Bootstrap
@@ -322,27 +329,27 @@ require [
 
   # Load all the stuff
   Parse.User::setup = ->
-    userPromise = (new Parse.Query("_User"))
+    new Parse.Query("_User")
     .include('lease')
     .include('unit')
     .include('profile')
     .include('property.role')
     .include('property.mgrRole')
     .include('network.role')
-    .equalTo("objectId", @id).first()
-    @notifications = new NotificationList
+    .equalTo("objectId", @id)
+    .first().then (user) => 
 
-    Parse.Promise.when(userPromise, @notifications.query.find())
-    .then (user, notifs) => 
-
-      # Notifications.
-      @notifications.add notifs
+      return unless user
 
       # Profile.
       profile = user.get "profile"
       profile.likes = new ActivityList([], {})
       profile.likes.query = profile.relation("likes").query()
       @set "profile", profile
+
+      # Notifications.
+      @notifications = new NotificationList
+      @notifications.query.find().then (notifs) => @notifications.add notifs
 
       # Living.
       @set "lease", user.get "lease"

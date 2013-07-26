@@ -9,12 +9,13 @@ define [
   "views/photo/Show"
   "i18n!nls/property"
   "i18n!nls/common"
+  "canvas-to-blob"
   "templates/property/sub/photos"
   'jqueryuiwidget'
   'jquery.fileupload'
   'jquery.fileupload-fp'
   'jquery.fileupload-ui'
-], ($, _, Parse, Property, Photo, Activity, PhotoList, PhotoView, i18nProperty, i18nCommon) ->
+], ($, _, Parse, Property, Photo, Activity, PhotoList, PhotoView, i18nProperty, i18nCommon, canvas) ->
 
   class PropertyPhotosView extends Parse.View
   
@@ -27,11 +28,11 @@ define [
       @on "view:change", @clear
       
       @unUploadedPhotos = 0
-          
-      @photos = new PhotoList [], property: @model
+      
+      @model.prep "photos"
 
-      @listenTo @photos, "add", @addOne
-      @listenTo @photos, "reset", @addAll
+      @listenTo @model.photos, "add", @addOne
+      @listenTo @model.photos, "reset", @addAll
 
       # @on 'added', (e, data) =>
       #   @unUploadedPhotos++
@@ -104,7 +105,7 @@ define [
         stop: (e, data) =>
 
           Parse.Promise.when(uploads).then =>
-            @photos.add photo for photo in arguments
+            @model.photos.add photo for photo in arguments
 
             # TODO: Have this be a modal prompt to confirm.
             activity = new Activity
@@ -121,12 +122,11 @@ define [
           @$(".fileupload-progress").addClass("hide")
       
       # Fetch all the property items for this user
-      @photos.fetch()
+      if @model.photos.length is 0 then @model.photos.fetch() else @addAll()
       @
 
     clear: (e) =>
       @undelegateEvents()
-      delete @photos
       delete this
 
     addOne : (photo) =>
@@ -136,7 +136,7 @@ define [
     # Add all items in the Properties collection at once.
     addAll: (collection, filter) =>
       @$list.html ""
-      unless @photos.length is 0
-        @photos.each @addOne
+      unless @model.photos.length is 0
+        @model.photos.each @addOne
       else
         @$list.before '<p class="empty">' + i18nProperty.empty.photos + '</p>'

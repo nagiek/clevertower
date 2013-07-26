@@ -7,6 +7,7 @@
       setup_property: "Setup Property",
       go_to_network: "Go to network",
       add_a_property: "Add a property",
+      share_property: "Share property",
       join_or_create_to_start: "Join or create a property to get started",
       join_property_at: function(title) {
         return "Create your lease at <em>" + (_.escape(title)) + "</em>";
@@ -48,9 +49,21 @@
       view_tenant: "See Tenant View"
     },
     activity: {
+      new_property: function() {
+        var titles;
+
+        titles = ["Saying hi to everyone.", "We're in the neighbourhood!", "Wanted to introduce ourselves!", "We just joined CleverTower."];
+        return titles[Math.floor(Math.random() * titles.length)];
+      },
       added_photos: function(count) {
         return "We added " + count + " photos.";
       }
+    },
+    listing: {
+      "public": "Display Public",
+      public_info: "Whether this property will appear in search results",
+      approx: "Display Address",
+      approx_info: "Whether the exact address or a representative area is shown."
     },
     network: {
       edit: "Edit network",

@@ -5,7 +5,7 @@
       jquery: "//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min",
       jqueryui: "libs/jqueryui/jquery-ui-1.10.3.custom.min",
       underscore: "//cdnjs.cloudflare.com/ajax/libs/lodash.js/1.0.1/lodash.min",
-      backbone: "//www.parsecdn.com/js/parse-1.2.8",
+      backbone: "libs/parse/parse-1.2.8",
       facebook: "//connect.facebook.net/en_US/all",
       jqueryuiwidget: "libs/jqueryui/jquery.ui.widget.min",
       jquerymobile: "//cdnjs.cloudflare.com/ajax/libs/jquery-mobile/1.2.0/jquery.mobile.min",
@@ -182,9 +182,14 @@
     Parse.initialize(window.APPID, window.JSKEY);
     Parse.App = {};
     Parse.App.featuredListings = new FeaturedListingList;
+    Parse.App.fbPerms = "email, publish_actions";
     Parse.App.countryCodes = {
       CA: "Canada",
       US: "United States"
+    };
+    Parse.App.cities = {
+      "Montreal--QC--Canada": 'Originally called Ville-Marie, or "City of Mary", it is named after Mount Royal, the triple-peaked hill located in the heart of the city.',
+      "Toronto--ON--Canada": 'Canada’s most cosmopolitan city is situated on beautiful Lake Ontario, and is the cultural heart of south central Ontario and of English-speaking Canada. '
     };
     _.str = _String;
     $.ajaxSetup({
@@ -241,19 +246,22 @@
       return false;
     };
     Parse.User.prototype.setup = function() {
-      var userPromise,
-        _this = this;
+      var _this = this;
 
-      userPromise = (new Parse.Query("_User")).include('lease').include('unit').include('profile').include('property.role').include('property.mgrRole').include('network.role').equalTo("objectId", this.id).first();
-      this.notifications = new NotificationList;
-      return Parse.Promise.when(userPromise, this.notifications.query.find()).then(function(user, notifs) {
+      return new Parse.Query("_User").include('lease').include('unit').include('profile').include('property.role').include('property.mgrRole').include('network.role').equalTo("objectId", this.id).first().then(function(user) {
         var network, profile;
 
-        _this.notifications.add(notifs);
+        if (!user) {
+          return;
+        }
         profile = user.get("profile");
         profile.likes = new ActivityList([], {});
         profile.likes.query = profile.relation("likes").query();
         _this.set("profile", profile);
+        _this.notifications = new NotificationList;
+        _this.notifications.query.find().then(function(notifs) {
+          return _this.notifications.add(notifs);
+        });
         _this.set("lease", user.get("lease"));
         if (user.get("unit")) {
           _this.set("unit", new Unit(user.get("unit").attributes));

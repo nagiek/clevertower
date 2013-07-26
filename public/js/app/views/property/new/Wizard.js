@@ -3,7 +3,7 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", "models/Property", "models/Unit", "models/Lease", "views/helper/Alert", "views/property/new/Map", "i18n!nls/property", "i18n!nls/common", "templates/property/new/map", "templates/property/new/wizard"], function($, _, Parse, Property, Unit, Lease, Alert, GMapView, i18nProperty, i18nCommon) {
+  define(["jquery", "underscore", "backbone", "models/Property", "models/Unit", "models/Lease", "models/Concierge", "models/Activity", "views/helper/Alert", "views/property/new/Map", "views/property/new/New", "views/property/new/Join", "views/property/new/Picture", "views/property/new/Share", "i18n!nls/property", "i18n!nls/common", "templates/property/new/map", "templates/property/new/wizard"], function($, _, Parse, Property, Unit, Lease, Concierge, Activity, Alert, GMapView, NewPropertyView, JoinPropertyView, PicturePropertyView, SharePropertyView, i18nProperty, i18nCommon) {
     var PropertyWizardView, _ref;
 
     return PropertyWizardView = (function(_super) {
@@ -11,6 +11,7 @@
 
       function PropertyWizardView() {
         this.clear = __bind(this.clear, this);
+        this.buttonsForward = __bind(this.buttonsForward, this);
         this.back = __bind(this.back, this);
         this.next = __bind(this.next, this);
         this.manage = __bind(this.manage, this);
@@ -21,6 +22,8 @@
       PropertyWizardView.prototype.className = 'wizard';
 
       PropertyWizardView.prototype.state = 'address';
+
+      PropertyWizardView.prototype.path = "/";
 
       PropertyWizardView.prototype.events = {
         'click .back': 'back',
@@ -66,23 +69,21 @@
           });
         });
         this.on("property:save", function(property) {
-          Parse.User.current().get("network").properties.add(property);
-          return Parse.history.navigate("/", {
-            trigger: true
-          });
+          return Parse.User.current().get("network").properties.add(property);
         });
-        return this.on("lease:save", function(lease, isNew) {
+        this.on("lease:save", function(lease) {
           var vars;
 
           vars = {
             lease: lease,
             unit: lease.get("unit"),
-            property: lease.get("property"),
-            mgrOfProp: isNew
+            property: lease.get("property")
           };
-          Parse.User.current().set(vars);
-          Parse.history.navigate("/account/building", true);
-          return _this.clear();
+          Parse.User.current().save(vars);
+          return _this.path = "/account/building";
+        });
+        return this.on("wizard:finish", function() {
+          return Parse.history.navigate(_this.path, true);
         });
       };
 
@@ -94,14 +95,16 @@
           setup: !Parse.User.current() || (!Parse.User.current().get("property") && !Parse.User.current().get("network"))
         };
         this.$el.html(JST['src/js/templates/property/new/wizard.jst'](vars));
+        this.share = new SharePropertyView({
+          wizard: this,
+          model: this.model
+        });
         this.$el.find(".wizard-forms").append(this.map.render().el);
         this.map.renderMap();
         return this;
       };
 
       PropertyWizardView.prototype.join = function(existingProperty) {
-        var _this = this;
-
         if (this.state === 'join') {
           return;
         }
@@ -110,37 +113,33 @@
         this.$('button.join').prop("disabled", true);
         this.state = 'join';
         this.existingProperty = existingProperty;
-        return require(["views/property/new/Join"], function(JoinPropertyView) {
-          _this.form = new JoinPropertyView({
-            wizard: _this,
-            property: _this.existingProperty
-          });
-          _this.map.$el.after(_this.form.render().el);
-          return _this.animate('forward');
+        this.form = new JoinPropertyView({
+          wizard: this,
+          property: this.existingProperty
         });
+        this.map.$el.after(this.form.render().el);
+        return this.animate('forward');
       };
 
       PropertyWizardView.prototype.manage = function(existingProperty) {
-        var _this = this;
+        var alert, concierge;
 
         this.$('.error').removeClass('error');
         this.$('button.next').prop("disabled", true);
         this.$('button.join').prop("disabled", true);
-        return require(["models/Concierge"], function(Concierge) {
-          var alert, concierge;
-
-          concierge = new Concierge({
-            property: existingProperty,
-            profile: Parse.User.current().get("profile"),
-            state: 'pending'
-          });
-          alert = new Alert({
-            event: 'model-save',
-            fade: false,
-            message: i18nCommon.actions.request_sent,
-            type: 'error'
-          });
-          return concierge.save().then(_this.clear, function(error) {
+        concierge = new Concierge({
+          property: existingProperty,
+          profile: Parse.User.current().get("profile"),
+          state: 'pending'
+        });
+        alert = new Alert({
+          event: 'model-save',
+          fade: false,
+          message: i18nCommon.actions.request_sent,
+          type: 'error'
+        });
+        return concierge.save().then(function() {
+          return this.trigger("wizard:finish", function(error) {
             return alert.setError(i18nCommon.errors.unknown_error);
           });
         });
@@ -160,32 +159,28 @@
               return this.model.trigger("invalid", {
                 message: 'invalid_address'
               });
-            }
-            if (this.model.get("thoroughfare") === '' || this.model.get("locality") === '' || this.model.get("administrative_area_level_1") === '' || this.model.get("country") === '' || this.model.get("postal_code") === '') {
+            } else if (!(this.model.get("thoroughfare") && this.model.get("locality") && this.model.get("administrative_area_level_1") && this.model.get("country") && this.model.get("postal_code"))) {
               return this.model.trigger("invalid", {
                 message: 'insufficient_data'
               });
-            }
-            this.state = 'property';
-            this.model.set('title', this.model.get('thoroughfare'));
-            if (this.forNetwork) {
-              return require(["views/property/new/New"], function(NewPropertyView) {
-                _this.form = new NewPropertyView({
-                  wizard: _this,
-                  model: _this.model
-                });
-                _this.map.$el.after(_this.form.render().el);
-                return _this.animate('forward');
-              });
             } else {
-              return require(["views/property/new/Join"], function(JoinPropertyView) {
-                _this.form = new JoinPropertyView({
-                  wizard: _this,
-                  property: _this.model
+              this.state = 'property';
+              this.model.set('title', this.model.get('thoroughfare'));
+              if (this.forNetwork) {
+                this.form = new NewPropertyView({
+                  wizard: this,
+                  model: this.model
                 });
-                _this.map.$el.after(_this.form.render().el);
-                return _this.animate('forward');
-              });
+                this.map.$el.after(this.form.render().el);
+                return this.animate('forward');
+              } else {
+                this.form = new JoinPropertyView({
+                  wizard: this,
+                  property: this.model
+                });
+                this.map.$el.after(this.form.render().el);
+                return this.animate('forward');
+              }
             }
             break;
           case 'property':
@@ -193,37 +188,100 @@
             if (data.lease) {
               attrs = this.form.model.scrub(data.lease);
               attrs = this.assignAdditionalToLease(data, attrs);
-              return this.form.model.save(attrs, {
-                success: function(lease) {
-                  return _this.trigger("lease:save", _this.form.model, false);
-                },
-                error: function(lease, error) {
-                  _this.form.model.trigger("invalid", error);
-                  return console.log(error);
-                }
+              return this.form.model.save(attrs).then(function(lease) {
+                _this.trigger("lease:save", _this.form.model);
+                _this.state = 'picture';
+                _this.picture = new PicturePropertyView({
+                  wizard: _this,
+                  model: _this.model
+                });
+                _this.form.$el.after(_this.picture.render().el);
+                return _this.animate('forward');
+              }, function(error) {
+                _this.form.model.trigger("invalid", error);
+                return console.log(error);
               });
             } else {
               attrs = this.model.scrub(data.property);
-              return this.model.save(attrs, {
-                success: function(property) {
-                  return _this.trigger("property:save", _this.model);
-                },
-                error: function(property, error) {
-                  _this.model.trigger("invalid", error);
-                  return console.log(error);
-                }
+              return this.model.save(attrs).then(function(property) {
+                _this.trigger("property:save", _this.model);
+                _this.state = 'picture';
+                _this.picture = new PicturePropertyView({
+                  wizard: _this,
+                  model: _this.model
+                });
+                _this.form.$el.after(_this.picture.render().el);
+                return _this.animate('forward');
+              }, function(error) {
+                _this.model.trigger("invalid", error);
+                return console.log(error);
               });
             }
             break;
+          case 'picture':
+            return this.model.save().then(function(property) {
+              _this.state = 'share';
+              _this.share = new SharePropertyView({
+                wizard: _this,
+                model: _this.model
+              });
+              _this.picture.$el.after(_this.share.render().el);
+              return _this.animate('forward');
+            }, function(error) {
+              _this.model.trigger("invalid", error);
+              return console.log(error);
+            });
+          case 'share':
+            data = this.share.$el.serializeObject();
+            attrs = this.model.scrub(data.property);
+            return this.model.save(attrs).then(function(property) {
+              var activity, activityACL;
+
+              if (data.share.ct === "on" || data.share.ct === "1") {
+                activity = new Activity;
+                activityACL = new Parse.ACL;
+                activityACL.setPublicReadAccess(true);
+                activity.save({
+                  activity_type: "new_property",
+                  "public": true,
+                  center: _this.model.get("center"),
+                  property: _this.model,
+                  network: Parse.User.current().get("network"),
+                  title: _this.model.get("title"),
+                  profile: Parse.User.current().get("profile"),
+                  ACL: activityACL
+                });
+                if (data.share.fb === "on" || data.share.fb === "1") {
+                  if (_this.forNetwork) {
+                    window.FB.api('me/clevertower:become_a_landlord_in', 'post', {
+                      city: window.location.origin + _this.model.city()
+                    }, function(response) {
+                      return console.log(response);
+                    });
+                  } else {
+                    window.FB.api('me/clevertower:move_into', 'post', {
+                      city: window.location.origin + _this.model.city()
+                    }, function(response) {
+                      return console.log(response);
+                    });
+                  }
+                }
+              }
+              return _this.trigger("wizard:finish");
+            }, function(error) {
+              _this.model.trigger("invalid", error);
+              return console.log(error);
+            });
           case 'join':
             data = this.form.$el.serializeObject();
             attrs = this.form.model.scrub(data.lease);
             attrs = this.assignAdditionalToLease(data, attrs);
             return this.form.model.save(attrs, {
               success: function(lease) {
-                return _this.trigger("lease:save", _this.form.model, true);
+                _this.trigger("lease:save", _this.form.model);
+                return _this.trigger("wizard:finish");
               },
-              error: function(lease, error) {
+              error: function(error) {
                 _this.form.model.trigger("invalid", error);
                 return console.log(error);
               }
@@ -235,9 +293,9 @@
         if (this.state === 'address') {
           return;
         }
-        delete this.existingProperty;
-        this.$('button.join').removeProp("disabled");
-        this.state = 'address';
+        if (this.state === 'property' || this.state === 'join') {
+          this.$('.back').prop("disabled", false);
+        }
         return this.animate('backward');
       };
 
@@ -289,34 +347,75 @@
 
         switch (dir) {
           case 'forward':
-            this.map.$el.animate({
-              left: "-150%"
-            }, 500);
-            return this.form.$el.animate({
-              left: "0"
-            }, 500, 'swing', function() {
-              _this.$('.next').removeProp("disabled");
-              _this.$('.next').html(i18nCommon.actions.save);
-              return _this.$('.back').prop({
-                disabled: false
-              });
-            });
+            switch (this.state) {
+              case "property":
+              case "join":
+                this.$('.back').removeProp("disabled");
+                this.map.$el.animate({
+                  left: "-150%"
+                }, 500);
+                return this.form.$el.animate({
+                  left: "0"
+                }, 500, 'swing', this.buttonsForward);
+              case "picture":
+                this.form.$el.animate({
+                  left: "-150%"
+                }, 500);
+                return this.picture.$el.animate({
+                  left: "0"
+                }, 500, 'swing', this.buttonsForward);
+              case "share":
+                this.$('.next').html(i18nCommon.actions.finish);
+                this.picture.$el.animate({
+                  left: "-150%"
+                }, 500);
+                return this.share.$el.animate({
+                  left: "0"
+                }, 500, 'swing', this.buttonsForward);
+            }
+            break;
           case 'backward':
-            this.map.$el.animate({
-              left: "0%"
-            }, 500);
-            this.form.$el.animate({
-              left: "150%"
-            }, 500, 'swing', function() {
-              _this.form.remove();
-              _this.form.undelegateEvents();
-              return delete _this.form;
-            });
-            this.$('.back').prop({
-              disabled: 'disabled'
-            });
-            return this.$('.next').html(i18nCommon.actions.create);
+            switch (this.state) {
+              case "property":
+              case "join":
+                this.map.$el.animate({
+                  left: "0%"
+                }, 500);
+                this.form.$el.animate({
+                  left: "150%"
+                }, 500, 'swing', function() {
+                  _this.form.clear();
+                  return _this.$('.back').prop({
+                    disabled: 'disabled'
+                  });
+                });
+                delete this.existingProperty;
+                this.state = 'address';
+                return this.$('.back').prop("disabled", true);
+              case "picture":
+                this.form.$el.animate({
+                  left: "0%"
+                }, 500);
+                this.picture.$el.animate({
+                  left: "150%"
+                }, 500, 'swing', this.picture.clear);
+                return this.state = 'property';
+              case "share":
+                this.$('.next').html(i18nCommon.actions.next);
+                this.picture.$el.animate({
+                  left: "0%"
+                }, 500);
+                this.share.$el.animate({
+                  left: "150%"
+                }, 500, 'swing', this.share.clear);
+                return this.state = 'picture';
+            }
         }
+      };
+
+      PropertyWizardView.prototype.buttonsForward = function() {
+        this.$('.next').removeProp("disabled");
+        return this.$('.join').removeProp("disabled");
       };
 
       PropertyWizardView.prototype.clear = function() {

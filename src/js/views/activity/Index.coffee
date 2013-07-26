@@ -69,7 +69,9 @@ define [
 
 
       @listenTo Parse.App.search, "google:search", (data) =>
-        @location = data.location
+        unless @location is data.location
+          @location = data.location
+          @renderCity()
         @placesService.getDetails reference: data.reference, @googleSearch
 
       @on "model:view", @showModal
@@ -82,7 +84,7 @@ define [
 
       @on "view:empty", =>
         @moreToDisplay = false
-        @$loading.html ""
+        @$loading.html i18nListing.listings.empty.index
 
       # Create a timer to buffer window re-draws.
       @time = null
@@ -128,7 +130,7 @@ define [
       _.each @listViews, (lv) -> lv.reset()
       Parse.App.activity.reset()
       @resetUserActivity() if Parse.User.current()
-      @$list.find('> li.empty').remove()
+      # @$list.find('> li.empty').remove()
 
 
     # refreshDisplay : ->
@@ -215,6 +217,8 @@ define [
         i18nListing: i18nListing
         i18nCommon: i18nCommon
       @$el.html JST["src/js/templates/activity/index.jst"](vars)
+
+      @renderCity()
       
       @$('[rel=tooltip]').tooltip placement: 'bottom'
 
@@ -329,6 +333,30 @@ define [
       $(document.documentElement).scroll @loadTracker
       @
 
+    renderCity : =>
+      if _.contains _.keys(Parse.App.cities), @location
+        desc = Parse.App.cities[@location]
+        title = @location.substring 0, @location.indexOf("-")
+        image = "/img/city/#{@location}.jpg"
+
+        # FB Meta Tags
+        $("head meta[property='og:description']").attr "content", desc
+        $("head meta[property='og:url']").attr "content", window.location.href
+        $("head meta[property='og:image']").attr "content", window.location.origin + image
+        $("head meta[property='og:type']").attr "content", "clevertower:city"
+
+        @$("#city").html """
+          <div class="fade in" style="background-image: url('#{image}');">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <div class="row">
+              <h1 class="span3">#{title}</h1>
+              <p class="span4">#{desc}</p>
+            </div>
+          </div>
+        """
+      else 
+        @$("#city").empty()
+
     renderMap : =>
       if @radius
         if @radius > 1000000 then zoom = 3
@@ -419,9 +447,6 @@ define [
 
       if status is google.maps.places.PlacesServiceStatus.OK
 
-        # console.log status
-        # console.log place
-
         # @center = place.geometry.location
         # @map.setCenter @center
 
@@ -443,17 +468,8 @@ define [
     searchMap : =>
       center = @map.getCenter()
       @locationAppend = "?lat=#{center.lat()}&lng=#{center.lng()}"
-      Parse.history.navigate "/search/#{@location}#{@locationAppend}"
+      Parse.history.navigate "/outside/#{@location}#{@locationAppend}"
       @performSearchWithinMap()
-
-    redoSearch : =>
-
-      @chunk = 1
-      @page = 1
-
-      @resetListViews()
-      @updatePaginiation()
-      @search()
 
     performSearchWithinMap: =>
 
@@ -463,6 +479,15 @@ define [
       Parse.App.activity.setBounds @sw, @ne
 
       @redoSearch()
+
+    redoSearch : =>
+
+      @chunk = 1
+      @page = 1
+
+      @resetListViews()
+      @search()
+      @updatePaginiation()
 
     search : =>
       @$loading.html "<img src='/img/misc/spinner.gif' class='spinner' alt='#{i18nCommon.verbs.loading}' />"
@@ -482,8 +507,8 @@ define [
     handleMapActivity : ->
       Parse.App.activity.query.skip(@resultsPerPage * (@page - 1)).limit(@resultsPerPage).find()
       .then (objs) =>
-        if objs.length < @resultsPerPage then @trigger "view:exhausted"
         if objs then Parse.App.activity.add objs
+          # if objs.length < @resultsPerPage then @trigger "view:exhausted"
         # @refreshDisplay()
 
 
@@ -692,7 +717,6 @@ define [
         @pages = Math.ceil((count + userCount)/ @resultsPerPage)
         # @$pagination.html ""
         if count + userCount is 0
-          @$list.append '<li class="general empty">' + i18nListing.listings.empty.index + '</li>'
           @trigger "view:empty"
         else 
           collectionLength = Parse.App.activity.length 

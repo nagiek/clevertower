@@ -21,19 +21,19 @@ define [
     # a one-to-one correspondence between a Photo and a PhotoView in this
     # app, we set a direct reference on the model for convenience.
     initialize: ->
-      _.bindAll this, "render", "close", "remove"
-      @model.on "change", @render
-      @model.on "destroy", =>
-        @remove()
-        @undelegateEvents()
-        delete this
-
+      @listenTo @model, "change", @render
+      @listenTo @model, "destroy", @clear
   
     # Re-render the contents of the photo item.
     render: ->
-      $(@el).html JST["src/js/templates/photo/show.jst"](_.merge(@model.toJSON(), i18nCommon: i18nCommon))
-      this
+      @$el.html JST["src/js/templates/photo/show.jst"](_.merge(@model.toJSON(), i18nCommon: i18nCommon))
+      @
 
     # Remove the item, destroy the model.
-    kill: ->
+    kill: =>
       @model.destroy() if confirm(i18nCommon.actions.confirm)
+
+    clear : =>
+      @remove()
+      @undelegateEvents()
+      delete this

@@ -10,6 +10,55 @@
   }
 }
 
+#city {
+  > div {
+    margin-bottom:18px;
+    background-repeat:none;
+    background-position:50% 50%;
+    .border-radius(4px);
+    > div {
+      padding: 40px 15px 0 15px;
+    }
+  }
+  h1 {
+    color:@white;
+    text-shadow:0 1px 25px @grayDark;
+  }
+  p {
+    color:@white;
+    text-shadow:0 1px 14px @grayDark;
+  }
+  .close {
+    color:@white;
+    font-size:20px;
+    font-weight: 400;
+    padding: 5px 10px;
+    .opacity(90);
+    &:hover {
+      .opacity(100);
+    }
+  }
+}
+
+// All forms where an activity is posted
+.activity-form {
+  legend {
+    font-size: @baseFontSize + 2px;
+    line-height: @baseLineHeight + 2px;
+    border: none;
+    margin: 0;
+    padding: 0;
+  }
+  legend + .control-group {
+    margin-top:0;
+  }
+  .share-options {
+    .control-label {
+      margin-top: 3px;
+    }
+  }
+}
+
 #activities {
   > li {
     &.divider {
@@ -128,6 +177,9 @@
     text-align: right;
     font-size: 24px;
     text-shadow: 0 1px 10px #fff;
+  }
+  .caption {
+    position:relative;
   }
 }
 

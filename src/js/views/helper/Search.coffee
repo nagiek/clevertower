@@ -109,8 +109,6 @@ define [
                               <% } %>
                               """
       ,
-
-
         name: 'places'
         header: "<span class='nav-header'>#{i18nCommon.nouns.places}</span>"
         footer: """
@@ -175,7 +173,7 @@ define [
                 url: "/properties/#{p.objectId}"
                 tokens: _.union(p.title.split(" "), p.thoroughfare.split(" "), [p.locality])
 
-        @vars[2] = 
+        @vars[3] = 
           name: 'tenants'
           header: "<span class='nav-header'>#{i18nCommon.classes.Tenants}</span>"
           local: Parse.User.current().get("network").tenants.map (t) ->
@@ -209,17 +207,17 @@ define [
         # ------------------------------------
 
         @listenTo Parse.User.current().get("network").properties, "add reset", =>
-          @$('.search').typeahead 'destroy'
+          @$('.search-query').typeahead 'destroy'
           @vars[0].local = Parse.User.current().get("network").properties.map (p) ->
             value: p.get("title")
             img_src: p.cover("tiny")
             url: p.url()
             tokens: _.union(p.get("title").split(" "), p.get("thoroughfare").split(" "), [p.get("locality")])          
 
-          @$('.search').typeahead @vars
+          @$('.search-query').typeahead @vars
 
         @listenTo Parse.User.current().get("network").tenants, "add reset", =>
-          @$('.search').typeahead 'destroy'
+          @$('.search-query').typeahead 'destroy'
           @vars[2].local =  Parse.User.current().get("network").tenants.map (t) ->
             p = t.get("profile")
             name = p.name()
@@ -229,7 +227,7 @@ define [
             value: name
             img_src: p.cover("tiny")
             url: p.url()
-          @$('.search').typeahead @vars
+          @$('.search-query').typeahead @vars
 
     # typeahead widget takes care of navigation.
     doNothing : (e) => e.preventDefault()
@@ -242,12 +240,12 @@ define [
     render : =>
       @$el.html JST["src/js/templates/helper/search.jst"](i18nCommon: i18nCommon)
 
-      @$('.search').on "typeahead:selected", @googleSearch
-      @$('.search').typeahead @vars
+      @$('.search-query').on "typeahead:selected", @googleSearch
+      @$('.search-query').typeahead @vars
       @
       
     reset : =>
-      @$('.search').typeahead('destroy')
+      @$('.search-query').typeahead('destroy')
       @initDatasets()
-      @$('.search').typeahead @vars
+      @$('.search-query').typeahead @vars
       

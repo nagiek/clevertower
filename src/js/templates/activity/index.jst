@@ -1,38 +1,41 @@
 <div class="container">
   <div class="row">
+    <div id="city" class="span8"></div>
     <div class="pull-right span4">
-      <div id="user-container" class="span4">
-        <div id="property-prompt"></div>
-        <div id="new-activity"></div>
-      </div>
-      <div class="span4">
-        <form id="activity-filter-form" class="well well-small">
-          <div id="general-controls">
-            <div class="control-group center">
-              <div class="controls">
-                <div id="filters" class="btn-group" data-toggle="buttons-radio">
-                  <button type="button" class="btn active"><%= i18nCommon.adjectives.all %></button>
+      <div class="row">
+        <div id="user-container" class="span4">
+          <div id="property-prompt"></div>
+          <div id="new-activity"></div>
+        </div>
+        <div class="span4">
+          <form id="activity-filter-form" class="well well-small">
+            <div id="general-controls">
+              <div class="control-group center">
+                <div class="controls">
+                  <div id="filters" class="btn-group" data-toggle="buttons-radio">
+                    <button type="button" class="btn active"><%= i18nCommon.adjectives.all %></button>
 
-                  <button data-filter="new_listing" type="button" class="btn" rel="tooltip" data-original-title="<%= i18nCommon.classes.Listing %>">
-                    <i class="icon icon-listing"></i>
-                  </button>
-                  <button data-filter="new_property" type="button" class="btn" rel="tooltip" data-original-title="<%= i18nCommon.nouns.building %>">
-                    <i class="icon icon-building"></i>
-                  </button>
-                  <button data-filter="new_post" type="button" class="btn" rel="tooltip" data-original-title="<%= i18nCommon.classes.Posts %>">
-                    <i class="icon icon-status"></i>
-                  </button>
+                    <button data-filter="new_listing" type="button" class="btn" rel="tooltip" data-original-title="<%= i18nCommon.classes.Listing %>">
+                      <i class="icon icon-listing"></i>
+                    </button>
+                    <button data-filter="new_property" type="button" class="btn" rel="tooltip" data-original-title="<%= i18nCommon.nouns.building %>">
+                      <i class="icon icon-building"></i>
+                    </button>
+                    <button data-filter="new_post" type="button" class="btn" rel="tooltip" data-original-title="<%= i18nCommon.classes.Posts %>">
+                      <i class="icon icon-status"></i>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
+            <div id="specific-controls" class="form-horizontal"></div>
+          </form>
+        </div>
+        <div id="map-container" class="pull-right span4">
+          <div class="position-relative">
+            <button type="button" id="search-map" class="btn btn-google-maps" rel="tooltip" title="<%= i18nListing.map.redo_search %>"><i class="icon icon-repeat"></i></button>
+            <div id="mapCanvas"></div>
           </div>
-          <div id="specific-controls" class="form-horizontal"></div>
-        </form>
-      </div>
-      <div id="map-container" class="span4">
-        <div class="position-relative">
-          <button type="button" id="search-map" class="btn btn-google-maps" rel="tooltip" title="<%= i18nListing.map.redo_search %>"><i class="icon icon-repeat"></i></button>
-          <div id="mapCanvas"></div>
         </div>
       </div>
     </div>

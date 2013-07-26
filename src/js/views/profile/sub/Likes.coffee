@@ -37,6 +37,6 @@ define [
 
       unless @model.likes.length is 0
         @model.likes.each @addOne
-      else @$list.html '<li class="empty">' + 
-                                if @current then i18nUser.empty.likes.self else i18nUser.empty.likes.other(name) +
-                                '</li>'
+      else 
+        text = if @current then i18nUser.empty.likes.self else i18nUser.empty.likes.other @model.get("first_name") || @model.name()
+        @$list.html '<li class="empty">' + text + '</li>'

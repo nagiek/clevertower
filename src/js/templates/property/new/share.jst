@@ -1,0 +1,79 @@
+<div class="row">
+  <div class="offset1 span5">
+    <h2><%= i18nProperty.actions.share_property %></h2>
+    <div class="control-group public-group">
+      <div class="clearfix">
+        <label for="type" class="control-label stay-left"><%= i18nProperty.listing.public %></label>
+        <div class="controls stay-right">
+          <div class="toggle">
+            <label class="toggle-radio" for="publicOption1"><%= i18nCommon.affirmations.yes %></label>
+            <input type="radio" name="property[public]" id="publicOption1" value="1" checked="checked">
+            <input type="radio" name="property[public]" id="publicOption2" value="0">
+            <label class="toggle-radio" for="publicOption2"><%= i18nCommon.affirmations.no %></label>
+          </div>
+        </div>
+      </div>
+      <p class="help-block"><%= i18nProperty.listing.public_info %></p>
+    </div>
+    <div class="control-group address-group">
+      <div class="clearfix">
+        <label class="control-label stay-left"><%= i18nProperty.listing.approx %></label>
+        <div class="controls stay-right">
+          <div class="toggle">
+            <label class="toggle-radio" for="approxOption1"><%= i18nCommon.adjectives.approximate %></label>
+            <input type="radio" name="property[approx]" id="approxOption1" value="1">
+            <input type="radio" name="property[approx]" id="approxOption2" value="0" checked="checked">
+            <label class="toggle-radio" for="approxOption2"><%= i18nCommon.adjectives.exact %></label>
+          </div>
+        </div>
+      </div>
+      <p class="help-block"><%= i18nProperty.listing.approx_info %></p>
+      <img src='/img/doodad/exact-vs-approx.png'>
+    </div>
+    <br>
+    <fieldset>
+      <div class="post-group control-group clearfix">
+        <label for="share[ct]" class="control-label stay-left"><%= i18nCommon.actions.post_to %> CleverTower</label>
+        <div class="controls stay-right">
+          <div class="toggle">
+            <label class="toggle-radio" for="ctOption1"><%= i18nCommon.affirmations.yes %></label>
+            <input type="radio" name="share[ct]" id="ctOption1" value="1" checked="checked">
+            <input type="radio" name="share[ct]" id="ctOption2" value="0">
+            <label class="toggle-radio" for="ctOption2"><%= i18nCommon.affirmations.no %></label>
+          </div>
+        </div>
+      </div>
+      <div class="facebook-group control-group clearfix">
+        <label for="share[fb]" class="control-label stay-left"><%= i18nCommon.actions.post_to %> Facebook</label>
+        <div class="controls stay-right">
+          <div class="toggle">
+            <label class="toggle-radio" for="fbOption1"><%= i18nCommon.affirmations.yes %></label>
+            <input type="radio" name="share[fb]" id="fbOption1" value="1" checked="checked">
+            <input type="radio" name="share[fb]" id="fbOption2" value="0">
+            <label class="toggle-radio" for="fbOption2"><%= i18nCommon.affirmations.no %></label>
+          </div>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+  <div id="sample-activity" class="offset1 span4 position-relative">
+    <div class="mask mask-disabled hide"></div>
+    <div class="well well-small">
+      <div class="photo photo-tiny stay-left">
+        <img id="activity-profile-pic" src="<%= profilePic %>" alt="<%= i18nCommon.classes.Profile %>">
+      </div>
+      <div class="photo-float tiny-float">
+        <div class="title-group control-group">
+          <label for="activity-title" class="control-label element-invisible"><%= i18nCommon.fields.title %></label>
+          <div class="controls position-relative with-caret">
+            <b id="activity-input-caret" class="input-caret"></b>
+            <div class="form-large">
+              <textarea class="input-condensed input-block-level" name="activity[title]" id="activity-title" rows="4"><%= title %></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+      <img src="<%= cover %>">
+    </div>
+  </div>
+</div>

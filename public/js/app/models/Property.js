@@ -91,6 +91,9 @@
       country: function() {
         return Parse.App.countryCodes[this.get("country")];
       },
+      city: function() {
+        return this.get("locality") + "--" + this.get("administrative_area_level_1") + "--" + Parse.App.countryCodes[this.get("country")];
+      },
       cover: function(format) {
         var img;
 

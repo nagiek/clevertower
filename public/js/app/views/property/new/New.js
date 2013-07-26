@@ -16,13 +16,13 @@
 
       NewPropertyView.prototype.tagName = "form";
 
-      NewPropertyView.prototype.className = "property-form span12";
+      NewPropertyView.prototype.id = "new-property-form";
+
+      NewPropertyView.prototype.className = "span12 form-large";
 
       NewPropertyView.prototype.initialize = function(attrs) {
         this.wizard = attrs.wizard;
-        this.listenTo(this.wizard, "wizard:cancel", this.clear);
-        this.listenTo(this.wizard, "property:save", this.clear);
-        return this.listenTo(this.wizard, "lease:save", this.clear);
+        return this.listenTo(this.wizard, "wizard:finish wizard:cancel", this.clear);
       };
 
       NewPropertyView.prototype.render = function() {

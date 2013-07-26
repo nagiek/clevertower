@@ -5,11 +5,11 @@
       <label for="type" class="control-label"><%= i18nDevise.form.type.label %>:</label>
       <div class="controls">
         <div class="toggle">
-        <label class="toggle-radio" for="typeOption1"><%= i18nDevise.form.type.tenant %></label>
-        <input type="radio" name="account_type" id="typeOption1" value="tenant" <%= type == 'tenant' ? checked="checked" : '' %>>
-        <input type="radio" name="account_type" id="typeOption2" value="manager" <%= type == 'manager' ? checked="checked" : '' %>>
-        <label class="toggle-radio" for="typeOption2"><%= i18nDevise.form.type.manager %></label>
-      </div>
+          <label class="toggle-radio" for="typeOption1"><%= i18nDevise.form.type.tenant %></label>
+          <input type="radio" name="account_type" id="typeOption1" value="tenant" <%= type == 'tenant' ? checked="checked" : '' %>>
+          <input type="radio" name="account_type" id="typeOption2" value="manager" <%= type == 'manager' ? checked="checked" : '' %>>
+          <label class="toggle-radio" for="typeOption2"><%= i18nDevise.form.type.manager %></label>
+        </div>
       </div>
     </div>
   </fieldset>

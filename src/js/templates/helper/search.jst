@@ -1,10 +1,12 @@
 <form class="form-search navbar-search">
   <div class="controls">
-    <div class="input-append">
-      <input class="input-large typeahead search search-query" type="text" name="q" placeholder="<%= i18nCommon.actions.search %>" autocomplete="off" spellcheck="off">
+    <div class="input-append stay-right">
       <button class="btn" type="submit" rel="tooltip" data-original-title="<%= i18nCommon.actions.search %>">
         <i class="icon icon-search"></i>
       </button>
+    </div>
+    <div class="input-append bar-append">
+      <input class="input-block-level search-query" type="text" name="q" placeholder="<%= i18nCommon.actions.search %>" autocomplete="off" spellcheck="off">
     </div>
   </div>
 </form>

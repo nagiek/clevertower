@@ -17,7 +17,11 @@ define [
   class GMapView extends Parse.View
 
     tagName : "form"
-    className : "address-form span12"
+
+    attributes:
+      id: "new-property-address-form"
+      class: "span12"
+      style: "left: 0%;"
     
     events:
       'keypress #geolocation-search' : 'checkForSubmit'
@@ -29,11 +33,7 @@ define [
       @forNetwork = if attrs.forNetwork then attrs.forNetwork else false
       @mapId = "mapCanvas"
       @wizard = attrs.wizard
-      @listenTo @wizard, "wizard:cancel", @clear
-      @listenTo @wizard, "property:save", @clear
-      @listenTo @wizard, "property:join", @clear
-      @listenTo @wizard, "property:manage", @clear
-      @listenTo @wizard, "lease:save", @clear
+      @listenTo @wizard, "wizard:finish wizard:cancel", @clear
       
       @geocoder = new google.maps.Geocoder
       @results = new PropertyList [], forNetwork: @forNetwork

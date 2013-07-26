@@ -7,6 +7,7 @@ define
     go_to_network:                    "Go to network"
     # add_to_start:                     "Add a property to get started"
     add_a_property:                   "Add a property"
+    share_property:                   "Share property"
     join_or_create_to_start:          "Join or create a property to get started"
     join_property_at:      (title) -> "Create your lease at <em>#{_.escape(title)}</em>"
   menu:                                 
@@ -44,7 +45,21 @@ define
     view_public:                      "See Public View"
     view_tenant:                      "See Tenant View"
   activity:
+    new_property: ->          
+                                      titles = [
+                                        "Saying hi to everyone.",
+                                        "We're in the neighbourhood!",
+                                        "Wanted to introduce ourselves!",
+                                        "We just joined CleverTower."
+                                      ]
+                                      titles[Math.floor(Math.random() * titles.length)]
+
     added_photos:          (count) -> "We added #{count} photos."
+  listing:
+    public:                           "Display Public"
+    public_info:                      "Whether this property will appear in search results"
+    approx:                           "Display Address"
+    approx_info:                      "Whether the exact address or a representative area is shown."
   network:
     edit:                             "Edit network"
     setup:                            "Set up network"

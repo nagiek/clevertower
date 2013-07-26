@@ -44,6 +44,8 @@
       go_to: "Go to",
       show: "Show",
       post: "Post",
+      post_to: "Post to",
+      also_post_to: "Also post to",
       join: "Join",
       manage: "Manage",
       search: "Search",
@@ -53,6 +55,7 @@
       "delete": "Delete",
       submit: "Submit",
       next: "Next",
+      finish: "Finish",
       cancel: "Cancel",
       close: "Close",
       save: "Save",
@@ -170,7 +173,7 @@
     },
     activity: {
       building: "Post to your building",
-      exhausted: "There are no more items to display"
+      exhausted: "There are no more items to display."
     },
     status: {
       ok: "OK",
@@ -188,6 +191,10 @@
       off: "off",
       at: "at",
       eg: "E.g., "
+    },
+    affirmations: {
+      yes: "Yes",
+      no: "No"
     },
     conjuctions: {
       or: "or",

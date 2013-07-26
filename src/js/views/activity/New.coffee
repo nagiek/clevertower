@@ -4,10 +4,13 @@ define [
   "backbone"
   "models/Activity"
   "views/helper/Alert"
+  "views/activity/BaseNew"
   "views/activity/Summary"
+  'views/user/AppsModal'
   "i18n!nls/user"
   "i18n!nls/property"
   "i18n!nls/common"
+  "plugins/toggler"
   "templates/activity/new"
   "templates/activity/pending_photo"
   "templates/activity/photo"
@@ -16,9 +19,9 @@ define [
   'jquery.fileupload'
   'jquery.fileupload-fp'
   'jquery.fileupload-ui'
-], ($, _, Parse, Activity, Alert, ActivityView, i18nUser, i18nProperty, i18nCommon) ->
+], ($, _, Parse, Activity, Alert, BaseNewActivityView, ActivityView, AppsModalView, i18nUser, i18nProperty, i18nCommon) ->
 
-  class NewActivityView extends Parse.View
+  class NewActivityView extends BaseNewActivityView
   
     # Instead of generating a new element, bind to the existing skeleton of
     # the App already present in the HTML.
@@ -29,14 +32,16 @@ define [
       "focus #activity-title"           : "showActivityForm"
       # "change #show-body"               : "toggleBodyView"
       # "change #centered-on-property"    : "toggleCenterOnProperty"
-      "change #post-as-property"        : "togglePostAsProperty"
-      "change #post-private"            : "togglePostPrivate"
       "change #toggle-end-date"         : "toggleEndDate"
       "click #add-property"             : "toggleBuildingActivity"
       "click #add-time"                 : "toggleTime"
       # "click #activity-type li input"   : "handleActivityClick"
       "change #property-options select" : "setProperty"
       "click .photo-destroy"            : "unsetImage"
+      # Share options
+      "change #post-as-property"        : "togglePostAsProperty"
+      "change #post-private"            : "togglePostPrivate"
+      "change #fbShare"                 : "checkShareOnFacebook"
     
     initialize: (attrs) ->
 
@@ -52,40 +57,13 @@ define [
 
       @dragListener = google.maps.event.addListener @view.map, 'dragend', @updateCenter
 
-    handleError: (error) =>
-      @$('.error').removeClass('error')
-      @$('button.save').removeProp "disabled"
 
-      console.log error
-
-      msg = i18nCommon.errors[error]
-
-      new Alert event: 'model-save', fade: false, message: msg, type: 'error'
-      switch error.message
-        when 'unit_missing'
-          @$('.unit-group').addClass('error')
-        when 'dates_missing' or 'dates_incorrect'
-          @$('.date-group').addClass('error')
-
-    renderImage: =>
-      @$('#preview-activity-photo').html if @model.get("image") then JST["src/js/templates/activity/photo.jst"](image: @model.get("image"), i18nCommon: i18nCommon) else ""
-      @trigger "view:resize"
+    # Mid level functions
+    # -------------------
 
     unsetImage: =>
       @model.unset("image")
       @trigger "view:resize"
-
-    updateCenter : =>
-      center = @view.map.getCenter()
-      @model.set "center", new Parse.GeoPoint(center.lat(), center.lng())
-
-    # handleActivityClick : =>
-    #   index = @getTypeIndex()
-    #   pos = @$("#activity-input-caret").data "position"
-    #   if index is pos 
-    #     if @shown then @hideActivityForm() else @showActivityForm()
-    #   else
-    #     @changeActivityType()
 
     togglePostAsProperty: ->
       if @model.get "profile" then @model.unset "profile"
@@ -116,6 +94,18 @@ define [
       else
         @$('#end-date').addClass "hide"
 
+
+    # Misc functions
+    # --------------------
+
+    renderImage: =>
+      @$('#preview-activity-photo').html if @model.get("image") then JST["src/js/templates/activity/photo.jst"](image: @model.get("image"), i18nCommon: i18nCommon) else ""
+      @trigger "view:resize"
+
+    updateCenter : =>
+      center = @view.map.getCenter()
+      @model.set "center", new Parse.GeoPoint(center.lat(), center.lng())
+
     toggleBuildingActivity: ->
       return if @empty
       unless @model.get "property"
@@ -136,23 +126,64 @@ define [
         @model.set "public", true
       @trigger "view:resize"
 
+
+    # Prop select functions
+    # ---------------------
+
     setProperty : =>
       p = @$('#property-options select :selected').val()
       property = Parse.User.current().get("network").properties.get(p)
       unless property then property = Parse.User.current().get("property")
       @model.set "property", property
 
-    # changeActivityType : ->
-    #   newPos = @getTypeIndex()
-    #   pos = @$("#activity-input-caret").data "position"
-    #   rand = Math.floor Math.random() * i18nUser.form.share[0].length
-    #   @$("#activity-input-caret").addClass "phase-#{newPos}"
-    #   @$("#activity-input-caret").removeClass "phase-#{pos}"
-    #   @$("#activity-input-caret").data "position", newPos
 
-    getTypeIndex: -> 
-      index = @$("#activity-type :checked").parent().index()
-      return if index then index else 0
+    populatePropertySelectFromNetwork : ->
+      if Parse.User.current().get("network").properties.length > 0
+        propertyOptions = ''
+        Parse.User.current().get("network").properties.each (p) -> 
+          propertyOptions += "<option value='#{p.id}'>#{p.get("title")}</option>"
+        @$("#property-options select").html propertyOptions
+      else
+        @handleNoProperty()
+
+    handleNoProperty : ->
+      @empty = true
+      # Set to building-type, to show the user that they still need to join/add a property
+      # @$("#activity-type :nth-child(4) input").prop('checked', true)
+      # @$("#activity-input-caret").data "position", 3
+      # @$("#centered-on-property").parent().append("<p class='empty'><small>(#{i18nProperty.empty.properties})</small></p>")
+      if Parse.User.current().get("network")
+        @$('.no-property').html """
+                          <p>CleverTower is more fun when you're connected, but you haven't added any property yet.</p>
+                          <a class="btn btn-primary btn-block" href='#{Parse.User.current().get("network").privateUrl()}'>
+                            #{i18nProperty.actions.add_a_property}
+                          </a>
+                          """
+      else 
+        @$('.no-property').html """
+                    <p>CleverTower is more fun when you're connected, but you haven't joined a property yet.</p>
+                    <a class="btn btn-primary btn-block" href='/account/setup'>
+                      #{i18nCommon.expressions.get_started}
+                    </a>
+                    """
+      # @changeActivityType()
+
+    handlePossiblePropertyAdd : =>
+      if Parse.User.current().get("network")
+        if Parse.User.current().get("network").properties.length > 0 then @handlePropertyAdd()
+        else 
+          @handleNoProperty()
+          @listenTo Parse.User.current().get("network").properties, "add", @handlePropertyAdd
+      else if Parse.User.current().get("property")
+        @handlePropertyAdd()
+
+    handlePropertyAdd : ->
+      @empty = false
+      # @changeActivityType()
+      # @$("#centered-on-property").parent().remove("p.empty")
+
+    # View functions
+    # --------------
 
     undelegateEvents: ->
       google.maps.event.removeListener @dragListener
@@ -216,6 +247,8 @@ define [
         i18nProperty: i18nProperty
 
       @$el.html JST["src/js/templates/activity/new.jst"](vars)
+
+      @$(".toggle").toggler()
 
       @$form = @$("> #activity-form")
 
@@ -314,54 +347,10 @@ define [
           that._trigger "photo:remove", e
       @
 
-    populatePropertySelectFromNetwork : ->
-      if Parse.User.current().get("network").properties.length > 0
-        propertyOptions = ''
-        Parse.User.current().get("network").properties.each (p) -> 
-          propertyOptions += "<option value='#{p.id}'>#{p.get("title")}</option>"
-        @$("#property-options select").html propertyOptions
-      else
-        @handleNoProperty()
 
-    handleNoProperty : ->
-      @empty = true
-      # Set to building-type, to show the user that they still need to join/add a property
-      # @$("#activity-type :nth-child(4) input").prop('checked', true)
-      # @$("#activity-input-caret").data "position", 3
-      # @$("#centered-on-property").parent().append("<p class='empty'><small>(#{i18nProperty.empty.properties})</small></p>")
-      if Parse.User.current().get("network")
-        @$('.no-property').html """
-                          <p>CleverTower is more fun when you're connected, but you haven't added any property yet.</p>
-                          <a class="btn btn-primary btn-block" href='#{Parse.User.current().get("network").privateUrl()}'>
-                            #{i18nProperty.actions.add_a_property}
-                          </a>
-                          """
-      else 
-        @$('.no-property').html """
-                    <p>CleverTower is more fun when you're connected, but you haven't joined a property yet.</p>
-                    <a class="btn btn-primary btn-block" href='/account/setup'>
-                      #{i18nCommon.expressions.get_started}
-                    </a>
-                    """
-      # @changeActivityType()
-
-    handlePossiblePropertyAdd : =>
-      if Parse.User.current().get("network")
-        if Parse.User.current().get("network").properties.length > 0 then @handlePropertyAdd()
-        else 
-          @handleNoProperty()
-          @listenTo Parse.User.current().get("network").properties, "add", @handlePropertyAdd
-      else if Parse.User.current().get("property")
-        @handlePropertyAdd()
-
-    handlePropertyAdd : ->
-      @empty = false
-      # @changeActivityType()
-      # @$("#centered-on-property").parent().remove("p.empty")
 
     showActivityForm : (e) => 
-      newPos = @getTypeIndex()
-      return if @shown # or newPos is 3 and @empty
+      return if @shown
       @shown = true
       @$('#activity-options').removeClass 'hide'
       # if @empty then @$("#centered-on-property").prop("disabled", true)
@@ -386,29 +375,25 @@ define [
       @marker.setVisible false
       @trigger "view:resize"
 
-    # toggleBodyView : (e) =>
-    #   if e.currentTarget.checked then @$('.body-group').removeClass 'hide'
-    #   else @$('.body-group').addClass 'hide'
-
     save : (e) ->
       e.preventDefault() if e
 
       @$('button.save').prop "disabled", true
-      data = @$('form').serializeObject().activity
+      data = @$('form').serializeObject()
       @$('.error').removeClass('error')
 
-      return @model.trigger "invalid", error: message: i18nCommon.errors.no_data unless data.title or @model.get("image")
+      return @model.trigger "invalid", error: message: i18nCommon.errors.no_data unless data.activity.title or @model.get("image")
 
       attrs = 
-        title: data.title
+        title: data.activity.title
 
       if @model.get("isEvent")
         
-        return @model.trigger "invalid", error: message: i18nCommon.errors.no_start_date unless data.start_date
-        attrs.startDate = new Date("#{data.start_date} #{data.start_time}")
+        return @model.trigger "invalid", error: message: i18nCommon.errors.no_start_date unless data.activity.start_date
+        attrs.startDate = new Date("#{data.activity.start_date} #{data.activity.start_time}")
         if @$('#toggle-end-date').is ":checked"
-          return @model.trigger "invalid", error: message: i18nCommon.errors.no_end_date unless data.end_date
-          attrs.endDate = new Date("#{data.end_date} #{data.end_time}") if data.end_date
+          return @model.trigger "invalid", error: message: i18nCommon.errors.no_end_date unless data.activity.end_date
+          attrs.endDate = new Date("#{data.activity.end_date} #{data.activity.end_time}") if data.activity.end_date
 
       @model.save(attrs).then (model) => 
         # Add to appropriate collection
@@ -417,6 +402,26 @@ define [
         else Parse.App.activity.add @model, silent: true
 
         @trigger "model:save", @model
+
+        # Share on FB?
+        if data.share.fb is "on" or data.share.fb is "1"
+          vars =
+            object: window.location.origin + @model.publicUrl()
+            message: @model.get("title")
+            place: @model.GPoint()
+
+          # Optional Event params.
+          vars.start_time = attrs.startDate if attrs.startDate
+          vars.end_time = attrs.endDate if attrs.endDate
+
+          # Add city if we have set one up.
+          city = @model.city()
+          if _.contains _.keys(Parse.App.cities), city
+            vars.city = window.location.origin + city
+
+          window.FB.api 'me/og:posts',
+            'post', vars,
+            (response) -> # handle the response
 
         # Reset
         @model = new Activity
@@ -433,7 +438,20 @@ define [
       , (error) => console.log error
 
     # attachPhoto: ->
+    handleError: (error) =>
+      @$('.error').removeClass('error')
+      @$('button.save').removeProp "disabled"
 
+      console.log error
+
+      msg = i18nCommon.errors[error]
+
+      new Alert event: 'model-save', fade: false, message: msg, type: 'error'
+      switch error.message
+        when 'unit_missing'
+          @$('.unit-group').addClass('error')
+        when 'dates_missing' or 'dates_incorrect'
+          @$('.date-group').addClass('error')
 
     clear: (e) =>
       @$el.html ""

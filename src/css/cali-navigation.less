@@ -21,24 +21,36 @@
 }
 
 .navbar {
-  .nav > li > a {
-    // Override default text-shadow.
-    text-shadow: none;
-    margin-bottom:1px;
-  }
-  .list-item-icon {
-    padding-left: 2px;
-    padding-right: 2px;
-    position: relative;
-    .badge {
-      position:absolute;
-      top:0;
-      right:0;
-      font-size: @fontSizeMini;
-      line-height: @lineHeightMini;
-      padding: @paddingMini;
+  .nav > li {
+    &.list-item-icon {
+      > a {
+        padding-left: 6px;
+        padding-right: 6px;
+      }
+      .badge {
+        position: absolute;
+        top: 22px;
+        right: 3px;
+        font-size: 9px;
+        line-height: 12px;
+        padding: 0px 3px;
+        border-radius: 5px;
+        // font-size: @fontSizeMini;
+        // line-height: @lineHeightMini;
+        // padding: @paddingMini;
+      }
+      .dropdown-menu {
+        &:before { right: 6px; }
+        &:after  { right: 7px; }
+      }
+    }
+    > a {
+      // Override default text-shadow.
+      text-shadow: none;
+      margin-bottom:1px;
     }
   }
+  
   .navbar-search {
     float:none;
     margin:5px 0 0;
@@ -118,6 +130,10 @@
   .btn-group {
     padding-bottom:0;
   }
+}
+
+#user-menu {
+  margin-right: 0;
 }
 
 @media (max-width:767px) {

@@ -1,0 +1,21 @@
+<form id="property-picture-upload-form" method="POST">
+  <div class="row-fluid"><h2 class="span11 offset1"><%= i18nCommon.actions.add_photo %></h2></div>
+  <div class="control-group row-fluid">
+    <div id="preview-property-picture" class="preview template-upload span4 offset1">
+      <img src="<%= cover %>" alt="Profile" class="profile-picture">
+    </div>
+    <div id="property-picture-controls" class="controls span4 offset1">
+      <div class="fileupload-buttonbar">
+        <!-- The fileinput-button span is used to style the file input field as button -->
+        <button type="button" id="file-input" class="btn fileinput-button btn-primary">
+          <span><%= i18nCommon.actions.choose_file %></span>
+          <input type="file" name="files[]" accept="photo/*">
+        </button>
+        <button type="button" class="delete btn btn-small hide"><%= i18nCommon.actions.remove %></button>
+      </div>
+    </div>
+
+    <!-- The loading indicator is shown during file processing -->
+    <div class="fileupload-loading"></div>
+  </div>
+</form>

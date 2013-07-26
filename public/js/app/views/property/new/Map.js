@@ -24,7 +24,11 @@
 
       GMapView.prototype.tagName = "form";
 
-      GMapView.prototype.className = "address-form span12";
+      GMapView.prototype.attributes = {
+        id: "new-property-address-form",
+        "class": "span12",
+        style: "left: 0%;"
+      };
 
       GMapView.prototype.events = {
         'keypress #geolocation-search': 'checkForSubmit',
@@ -36,11 +40,7 @@
         this.forNetwork = attrs.forNetwork ? attrs.forNetwork : false;
         this.mapId = "mapCanvas";
         this.wizard = attrs.wizard;
-        this.listenTo(this.wizard, "wizard:cancel", this.clear);
-        this.listenTo(this.wizard, "property:save", this.clear);
-        this.listenTo(this.wizard, "property:join", this.clear);
-        this.listenTo(this.wizard, "property:manage", this.clear);
-        this.listenTo(this.wizard, "lease:save", this.clear);
+        this.listenTo(this.wizard, "wizard:finish wizard:cancel", this.clear);
         this.geocoder = new google.maps.Geocoder;
         this.results = new PropertyList([], {
           forNetwork: this.forNetwork

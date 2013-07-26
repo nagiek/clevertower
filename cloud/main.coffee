@@ -20,6 +20,41 @@ Parse.Cloud.define "PromoteToFeatured", (req, res) ->
         res.error "bad_query"
     , -> res.error "bad_query"
 
+# Set Picture
+# -----------
+# Set a user's picture to an external URL
+Parse.Cloud.define "SetPicture", (req, res) ->
+
+  Buffer = require('buffer').Buffer
+
+  Parse.Cloud.httpRequest
+    method: "GET"
+    url: req.params.url
+    success: (httpres) ->
+      # Write the response to a buffer and save as file.
+      buf = new Buffer(httpres.buffer)      
+      file = new Parse.File(req.user.getUsername() + "-picture.jpeg", base64: buf.toString('base64'))
+      file.save().then ->
+        (new Parse.Query "Profile").equalTo('objectId', req.user.get("profile").id).first()
+      .then (profile) ->
+        profile.save image_thumb: file.url(), image_profile: file.url(), image_full: file.url()
+      .then ->
+        res.success file.url()
+        # error: (error) ->
+        #   res.error
+    error: (error) ->
+      res.error error
+      # console.log("Got response: " + res.statusCode);
+      # res.setEncoding('binary')
+      # var imagedata = ''
+      # res.on('data', function(chunk){
+      #     imagedata+= chunk; 
+      # });
+      # res.on('end', function(){
+      #     fs.writeFile(o.dest, imagedata, 'binary', cb);
+      # });
+
+
 # AddTenants
 # ----------
 # This can be called by managers or tenants.
@@ -422,7 +457,7 @@ Parse.Cloud.beforeSave "_User", (req, res) ->
 
     else
       profile = new Parse.Object("Profile")
-      profile.save().then ->
+      profile.save(email: email).then ->
         req.object.set "profile", profile
         res.success()
 
@@ -448,7 +483,6 @@ Parse.Cloud.afterSave "_User", (req, res) ->
       profileACL.setWriteAccess req.object, true
 
       profile.save 
-        email: req.object.get("email")
         user: req.object
         ACL: profileACL
 
@@ -726,28 +760,7 @@ Parse.Cloud.beforeSave "Property", (req, res) ->
           res.success()
         else res.success()
       , -> res.error "bad_query"
-    else res.success()    
-
-# Property cleanup
-Parse.Cloud.afterSave "Property", (req) ->
-
-  if !req.object.existed() and req.object.get "public"
-
-    # Create activity
-    (new Parse.Query "Profile").equalTo('user', req.user).first()
-    .then (profile) ->
-      activity = new Parse.Object("Activity")
-      activityACL = new Parse.ACL
-      activityACL.setPublicReadAccess true
-      activity.save
-        activity_type: "new_property"
-        public: true
-        center: req.object.get "center"
-        property: req.object
-        network: req.object.get "network"
-        title: req.object.get "title"
-        profile: profile
-        ACL: activityACL
+    else res.success()
 
 # Unit validation
 Parse.Cloud.beforeSave "Unit", (req, res) ->

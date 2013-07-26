@@ -3,27 +3,20 @@
     <div class="facebook-group control-group span6">
       <div class="photo photo-thumbnail stay-left">
         <img width="64" height="64" alt="Facebook" src="/img/vendor/facebook/fb-icon-64.png">
-        <span class="mask"></span>
+        <div class="mask mask-thumbnail"></div>
       </div>
-      <div class="photo-float thumbnail-float">
-        <label for="user-email" class="control-label">
-          <h3>
-            Facebook
-            <div class="pull-right">
-              <% if (!fbLinked) { %>
-                <button id="fb-link" class="btn"><%= i18nCommon.actions.link %></button>
-              <% } else { %>
-                <span class="btn active linked"><%= i18nCommon.adjectives.linked %></span>
-                <span></span> <!-- to break up .btn + .btn spacing -->
-                <button id="fb-unlink" class="btn revoke btn-danger"><%= i18nCommon.actions.revoke_access %></button>
-              <% } %>
-            </div>
-          </h3>
-
-        </label>
-        <div class="controls">
-          <%= i18nUser.app_descriptions.facebook %>
+      <div class="photo-float thumbnail-float clearfix">
+        <label class="control-label pull-left">Facebook</label>
+        <div class="controls pull-right">
+          <% if (!fbLinked) { %>
+            <button id="fb-link" class="btn"><%= i18nCommon.actions.link %></button>
+          <% } else { %>
+            <span class="btn active linked"><%= i18nCommon.adjectives.linked %></span>
+            <span></span> <!-- to break up .btn + .btn spacing -->
+            <button id="fb-unlink" class="btn revoke btn-danger"><%= i18nCommon.actions.revoke_access %></button>
+          <% } %>
         </div>
+        <p><%= i18nUser.app_descriptions.facebook %></p>
       </div>
     </div>
   </div>
@@ -32,7 +25,7 @@
     <div class="twitter-group control-group span6">
       <div class="photo photo-thumbnail stay-left">
         <img width="64" height="64" alt="Twitter" src="/img/vendor/twitter/twitter-icon-64.png">
-        <span class="mask"></span>
+        <div class="mask mask-thumbnail"></div>
       </div>
       <div class="photo-float thumbnail-float">
         <label for="user-email" class="control-label">

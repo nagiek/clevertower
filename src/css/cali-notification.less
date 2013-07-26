@@ -1,40 +1,42 @@
 .notifications-menu {
   ul {
     width: 330px;
-      > li {
-        > a {
-          &.unclicked,
-          &:hover {
-            #gradient > .vertical(lighten(@blueLight, 5%), @blueLight);
-            background-color:@blueLight;
-            color:@black;
-          }
-          &.unclicked:hover {
-            #gradient > .vertical(@blueLight, darken(@blueLight, 5%));
-            background-color:darken(@blueLight, 5%);
-          }
+    > li {
+      > a {
+        &.unclicked,
+        &:hover {
+          #gradient > .vertical(lighten(@blueLight, 5%), @blueLight);
+          background-color:@blueLight;
+          color:@black;
+        }
+        &.unclicked:hover {
+          #gradient > .vertical(@blueLight, darken(@blueLight, 5%));
+          background-color:darken(@blueLight, 5%);
         }
       }
-  }
-}
-#memos {
-  right: -40px;
-  .notifications-menu {
-    &:before { right: 39px; }
-    &:after  { right: 40px; }
+    }
   }
 }
 #friend-requests {
-  right: -20px;
   .notifications-menu {
-    &:before { right: 19px; }
-    &:after  { right: 20px; }
+    right: -26px;
+    &:before { right: 31px; }
+    &:after  { right: 32px; }
+  }
+}
+#memos {
+  .notifications-menu {
+    right: -52px;
+    &:before { right: 57px; }
+    &:after  { right: 58px; }
   }
 }
 
 
 @media (max-width: 480px) {
   .notifications-menu {
+    max-height: 300px;
+    overflow-y: scroll;
     left: 20px;
     right:20px;
     ul {

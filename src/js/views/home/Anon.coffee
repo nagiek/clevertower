@@ -18,11 +18,6 @@ define [
       "mouseover #featured-listings-wrapper" : "showControls"
       "mouseout #featured-listings-wrapper" : "hideControls"
       'submit form': 'doNothing'
-    
-    initialize: (attrs) ->
-      @listenTo Parse.Dispatcher, "user:login", ->
-        Parse.history.navigate "/", true
-        @clear()
 
     # typeahead widget takes care of navigation.
     doNothing : (e) -> e.preventDefault()
@@ -35,8 +30,8 @@ define [
         i18nProperty: i18nProperty
       @$el.html JST["src/js/templates/home/anon.jst"](vars)
 
-      @$('.search').on "typeahead:selected", Parse.App.search.googleSearch
-      @$('.search').typeahead Parse.App.search.vars
+      @$('.search-query').on "typeahead:selected", Parse.App.search.googleSearch
+      @$('.search-query').typeahead Parse.App.search.vars
 
       @$list = @$("#featured-listings")
       @$listWrapper = @$("#featured-listings-wrapper")

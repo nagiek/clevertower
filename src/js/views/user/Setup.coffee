@@ -38,31 +38,30 @@ define [
       @render()
 
     render: =>
-      
+
       # Check if the user has any outstanding requests and present them. 
-      unless @skip or Parse.User.current().notifications.visibleWithAction().length is 0
+      if @skip or Parse.User.current().notifications.visibleWithAction().length is 0
+        type = Parse.User.current().get("user_type") || "tenant"
+        vars =
+          type: type
+          i18nCommon: i18nCommon
+          i18nDevise: i18nDevise
+          i18nUser: i18nUser
+        @$el.html JST["src/js/templates/user/setup.jst"](vars)
+        @$('.toggle').toggler()
+
+        # Have to reverse the type, as the event processes the one which is being clicked.
+        defaultValue = if type is "manager" then "tenant" else "manager"
+        @changeSubView currentTarget: defaultValue: defaultValue        
+
+      # Go to user setup.
+      else 
         vars =
           i18nCommon: i18nCommon
           i18nUser: i18nUser
         @$el.html JST["src/js/templates/user/presetup.jst"](vars)
         @$list = @$("table.content tbody")
         Parse.User.current().notifications.each @addOne
-
-      # Go to user setup.
-      else 
-        type = if Parse.User.current().get("user_type") then Parse.User.current().get("user_type") else "tenant"
-        vars =
-          type: type
-          i18nCommon: i18nCommon
-          i18nDevise: i18nDevise
-          i18nUser: i18nUser
-        
-        @$el.html JST["src/js/templates/user/setup.jst"](vars)
-        @$('.toggle').toggler()
-
-        # Have to reverse the type, as the event processes the one which is being clicked.
-        defaultValue = if type is "manager" then "tenant" else "manager"
-        @changeSubView currentTarget: defaultValue: defaultValue
       @
 
     # Add a single todo item to the list by creating a view for it, and

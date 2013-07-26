@@ -9,7 +9,6 @@ define [
   class DesktopRouter extends Parse.Router
     routes:
       ""                            : "index"
-      "properties/new"              : "propertiesNew"
       "places/:country/:region/:city/:id/:slug" : "propertiesPublic"
       "outside/*splat"               : "search"
       "outside"                      : "search"
@@ -20,6 +19,7 @@ define [
       "listings/new"                : "listingsNew"
       "leases/new"                  : "leasesNew"
       "tenants/new"                 : "tenantsNew"
+      "movein"                      : "movein"
       "properties/new"              : "propertiesNew"
       "properties/:id"              : "propertiesManage"
       "properties/:id/*splat"       : "propertiesManage"
@@ -47,20 +47,22 @@ define [
       new NavMenuView().render()
       Parse.App.search = new SearchView().render()
             
-      @listenTo Parse.Dispatcher, "user:login", (user) =>      
-        unless Parse.User.current().get("network") or Parse.User.current().get("property")
+      @listenTo Parse.Dispatcher, "user:login", (user) =>
+        if Parse.User.current().get("network") or Parse.User.current().get("property")
+          # Reload the current path. Don't use navigate, as it will fail.
+          # The route functions themselves are responsible for altering content.
+          console.log '1'
+          Parse.history.loadUrl location.pathname
+        else
           # require ["views/helper/Alert", 'i18n!nls/property'], (Alert, i18nProperty) =>
           #   new Alert
           #     event:    'no_network'
           #     type:     'warning'
           #     fade:     true
           #     heading:  i18nProperty.errors.network_not_set
-          Parse.history.navigate "account/setup"
-          @accountSetup()
-        else
-          # Reload the current path. Don't use navigate, as it will fail.
-          # The route functions themselves are responsible for altering content.
-          Parse.history.loadUrl location.pathname
+          console.log '2'
+          Parse.history.navigate "account/setup", true
+          
           
       @listenTo Parse.Dispatcher, "user:logout", =>
         # Reload the current path. Don't use navigate, as it will fail.
@@ -71,8 +73,7 @@ define [
       # Clean up after views
       @listenTo Parse.history, "route", (route) =>
 
-        $('#search-menu input.search').val("").blur()
-
+        Parse.App.search.$('input').val("").blur()
         if @view
           if @oldCID and @oldCID isnt @view.cid
             @oldCID = @view.cid
@@ -91,6 +92,7 @@ define [
         # If this is a relative link on this domain.
         if href.substring(0,1) is '/' and href.substring(0,2) isnt '//'
           e.preventDefault()
+          console.log '3'
           Parse.history.navigate href, true
           
           
@@ -153,8 +155,8 @@ define [
               else
                 view.changeSubView(vars.path, vars.params)
         else 
-          Parse.history.navigate "/account/setup"
-          @accountSetup()
+          Parse.history.navigate "account/setup", true
+          # @accountSetup()
       # Handling this in the NavMenu view. This URL is exposed, and
       # should not be followed through, which is why it shouldn't be
       # handled by @signupOrLogin
@@ -167,11 +169,19 @@ define [
 
     # DIFFERENT FROM NETWORK
     # FOR USER
-    propertiesNew: =>
+    movein: =>
       view = @view
       require ["views/property/new/Wizard"], (PropertyWizard) =>
         if !view or view !instanceof PropertyWizard
           @view = new PropertyWizard forNetwork: false
+          @view.setElement "#main"
+          @view.render()
+
+    propertiesNew: =>
+      view = @view
+      require ["views/property/new/Wizard"], (PropertyWizard) =>
+        if !view or view !instanceof PropertyWizard
+          @view = new PropertyWizard forNetwork: true
           @view.setElement "#main"
           @view.render()
 
@@ -208,8 +218,8 @@ define [
             view.changeSubView(vars.path, vars.params)
         
       else
-        Parse.history.navigate "account/setup"
-        @accountSetup()
+        Parse.history.navigate "account/setup", true
+        # @accountSetup()
 
     propertiesPublic: (country, region, city, id, slug) =>
       place = "#{city}--#{region}--#{country}"
@@ -242,9 +252,8 @@ define [
 
     accountSetup : ->
       if Parse.User.current()
-        require ["views/user/Setup"], (NewNetworkView) =>              
-          @view = new NewNetworkView(model: Parse.User.current().get("network")) # if !@view or @view !instanceof NewNetworkView
-          @view.render()
+        require ["views/user/Setup"], (UserSetupView) =>              
+          @view = new UserSetupView().render()
       else
         @signupOrLogin()
 
@@ -278,7 +287,7 @@ define [
         require ["views/user/Signup"], (SignupView) =>
           @view = new SignupView().render()
       else
-        Parse.history.navigate "users/#{Parse.User.current().get("profile").id}"
+        Parse.history.navigate "/users/#{Parse.User.current().get("profile").id}"
         @profileShow()
 
     login : ->
@@ -286,7 +295,7 @@ define [
         require ["views/user/Login"], (LoginView) =>
           @view = new LoginView().render()
       else
-        Parse.history.navigate "users/#{Parse.User.current().get("profile").id}"
+        Parse.history.navigate "/users/#{Parse.User.current().get("profile").id}"
         @profileShow()
 
     resetPassword : ->
@@ -295,14 +304,15 @@ define [
 
     logout : ->
       if Parse.User.current()
+        console.log "4"
         Parse.User.logOut()
         Parse.Dispatcher.trigger "user:change"
         Parse.Dispatcher.trigger "user:logout"
-        Parse.history.navigate ""
-        @index()
+        Parse.history.navigate "", true
+        # @index()
       else 
-        Parse.history.navigate "/account/login"
-        @login()
+        Parse.history.navigate "/account/login", true
+        # @login()
 
 
     # OAuth
@@ -310,6 +320,7 @@ define [
 
     oauth2callback : ->
       if Parse.User.current()
+        console.log '5'
         # Variables will be placed in a hash querystring.
         vars = @deparam window.location.hash.substring(1)
         unless vars.error
@@ -356,6 +367,7 @@ define [
           fade:     true
           heading:  i18nCommon.errors.fourOhFour
           message:  i18nCommon.errors.not_found
+        console.log '5'
         Parse.history.navigate "/", true
 
     deparamAction : (splat) ->

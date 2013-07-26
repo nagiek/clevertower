@@ -3,12 +3,13 @@ define [
   "underscore"
   "backbone"
   "moment"
+  "collections/ActivityList"
   "models/Profile"
   "views/profile/sub/Activities"
   "i18n!nls/user"
   "i18n!nls/common"
   'templates/profile/show'
-], ($, _, Parse, moment, Profile, ActivityView, i18nUser, i18nCommon) ->
+], ($, _, Parse, moment, ActivityList, Profile, ActivityView, i18nUser, i18nCommon) ->
 
   class ShowProfileView extends Parse.View
   

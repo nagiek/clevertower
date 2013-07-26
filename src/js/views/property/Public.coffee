@@ -24,7 +24,7 @@ define [
 
     initialize: (attrs) ->
 
-      @place = if attrs.place then attrs.place else @model.get("locality") + "--" + @model.get("administrative_area_level_1") + "--" + Parse.App.countryCodes[@model.get("country")]
+      @place = if attrs.place then attrs.place else @model.city()
 
       @mapId = "mapCanvas"
 

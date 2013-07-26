@@ -14,6 +14,7 @@
         this.propertiesPublic = __bind(this.propertiesPublic, this);
         this.propertiesManage = __bind(this.propertiesManage, this);
         this.propertiesNew = __bind(this.propertiesNew, this);
+        this.movein = __bind(this.movein, this);
         this.insideManage = __bind(this.insideManage, this);
         this.networkNew = __bind(this.networkNew, this);        _ref = DesktopRouter.__super__.constructor.apply(this, arguments);
         return _ref;
@@ -21,7 +22,6 @@
 
       DesktopRouter.prototype.routes = {
         "": "index",
-        "properties/new": "propertiesNew",
         "places/:country/:region/:city/:id/:slug": "propertiesPublic",
         "outside/*splat": "search",
         "outside": "search",
@@ -29,6 +29,7 @@
         "listings/new": "listingsNew",
         "leases/new": "leasesNew",
         "tenants/new": "tenantsNew",
+        "movein": "movein",
         "properties/new": "propertiesNew",
         "properties/:id": "propertiesManage",
         "properties/:id/*splat": "propertiesManage",
@@ -57,18 +58,19 @@
         new NavMenuView().render();
         Parse.App.search = new SearchView().render();
         this.listenTo(Parse.Dispatcher, "user:login", function(user) {
-          if (!(Parse.User.current().get("network") || Parse.User.current().get("property"))) {
-            Parse.history.navigate("account/setup");
-            return _this.accountSetup();
-          } else {
+          if (Parse.User.current().get("network") || Parse.User.current().get("property")) {
+            console.log('1');
             return Parse.history.loadUrl(location.pathname);
+          } else {
+            console.log('2');
+            return Parse.history.navigate("account/setup", true);
           }
         });
         this.listenTo(Parse.Dispatcher, "user:logout", function() {
           return Parse.history.loadUrl(location.pathname);
         });
         this.listenTo(Parse.history, "route", function(route) {
-          $('#search-menu input.search').val("").blur();
+          Parse.App.search.$('input').val("").blur();
           if (_this.view) {
             if (_this.oldCID && _this.oldCID !== _this.view.cid) {
               _this.oldCID = _this.view.cid;
@@ -88,6 +90,7 @@
           }
           if (href.substring(0, 1) === '/' && href.substring(0, 2) !== '//') {
             e.preventDefault();
+            console.log('3');
             return Parse.history.navigate(href, true);
           }
         });
@@ -179,10 +182,25 @@
               });
             }
           } else {
-            Parse.history.navigate("/account/setup");
-            return this.accountSetup();
+            return Parse.history.navigate("account/setup", true);
           }
         }
+      };
+
+      DesktopRouter.prototype.movein = function() {
+        var view,
+          _this = this;
+
+        view = this.view;
+        return require(["views/property/new/Wizard"], function(PropertyWizard) {
+          if (!view || !(view instanceof PropertyWizard)) {
+            _this.view = new PropertyWizard({
+              forNetwork: false
+            });
+            _this.view.setElement("#main");
+            return _this.view.render();
+          }
+        });
       };
 
       DesktopRouter.prototype.propertiesNew = function() {
@@ -193,7 +211,7 @@
         return require(["views/property/new/Wizard"], function(PropertyWizard) {
           if (!view || !(view instanceof PropertyWizard)) {
             _this.view = new PropertyWizard({
-              forNetwork: false
+              forNetwork: true
             });
             _this.view.setElement("#main");
             return _this.view.render();
@@ -237,8 +255,7 @@
             }
           });
         } else {
-          Parse.history.navigate("account/setup");
-          return this.accountSetup();
+          return Parse.history.navigate("account/setup", true);
         }
       };
 
@@ -304,11 +321,8 @@
         var _this = this;
 
         if (Parse.User.current()) {
-          return require(["views/user/Setup"], function(NewNetworkView) {
-            _this.view = new NewNetworkView({
-              model: Parse.User.current().get("network")
-            });
-            return _this.view.render();
+          return require(["views/user/Setup"], function(UserSetupView) {
+            return _this.view = new UserSetupView().render();
           });
         } else {
           return this.signupOrLogin();
@@ -361,7 +375,7 @@
             return _this.view = new SignupView().render();
           });
         } else {
-          Parse.history.navigate("users/" + (Parse.User.current().get("profile").id));
+          Parse.history.navigate("/users/" + (Parse.User.current().get("profile").id));
           return this.profileShow();
         }
       };
@@ -374,7 +388,7 @@
             return _this.view = new LoginView().render();
           });
         } else {
-          Parse.history.navigate("users/" + (Parse.User.current().get("profile").id));
+          Parse.history.navigate("/users/" + (Parse.User.current().get("profile").id));
           return this.profileShow();
         }
       };
@@ -389,14 +403,13 @@
 
       DesktopRouter.prototype.logout = function() {
         if (Parse.User.current()) {
+          console.log("4");
           Parse.User.logOut();
           Parse.Dispatcher.trigger("user:change");
           Parse.Dispatcher.trigger("user:logout");
-          Parse.history.navigate("");
-          return this.index();
+          return Parse.history.navigate("", true);
         } else {
-          Parse.history.navigate("/account/login");
-          return this.login();
+          return Parse.history.navigate("/account/login", true);
         }
       };
 
@@ -404,6 +417,7 @@
         var vars;
 
         if (Parse.User.current()) {
+          console.log('5');
           vars = this.deparam(window.location.hash.substring(1));
           if (!vars.error) {
             return $.ajax("https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=" + vars.access_token, {
@@ -457,6 +471,7 @@
             heading: i18nCommon.errors.fourOhFour,
             message: i18nCommon.errors.not_found
           });
+          console.log('5');
           return Parse.history.navigate("/", true);
         });
       };

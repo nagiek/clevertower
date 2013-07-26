@@ -31,10 +31,7 @@ define [
       delete @events["submit form"]
 
       @wizard = attrs.wizard
-      
-      @listenTo @wizard, "wizard:cancel", @clear
-      @listenTo @wizard, "property:save", @clear
-      @listenTo @wizard, "lease:save", @clear
+      @listenTo @wizard, "wizard:cancel wizard:finish", @clear
 
       @property = attrs.property
 

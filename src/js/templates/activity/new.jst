@@ -1,35 +1,7 @@
-<form id="activity-form" class="well well-small">
+<form id="new-activity-form" class="activity-form well well-small">
   <div class="photo photo-tiny stay-left">
     <img id="activity-profile-pic" src="<%= profilePic %>" alt="<%= i18nCommon.classes.Profile %>">
   </div>
-  <!--   
-  <ul id="activity-type" class="radio-icons inline">
-    <li>
-      <input id="activity-type-status" name="activity-type" type="radio" value="status">
-      <label for="activity-type-status">
-        <i class="icon icon-activity icon-status" rel="tooltip" data-original-title="<%= i18nCommon.classes.status %>"></i>
-      </label>
-    </li>
-    <li>
-      <input id="activity-type-photo" name="activity-type" type="radio" value="photo">
-      <label for="activity-type-photo">
-        <i class="icon icon-activity icon-photo" rel="tooltip" data-original-title="<%= i18nCommon.classes.Photo %>"></i>
-      </label>
-    </li>
-    <li>
-      <input id="activity-type-tip" name="activity-type" type="radio" value="tip">
-      <label for="activity-type-tip">
-        <i class="icon icon-activity icon-tip" rel="tooltip" data-original-title="<%= i18nCommon.classes.tip %>"></i>
-      </label>
-    </li> 
-    <li>
-      <input id="activity-type-building" name="activity-type" type="radio" value="building">
-      <label for="activity-type-building">
-        <i class="icon icon-activity icon-building" rel="tooltip" data-original-title="<%= i18nCommon.nouns.building %>"></i>
-      </label>
-    </li>
-  </ul>
-  -->
   <div class="photo-float tiny-float">
     <div class="title-group control-group">
       <label for="activity-title" class="control-label element-invisible"><%= i18nCommon.fields.title %></label>
@@ -59,14 +31,6 @@
       </div>
     </div>
     <div id="activity-options" class="hide clearfix control-group with-caret">
-      <!--
-      <label for="show-body" class="checkbox">
-        <input type="checkbox" id="show-body"><%= i18nCommon.actions.add_extra_details %>
-      </label>
-      <label for="centered-on-property" class="checkbox">
-        <input type="checkbox" id="centered-on-property"><%= i18nCommon.form.center_on_property %>
-      </label>
-      -->
       <div id="event-options" class="control-group hide">
         <div class="controls">
           <input type="text" class="input-small start-date datepicker" name="activity[start_date]" maxlength="12" data-date-format="<%= i18nCommon.dates.datepicker_format %>" placeholder="<%= i18nCommon.dates.start_date %>" />
@@ -178,6 +142,20 @@
           </select>
         </div>
       </div>
+      <fieldset class="share-options">
+        <legend><%= i18nCommon.actions.also_post_to %></legend>
+        <div class="control-group clearfix">
+          <label for="type" class="control-label stay-left">Facebook</label>
+          <div class="controls stay-right">
+            <div class="toggle">
+              <label class="toggle-radio" for="fbOption1"><%= i18nCommon.affirmations.yes %></label>
+              <input type="radio" name="share[fb]" id="fbOption1" value="1" checked="checked">
+              <input type="radio" name="share[fb]" id="fbOption2" value="0">
+              <label class="toggle-radio" for="fbOption2"><%= i18nCommon.affirmations.no %></label>
+            </div>
+          </div>
+        </div>
+      </fieldset>
       <div id="property-options" class="pull-left hide">
         <div class="controls"></div>
         <label for="post-as-property" class="checkbox hide">
@@ -187,19 +165,10 @@
           <input type="checkbox" id="post-private" checked="checked"><%= i18nCommon.adjectives.private %>
         </label>
       </div>
-      <!-- <div class=""></div> -->
       <div class="pull-right">
         <button class="btn btn-primary stay-right save"><%= i18nCommon.actions.post %></button>
       </div>
     </div>
-    <!--
-    <div class="body-group control-group hide">
-      <label for="activity-body" class="control-label element-invisible"><%= i18nCommon.fields.body %></label>
-      <div class="controls">
-        <textarea class="input-block-level" name="activity[body]" id="activity-body" placeholder="<%= i18nCommon.nouns.extra_details %>"></textarea>
-      </div>
-    </div>
-    -->
     <div id="preview-activity-photo" class="preview template-upload"></div>
     <div class="no-property hide"></div>
   </div>

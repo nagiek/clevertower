@@ -115,6 +115,8 @@ define [
 
     country: -> Parse.App.countryCodes[@get("country")]
 
+    city: -> @get("locality") + "--" + @get("administrative_area_level_1") + "--" + Parse.App.countryCodes[@get("country")]
+
     cover: (format) ->
       img = @get "image_#{format}"
       img = "/img/fallback/property-#{format}.png" if img is '' or !img?

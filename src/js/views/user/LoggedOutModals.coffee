@@ -7,9 +7,11 @@ define [
   "i18n!nls/common"
   "i18n!nls/devise"
   "i18n!nls/user"
+  "load-image"
+  "canvas-to-blob"
   'plugins/toggler'
   'templates/user/logged_out_modals'
-], ($, _, Parse, NotificationList, Alert, i18nCommon, i18nDevise, i18nUser) ->
+], ($, _, Parse, NotificationList, Alert, i18nCommon, i18nDevise, i18nUser, loadImage) ->
 
   class LoggedOutModalsView extends Parse.View
 
@@ -26,16 +28,20 @@ define [
 
     initialize: ->
 
-      @listenToOnce Parse.Dispatcher, "user:loginStart", (user) =>
-        Parse.User.current().setup().then =>
-          Parse.Dispatcher.trigger "user:login", user
-          Parse.Dispatcher.trigger "user:change", user
-          @$('#reset-password-modal').remove()
-          @$('#signup-modal').remove()
-          @$('#login-modal').remove()
+      @listenTo Parse.Dispatcher, "user:loginStart", @startLogin
 
-          @undelegateEvents()
-          delete this
+
+    startLogin: (user) =>
+      Parse.User.current().setup().then =>
+        Parse.Dispatcher.trigger "user:login", user
+        Parse.Dispatcher.trigger "user:change", user
+        @$('#reset-password-modal').remove()
+        @$('#signup-modal').remove()
+        @$('#login-modal').remove()
+
+        @stopListening()
+        @undelegateEvents()
+        delete this
 
     render: =>
       @$el.append JST["src/js/templates/user/logged_out_modals.jst"](i18nCommon: i18nCommon, i18nDevise: i18nDevise)
@@ -70,7 +76,7 @@ define [
           @$('> #login-modal').modal('hide')
           Parse.Dispatcher.trigger "user:loginStart", user
 
-        error: (user, error) =>
+        error: (error) =>
           @$("> #login-modal #login-modal-form button").removeProp "disabled"
           @$('> #login-modal #login-modal-form .username-group').addClass('error')
           @$('> #login-modal #login-modal-form .password-group').addClass('error')
@@ -83,13 +89,53 @@ define [
 
     logInWithFacebook : (e) =>  
       e.preventDefault()
-      Parse.FacebookUtils.logIn "user_likes,email",
+      Parse.FacebookUtils.logIn Parse.App.fbPerms,
         success: (user) =>
-          @$('> #login-modal').modal('hide')
-          # We don't know if this is a signup or a login.
-          Parse.Dispatcher.trigger "user:loginStart", user
 
-        error: (user, error) =>
+          # We don't know if this is a signup or a login. 
+          @$('> #login-modal').modal('hide')
+          @$('> #signup-modal').modal('hide')
+
+          # Must run through login-start process in-sync, without trigger, as we may change the profile.
+          Parse.User.current().setup().then =>
+            unless Parse.User.current().get("email")
+              FB.api '/me', (response) ->
+                userVars = 
+                  email: response.email
+                  birthday: new Date response.birthday
+                  gender: response.gender
+                userVars.location = response.location.name if response.location
+                Parse.User.current().save userVars
+                Parse.User.current().get("profile").save
+                  email: response.email
+                  first_name: response.first_name
+                  last_name: response.last_name
+
+              # We need at least width=270
+              FB.api '/me/picture?width=400&height=400', (response) ->
+                if response.data and not response.data.is_silhouette
+
+                  Parse.Cloud.run "SetPicture", {
+                    url: response.data.url
+                  },
+                  success: (res) ->
+                    Parse.User.current().get("profile").set
+                      image_full: res
+                      image_profile: res
+                      image_thumb: res
+                  error: (res) -> console.log res                  
+
+            Parse.Dispatcher.trigger "user:login", user
+            Parse.Dispatcher.trigger "user:change", user
+            @$('#reset-password-modal').remove()
+            @$('#signup-modal').remove()
+            @$('#login-modal').remove()
+
+            @stopListening()
+            @undelegateEvents()
+            delete this
+
+        error: (error) =>
             
     signUp: (e) =>
       e.preventDefault()
@@ -115,7 +161,7 @@ define [
           Parse.Dispatcher.trigger "user:change", user
           Parse.history.navigate "/account/setup", trigger: true
 
-        error: (user, error) =>
+        error: (error) =>
           @$("> #signup-modal #signup-modal-form .error").removeClass 'error'
           @$("> #signup-modal #signup-modal-form button").removeProp "disabled"
           msg = switch error.code
@@ -132,7 +178,6 @@ define [
               @$('> #signup-modal #signup-modal-form password-group').addClass('error')
 
           @$("> #signup-modal #signup-modal-form .alert-error").html(msg).show()
-
 
     switchToSignup: (e) =>
       e.preventDefault()

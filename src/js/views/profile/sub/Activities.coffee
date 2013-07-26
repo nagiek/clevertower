@@ -43,6 +43,6 @@ define [
           _.each set, @addOne
           @$list.append "<li class='divider clearfix'></li>"
 
-      else @$list.html '<li class="empty">' + 
-                                if @current then i18nUser.empty.activities.self else i18nUser.empty.activities.other(name) +
-                                '</li>'
+      else 
+        text = if @current then i18nUser.empty.activities.self else i18nUser.empty.activities.other @model.get("first_name") || @model.name()
+        @$list.html '<li class="empty">' + text + '</li>'

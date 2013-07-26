@@ -62,7 +62,7 @@ define [
         i18nCommon: i18nCommon
 
       @$el.html JST["src/js/templates/user/logged_in_menu.jst"](vars)
-      $("#panel-user-menu").html JST["src/js/templates/user/logged_in_menu.jst"](vars)
+      $("#panel-user-menu").html JST["src/js/templates/user/logged_in_panel.jst"](vars)
       @notificationsView = new NotificationsView
       @notificationsView.render()
       @

@@ -25,19 +25,21 @@ define [
     
     FBlink: (e) ->
       e.preventDefault()
-      unless Parse.FacebookUtils.isLinked(Parse.User.current())
-        Parse.FacebookUtils.link Parse.User.current(), "email", 
-          success: @render
-            
+      unless Parse.User.current().isLinked("facebook")
+        Parse.FacebookUtils.link Parse.User.current(), Parse.App.fbPerms, success:
+          @$(".facebook-group controls").html "<span class='btn active linked'>#{i18nCommon.adjectives.linked}</span>" +
+            "<span></span>" +
+            "<button id='fb-unlink' class='btn revoke btn-danger'>#{i18nCommon.actions.revoke_access}</button>"
 
     FBunlink: (e) ->
       e.preventDefault()
-      if Parse.FacebookUtils.isLinked(Parse.User.current())
-        Parse.FacebookUtils.unlink Parse.User.current(), success: @render
+      if Parse.User.current().isLinked("facebook")
+        Parse.FacebookUtils.unlink Parse.User.current(), success: 
+          @$(".facebook-group controls").html "<button id='fb-link' class='btn'>#{i18nCommon.actions.link}</button>"
             
     render: =>
       vars =
-        fbLinked:     Parse.FacebookUtils.isLinked(Parse.User.current())
+        fbLinked:     Parse.User.current().isLinked("facebook")
         cancel_path:  "/users/#{Parse.User.current().get('profile').id}"
         i18nCommon:   i18nCommon
         i18nUser:     i18nUser

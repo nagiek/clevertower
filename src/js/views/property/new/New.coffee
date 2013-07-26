@@ -14,16 +14,13 @@ define [
   class NewPropertyView extends Parse.View
 
     tagName : "form"
-    className: "property-form span12"
+    id : "new-property-form"
+    className: "span12 form-large"
 
     initialize: (attrs) ->
       
       @wizard = attrs.wizard
-      
-      @listenTo @wizard, "wizard:cancel", @clear
-      @listenTo @wizard, "property:save", @clear
-      @listenTo @wizard, "lease:save", @clear
-
+      @listenTo @wizard, "wizard:finish wizard:cancel", @clear
         
     render : ->
 

@@ -3,7 +3,7 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", "models/Property", "models/Photo", "models/Activity", "collections/PhotoList", "views/photo/Show", "i18n!nls/property", "i18n!nls/common", "templates/property/sub/photos", 'jqueryuiwidget', 'jquery.fileupload', 'jquery.fileupload-fp', 'jquery.fileupload-ui'], function($, _, Parse, Property, Photo, Activity, PhotoList, PhotoView, i18nProperty, i18nCommon) {
+  define(["jquery", "underscore", "backbone", "models/Property", "models/Photo", "models/Activity", "collections/PhotoList", "views/photo/Show", "i18n!nls/property", "i18n!nls/common", "canvas-to-blob", "templates/property/sub/photos", 'jqueryuiwidget', 'jquery.fileupload', 'jquery.fileupload-fp', 'jquery.fileupload-ui'], function($, _, Parse, Property, Photo, Activity, PhotoList, PhotoView, i18nProperty, i18nCommon, canvas) {
     var PropertyPhotosView, _ref;
 
     return PropertyPhotosView = (function(_super) {
@@ -21,11 +21,9 @@
       PropertyPhotosView.prototype.initialize = function() {
         this.on("view:change", this.clear);
         this.unUploadedPhotos = 0;
-        this.photos = new PhotoList([], {
-          property: this.model
-        });
-        this.listenTo(this.photos, "add", this.addOne);
-        return this.listenTo(this.photos, "reset", this.addAll);
+        this.model.prep("photos");
+        this.listenTo(this.model.photos, "add", this.addOne);
+        return this.listenTo(this.model.photos, "reset", this.addAll);
       };
 
       PropertyPhotosView.prototype.render = function() {
@@ -95,7 +93,7 @@
 
               for (_i = 0, _len = arguments.length; _i < _len; _i++) {
                 photo = arguments[_i];
-                _this.photos.add(photo);
+                _this.model.photos.add(photo);
               }
               activity = new Activity({
                 image: arguments[0].get("name"),
@@ -115,13 +113,16 @@
             return _this.$(".fileupload-progress").addClass("hide");
           }
         });
-        this.photos.fetch();
+        if (this.model.photos.length === 0) {
+          this.model.photos.fetch();
+        } else {
+          this.addAll();
+        }
         return this;
       };
 
       PropertyPhotosView.prototype.clear = function(e) {
         this.undelegateEvents();
-        delete this.photos;
         return delete this;
       };
 
@@ -136,8 +137,8 @@
 
       PropertyPhotosView.prototype.addAll = function(collection, filter) {
         this.$list.html("");
-        if (this.photos.length !== 0) {
-          return this.photos.each(this.addOne);
+        if (this.model.photos.length !== 0) {
+          return this.model.photos.each(this.addOne);
         } else {
           return this.$list.before('<p class="empty">' + i18nProperty.empty.photos + '</p>');
         }
