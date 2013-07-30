@@ -1,51 +1,6 @@
 <form class="form-horizontal" method="post" id="settings-form">
 
-  <fieldset>
-    <div class="control-group type-group">
-      <label for="type" class="control-label"><%= i18nDevise.form.type.label %>:</label>
-      <div class="controls">
-        <div class="toggle">
-          <label class="toggle-radio" for="typeOption1"><%= i18nDevise.form.type.tenant %></label>
-          <input type="radio" name="account_type" id="typeOption1" value="tenant" <%= type == 'tenant' ? checked="checked" : '' %>>
-          <input type="radio" name="account_type" id="typeOption2" value="manager" <%= type == 'manager' ? checked="checked" : '' %>>
-          <label class="toggle-radio" for="typeOption2"><%= i18nDevise.form.type.manager %></label>
-        </div>
-      </div>
-    </div>
-  </fieldset>
-  
-  <hr>
-  
-  <fieldset>
-    <div class="password-group control-group">
-      <label for="user-email" class="control-label"><%= i18nDevise.form.password %></label>
-      <div class="controls">
-        <input class="span2" type="password" name="user[password]" maxlength="64" />
-        <p class="help-block">
-          <%= i18nDevise.form.password_required %>
-          <a href="#" id="reset-password"><%= i18nDevise.actions.forgot_your_password %></a>
-        </p>
-      </div>
-    </div>
-  
-    <div class="email-group control-group">
-      <label for="user-email" class="control-label"><%= i18nDevise.form.email %></label>
-      <div class="controls">
-        <input class="span4" type="text" name="user[email]" value="<%= email %>" maxlength="64" />
-      </div>
-    </div>
-  
-    <div class="new-password-group control-group">
-      <label for="user-email" class="control-label"><%= i18nDevise.form.new_password %></label>
-      <div class="controls">
-        <input class="span2" type="password" name="user[new_password]" maxlength="64" />
-      </div>
-      <label for="user-email" class="control-label"><%= i18nDevise.form.new_password_confirm %></label>
-      <div class="controls">
-        <input class="span2" type="password" name="user[new_password_confirm]" maxlength="64" />
-      </div>
-    </div>
-  </fieldset>
+  <%= JST["src/js/templates/user/form.jst"]({type: type, email: email, i18nCommon: i18nCommon, i18nDevise: i18nDevise}) %>
 
   <div class="form-actions">
     <button class="save btn btn-primary"><%= i18nCommon.actions.save %></button>

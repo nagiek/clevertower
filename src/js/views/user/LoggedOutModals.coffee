@@ -123,7 +123,10 @@ define [
                       image_full: res
                       image_profile: res
                       image_thumb: res
-                  error: (res) -> console.log res                  
+                  error: (res) -> console.log res
+
+              # Have the user set a password before moving on.
+              # Parse.history.navigate "account/confirm", true
 
             Parse.Dispatcher.trigger "user:login", user
             Parse.Dispatcher.trigger "user:change", user

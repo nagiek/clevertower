@@ -38,10 +38,12 @@ define [
     render: ->    
 
       isMgr = Parse.User.current().get("network") and Parse.User.current().get("network").id is @model.get("network").id 
+      unit = @property.units.get(@model.get("unit").id) || @model.get("unit")
+      title = if unit then unit.get("title") else ""
 
       vars = _.merge @model.toJSON(), 
         # References
-        title: @property.units.get(@model.get("unit").id).get("title")
+        title: title
         tenants: false
         isMgr: isMgr
         # Parse turns dates into an object, which we must override.
@@ -56,6 +58,7 @@ define [
       
       @$list = @$('ul#tenants')
       
+      if @property.units.length is 0 then @property.units.fetch()
       if @model.tenants.length is 0 then @model.tenants.fetch() else @addAll()
       @
       

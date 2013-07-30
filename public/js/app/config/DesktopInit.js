@@ -269,14 +269,16 @@
         _this.set("property", user.get("property"));
         network = user.get("network");
         if (network) {
-          return _this.networkSetup(network);
+          _this.set("network", network);
+          return _this.networkSetup();
         }
       });
     };
-    Parse.User.prototype.networkSetup = function(network) {
-      var role,
+    Parse.User.prototype.networkSetup = function() {
+      var network, role,
         _this = this;
 
+      network = this.get("network");
       network.prep("properties").fetch();
       network.prep("units").fetch();
       network.prep("activity").fetch();

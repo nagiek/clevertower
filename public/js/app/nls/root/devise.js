@@ -24,6 +24,10 @@
       unlock_account: "Unlock my account",
       back_to_profile: "Back to profile"
     },
+    setup: {
+      confirm_details: "Confirm details",
+      confirm_info: "We need to confirm some information on your account. This will allow you to access to your account without facebook."
+    },
     "switch": {
       signup: "Don't have an account?",
       login: "Already have an account?"

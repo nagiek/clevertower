@@ -2,11 +2,12 @@ define [
   "jquery"
   "underscore"
   "backbone"
+  "collections/ActivityList"
+  "models/Activity"
   "models/Property"
   "models/Unit"
   "models/Lease"
   "models/Concierge"
-  "models/Activity"
   "views/helper/Alert"
   "views/property/new/Map"
   "views/property/new/New"
@@ -17,7 +18,7 @@ define [
   "i18n!nls/common"
   "templates/property/new/map"
   "templates/property/new/wizard"
-], ($, _, Parse, Property, Unit, Lease, Concierge, Activity, Alert, GMapView, NewPropertyView, JoinPropertyView, PicturePropertyView, SharePropertyView, i18nProperty, i18nCommon) ->
+], ($, _, Parse, ActivityList, Activity, Property, Unit, Lease, Concierge, Alert, GMapView, NewPropertyView, JoinPropertyView, PicturePropertyView, SharePropertyView, i18nProperty, i18nCommon) ->
 
   class PropertyWizardView extends Parse.View
   
@@ -53,7 +54,8 @@ define [
         @clear()
 
       @listenTo @model, "invalid", (error) =>
-        @$('button.next').removeProp "disabled"
+        @$('button.next').button('complete')
+        @$('button.join').button('complete')
 
         msg = if error.message.indexOf(":") > 0  
           args = error.message.split ":"
@@ -97,8 +99,9 @@ define [
     join : (existingProperty) =>
       return if @state is 'join'
       @$('.error').removeClass('error')
-      @$('button.next').prop "disabled", true
-      @$('button.join').prop "disabled", true
+      $().button('loading')
+      @$('button.next').button('loading') # prop "disabled", true
+      @$('button.join').button('loading') # prop "disabled", true
       @state = 'join'
       @existingProperty = existingProperty
       
@@ -108,8 +111,8 @@ define [
 
     manage : (existingProperty) =>
       @$('.error').removeClass('error')
-      @$('button.next').prop "disabled", true
-      @$('button.join').prop "disabled", true
+      @$('button.next').button('loading') # prop "disabled", true
+      @$('button.join').button('loading') # prop "disabled", true
 
       concierge = new Concierge
         property: existingProperty
@@ -123,8 +126,8 @@ define [
 
     next : (e) =>
       @$('.error').removeClass('error')
-      @$('button.next').prop "disabled", true
-      @$('button.join').prop "disabled", true
+      @$('button.next').button('loading') # prop "disabled", true
+      @$('button.join').button('loading') # prop "disabled", true
       switch @state
         when 'address'
           center = @model.get "center"
@@ -166,8 +169,7 @@ define [
               @picture = new PicturePropertyView wizard: @, model: @model
               @form.$el.after @picture.render().el
               @animate 'forward'
-            , (error) =>
-              @form.model.trigger "invalid", error; console.log error
+            , (lease, error) => @form.model.trigger "invalid", error
 
           else 
             attrs = @model.scrub data.property
@@ -177,8 +179,7 @@ define [
               @picture = new PicturePropertyView wizard: @, model: @model
               @form.$el.after @picture.render().el
               @animate 'forward'
-            , (error) => 
-              @model.trigger "invalid", error; console.log error
+            , (property, error) => @model.trigger "invalid", error
 
         when 'picture'
           @model.save().then (property) => 
@@ -186,8 +187,7 @@ define [
             @share = new SharePropertyView wizard: @, model: @model
             @picture.$el.after @share.render().el
             @animate 'forward'
-          , (error) =>
-            @model.trigger "invalid", error; console.log error
+          , (property, error) => @model.trigger "invalid", error
 
         when 'share'
           data = @share.$el.serializeObject()
@@ -208,6 +208,9 @@ define [
                 title: @model.get "title"
                 profile: Parse.User.current().get("profile")
                 ACL: activityACL
+              .then ->
+                Parse.User.current().activity = Parse.User.current().activity || new ActivityList {}, []
+                Parse.User.current().Activity.add activity
 
               # Share on FB?
               if data.share.fb is "on" or data.share.fb is "1"
@@ -227,8 +230,7 @@ define [
                   (response) -> console.log response
 
             @trigger "wizard:finish"
-          , (error) => 
-            @model.trigger "invalid", error; console.log error
+          , (property, error) => @model.trigger "invalid", error
 
 
         # Join steps
@@ -241,12 +243,10 @@ define [
           
           @form.model.save attrs,
             success: (lease) =>      @trigger "lease:save", @form.model; @trigger "wizard:finish"
-            error: (error) => @form.model.trigger "invalid", error; console.log error
+            error: (lease, error) => @form.model.trigger "invalid", error
 
     back : (e) =>
       return if @state is 'address'
-      if @state is 'property' or @state is 'join'
-        @$('.back').prop "disabled", false
       @animate 'backward'
 
     # cancel : (e) =>
@@ -303,6 +303,7 @@ define [
         when 'forward'
           switch @state
             when "property", "join"
+              @trigger "view:advance"
               @$('.back').removeProp "disabled"
               @map.$el.animate left: "-150%", 500
               @form.$el.animate left: "0", 500, 'swing', @buttonsForward
@@ -316,8 +317,9 @@ define [
         when 'backward'
           switch @state
             when "property", "join"
+              @trigger "view:retreat"
               @map.$el.animate left: "0%", 500
-              @form.$el.animate left: "150%", 500, 'swing', => @form.clear();  @$('.back').prop disabled: 'disabled'
+              @form.$el.animate left: "150%", 500, 'swing', => @form.clear();  @$('.back').prop "disabled", true
               delete @existingProperty
               @state = 'address'
               @$('.back').prop "disabled", true
@@ -332,8 +334,15 @@ define [
               @state = 'picture'
 
     buttonsForward: =>
-      @$('.next').removeProp "disabled"
-      @$('.join').removeProp "disabled"
+      @$('.next').button('complete') # .removeProp "disabled"
+      @$('.join').button('complete') # .removeProp "disabled"
+      switch @state
+        when "property", "join", "picture"
+          @$('.next').html i18nCommon.actions.next
+          @$('.join').html i18nCommon.actions.join
+        when "share"
+          @$('.next').html i18nCommon.actions.finish
+          @$('.join').html i18nCommon.actions.join
 
     clear : =>
       @stopListening()

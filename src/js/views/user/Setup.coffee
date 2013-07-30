@@ -3,6 +3,8 @@ define [
   "underscore"
   "backbone"
   "collections/NotificationList"
+  "views/network/New"
+  "views/property/new/Wizard"
   "views/notification/Setup"
   "views/helper/Alert"
   "i18n!nls/common"
@@ -11,7 +13,7 @@ define [
   "plugins/toggler"
   "templates/user/presetup"
   "templates/user/setup"
-], ($, _, Parse, NotificationList, NotificationView, Alert, i18nCommon, i18nDevise, i18nUser) ->
+], ($, _, Parse, NotificationList, NewNetworkView, PropertyWizard, NotificationView, Alert, i18nCommon, i18nDevise, i18nUser) ->
 
   class SetupUserView extends Parse.View
     
@@ -70,18 +72,21 @@ define [
       if n.withAction() and n.unclicked()
         view = new NotificationView(model: n)
         @$list.append view.render().el
-      
+
+    hideIntro: => @$("header").removeClass "in"
+    showIntro: => @$("header").addClass "in"
+
     changeSubView: (e) ->
       type = if e.currentTarget.defaultValue is "manager" then "tenant" else "manager"
       if type is "manager"
-        require ["views/network/New"], (NewNetworkView) => 
-          view = new NewNetworkView(model: Parse.User.current().get("network"))
-          @$(".content").removeClass("in").html(view.render().el).delay(150).addClass("in")
+        view = new NewNetworkView(model: Parse.User.current().get("network"))
+        @$(".content").removeClass("in").html(view.render().el).delay(150).addClass("in")
       else 
-        require ["views/property/new/Wizard"], (PropertyWizard) =>
+        @$(".content").removeClass("in")
+        view = new PropertyWizard forNetwork: false
+        @listenTo view, "view:advance", @hideIntro
+        @listenTo view, "view:retreat", @showIntro
 
-          @$(".content").removeClass("in")
-          view = new PropertyWizard forNetwork: false
-          view.setElement ".content"
-          view.render()
-          @$(".content").delay(150).addClass("in")
+        view.setElement ".content"
+        view.render()
+        @$(".content").delay(150).addClass("in")

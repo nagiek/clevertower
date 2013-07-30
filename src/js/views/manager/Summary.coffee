@@ -40,8 +40,6 @@ define [
     
     kill: =>
       if confirm(i18nCommon.actions.confirm)
-        # Remove the manager
-        @model.destroy()
 
         # Take additional actions if we are refering to ourselves.
         if @model.get("profile").id is Parse.User.current().get("profile").id
@@ -50,15 +48,19 @@ define [
           if @model.collection.length is 1 and Parse.User.current().get("network").mgr 
             Parse.User.current().get("network").destroy()
 
-          Parse.User.current().save("network", null)
+          Parse.User.current().save(network: null)
 
-          # Go to the home
-          hostArray = location.host.split(".")
-          hostArray.shift()
-          home = hostArray.join(".")
+          # Go to the home page
+          Parse.history.navigate "/", true
+          # hostArray = location.host.split(".")
+          # hostArray.shift()
+          # home = hostArray.join(".")
 
-          domain = "#{location.protocol}//#{home}"
-          setTimeout window.location.replace domain, 1000
+          # domain = "#{location.protocol}//#{home}"
+          # setTimeout window.location.replace domain, 1000
+
+        # Remove the manager
+        @model.destroy()
 
     accept: ->
       @model.save(newStatus:"current")

@@ -36,7 +36,7 @@ define [
 
       @listenTo Parse.Dispatcher, 'user:logout', @clear
 
-      @baseUrl = if @model.get("network") then "/properties/#{@model.id}" else "/manage"
+      @baseUrl = if @model.get("network") then "/properties/#{@model.id}" else "/inside"
 
       @file = false
       

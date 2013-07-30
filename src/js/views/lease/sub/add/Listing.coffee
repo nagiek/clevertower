@@ -7,7 +7,7 @@ define [
   "models/Unit"
   "models/Listing"
   "views/listing/New"
-], ($, _, Parse, UnitList, Property, Unit, Listing, NewListingView, i18nCommon, i18nListing) ->
+], ($, _, Parse, UnitList, Property, Unit, Listing, NewListingView) ->
 
   class AddListingToLeaseView extends Parse.View
 
@@ -29,7 +29,7 @@ define [
       @listing = new Listing(vars)
       
     render : ->
-      @form = new NewListingView(model: @listing, property: @model, forNetwork: @forNetwork, baseUrl: @baseUrl).render()
+      @form = new NewListingView(model: @listing, unit: @model.get("unit"), property: @model.get("property"), forNetwork: @forNetwork, baseUrl: @baseUrl).render()
       @
     
     clear : ->

@@ -1,8 +1,7 @@
 (function() {
   define({
     actions: {
-      back_to_profile: "Back to profile",
-      setup: "Welcome to CleverTower"
+      back_to_profile: "Back to profile"
     },
     manager_menu: {
       properties: "Properties",
@@ -34,6 +33,7 @@
       }
     },
     setup: {
+      welcome_message: "Welcome to CleverTower",
       performing_setup_for: "Performing setup for",
       existing_notifications: "You have existing offers to join or manage properties. Please select from the list below."
     },

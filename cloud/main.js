@@ -894,12 +894,13 @@
         return res.success();
       }
       Parse.Cloud.useMasterKey();
-      return (new Parse.Query("Property")).include('mgrRole').include('network.role').get(req.object.get("property").id, {
+      return (new Parse.Query("Property")).include('role').include('mgrRole').include('network.role').get(req.object.get("property").id, {
         success: function(property) {
-          var channels, current, emails, leaseACL, mgrRole, netRole, network, notificationACL, possible, randomId, role, savesToComplete, _j;
+          var channels, current, emails, leaseACL, mgrRole, netRole, network, notificationACL, possible, propRole, randomId, role, savesToComplete, _j;
 
           network = property.get("network");
           mgrRole = property.get("mgrRole");
+          propRole = property.get("role");
           req.object.set({
             user: req.user,
             confirmed: false,

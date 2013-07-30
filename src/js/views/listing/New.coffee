@@ -73,6 +73,8 @@ define [
           when 'dates_missing' or 'dates_incorrect'
             @$('.date-group').addClass('error')
       
+      @listenTo @model, 'destroy', @clear
+
       @on "save:success", (model) =>
 
         new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
@@ -91,16 +93,18 @@ define [
         #   new ShowListingView(model: model, property: model.get("property")).render()
         #   Parse.history.navigate "#{@baseUrl}/listings/#{model.id}"
         #   @clear()
-                
-      @listenTo @model, 'destroy', @clear
       
       # @unit = @model.get("unit")
       unless @unit
         if @property
+          console.log @property.units
+          debugger
           @property.prep("units")
           @listenTo @property.units, "add", @addOne
           @listenTo @property.units, "reset", @addAll
         else 
+          console.log Parse.User.current().get("network")
+          debugger
           Parse.User.current().get("network").prep("units")
           @listenTo Parse.User.current().get("network").units, "add", @addOne
           @listenTo Parse.User.current().get("network").units, "reset", @addAll

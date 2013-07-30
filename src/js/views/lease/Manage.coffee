@@ -20,7 +20,7 @@ define [
     el: '#main'
     
     initialize: (attrs) ->
-      @baseUrl = "/manage"
+      @baseUrl = "/inside"
       @listenTo @model, "change:start_date change:end_date", @renderHeader
       @listenTo Parse.User.current().get("unit"), "change:title", @renderHeader
       @listenTo Parse.Dispatcher, "user:logout", @clear

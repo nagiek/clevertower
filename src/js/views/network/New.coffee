@@ -25,8 +25,9 @@ define [
       @results = new NetworkResultsList
 
       @listenTo @results, "reset", @addAll
-      @listenTo @results, "network:join", =>
-        Parse.history.navigate "/", trigger: true
+      @listenTo @results, "network:join", => 
+        Parse.User.current().networkSetup()
+        Parse.history.navigate "/inside", true
         @clear()
 
       # Only do this on 'invalid', as we will reload the page 
@@ -35,7 +36,7 @@ define [
       #   @$('.error').removeClass('error')
       #   @$('button.save').removeProp "disabled"
 
-      @model.on "invalid", (error) =>
+      @listenTo @model, "invalid", (error) =>
         console.log error
         @$('.error').removeClass('error')
         @$('button.save').removeProp "disabled"
@@ -50,11 +51,12 @@ define [
           
                   
       @on "save:success", (model) =>
-        Parse.User.current().set "network", model
         new Alert(event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success')
+        Parse.User.current().set "network", @model
         
+        Parse.history.navigate "inside", true
+
         # Navigate after a second.
-        setTimeout Parse.history.navigate("/inside", true), 1000
         # domain = "#{location.protocol}//#{model.get("name")}.#{location.host}"
         # setTimeout window.location.replace domain, 1000
     

@@ -10,8 +10,9 @@ define [
     routes:
       ""                            : "index"
       "places/:country/:region/:city/:id/:slug" : "propertiesPublic"
-      "outside/*splat"               : "search"
-      "outside"                      : "search"
+      "outside/:id"                 : "activityShow"
+      "outside/*splat"              : "search"
+      "outside"                     : "search"
       # "inside"                      : "propertiesManage"
       # "inside/*splat"               : "propertiesManage"
       "network/new"                 : "networkNew"
@@ -31,6 +32,7 @@ define [
       "users/:id/*splat"            : "profileShow"
       "notifications"               : "notifications"
       "account/setup"               : "accountSetup"
+      # "account/confirm"             : "accountConfirm"
       "account/signup"              : "signup"
       "account/reset_password"      : "resetPassword"
       "account/login"               : "login"
@@ -45,13 +47,13 @@ define [
       
       new UserMenuView().render()
       new NavMenuView().render()
-      Parse.App.search = new SearchView().render()
-            
-      @listenTo Parse.Dispatcher, "user:login", (user) =>
+      Parse.App.search = new SearchView().render()          
+          
+      @listenTo Parse.Dispatcher, "user:login", =>
         if Parse.User.current().get("network") or Parse.User.current().get("property")
-          # Reload the current path. Don't use navigate, as it will fail.
+          # Reload the current path. 
+          # Don't use navigate, as it will fail.
           # The route functions themselves are responsible for altering content.
-          console.log '1'
           Parse.history.loadUrl location.pathname
         else
           # require ["views/helper/Alert", 'i18n!nls/property'], (Alert, i18nProperty) =>
@@ -60,10 +62,8 @@ define [
           #     type:     'warning'
           #     fade:     true
           #     heading:  i18nProperty.errors.network_not_set
-          console.log '2'
           Parse.history.navigate "account/setup", true
-          
-          
+
       @listenTo Parse.Dispatcher, "user:logout", =>
         # Reload the current path. Don't use navigate, as it will fail.
         # The route functions themselves are responsible for altering content.
@@ -92,7 +92,6 @@ define [
         # If this is a relative link on this domain.
         if href.substring(0,1) is '/' and href.substring(0,2) isnt '//'
           e.preventDefault()
-          console.log '3'
           Parse.history.navigate href, true
           
           
@@ -116,6 +115,23 @@ define [
         if !view or view !instanceof ActivityIndexView
           vars = @deparamAction splat
           @view = new ActivityIndexView(location: vars.path, params: vars.params).render()
+
+    # 
+    # 
+
+    activityShow: (id) =>
+      view = @view
+      require ["collections/ActivityList", "views/activity/Show"], (ActivityList, ActivityShowView) =>
+        Parse.App.activity = Parse.App.activity || new ActivityList [], {}
+        model = Parse.App.activity.get id
+        if model 
+          @view = new ActivityShowView(model: model).render()
+        else
+          new Parse.Query("Activity").get id,
+            success: (model) =>
+              Parse.App.activity.add model
+              @view = new ActivityShowView(model: model).render()
+            error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
 
     # Network
     # --------------
@@ -149,6 +165,7 @@ define [
           else
           # error: =>
             require ["views/lease/Manage"], (LeaseView) => 
+              vars = @deparamAction splat
               if !view or view !instanceof LeaseView
                 vars.model = Parse.User.current().get("lease")
                 @view = new LeaseView(vars)
@@ -160,8 +177,8 @@ define [
       # Handling this in the NavMenu view. This URL is exposed, and
       # should not be followed through, which is why it shouldn't be
       # handled by @signupOrLogin
-      # else
-      #   @signupOrLogin()
+      else
+        Parse.history.navigate "account/login", true
 
 
     # Property
@@ -257,6 +274,13 @@ define [
       else
         @signupOrLogin()
 
+    # accountConfirm : ->
+    #   if Parse.User.current()
+    #     require ["views/user/Confirm"], (UserConfirmView) =>              
+    #       @view = new UserConfirmView().render()
+    #   else
+    #     @signupOrLogin()
+
     accountSettings : (splat) ->
       view = @view
       if splat is 'edit'
@@ -287,7 +311,7 @@ define [
         require ["views/user/Signup"], (SignupView) =>
           @view = new SignupView().render()
       else
-        Parse.history.navigate "/users/#{Parse.User.current().get("profile").id}"
+        Parse.history.navigate "users/#{Parse.User.current().get("profile").id}"
         @profileShow()
 
     login : ->
@@ -295,7 +319,7 @@ define [
         require ["views/user/Login"], (LoginView) =>
           @view = new LoginView().render()
       else
-        Parse.history.navigate "/users/#{Parse.User.current().get("profile").id}"
+        Parse.history.navigate "users/#{Parse.User.current().get("profile").id}"
         @profileShow()
 
     resetPassword : ->
@@ -304,14 +328,13 @@ define [
 
     logout : ->
       if Parse.User.current()
-        console.log "4"
         Parse.User.logOut()
         Parse.Dispatcher.trigger "user:change"
         Parse.Dispatcher.trigger "user:logout"
         Parse.history.navigate "", true
         # @index()
       else 
-        Parse.history.navigate "/account/login", true
+        Parse.history.navigate "account/login", true
         # @login()
 
 
@@ -320,7 +343,6 @@ define [
 
     oauth2callback : ->
       if Parse.User.current()
-        console.log '5'
         # Variables will be placed in a hash querystring.
         vars = @deparam window.location.hash.substring(1)
         unless vars.error
@@ -367,8 +389,7 @@ define [
           fade:     true
           heading:  i18nCommon.errors.fourOhFour
           message:  i18nCommon.errors.not_found
-        console.log '5'
-        Parse.history.navigate "/", true
+        Parse.history.navigate "", true
 
     deparamAction : (splat) ->
       unless splat then return path: "", params: {}
@@ -400,7 +421,7 @@ define [
           fade:     true
           heading:  i18nCommon.errors.access_denied
           message:  i18nCommon.errors.no_permission
-        # Parse.history.navigate "/", true
+        # Parse.history.navigate "", true
         
     signupOrLogin: ->
       # require ["views/helper/Alert", 'i18n!nls/common'], (Alert, i18nCommon) -> 
@@ -409,5 +430,5 @@ define [
       #     type:     'warning'
       #     fade:     true
       #     heading:  i18nCommon.errors.not_logged_in
-      #   Parse.history.navigate "/", true
+      #   Parse.history.navigate "", true
       $("#login-modal").modal()

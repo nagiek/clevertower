@@ -240,6 +240,7 @@ define [
             if data.profile then item.$el.find("footer img").prop 'src', data.profile
             unless item.marker
               originY = if data.collection is "user" then 25 else 0
+
               item.marker = new google.maps.Marker
                 position: new google.maps.LatLng data.lat, data.lng
                 map: _this.map
@@ -382,27 +383,27 @@ define [
 
       if Parse.User.current()
         Parse.User.current().activity.fetch() if Parse.User.current().activity
-
         if Parse.User.current().get("property")
           Parse.User.current().get("property").marker = new google.maps.Marker
             position:   Parse.User.current().get("property").GPoint()
             map:        @map
-            ZIndex:     100
-            url:        Parse.User.current().get("property").publicUrl()
             items:      []
-            highlightCard: @highlightCard
-            highlightMarker: @highlightMarker
-            unhighlightCard: @unhighlightCard
-            unhighlightMarker: @unhighlightMarker
             icon: 
               url: "/img/icon/pins-sprite.png"
               size: new google.maps.Size(25, 32, "px", "px")
               origin: new google.maps.Point(50, 0)
               anchor: null
               scaledSize: null
-            Parse.User.current().get("property").highlightListener = google.maps.event.addListener Parse.User.current().get("property").marker, "mouseover", @highlightCardsFromPropertyMarker
-            Parse.User.current().get("property").unhighlightListener = google.maps.event.addListener Parse.User.current().get("property").marker, "mouseout", @unhhighlightCardsFromPropertyMarker
-            Parse.User.current().get("property").clickListener = google.maps.event.addListener Parse.User.current().get("property").marker, "click", @goToPropertyFromPropertyMarker
+            ZIndex:     100
+            url:        Parse.User.current().get("property").publicUrl()
+            highlightCard: @highlightCard
+            highlightMarker: @highlightMarker
+            unhighlightCard: @unhighlightCard
+            unhighlightMarker: @unhighlightMarker
+
+          Parse.User.current().get("property").highlightListener = google.maps.event.addListener Parse.User.current().get("property").marker, "mouseover", @highlightCardsFromPropertyMarker
+          Parse.User.current().get("property").unhighlightListener = google.maps.event.addListener Parse.User.current().get("property").marker, "mouseout", @unhhighlightCardsFromPropertyMarker
+          Parse.User.current().get("property").clickListener = google.maps.event.addListener Parse.User.current().get("property").marker, "click", @goToPropertyFromPropertyMarker
         else if Parse.User.current().get("network")
           Parse.User.current().get("network").properties.each (p) =>
             p.marker = new google.maps.Marker
@@ -538,7 +539,7 @@ define [
         data-lng="#{model.GPoint().lng()}"
         data-collection="#{collection}"
         data-profile="#{model.profilePic("tiny")}"
-        data-image="#{model.image("span4")}"
+        data-image="#{model.image("large")}"
       />
       """
 
@@ -549,7 +550,7 @@ define [
         start: moment(model.get("startDate")).format("LLL")
         end: moment(model.get("endDate")).format("LLL")
         postDate: moment(model.createdAt).fromNow()
-        postImage: model.image("span4") # Keep this in for template logic.
+        postImage: model.image("large") # Keep this in for template logic.
         liked: liked
         icon: model.icon()
         name: model.name()
@@ -975,7 +976,7 @@ define [
       return unless @modal
       @index++
       model = if @collection is "user"
-        if @index > Parse.User.current().activity.length then @index = 0
+        if @index >= Parse.User.current().activity.length then @index = 0
         Parse.User.current().activity.at(@index)
       else
         if @index >= Parse.App.activity.length then @index = 0

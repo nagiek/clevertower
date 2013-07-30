@@ -60,11 +60,6 @@
 }
 
 #activities {
-  > li {
-    &.divider {
-      margin: 18px 0;
-    }
-  }
   &.small {
     .activity {
       // Make .photo-grid4 behave as photo-thumbnail
@@ -88,7 +83,58 @@
       }
     }
   }
+  // Special wide-activity formatting
+  > .span8 {
+    .photo-grid4 {
+      height: 260px;
+      width: 620px - 10px;
+      img {
+        width: 620px - 10px;
+      }
+    }
+    // .caption {}
+  }
 }
+
+@media (min-width: 1200px) {
+  #activities {
+    // Special wide-activity formatting
+    > .span8 {
+      .photo-grid4 {
+        width: 770px - 10px;
+        img {
+          width: 770px - 10px;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 979px) and (min-width: 768px) {
+  #activities {
+    // Special wide-activity formatting
+    > .span8 {
+      .photo-grid4 {
+        width: 476px - 10px;
+        img {
+          width: 476px - 10px;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  #activities {
+    // Special wide-activity formatting
+    > .span8 {
+      .photo-grid4 {
+        width: 100%;
+      }
+    }
+  }
+}
+
 
 #activity-filter-form {
   #general-controls {

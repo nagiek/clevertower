@@ -33,7 +33,6 @@ define [
       @changeSubView attrs.path, attrs.params
 
     clear: =>
-      Parse.history.navigate "/", true
       @undelegateEvents()
       @stopListening()
       delete this

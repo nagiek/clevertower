@@ -6,13 +6,13 @@ define [
   "i18n!nls/common"
   "i18n!nls/devise"
   "plugins/toggler"
-  "templates/user/sub/settings"
+  "templates/user/confirm"
   "templates/user/form"
 ], ($, _, Parse, Alert, i18nCommon, i18nDevise, i18nUser) ->
 
-  class AccountSettingsView extends Parse.View
+  class AccountConfirmView extends Parse.View
     
-    el: '#settings'
+    el: '#main'
     
     events:
       'submit form'           : 'save'
@@ -46,7 +46,7 @@ define [
     
       Parse.User.requestPasswordReset @model.getEmail(),
         success: ->
-          new Alert(event: 'reset-password', message: i18nDevise.messages.password_reset)    
+          new Alert(event: 'reset-password', message: i18nDevise.messages.password_reset)
     
     # Save is broken into two saves: User and profile.
     # Profile is always available, but user may be hidden.
@@ -101,7 +101,7 @@ define [
         i18nDevise: i18nDevise
       vars.type = 'tenant' unless vars.type
 
-      @$el.html JST["src/js/templates/user/sub/settings.jst"](vars)
+      @$el.html JST["src/js/templates/user/confirm.jst"](vars)
       
       @$('.toggle').toggler()
       @

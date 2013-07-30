@@ -3,7 +3,7 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", "models/Property", "models/Unit", "models/Lease", "models/Concierge", "models/Activity", "views/helper/Alert", "views/property/new/Map", "views/property/new/New", "views/property/new/Join", "views/property/new/Picture", "views/property/new/Share", "i18n!nls/property", "i18n!nls/common", "templates/property/new/map", "templates/property/new/wizard"], function($, _, Parse, Property, Unit, Lease, Concierge, Activity, Alert, GMapView, NewPropertyView, JoinPropertyView, PicturePropertyView, SharePropertyView, i18nProperty, i18nCommon) {
+  define(["jquery", "underscore", "backbone", "collections/ActivityList", "models/Activity", "models/Property", "models/Unit", "models/Lease", "models/Concierge", "views/helper/Alert", "views/property/new/Map", "views/property/new/New", "views/property/new/Join", "views/property/new/Picture", "views/property/new/Share", "i18n!nls/property", "i18n!nls/common", "templates/property/new/map", "templates/property/new/wizard"], function($, _, Parse, ActivityList, Activity, Property, Unit, Lease, Concierge, Alert, GMapView, NewPropertyView, JoinPropertyView, PicturePropertyView, SharePropertyView, i18nProperty, i18nCommon) {
     var PropertyWizardView, _ref;
 
     return PropertyWizardView = (function(_super) {
@@ -52,7 +52,8 @@
         this.listenTo(this.model, "invalid", function(error) {
           var args, fn, msg;
 
-          _this.$('button.next').removeProp("disabled");
+          _this.$('button.next').button('complete');
+          _this.$('button.join').button('complete');
           msg = error.message.indexOf(":") > 0 ? (args = error.message.split(":"), fn = args.pop(), i18nProperty.errors[fn](args[0])) : i18nProperty.errors[error.message];
           switch (error.message) {
             case 'title_missing':
@@ -109,8 +110,9 @@
           return;
         }
         this.$('.error').removeClass('error');
-        this.$('button.next').prop("disabled", true);
-        this.$('button.join').prop("disabled", true);
+        $().button('loading');
+        this.$('button.next').button('loading');
+        this.$('button.join').button('loading');
         this.state = 'join';
         this.existingProperty = existingProperty;
         this.form = new JoinPropertyView({
@@ -125,8 +127,8 @@
         var alert, concierge;
 
         this.$('.error').removeClass('error');
-        this.$('button.next').prop("disabled", true);
-        this.$('button.join').prop("disabled", true);
+        this.$('button.next').button('loading');
+        this.$('button.join').button('loading');
         concierge = new Concierge({
           property: existingProperty,
           profile: Parse.User.current().get("profile"),
@@ -150,8 +152,8 @@
           _this = this;
 
         this.$('.error').removeClass('error');
-        this.$('button.next').prop("disabled", true);
-        this.$('button.join').prop("disabled", true);
+        this.$('button.next').button('loading');
+        this.$('button.join').button('loading');
         switch (this.state) {
           case 'address':
             center = this.model.get("center");
@@ -197,9 +199,8 @@
                 });
                 _this.form.$el.after(_this.picture.render().el);
                 return _this.animate('forward');
-              }, function(error) {
-                _this.form.model.trigger("invalid", error);
-                return console.log(error);
+              }, function(lease, error) {
+                return _this.form.model.trigger("invalid", error);
               });
             } else {
               attrs = this.model.scrub(data.property);
@@ -212,9 +213,8 @@
                 });
                 _this.form.$el.after(_this.picture.render().el);
                 return _this.animate('forward');
-              }, function(error) {
-                _this.model.trigger("invalid", error);
-                return console.log(error);
+              }, function(property, error) {
+                return _this.model.trigger("invalid", error);
               });
             }
             break;
@@ -227,9 +227,8 @@
               });
               _this.picture.$el.after(_this.share.render().el);
               return _this.animate('forward');
-            }, function(error) {
-              _this.model.trigger("invalid", error);
-              return console.log(error);
+            }, function(property, error) {
+              return _this.model.trigger("invalid", error);
             });
           case 'share':
             data = this.share.$el.serializeObject();
@@ -250,6 +249,9 @@
                   title: _this.model.get("title"),
                   profile: Parse.User.current().get("profile"),
                   ACL: activityACL
+                }).then(function() {
+                  Parse.User.current().activity = Parse.User.current().activity || new ActivityList({}, []);
+                  return Parse.User.current().Activity.add(activity);
                 });
                 if (data.share.fb === "on" || data.share.fb === "1") {
                   if (_this.forNetwork) {
@@ -268,9 +270,8 @@
                 }
               }
               return _this.trigger("wizard:finish");
-            }, function(error) {
-              _this.model.trigger("invalid", error);
-              return console.log(error);
+            }, function(property, error) {
+              return _this.model.trigger("invalid", error);
             });
           case 'join':
             data = this.form.$el.serializeObject();
@@ -281,9 +282,8 @@
                 _this.trigger("lease:save", _this.form.model);
                 return _this.trigger("wizard:finish");
               },
-              error: function(error) {
-                _this.form.model.trigger("invalid", error);
-                return console.log(error);
+              error: function(lease, error) {
+                return _this.form.model.trigger("invalid", error);
               }
             });
         }
@@ -292,9 +292,6 @@
       PropertyWizardView.prototype.back = function(e) {
         if (this.state === 'address') {
           return;
-        }
-        if (this.state === 'property' || this.state === 'join') {
-          this.$('.back').prop("disabled", false);
         }
         return this.animate('backward');
       };
@@ -350,6 +347,7 @@
             switch (this.state) {
               case "property":
               case "join":
+                this.trigger("view:advance");
                 this.$('.back').removeProp("disabled");
                 this.map.$el.animate({
                   left: "-150%"
@@ -378,6 +376,7 @@
             switch (this.state) {
               case "property":
               case "join":
+                this.trigger("view:retreat");
                 this.map.$el.animate({
                   left: "0%"
                 }, 500);
@@ -385,9 +384,7 @@
                   left: "150%"
                 }, 500, 'swing', function() {
                   _this.form.clear();
-                  return _this.$('.back').prop({
-                    disabled: 'disabled'
-                  });
+                  return _this.$('.back').prop("disabled", true);
                 });
                 delete this.existingProperty;
                 this.state = 'address';
@@ -414,8 +411,18 @@
       };
 
       PropertyWizardView.prototype.buttonsForward = function() {
-        this.$('.next').removeProp("disabled");
-        return this.$('.join').removeProp("disabled");
+        this.$('.next').button('complete');
+        this.$('.join').button('complete');
+        switch (this.state) {
+          case "property":
+          case "join":
+          case "picture":
+            this.$('.next').html(i18nCommon.actions.next);
+            return this.$('.join').html(i18nCommon.actions.join);
+          case "share":
+            this.$('.next').html(i18nCommon.actions.finish);
+            return this.$('.join').html(i18nCommon.actions.join);
+        }
       };
 
       PropertyWizardView.prototype.clear = function() {

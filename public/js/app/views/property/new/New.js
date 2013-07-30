@@ -37,7 +37,7 @@
           });
         }
         vars = {
-          property: this.model.attributes,
+          property: this.model.toJSON(),
           i18nProperty: i18nProperty,
           i18nCommon: i18nCommon
         };

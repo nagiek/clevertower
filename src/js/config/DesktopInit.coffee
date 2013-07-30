@@ -365,9 +365,13 @@ require [
       # Should query for network when loading user... this is weird.
       # Set network on current user from loaded user.
       network = user.get "network"
-      @networkSetup(network) if network
+      if network
+        @set "network", network
+        @networkSetup() 
 
-  Parse.User::networkSetup = (network)->
+  Parse.User::networkSetup = ->
+
+    network = @get "network"
 
     # Create & fill our collections
     # Can't use a Promise here, as fetch does not return a promise.

@@ -37,11 +37,13 @@
       };
 
       ShowLeaseView.prototype.render = function() {
-        var isMgr, vars;
+        var isMgr, title, unit, vars;
 
         isMgr = Parse.User.current().get("network") && Parse.User.current().get("network").id === this.model.get("network").id;
+        unit = this.property.units.get(this.model.get("unit").id) || this.model.get("unit");
+        title = unit ? unit.get("title") : "";
         vars = _.merge(this.model.toJSON(), {
-          title: this.property.units.get(this.model.get("unit").id).get("title"),
+          title: title,
           tenants: false,
           isMgr: isMgr,
           start_date: moment(this.model.get("start_date")).format("LL"),
@@ -53,6 +55,9 @@
         });
         this.$el.html(JST["src/js/templates/lease/show.jst"](vars));
         this.$list = this.$('ul#tenants');
+        if (this.property.units.length === 0) {
+          this.property.units.fetch();
+        }
         if (this.model.tenants.length === 0) {
           this.model.tenants.fetch();
         } else {

@@ -18,28 +18,29 @@ define [
       'click .delete' : 'kill'
     
     initialize : (attrs) ->
-      _.bindAll 'this', 'render'
-      @profile = @model.get("profile")
       
-      @model.on "destroy", =>
-        @remove()
-        @undelegateEvents()
-        delete this
+      @listenTo @model, "destroy", @clear
   
     # Re-render the contents of the property item.
     render: ->
       status = @model.get 'status'
-      vars = _.merge @profile.toJSON(),
+      vars = _.merge @model.get("profile").toJSON(),
         i_status: i18nGroup.fields.status[status]
         status: status
-        url: @profile.cover 'thumb'
+        name: @model.get("profile").name()
+        url: @model.get("profile").cover 'thumb'
         i18nCommon: i18nCommon
         i18nGroup: i18nGroup
-        
-      vars.name = @profile.get("email") unless vars.name
+
       @$el.html JST["src/js/templates/profile/summary.jst"](vars)
       @
     
     kill: ->
       if confirm(i18nCommon.actions.confirm)
         @model.destroy()
+
+    clear: =>
+      @remove()
+      @undelegateEvents()
+      delete this
+      

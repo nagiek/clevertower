@@ -16,13 +16,15 @@
         this.propertiesNew = __bind(this.propertiesNew, this);
         this.movein = __bind(this.movein, this);
         this.insideManage = __bind(this.insideManage, this);
-        this.networkNew = __bind(this.networkNew, this);        _ref = DesktopRouter.__super__.constructor.apply(this, arguments);
+        this.networkNew = __bind(this.networkNew, this);
+        this.activityShow = __bind(this.activityShow, this);        _ref = DesktopRouter.__super__.constructor.apply(this, arguments);
         return _ref;
       }
 
       DesktopRouter.prototype.routes = {
         "": "index",
         "places/:country/:region/:city/:id/:slug": "propertiesPublic",
+        "outside/:id": "activityShow",
         "outside/*splat": "search",
         "outside": "search",
         "network/new": "networkNew",
@@ -57,12 +59,10 @@
         new UserMenuView().render();
         new NavMenuView().render();
         Parse.App.search = new SearchView().render();
-        this.listenTo(Parse.Dispatcher, "user:login", function(user) {
+        this.listenTo(Parse.Dispatcher, "user:login", function() {
           if (Parse.User.current().get("network") || Parse.User.current().get("property")) {
-            console.log('1');
             return Parse.history.loadUrl(location.pathname);
           } else {
-            console.log('2');
             return Parse.history.navigate("account/setup", true);
           }
         });
@@ -90,7 +90,6 @@
           }
           if (href.substring(0, 1) === '/' && href.substring(0, 2) !== '//') {
             e.preventDefault();
-            console.log('3');
             return Parse.history.navigate(href, true);
           }
         });
@@ -138,6 +137,36 @@
         });
       };
 
+      DesktopRouter.prototype.activityShow = function(id) {
+        var view,
+          _this = this;
+
+        view = this.view;
+        return require(["collections/ActivityList", "views/activity/Show"], function(ActivityList, ActivityShowView) {
+          var model;
+
+          Parse.App.activity = Parse.App.activity || new ActivityList([], {});
+          model = Parse.App.activity.get(id);
+          if (model) {
+            return _this.view = new ActivityShowView({
+              model: model
+            }).render();
+          } else {
+            return new Parse.Query("Activity").get(id, {
+              success: function(model) {
+                Parse.App.activity.add(model);
+                return _this.view = new ActivityShowView({
+                  model: model
+                }).render();
+              },
+              error: function(object, error) {
+                return _this.accessDenied();
+              }
+            });
+          }
+        });
+      };
+
       DesktopRouter.prototype.networkNew = function() {
         var view,
           _this = this;
@@ -173,6 +202,9 @@
               return this.propertiesManage(Parse.User.current().get("property").id, splat);
             } else {
               return require(["views/lease/Manage"], function(LeaseView) {
+                var vars;
+
+                vars = _this.deparamAction(splat);
                 if (!view || !(view instanceof LeaseView)) {
                   vars.model = Parse.User.current().get("lease");
                   return _this.view = new LeaseView(vars);
@@ -184,6 +216,8 @@
           } else {
             return Parse.history.navigate("account/setup", true);
           }
+        } else {
+          return Parse.history.navigate("account/login", true);
         }
       };
 
@@ -375,7 +409,7 @@
             return _this.view = new SignupView().render();
           });
         } else {
-          Parse.history.navigate("/users/" + (Parse.User.current().get("profile").id));
+          Parse.history.navigate("users/" + (Parse.User.current().get("profile").id));
           return this.profileShow();
         }
       };
@@ -388,7 +422,7 @@
             return _this.view = new LoginView().render();
           });
         } else {
-          Parse.history.navigate("/users/" + (Parse.User.current().get("profile").id));
+          Parse.history.navigate("users/" + (Parse.User.current().get("profile").id));
           return this.profileShow();
         }
       };
@@ -403,13 +437,12 @@
 
       DesktopRouter.prototype.logout = function() {
         if (Parse.User.current()) {
-          console.log("4");
           Parse.User.logOut();
           Parse.Dispatcher.trigger("user:change");
           Parse.Dispatcher.trigger("user:logout");
           return Parse.history.navigate("", true);
         } else {
-          return Parse.history.navigate("/account/login", true);
+          return Parse.history.navigate("account/login", true);
         }
       };
 
@@ -417,7 +450,6 @@
         var vars;
 
         if (Parse.User.current()) {
-          console.log('5');
           vars = this.deparam(window.location.hash.substring(1));
           if (!vars.error) {
             return $.ajax("https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=" + vars.access_token, {
@@ -471,8 +503,7 @@
             heading: i18nCommon.errors.fourOhFour,
             message: i18nCommon.errors.not_found
           });
-          console.log('5');
-          return Parse.history.navigate("/", true);
+          return Parse.history.navigate("", true);
         });
       };
 

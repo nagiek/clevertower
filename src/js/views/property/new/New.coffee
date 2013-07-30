@@ -33,7 +33,7 @@ define [
           website: Parse.User.current().get("network").get("website")
 
       vars = 
-        property: @model.attributes
+        property: @model.toJSON()
         i18nProperty: i18nProperty
         i18nCommon: i18nCommon
 

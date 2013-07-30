@@ -38,7 +38,9 @@ define [
       # Don't set the property on the lease, as we may not have access to it.
       @model = new Lease(forNetwork: false)
             
-      @listenTo @model, 'invalid', (error) =>
+      @listenTo @model, 'invalid', (error, second) =>
+        console.log error
+        console.log second
         @$('.error').removeClass('error')
         @$('button.save').removeProp "disabled"
 
@@ -88,9 +90,11 @@ define [
       # @el = "form.lease-form"
       # @$el = $("#content form.lease-form")
       @$unitSelect = @$('.unit-select')
+      @$unitSelect.append "<option class='new-unit-option' value='-1'>#{i18nUnit.constants.new_unit}</option>"
 
       # We will definitely be adding a new unit.
       @$unitSelect.val("-1").trigger("change")
+      @$('.new-unit').show()
           
       @$startDate = @$('.start-date')
       @$endDate = @$('.end-date')

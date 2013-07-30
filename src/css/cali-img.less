@@ -88,11 +88,25 @@ img[class*="span"] {
   }
 }
 
+.photo-grid6 {
+  width:460px - 10px;
+  img {
+    width:460px - 10px;
+  }
+}
+
 @media (min-width: 1200px) {
   .photo-grid4 {
     width:370px - 10px;
     img {
       width:370px - 10px;
+    }
+  }
+
+  .photo-grid6 {
+    width:570px - 10px;
+    img {
+      width:570px - 10px;
     }
   }
 }
@@ -106,11 +120,21 @@ img[class*="span"] {
       width:228px - 10px;
     }
   }
+
+  .photo-grid6 {
+    width:352px - 10px;
+    img {
+      width:352px - 10px;
+    }
+  }
 }
 
 @media (max-width: 767px) {
   .photo-grid4 {
     height:350px; // Take a guess, but must be fixed height.
+  }
+  .photo-grid4,
+  .photo-grid6 {
     width:100%;
     img {
       width:auto;

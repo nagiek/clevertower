@@ -913,10 +913,15 @@ Parse.Cloud.beforeSave "Lease", (req, res) ->
     # Have to use the master key to check the role.
     Parse.Cloud.useMasterKey()
     
-    (new Parse.Query "Property").include('mgrRole').include('network.role').get req.object.get("property").id,
+    (new Parse.Query "Property")
+    .include('role')
+    .include('mgrRole')
+    .include('network.role')
+    .get req.object.get("property").id,
     success: (property) ->
-      network = property.get("network")
-      mgrRole = property.get("mgrRole")
+      network = property.get "network"
+      mgrRole = property.get "mgrRole"
+      propRole = property.get "role"
 
       # Set default attributes
       req.object.set 

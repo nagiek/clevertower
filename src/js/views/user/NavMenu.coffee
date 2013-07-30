@@ -27,7 +27,10 @@ define [
     #   @listenTo Parse.User.current(), "change:network", @render
     #   @listenTo Parse.User.current().get("network"), "change:name", @render if Parse.User.current().get("network")
       
-    checkForLogin: -> $("#login-modal").modal() unless Parse.User.current()
+    checkForLogin: (e) ->
+      unless Parse.User.current()
+        $("#login-modal").modal()
+        e.preventDefault()
 
     render: =>  
       @$('#home-nav a').html i18nCommon.nouns.outside # i18nCommon.verbs.explore

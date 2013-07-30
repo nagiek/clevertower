@@ -24,7 +24,7 @@ define [
     pos : -> @collection.indexOf(@)
 
     # Index of model in its collection.
-    url : -> "/posts/#{@id}"
+    url : -> "/outside/#{@id}"
 
     validate: (attrs = {}, options = {}) ->
       # Check all attribute existence, as validate is called on set
@@ -54,8 +54,8 @@ define [
 
     title: ->
       switch @get "activity_type"
-        when "new_post", "new_listing" then @get("title")
-        when "new_property" then @get("property").get("title")
+        when "new_post", "new_listing", "new_property" then @get("title")
+        # when "new_property" then @get("property").get("title")
         when "new_photo" then @get("property").get("title")
         else false
 
