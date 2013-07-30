@@ -10,7 +10,7 @@ define [
     routes:
       ""                            : "index"
       "places/:country/:region/:city/:id/:slug" : "propertiesPublic"
-      "outside/:id"                 : "activityShow"
+      "posts/:id"                 : "activityShow"
       "outside/*splat"              : "search"
       "outside"                     : "search"
       # "inside"                      : "propertiesManage"

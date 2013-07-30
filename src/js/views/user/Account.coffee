@@ -23,9 +23,10 @@ define [
       @changeSubView attrs.path, attrs.params
     
     clear: =>
-      @stopListening()
       @undelegateEvents()
+      @stopListening()
       @subView.trigger "view:change" if @subView
+      Parse.history.navigate "", true
       delete this
 
     render: ->      

@@ -619,12 +619,13 @@ Parse.Cloud.beforeSave "Property", (req, res) ->
   unless req.object.get("center") 
     # Invalid address
     return res.error 'invalid_address'
-  else if ( 
-    req.object.get("thoroughfare"                ) is '' or 
-    req.object.get("locality"                    ) is '' or
-    req.object.get("administrative_area_level_1" ) is '' or
-    req.object.get("country"                     ) is '' or
-    req.object.get("postal_code"                 ) is ''
+  else unless ( 
+    req.object.get("thoroughfare"            ) and # is '' or 
+    req.object.get("locality"                    ) and # is '' or
+      ( req.object.get("administrative_area_level_1" ) or
+        req.object.get("administrative_area_level_2" ) ) and # is '' or
+    req.object.get("country"                     ) and # is '' or
+    req.object.get("postal_code"                 )     # is ''
   )
     # Insufficient data
     return res.error 'insufficient_data'

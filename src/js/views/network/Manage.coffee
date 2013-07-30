@@ -26,7 +26,7 @@ define [
 
       @listenTo Parse.Dispatcher, "user:logout", @clear
       
-      @listenTo @model, 'destroy', -> Parse.Dispatcher.trigger "user:logout"
+      @listenTo @model, 'destroy', @clear
       
       # Render immediately, as we will display a subview
       @render()
@@ -35,6 +35,8 @@ define [
     clear: =>
       @undelegateEvents()
       @stopListening()
+      @subView.trigger "view:change" if @subView
+      Parse.history.navigate "", true
       delete this
 
     # Re-render the contents of the property item.

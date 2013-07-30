@@ -601,7 +601,7 @@
 
     if (!req.object.get("center")) {
       return res.error('invalid_address');
-    } else if (req.object.get("thoroughfare") === '' || req.object.get("locality") === '' || req.object.get("administrative_area_level_1") === '' || req.object.get("country") === '' || req.object.get("postal_code") === '') {
+    } else if (!(req.object.get("thoroughfare") && req.object.get("locality") && (req.object.get("administrative_area_level_1") || req.object.get("administrative_area_level_2")) && req.object.get("country") && req.object.get("postal_code"))) {
       return res.error('insufficient_data');
     } else if (!req.object.get("title")) {
       return res.error('title_missing');

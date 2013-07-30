@@ -24,14 +24,12 @@ define [
     pos : -> @collection.indexOf(@)
 
     # Index of model in its collection.
-    url : -> "/outside/#{@id}"
+    url : -> "/posts/#{@id}"
 
     validate: (attrs = {}, options = {}) ->
       # Check all attribute existence, as validate is called on set
       # and save, and may not have the attributes in question.
       if attrs.start_date and attrs.end_date 
-        if attrs.start_date is '' or attrs.end_date is ''
-          return message: 'dates_missing'
         if moment(attrs.start_date).isAfter(attrs.end_date)
           return message: 'dates_incorrect'
       if attrs.unit

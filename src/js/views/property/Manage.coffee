@@ -107,7 +107,8 @@ define [
     clear: =>
       @undelegateEvents()
       @stopListening()
-      Parse.history.navigate "/", true
+      @subView.trigger "view:change" if @subView
+      Parse.history.navigate "", true
       delete this
     
     editProfilePicture: ->

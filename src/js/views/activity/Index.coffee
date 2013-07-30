@@ -849,14 +849,14 @@ define [
 
     withinBounds : (center) ->
 
-      lat = center._latitude
-      lng = center._longitude
+      lat = center.latitude
+      lng = center.longitude
 
       # Determine if it is within the box.
-      @sw._latitude < lat and
-        lat < @ne._latitude and 
-        @sw._longitude < lng and 
-        lng < @ne._longitude
+      @sw.latitude < lat and
+        lat < @ne.latitude and 
+        @sw.longitude < lng and 
+        lng < @ne.longitude
 
 
     # Model-specific

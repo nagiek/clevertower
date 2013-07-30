@@ -52,8 +52,7 @@
         this.listenTo(this.model, "invalid", function(error) {
           var args, fn, msg;
 
-          _this.$('button.next').button('complete');
-          _this.$('button.join').button('complete');
+          _this.buttonsForward();
           msg = error.message.indexOf(":") > 0 ? (args = error.message.split(":"), fn = args.pop(), i18nProperty.errors[fn](args[0])) : i18nProperty.errors[error.message];
           switch (error.message) {
             case 'title_missing':
@@ -157,11 +156,11 @@
         switch (this.state) {
           case 'address':
             center = this.model.get("center");
-            if (center._latitude === 0 && center._longitude === 0) {
+            if (center.latitude === 0 && center.longitude === 0) {
               return this.model.trigger("invalid", {
                 message: 'invalid_address'
               });
-            } else if (!(this.model.get("thoroughfare") && this.model.get("locality") && this.model.get("administrative_area_level_1") && this.model.get("country") && this.model.get("postal_code"))) {
+            } else if (!(this.model.get("thoroughfare") && this.model.get("locality") && (this.model.get("administrative_area_level_1") || this.model.get("administrative_area_level_2")) && this.model.get("country") && this.model.get("postal_code"))) {
               return this.model.trigger("invalid", {
                 message: 'insufficient_data'
               });
@@ -199,7 +198,7 @@
                 });
                 _this.form.$el.after(_this.picture.render().el);
                 return _this.animate('forward');
-              }, function(lease, error) {
+              }, function(error) {
                 return _this.form.model.trigger("invalid", error);
               });
             } else {
@@ -213,7 +212,7 @@
                 });
                 _this.form.$el.after(_this.picture.render().el);
                 return _this.animate('forward');
-              }, function(property, error) {
+              }, function(error) {
                 return _this.model.trigger("invalid", error);
               });
             }
@@ -227,7 +226,7 @@
               });
               _this.picture.$el.after(_this.share.render().el);
               return _this.animate('forward');
-            }, function(property, error) {
+            }, function(error) {
               return _this.model.trigger("invalid", error);
             });
           case 'share':
@@ -246,12 +245,12 @@
                   center: _this.model.get("center"),
                   property: _this.model,
                   network: Parse.User.current().get("network"),
-                  title: _this.model.get("title"),
+                  title: data.activity.title,
                   profile: Parse.User.current().get("profile"),
                   ACL: activityACL
                 }).then(function() {
                   Parse.User.current().activity = Parse.User.current().activity || new ActivityList({}, []);
-                  return Parse.User.current().Activity.add(activity);
+                  return Parse.User.current().activity.add(activity);
                 });
                 if (data.share.fb === "on" || data.share.fb === "1") {
                   if (_this.forNetwork) {
@@ -270,7 +269,7 @@
                 }
               }
               return _this.trigger("wizard:finish");
-            }, function(property, error) {
+            }, function(error) {
               return _this.model.trigger("invalid", error);
             });
           case 'join':
@@ -282,7 +281,7 @@
                 _this.trigger("lease:save", _this.form.model);
                 return _this.trigger("wizard:finish");
               },
-              error: function(lease, error) {
+              error: function(error) {
                 return _this.form.model.trigger("invalid", error);
               }
             });
@@ -414,13 +413,11 @@
         this.$('.next').button('complete');
         this.$('.join').button('complete');
         switch (this.state) {
-          case "property":
-          case "join":
-          case "picture":
-            this.$('.next').html(i18nCommon.actions.next);
-            return this.$('.join').html(i18nCommon.actions.join);
           case "share":
             this.$('.next').html(i18nCommon.actions.finish);
+            return this.$('.join').html(i18nCommon.actions.join);
+          default:
+            this.$('.next').html(i18nCommon.actions.next);
             return this.$('.join').html(i18nCommon.actions.join);
         }
       };

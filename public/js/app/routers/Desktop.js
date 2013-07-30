@@ -24,7 +24,7 @@
       DesktopRouter.prototype.routes = {
         "": "index",
         "places/:country/:region/:city/:id/:slug": "propertiesPublic",
-        "outside/:id": "activityShow",
+        "posts/:id": "activityShow",
         "outside/*splat": "search",
         "outside": "search",
         "network/new": "networkNew",

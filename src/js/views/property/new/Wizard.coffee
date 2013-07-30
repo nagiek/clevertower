@@ -54,8 +54,7 @@ define [
         @clear()
 
       @listenTo @model, "invalid", (error) =>
-        @$('button.next').button('complete')
-        @$('button.join').button('complete')
+        @buttonsForward()
 
         msg = if error.message.indexOf(":") > 0  
           args = error.message.split ":"
@@ -131,11 +130,12 @@ define [
       switch @state
         when 'address'
           center = @model.get "center"
-          if center._latitude is 0 and center._longitude is 0
+          if center.latitude is 0 and center.longitude is 0
             @model.trigger "invalid", {message: 'invalid_address'}
           else unless @model.get("thoroughfare"            ) and # is '' or 
                        @model.get("locality"                    ) and # is '' or
-                       @model.get("administrative_area_level_1" ) and # is '' or
+                         ( @model.get("administrative_area_level_1" ) or
+                           @model.get("administrative_area_level_2" ) ) and # is '' or
                        @model.get("country"                     ) and # is '' or
                        @model.get("postal_code"                 )     # is ''
             @model.trigger "invalid", {message: 'insufficient_data'}
@@ -169,7 +169,7 @@ define [
               @picture = new PicturePropertyView wizard: @, model: @model
               @form.$el.after @picture.render().el
               @animate 'forward'
-            , (lease, error) => @form.model.trigger "invalid", error
+            , (error) => @form.model.trigger "invalid", error
 
           else 
             attrs = @model.scrub data.property
@@ -179,7 +179,7 @@ define [
               @picture = new PicturePropertyView wizard: @, model: @model
               @form.$el.after @picture.render().el
               @animate 'forward'
-            , (property, error) => @model.trigger "invalid", error
+            , (error) => @model.trigger "invalid", error
 
         when 'picture'
           @model.save().then (property) => 
@@ -187,7 +187,7 @@ define [
             @share = new SharePropertyView wizard: @, model: @model
             @picture.$el.after @share.render().el
             @animate 'forward'
-          , (property, error) => @model.trigger "invalid", error
+          , (error) => @model.trigger "invalid", error
 
         when 'share'
           data = @share.$el.serializeObject()
@@ -205,12 +205,12 @@ define [
                 center: @model.get "center"
                 property: @model
                 network: Parse.User.current().get("network")
-                title: @model.get "title"
+                title: data.activity.title
                 profile: Parse.User.current().get("profile")
                 ACL: activityACL
               .then ->
                 Parse.User.current().activity = Parse.User.current().activity || new ActivityList {}, []
-                Parse.User.current().Activity.add activity
+                Parse.User.current().activity.add activity
 
               # Share on FB?
               if data.share.fb is "on" or data.share.fb is "1"
@@ -230,7 +230,7 @@ define [
                   (response) -> console.log response
 
             @trigger "wizard:finish"
-          , (property, error) => @model.trigger "invalid", error
+          , (error) => @model.trigger "invalid", error
 
 
         # Join steps
@@ -242,8 +242,8 @@ define [
           attrs = @assignAdditionalToLease data, attrs
           
           @form.model.save attrs,
-            success: (lease) =>      @trigger "lease:save", @form.model; @trigger "wizard:finish"
-            error: (lease, error) => @form.model.trigger "invalid", error
+            success: (lease) => @trigger "lease:save", @form.model; @trigger "wizard:finish"
+            error: (error) =>   @form.model.trigger "invalid", error
 
     back : (e) =>
       return if @state is 'address'
@@ -337,11 +337,11 @@ define [
       @$('.next').button('complete') # .removeProp "disabled"
       @$('.join').button('complete') # .removeProp "disabled"
       switch @state
-        when "property", "join", "picture"
-          @$('.next').html i18nCommon.actions.next
-          @$('.join').html i18nCommon.actions.join
         when "share"
           @$('.next').html i18nCommon.actions.finish
+          @$('.join').html i18nCommon.actions.join
+        else
+          @$('.next').html i18nCommon.actions.next
           @$('.join').html i18nCommon.actions.join
 
     clear : =>
