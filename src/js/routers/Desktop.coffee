@@ -154,23 +154,38 @@ define [
             else
               view.changeSubView(vars.path, vars.params)
         else if Parse.User.current().get("property")
-          # If we can see the mgrRole, we must be part of it.
-          # Yes, this looks strange, but it works.
-          # 
-          # TODO: Or does it? Can't see propRole either. Check "AddTenants" function.
-          if Parse.User.current().get("property").get("mgrRole")
-            # Parse.User.current().get("property").get("mgrRole").getUsers().query().get Parse.User.current().id,
-            # success: =>
-            @propertiesManage Parse.User.current().get("property").id, splat
-          else
-          # error: =>
-            require ["views/lease/Manage"], (LeaseView) => 
-              vars = @deparamAction splat
-              if !view or view !instanceof LeaseView
-                vars.model = Parse.User.current().get("lease")
-                @view = new LeaseView(vars)
-              else
-                view.changeSubView(vars.path, vars.params)
+          if Parse.User.current().get("property").mgr is undefined
+            Parse.User.current().get("property").get("mgrRole").getUsers().query().get Parse.User.current().id,
+              success: (user) =>
+                if user
+                  Parse.User.current().get("property").mgr = true
+                  @propertiesManage Parse.User.current().get("property").id, splat
+                else
+                  Parse.User.current().get("property").mgr = false
+                  require ["views/lease/Manage"], (LeaseView) => 
+                    vars = @deparamAction splat
+                    if !view or view !instanceof LeaseView
+                      vars.model = Parse.User.current().get("lease")
+                      @view = new LeaseView(vars)
+                    else
+                      view.changeSubView(vars.path, vars.params)
+              error: (error) =>
+                Parse.User.current().get("property").mgr = false
+          else 
+            # Cached answer
+            if Parse.User.current().get("property").mgr
+              # Parse.User.current().get("property").get("mgrRole").getUsers().query().get Parse.User.current().id,
+              # success: =>
+              @propertiesManage Parse.User.current().get("property").id, splat
+            else
+            # error: =>
+              require ["views/lease/Manage"], (LeaseView) => 
+                vars = @deparamAction splat
+                if !view or view !instanceof LeaseView
+                  vars.model = Parse.User.current().get("lease")
+                  @view = new LeaseView(vars)
+                else
+                  view.changeSubView(vars.path, vars.params)
         else 
           Parse.history.navigate "account/setup", true
           # @accountSetup()

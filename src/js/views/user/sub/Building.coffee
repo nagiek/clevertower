@@ -48,11 +48,13 @@ define [
       @$rList = @$("#roommates")
 
       if Parse.User.current().get("property")
-        if Parse.User.current().get("property").tenants.length > 0 then @addAll 
+        if Parse.User.current().get("property").tenants.length > 0 then @addAll()
         else Parse.User.current().get("property").tenants.fetch()
       @
 
     addAll: =>
+
+      console.log Parse.User.current().get("property").tenants
 
       @$tList.html ""
       @$rList.html ""

@@ -1,12 +1,12 @@
 <div id="lease" class="container">
-  <div class="page-header clearfix">    
+  <div class="clearfix">    
     <div class="photo photo-thumbnail photo-elastic pull-left tablet-left">
       <a href="<%= baseUrl %>">
         <img src="<%= cover %>" alt="Profile" class="img-rounded profile-picture">
       </a>
     </div>
     
-    <header class="header photo-float thumbnail-float elastic-float">
+    <header class="header page-header photo-float thumbnail-float elastic-float">
 
       <% if (!hasNetwork) { %>
         <a href="/network/new" class="pull-right btn tablet-hidden phone-hidden"><i class="icon-arrow-up"></i><%= i18nCommon.actions.upgrade %></a>

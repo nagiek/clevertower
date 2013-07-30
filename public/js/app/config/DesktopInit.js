@@ -263,9 +263,7 @@
           return _this.notifications.add(notifs);
         });
         _this.set("lease", user.get("lease"));
-        if (user.get("unit")) {
-          _this.set("unit", new Unit(user.get("unit").attributes));
-        }
+        _this.set("unit", user.get("unit"));
         _this.set("property", user.get("property"));
         network = user.get("network");
         if (network) {

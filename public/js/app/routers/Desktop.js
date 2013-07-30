@@ -198,20 +198,47 @@
               }
             });
           } else if (Parse.User.current().get("property")) {
-            if (Parse.User.current().get("property").get("mgrRole")) {
-              return this.propertiesManage(Parse.User.current().get("property").id, splat);
-            } else {
-              return require(["views/lease/Manage"], function(LeaseView) {
-                var vars;
+            if (Parse.User.current().get("property").mgr === void 0) {
+              return Parse.User.current().get("property").get("mgrRole").getUsers().query().get(Parse.User.current().id, {
+                success: function(user) {
+                  if (user) {
+                    Parse.User.current().get("property").mgr = true;
+                    return _this.propertiesManage(Parse.User.current().get("property").id, splat);
+                  } else {
+                    Parse.User.current().get("property").mgr = false;
+                    return require(["views/lease/Manage"], function(LeaseView) {
+                      var vars;
 
-                vars = _this.deparamAction(splat);
-                if (!view || !(view instanceof LeaseView)) {
-                  vars.model = Parse.User.current().get("lease");
-                  return _this.view = new LeaseView(vars);
-                } else {
-                  return view.changeSubView(vars.path, vars.params);
+                      vars = _this.deparamAction(splat);
+                      if (!view || !(view instanceof LeaseView)) {
+                        vars.model = Parse.User.current().get("lease");
+                        return _this.view = new LeaseView(vars);
+                      } else {
+                        return view.changeSubView(vars.path, vars.params);
+                      }
+                    });
+                  }
+                },
+                error: function(error) {
+                  return Parse.User.current().get("property").mgr = false;
                 }
               });
+            } else {
+              if (Parse.User.current().get("property").mgr) {
+                return this.propertiesManage(Parse.User.current().get("property").id, splat);
+              } else {
+                return require(["views/lease/Manage"], function(LeaseView) {
+                  var vars;
+
+                  vars = _this.deparamAction(splat);
+                  if (!view || !(view instanceof LeaseView)) {
+                    vars.model = Parse.User.current().get("lease");
+                    return _this.view = new LeaseView(vars);
+                  } else {
+                    return view.changeSubView(vars.path, vars.params);
+                  }
+                });
+              }
             }
           } else {
             return Parse.history.navigate("account/setup", true);

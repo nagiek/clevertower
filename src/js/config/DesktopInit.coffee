@@ -354,12 +354,12 @@ require [
       # Living.
       @set "lease", user.get "lease"
       # Need to get the Unit functions when managing our lease.
-      if user.get("unit")
-        @set "unit", new Unit(user.get("unit").attributes)
+      @set "unit", user.get "unit"
+      # if user.get("unit") then @set "unit", new Unit(user.get("unit").attributes)
+
       # Need Property methods for posting
-      # if user.get("property")
-      #   @set "property", new Property(user.get("property").attributes)
       @set "property", user.get "property"
+      # if user.get("property") then @set "property", new Property(user.get("property").attributes)
 
       # Load the network regardless if we are on a subdomain or not, as we need the link.
       # Should query for network when loading user... this is weird.
