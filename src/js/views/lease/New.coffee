@@ -168,6 +168,7 @@ define [
           if @property.units.where(property: @property).length is 0 then @property.units.fetch() else @addAll()
         else
           if Parse.User.current().get("network").units.length is 0 then Parse.User.current().get("network").units.fetch() else @addAll()
+
       @
 
     addOne : (u) =>
@@ -182,8 +183,13 @@ define [
       @$unitSelect.html "<option value=''>#{i18nCommon.form.select.select_value}</option>" # if @$unitSelect.children().length > 2
 
       if @property
-        _.each @property.units.where(property: @property), @addOne
-        @$unitSelect.append "<option class='new-unit-option' value='-1'>#{i18nUnit.constants.new_unit}</option>"
+        units = @property.units.where(property: @property)
+        _.each units, @addOne
+        if @modal or units.length is 0 
+          selected = ' selected="selected"' 
+          @$('.new-unit').show()
+        else selected = ""
+        @$unitSelect.append "<option class='new-unit-option' value='-1'#{selected}>#{i18nUnit.constants.new_unit}</option>"
       else
         # Group by property.
         properties = Parse.User.current().get("network").units.groupBy (u) -> u.get("property").id

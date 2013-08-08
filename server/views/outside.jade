@@ -1,0 +1,47 @@
+extends layout
+
+block fbTags
+  meta(property='og:description', content='#{desc}')
+  meta(property='og:url', content='clevertower.com/outside#{location}')
+  meta(property='og:image', content='/img/city#{location}.jpg')
+  meta(property='og:type', content='clevertower:city')
+
+block content
+  .container
+    .row
+      #city.span8
+        if city
+          .fade.in(style='background-image: url(\'/img/city#{location}.jpg\');')
+            button.close(type='button', data-dismiss='alert') ×
+            .row
+              h1.span3= name
+              p.span4= desc
+      .pull-right.span4
+        .row
+          .span4
+            form#activity-filter-form.well.well-small
+              #general-controls
+                .control-group.center
+                  .controls
+                    #filters.btn-group(data-toggle='buttons-radio')
+                      button.btn.active(type='button') All
+                      button.btn(data-filter='new_listing', type='button', rel='tooltip', data-original-title='Listing')
+                        i.icon.icon-listing
+                      button.btn(data-filter='new_property', type='button', rel='tooltip', data-original-title='Building')
+                        i.icon.icon-building
+                      button.btn(data-filter='new_post', type='button', rel='tooltip', data-original-title='Posts')
+                        i.icon.icon-status
+              #specific-controls.form-horizontal
+          #map-container.pull-right.span4
+            .position-relative
+              button#search-map.btn.btn-google-maps(type='button', rel='tooltip', title='', data-original-title='Redo search')
+                i.icon.icon-repeat
+              #mapCanvas
+      .span8.content
+        #activities.thumbnails
+          .list-view.span4
+          .list-view.span4
+        .loading.center No one has posted any thing here yet.
+        .pagination
+          ul
+  #view-content-modal.modal.modal-wide.modal-picture.hide

@@ -420,7 +420,7 @@
   function convertToItem(listView, possibleItem, prepend) {
     var item;
     if(possibleItem instanceof ListItem) { 
-      updateCoords(possibleItem, listView.height);
+      cacheCoordsFor(listView, possibleItem, prepend);
       return possibleItem;
     }
     if(typeof possibleItem === 'string') possibleItem = $(possibleItem);

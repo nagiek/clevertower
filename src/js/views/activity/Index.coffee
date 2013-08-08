@@ -83,6 +83,7 @@ define [
         @$loading.html i18nCommon.activity.exhausted
 
       @on "view:empty", =>
+        console.log "view:empty"
         @moreToDisplay = false
         @$loading.html i18nListing.listings.empty.index
 
@@ -99,7 +100,7 @@ define [
 
       # Activity that we find on the map.
       unless Parse.App.activity
-        Parse.App.activity = new ActivityList([], {})
+        Parse.App.activity = new ActivityList [], {}
         Parse.App.activity.query
         .include("property")
         .containedIn("activity_type", ["new_property", "new_listing", "new_post"])
@@ -469,7 +470,7 @@ define [
     searchMap : =>
       center = @map.getCenter()
       @locationAppend = "?lat=#{center.lat()}&lng=#{center.lng()}"
-      Parse.history.navigate "/outside/#{@location}#{@locationAppend}"
+      Parse.history.navigate "/outside" + (if @location then "/#{@location}" else "") + @locationAppend
       @performSearchWithinMap()
 
     performSearchWithinMap: =>
@@ -617,6 +618,9 @@ define [
 
       # item = new infinity.ListItem view.render().$el
       item = new infinity.ListItem @renderTemplate(a, liked, true, a.get("property").pos())
+
+      console.log item
+
       item.marker = a.get("property").marker
       a.get("property").marker.items.push item
       @listViews[@shortestColumnIndex()].append item
@@ -694,6 +698,9 @@ define [
         userCountQuery.limit(-1).skip(0)
 
         if Parse.User.current().get("property")
+
+          console.log Parse.User.current().get("property").shown
+
           # Visibility counter
           if Parse.User.current().get("property").shown is true
             userCountQuery.containedIn "property", Parse.User.current().get("property")
@@ -703,9 +710,13 @@ define [
 
         else if Parse.User.current().get("network")
 
-          properties = Parse.User.current().get("network").properties.map (p) -> p.shown is true
+          properties = Parse.User.current().get("network").properties.filter (p) -> p.shown is true
           userCountQuery.containedIn "property", properties
+          console.log userCountQuery
+          console.log properties
           userCounting = userCountQuery.count()
+
+        console.log userCountQuery
 
       else 
         userCounting = undefined
@@ -714,6 +725,8 @@ define [
       .when(counting, userCounting)
       .then (count, userCount) =>
         # remaining pages
+        console.log userCount
+
         userCount = 0 unless userCount
         @pages = Math.ceil((count + userCount)/ @resultsPerPage)
         # @$pagination.html ""
@@ -732,7 +745,10 @@ define [
               Parse.User.current().get("network").properties.each (p) -> 
                 collectionLength += pCount[p.id] if p.shown is true
 
-          if count + userCount < collectionLength 
+          console.log count + userCount
+          console.log collectionLength
+
+          if count + userCount <= collectionLength 
             @trigger "view:exhausted"
         #   @renderPaginiation()
           

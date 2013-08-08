@@ -13,6 +13,7 @@ define
     account:                    "Account"
     privacy:                    "Privacy"
     apps:                       "Apps"
+    connect_to_continue:        "Connect to continue"
     account_settings:           "Account settings"
     privacy_settings:           "Privacy settings"
     profile_menu:               "Profile menu"

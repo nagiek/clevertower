@@ -106,6 +106,12 @@ ul.inline, ol.inline {
   -webkit-column-gap: 10px;
   column-count: 3;
   column-gap: 10px;
+
+  // Move margin of list-items to the list-items themselves.
+  margin-left: 0;
+  > li {
+    margin-left: 25px;
+  }
 }
 .two-column {
   -moz-column-count: 2;
@@ -114,6 +120,12 @@ ul.inline, ol.inline {
   -webkit-column-gap: 10px;
   column-count: 2;
   column-gap: 10px;
+
+  // Move margin to the list-items themselves.
+  margin-left: 0;
+  > li {
+    margin-left: 25px;
+  }
 }
 
 @media (max-width: 767px) { 
@@ -138,8 +150,6 @@ ul.inline, ol.inline {
     column-gap: 0;
   }
 }
-
-
 
 .display-block {
   display:block;

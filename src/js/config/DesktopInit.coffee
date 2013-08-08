@@ -269,7 +269,7 @@ require [
 
   Parse.App.cities = 
     "Montreal--QC--Canada": 'Originally called Ville-Marie, or "City of Mary", it is named after Mount Royal, the triple-peaked hill located in the heart of the city.'
-    "Toronto--ON--Canada": 'Canada’s most cosmopolitan city is situated on beautiful Lake Ontario, and is the cultural heart of south central Ontario and of English-speaking Canada. '
+    "Toronto--ON--Canada": 'Canada’s most cosmopolitan city is situated on beautiful Lake Ontario, and is the cultural heart of south central Ontario and of English-speaking Canada.'
 
 
   # Bootstrap

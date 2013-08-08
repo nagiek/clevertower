@@ -22,20 +22,34 @@ define [
         @$('.error').removeClass('error')
         @$('button.save').removeProp "disabled"
         new Alert(event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success')
-    
-    FBlink: (e) ->
+        
+    FBlink: (e) =>
       e.preventDefault()
       unless Parse.User.current()._isLinked("facebook")
-        Parse.FacebookUtils.link Parse.User.current(), Parse.App.fbPerms, success:
-          @$(".facebook-group controls").html "<span class='btn active linked'>#{i18nCommon.adjectives.linked}</span>" +
+        Parse.FacebookUtils.link Parse.User.current(), Parse.App.fbPerms, 
+        success: =>
+          @$("#fb-link").button("complete")
+          @$("#fb-link").html i18nCommon.actions.link
+          @$(".facebook-group .controls").html "<span class='btn active linked'>#{i18nCommon.adjectives.linked}</span>" +
             "<span></span>" +
             "<button id='fb-unlink' class='btn revoke btn-danger'>#{i18nCommon.actions.revoke_access}</button>"
+        error: =>
+          @$("#fb-link").button("complete")
+          @$("#fb-link").html i18nCommon.actions.link
+          new Alert(event: 'facebook-link', fade: false, message: i18nCommon.errors.unknown, type: 'error')
 
-    FBunlink: (e) ->
+    FBunlink: (e) =>
       e.preventDefault()
       if Parse.User.current()._isLinked("facebook")
-        Parse.FacebookUtils.unlink Parse.User.current(), success: 
-          @$(".facebook-group controls").html "<button id='fb-link' class='btn'>#{i18nCommon.actions.link}</button>"
+        Parse.FacebookUtils.unlink Parse.User.current(), 
+        success: =>
+          @$("#fb-unlink").button("complete")
+          @$("#fb-unlink").html i18nCommon.actions.unlink
+          @$(".facebook-group .controls").html "<button id='fb-link' class='btn'>#{i18nCommon.actions.link}</button>"
+        error: =>
+          @$("#fb-unlink").button("complete")
+          @$("#fb-unlink").html i18nCommon.actions.unlink
+          new Alert(event: 'facebook-link', fade: false, message: i18nCommon.errors.unknown, type: 'error')
             
     render: =>
       vars =

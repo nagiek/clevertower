@@ -41,7 +41,8 @@ define [
       # Share options
       "change #post-as-property"        : "togglePostAsProperty"
       "change #post-private"            : "togglePostPrivate"
-      "change #fbShare"                 : "checkShareOnFacebook"
+      # Original from BaseNewActivityView.
+      "toggle:on .facebook-group .toggle": "checkShareOnFacebook"
     
     initialize: (attrs) ->
 
@@ -70,7 +71,7 @@ define [
       else @model.set "profile", Parse.User.current().get("profile")
 
     togglePostPrivate: ->
-      if $(this).is(":checked") then @model.set("public", false) else @model.set("public", true)
+      if @$("#post-private").is(":checked") then @model.set("public", false) else @model.set("public", true)
 
     toggleTime: ->
       unless @model.get "isEvent"
@@ -107,7 +108,7 @@ define [
       @model.set "center", new Parse.GeoPoint(center.lat(), center.lng())
 
     toggleBuildingActivity: ->
-      return if @empty
+      return unless @hasProperty
       unless @model.get "property"
         @showActivityForm()
         @$('#add-property').addClass 'active'
@@ -122,7 +123,7 @@ define [
         @$("#post-as-property").prop "checked", false 
         @model.set "profile", Parse.User.current().get("profile")
         # Post publicly
-        @$("#post-public").prop "checked", false 
+        @$("#post-private").prop "checked", true
         @model.set "public", true
       @trigger "view:resize"
 
@@ -147,7 +148,7 @@ define [
         @handleNoProperty()
 
     handleNoProperty : ->
-      @empty = true
+      @hasProperty = false
       # Set to building-type, to show the user that they still need to join/add a property
       # @$("#activity-type :nth-child(4) input").prop('checked', true)
       # @$("#activity-input-caret").data "position", 3
@@ -173,12 +174,13 @@ define [
         if Parse.User.current().get("network").properties.length > 0 then @handlePropertyAdd()
         else 
           @handleNoProperty()
+          # We have just created a network, therefore add the listeners.
           @listenTo Parse.User.current().get("network").properties, "add", @handlePropertyAdd
       else if Parse.User.current().get("property")
         @handlePropertyAdd()
 
     handlePropertyAdd : ->
-      @empty = false
+      @hasProperty = true
       # @changeActivityType()
       # @$("#centered-on-property").parent().remove("p.empty")
 
@@ -201,11 +203,11 @@ define [
       @listenTo @model, "change:image", @renderImage
 
       @listenTo @model, "change:property", =>
+
         if @model.get "property"
 
           # We are private by default when posting to the property. Adjust model accordingly.
           @togglePostPrivate()
-
           @$("#activity-profile-pic").prop "src", @model.get("property").cover("tiny") unless @model.get "profile"
           @marker.setVisible false
           @$('#property-options').removeClass 'hide'
@@ -239,10 +241,11 @@ define [
         visible:    false
         title:      "Select where you want to place this activity."
 
-      @empty = false
+      @hasProperty = true
 
       vars = 
         profilePic: Parse.User.current().get("profile").cover("tiny")
+        fbLinked: Parse.User.current()._isLinked("facebook")
         i18nCommon: i18nCommon
         i18nProperty: i18nProperty
 
@@ -353,13 +356,13 @@ define [
       return if @shown
       @shown = true
       @$('#activity-options').removeClass 'hide'
-      # if @empty then @$("#centered-on-property").prop("disabled", true)
+      # if @hasProperty then @$("#centered-on-property").prop("disabled", true)
       @marker.bindTo 'position', @view.map, 'center'
       @marker.setVisible true
       $("#redo-search").prop('checked', false).trigger("change") if $("#redo-search").is(":checked")
       @trigger "view:resize"
 
-      unless @empty
+      if @hasProperty
         @$(".no-property").addClass "hide"
         @$(".title-group").removeClass "hide"
         # @$("#activity-title").removeProp 'disabled'

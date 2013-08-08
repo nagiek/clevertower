@@ -11,10 +11,6 @@ module.exports = (_app) ->
   return controller
 
 
-
-
-
-
 # RESTful service routes
 # ----------------------
 
@@ -41,3 +37,16 @@ controller.listing = (req, res) ->
     if (listing) then res.render 'listing', listing: listing.toJSON()
     else error: message: 'access_denied'
   error: -> error: message: 'access_denied'
+
+# Listing
+controller.outside = (req, res) ->
+
+  cities = 
+    "Montreal--QC--Canada": 'Originally called Ville-Marie, or "City of Mary", it is named after Mount Royal, the triple-peaked hill located in the heart of the city.'
+    "Toronto--ON--Canada": 'Canada’s most cosmopolitan city is situated on beautiful Lake Ontario, and is the cultural heart of south central Ontario and of English-speaking Canada.'
+
+  if cities[req.params.location] isnt ""
+    name = req.params.location.split("--")[0]
+    res.render 'outside', city: true, location: "/" + req.params.location, desc: cities[req.params.location], name: name
+  else
+   res.render 'outside', city: false, location: "", desc: ""

@@ -16,6 +16,7 @@ module.exports = (app) ->
   app.get '/public/:propertyId/listing/:id' , nodes.listing
   app.get '/public/:id'                     , nodes.property
   app.get '/networks/:id'                   , nodes.network
+  app.get '/outside/:location'              , nodes.outside
 
   # Everything else
   app.get '*', (req, res) ->

@@ -38,13 +38,6 @@
         if (this.forNetwork) {
           this.model.set("network", Parse.User.current().get("network"));
         }
-        this.map = new GMapView({
-          wizard: this,
-          model: this.model,
-          forNetwork: this.forNetwork
-        });
-        this.listenTo(this.map, "property:join", this.join);
-        this.listenTo(this.map, "property:manage", this.manage);
         this.listenTo(Parse.Dispatcher, 'user:logout', function() {
           Parse.history.navigate("/", true);
           return this.clear();
@@ -95,11 +88,14 @@
           setup: !Parse.User.current() || (!Parse.User.current().get("property") && !Parse.User.current().get("network"))
         };
         this.$el.html(JST['src/js/templates/property/new/wizard.jst'](vars));
-        this.share = new SharePropertyView({
+        this.map = new GMapView({
           wizard: this,
-          model: this.model
+          model: this.model,
+          forNetwork: this.forNetwork
         });
-        this.$el.find(".wizard-forms").append(this.map.render().el);
+        this.listenTo(this.map, "property:join", this.join);
+        this.listenTo(this.map, "property:manage", this.manage);
+        this.$(".wizard-forms").append(this.map.render().el);
         this.map.renderMap();
         return this;
       };
@@ -109,7 +105,6 @@
           return;
         }
         this.$('.error').removeClass('error');
-        $().button('loading');
         this.$('button.next').button('loading');
         this.$('button.join').button('loading');
         this.state = 'join';

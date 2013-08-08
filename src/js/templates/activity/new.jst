@@ -144,13 +144,13 @@
       </div>
       <fieldset class="share-options">
         <legend><%= i18nCommon.actions.also_post_to %></legend>
-        <div class="control-group clearfix">
+        <div class="facebook-group control-group clearfix">
           <label for="type" class="control-label stay-left">Facebook</label>
           <div class="controls stay-right">
             <div class="toggle">
               <label class="toggle-radio" for="fbOption1"><%= i18nCommon.affirmations.yes %></label>
-              <input type="radio" name="share[fb]" id="fbOption1" value="1" checked="checked">
-              <input type="radio" name="share[fb]" id="fbOption2" value="0">
+              <input type="radio" name="share[fb]" id="fbOption1" value="1"<% if (fbLinked) { %> checked="checked"<% } %>>
+              <input type="radio" name="share[fb]" id="fbOption2" value="0"<% if (!fbLinked) { %> checked="checked"<% } %>>
               <label class="toggle-radio" for="fbOption2"><%= i18nCommon.affirmations.no %></label>
             </div>
           </div>

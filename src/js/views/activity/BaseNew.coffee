@@ -26,18 +26,23 @@ define [
 
     events:
       # Share options
-      "change #fbShare"                 : "checkShareOnFacebook"
+      "toggle:on .facebook-group .toggle": "checkShareOnFacebook"
 
     # If the account is unlinked to FB but the user wants to share, get them to connect first.
     # 
     checkShareOnFacebook: (e) =>
+
+      console.log "checkShareOnFacebook"
+      console.log Parse.User.current()._isLinked("facebook") 
+      console.log @$(".facebook-group .toggle :eq[0]").is("checked")
+
       # Ignore if the user is connected, or if it is set to false.
-      return if Parse.User.current()._isLinked("facebook") or @$("#fbShare :eq[0]").is("checked")
+      return if Parse.User.current()._isLinked("facebook") or @$(".facebook-group .toggle :eq[0]").is("checked")
       # If the user is not linked, set the toggle to "false" and prompt the user to connect.
       e.preventDefault()
-      @$("#fbShare eq[0]").prop "checked", true
-      @$("#fbShare eq[1]").prop "checked", false
-      if @appsModal then @appsModal.$el.modal("show") else @appsModal = new AppsModalView().render()
+      @$(".facebook-group .toggle eq[0]").prop "checked", true
+      @$(".facebook-group .toggle eq[1]").prop "checked", false
+      if @appsModal then @appsModal.$el.modal("show") else @appsModal = new AppsModalView().render().$el.modal("show")
 
     clear : =>
       @appsModal.clear() if @appsModal

@@ -112,7 +112,7 @@ define [
 
       visible = @model.activity.select (a) => a.get("property").id is @model.id
       if visible.length > 0 then _.each visible, @addOneActivity
-      else @$activity.before '<p class="empty">' + i18nProperty.tenant_empty.activity + '</p>'
+      else @$activity.html '<li class="empty">' + i18nProperty.tenant_empty.activity + '</li>'
 
     # Photos
     # ------
@@ -129,7 +129,7 @@ define [
       unless @model.photos.length is 0
         @model.photos.each @addOnePhoto
       else
-        @$photos.before '<p class="empty">' + i18nProperty.tenant_empty.photos + '</p>'
+        @$photos.html '<li class="empty offset2 span4">' + i18nProperty.tenant_empty.photos + '</li>'
 
     # Listings
     # --------
@@ -159,7 +159,7 @@ define [
             @$listings.append '<tr class="divider"><td colspan="4">' + i18nUnit.fields.bedrooms + ": #{i}</td></tr>"
             _.each listings, @addOneListing
       else
-        @$listings.before "<tr class='empty'><td colspan='4'>#{i18nProperty.tenant_empty.listings}</td></tr>"
+        @$listings.html "<tr class='empty'><td colspan='4'>#{i18nProperty.tenant_empty.listings}</td></tr>"
 
     showModal: (e) =>
       e.preventDefault()

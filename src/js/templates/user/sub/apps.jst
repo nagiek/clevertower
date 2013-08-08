@@ -1,4 +1,4 @@
-<form method="post" id="apps-form">
+<form method="post" id="apps-form" class="apps-form">
   <div class="row">
     <div class="facebook-group control-group span6">
       <div class="photo photo-thumbnail stay-left">
@@ -6,8 +6,7 @@
         <div class="mask mask-thumbnail"></div>
       </div>
       <div class="photo-float thumbnail-float clearfix">
-        <label class="control-label pull-left">Facebook</label>
-        <div class="controls pull-right">
+        <div class="controls stay-right">
           <% if (!fbLinked) { %>
             <button id="fb-link" class="btn"><%= i18nCommon.actions.link %></button>
           <% } else { %>
@@ -16,6 +15,7 @@
             <button id="fb-unlink" class="btn revoke btn-danger"><%= i18nCommon.actions.revoke_access %></button>
           <% } %>
         </div>
+        <label class="control-label">Facebook</label>
         <p><%= i18nUser.app_descriptions.facebook %></p>
       </div>
     </div>

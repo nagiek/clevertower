@@ -20,9 +20,16 @@ define [
     id: "new-property-activity-form"
     className: "activity-form span12"
 
+    # attributes:
+    #   id: "new-property-activity-form"
+    #   class: "activity-form span12"
+    #   style: "left: 0%;"
+
     events:
-      "toggle:on  .post-group .toggle": "enableActivityView"
-      "toggle:off  .post-group .toggle": "disableActivityView"
+      "toggle:on .post-group .toggle": "enableActivityView"
+      "toggle:off .post-group .toggle": "disableActivityView"
+      # Original from BaseNewActivityView.
+      "toggle:on .facebook-group .toggle": "checkShareOnFacebook"
 
     initialize: (attrs) ->
       
@@ -35,6 +42,7 @@ define [
         title: i18nProperty.activity.new_property()
         cover: @model.cover("large")
         profilePic: Parse.User.current().get("profile").cover("tiny")
+        fbLinked: Parse.User.current()._isLinked("facebook")
         i18nProperty: i18nProperty
         i18nCommon: i18nCommon
 
@@ -43,5 +51,5 @@ define [
 
       @
 
-    disableActivityView : => @$("#sample-activity").find('.mask').addClass("hide")
-    enableActivityView : => @$("#sample-activity").find('.mask').removeClass("hide")
+    enableActivityView : => @$("#sample-activity").find('.mask').addClass("hide")
+    disableActivityView : => @$("#sample-activity").find('.mask').removeClass("hide")

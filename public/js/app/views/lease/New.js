@@ -210,15 +210,22 @@
       };
 
       NewLeaseView.prototype.addAll = function() {
-        var properties,
+        var properties, selected, units,
           _this = this;
 
         this.$unitSelect.html("<option value=''>" + i18nCommon.form.select.select_value + "</option>");
         if (this.property) {
-          _.each(this.property.units.where({
+          units = this.property.units.where({
             property: this.property
-          }), this.addOne);
-          return this.$unitSelect.append("<option class='new-unit-option' value='-1'>" + i18nUnit.constants.new_unit + "</option>");
+          });
+          _.each(units, this.addOne);
+          if (this.modal || units.length === 0) {
+            selected = ' selected="selected"';
+            this.$('.new-unit').show();
+          } else {
+            selected = "";
+          }
+          return this.$unitSelect.append("<option class='new-unit-option' value='-1'" + selected + ">" + i18nUnit.constants.new_unit + "</option>");
         } else {
           properties = Parse.User.current().get("network").units.groupBy(function(u) {
             return u.get("property").id;

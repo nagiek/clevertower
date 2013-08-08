@@ -115,7 +115,10 @@ define [
 
     country: -> Parse.App.countryCodes[@get("country")]
 
-    city: -> @get("locality") + "--" + @get("administrative_area_level_1") + "--" + Parse.App.countryCodes[@get("country")]
+    city: -> 
+      @get("locality").replace(/\s+/g, '-') + "--" + 
+      @get("administrative_area_level_1").replace(/\s+/g, '-') + "--" + 
+      Parse.App.countryCodes[@get("country")].replace(/\s+/g, '-')
 
     cover: (format) ->
       img = @get "image_#{format}"

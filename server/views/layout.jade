@@ -18,11 +18,12 @@ html(lang="en")
 
     // Facebook
     meta(property='fb:app_id', content='387187337995318')
-    meta(property='og:description', content='CleverTower is a startup on a mission to change the way you live, and the way you manage property. Thanks for stopping by.')
-    meta(property='og:url', content='clevertower.com')
-    meta(property='og:image', content='/img/logos/logo-200.png')
-    meta(property='og:type', content='website')
     meta(property='og:site_name', content='CleverTower')
+    block fbTags
+      meta(property='og:description', content='CleverTower is a startup on a mission to change the way you live, and the way you manage property. Thanks for stopping by.')
+      meta(property='og:url', content='clevertower.com')
+      meta(property='og:image', content='/img/logos/logo-200.png')
+      meta(property='og:type', content='website')
     
     // Only script we need
     script(type="text/javascript", src="/js/app/config/init.js")

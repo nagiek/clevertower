@@ -45,10 +45,6 @@ define [
       @model = new Property
       @model.set "network", Parse.User.current().get("network") if @forNetwork 
 
-      @map = new GMapView(wizard: @, model: @model, forNetwork: @forNetwork)
-      @listenTo @map, "property:join", @join
-      @listenTo @map, "property:manage", @manage
-
       @listenTo Parse.Dispatcher, 'user:logout', ->
         Parse.history.navigate "/", true
         @clear()
@@ -89,16 +85,18 @@ define [
         i18nCommon: i18nCommon
         setup: !Parse.User.current() or (!Parse.User.current().get("property") and !Parse.User.current().get("network"))
       @$el.html JST['src/js/templates/property/new/wizard.jst'](vars)
-      @share = new SharePropertyView wizard: @, model: @model
-      # @$el.find(".wizard-forms").append @share.render().el
-      @$el.find(".wizard-forms").append @map.render().el
+
+      @map = new GMapView(wizard: @, model: @model, forNetwork: @forNetwork)
+      @listenTo @map, "property:join", @join
+      @listenTo @map, "property:manage", @manage
+      @$(".wizard-forms").append @map.render().el
       @map.renderMap()
+
       @
 
     join : (existingProperty) =>
       return if @state is 'join'
       @$('.error').removeClass('error')
-      $().button('loading')
       @$('button.next').button('loading') # prop "disabled", true
       @$('button.join').button('loading') # prop "disabled", true
       @state = 'join'
