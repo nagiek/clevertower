@@ -1,36 +1,6 @@
 <div class="row">
   <div class="offset1 span5">
     <h2><%= i18nProperty.actions.share_property %></h2>
-    <div class="control-group public-group">
-      <div class="clearfix">
-        <label for="type" class="control-label stay-left"><%= i18nProperty.listing.public %></label>
-        <div class="controls stay-right">
-          <div class="toggle">
-            <label class="toggle-radio" for="publicOption1"><%= i18nCommon.affirmations.yes %></label>
-            <input type="radio" name="property[public]" id="publicOption1" value="1" checked="checked">
-            <input type="radio" name="property[public]" id="publicOption2" value="0">
-            <label class="toggle-radio" for="publicOption2"><%= i18nCommon.affirmations.no %></label>
-          </div>
-        </div>
-      </div>
-      <p class="help-block"><%= i18nProperty.listing.public_info %></p>
-    </div>
-    <div class="control-group address-group">
-      <div class="clearfix">
-        <label class="control-label stay-left"><%= i18nProperty.listing.approx %></label>
-        <div class="controls stay-right">
-          <div class="toggle">
-            <label class="toggle-radio" for="approxOption1"><%= i18nCommon.adjectives.approximate %></label>
-            <input type="radio" name="property[approx]" id="approxOption1" value="1">
-            <input type="radio" name="property[approx]" id="approxOption2" value="0" checked="checked">
-            <label class="toggle-radio" for="approxOption2"><%= i18nCommon.adjectives.exact %></label>
-          </div>
-        </div>
-      </div>
-      <p class="help-block"><%= i18nProperty.listing.approx_info %></p>
-      <img src='/img/doodad/exact-vs-approx.png'>
-    </div>
-    <br>
     <fieldset>
       <div class="post-group control-group clearfix">
         <label for="share[ct]" class="control-label stay-left"><%= i18nCommon.actions.post_to %> CleverTower</label>
@@ -53,6 +23,39 @@
             <label class="toggle-radio" for="fbOption2"><%= i18nCommon.affirmations.no %></label>
           </div>
         </div>
+      </div>
+    </fieldset>
+    <br/>
+    <br/>
+    <fieldset>
+      <div class="control-group public-group">
+        <div class="clearfix">
+          <label for="type" class="control-label stay-left"><%= i18nProperty.listing.public %></label>
+          <div class="controls stay-right">
+            <div class="toggle">
+              <label class="toggle-radio" for="publicOption1"><%= i18nCommon.affirmations.yes %></label>
+              <input type="radio" name="property[public]" id="publicOption1" value="1" checked="checked">
+              <input type="radio" name="property[public]" id="publicOption2" value="0">
+              <label class="toggle-radio" for="publicOption2"><%= i18nCommon.affirmations.no %></label>
+            </div>
+          </div>
+        </div>
+        <p class="help-block"><%= i18nProperty.listing.public_info %></p>
+      </div>
+      <div class="control-group address-group">
+        <div class="clearfix">
+          <label class="control-label stay-left"><%= i18nProperty.listing.approx %></label>
+          <div class="controls stay-right">
+            <div class="toggle">
+              <label class="toggle-radio" for="approxOption1"><%= i18nCommon.adjectives.approximate %></label>
+              <input type="radio" name="property[approx]" id="approxOption1" value="1">
+              <input type="radio" name="property[approx]" id="approxOption2" value="0" checked="checked">
+              <label class="toggle-radio" for="approxOption2"><%= i18nCommon.adjectives.exact %></label>
+            </div>
+          </div>
+        </div>
+        <p class="help-block"><%= i18nProperty.listing.approx_info %></p>
+        <img src='/img/doodad/exact-vs-approx.png'>
       </div>
     </fieldset>
   </div>

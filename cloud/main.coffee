@@ -25,13 +25,12 @@ Parse.Cloud.define "PromoteToFeatured", (req, res) ->
 # Set a user's picture to an external URL
 Parse.Cloud.define "SetPicture", (req, res) ->
 
-  Buffer = require('buffer').Buffer
-
   Parse.Cloud.httpRequest
     method: "GET"
     url: req.params.url
     success: (httpres) ->
       # Write the response to a buffer and save as file.
+      Buffer = require('buffer').Buffer
       buf = new Buffer(httpres.buffer)      
       file = new Parse.File(req.user.getUsername() + "-picture.jpeg", base64: buf.toString('base64'))
       file.save().then ->

@@ -2,6 +2,7 @@ define [
   'underscore'
   'backbone'
   "moment"
+  "gmaps"
 ], (_, Parse, moment) ->
 
   Activity = Parse.Object.extend "Activity",
@@ -40,6 +41,11 @@ define [
           return error if error = attrs.unit.validationError
       false
 
+    city: ->
+      @get("locality").replace(/\s+/g, '-') + "--"
+      + @get("administrative_area_level_1").replace(/\s+/g, '-') + "--"
+      + Parse.App.countryCodes[@get("country")].replace(/\s+/g, '-')
+
 
     # Display functions
     # -----------------
@@ -72,3 +78,14 @@ define [
         when "new_post", "new_photo" then @get("image") || false
         when "new_tenant", "new_manager" then @get('profile').cover(size)
         else false
+
+
+  # CLASS METHODS
+  # -------------
+
+  Activity.city = (attrs) -> 
+    attrs.locality.replace(/\s+/g, '-') + "--"
+    + attrs.administrative_area_level_1.replace(/\s+/g, '-') + "--"
+    + Parse.App.countryCodes[attrs.country].replace(/\s+/g, '-')
+
+  Activity

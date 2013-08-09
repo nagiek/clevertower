@@ -116,11 +116,14 @@ define [
     country: -> Parse.App.countryCodes[@get("country")]
 
     city: -> 
-      @get("locality").replace(/\s+/g, '-') + "--" + 
-      @get("administrative_area_level_1").replace(/\s+/g, '-') + "--" + 
-      Parse.App.countryCodes[@get("country")].replace(/\s+/g, '-')
+      @get("locality").replace(/\s+/g, '-') + "--"
+      + @get("administrative_area_level_1").replace(/\s+/g, '-') + "--"
+      + Parse.App.countryCodes[@get("country")].replace(/\s+/g, '-')
 
     cover: (format) ->
+      switch format
+        when "micro", "tiny" then format = "thumb"
+        when "large" then format = "full"
       img = @get "image_#{format}"
       img = "/img/fallback/property-#{format}.png" if img is '' or !img?
       img 

@@ -188,8 +188,14 @@
       US: "United States"
     };
     Parse.App.cities = {
-      "Montreal--QC--Canada": 'Originally called Ville-Marie, or "City of Mary", it is named after Mount Royal, the triple-peaked hill located in the heart of the city.',
-      "Toronto--ON--Canada": 'Canada’s most cosmopolitan city is situated on beautiful Lake Ontario, and is the cultural heart of south central Ontario and of English-speaking Canada.'
+      "Montreal--QC--Canada": {
+        fbID: 102184499823699,
+        desc: 'Originally called Ville-Marie, or "City of Mary", it is named after Mount Royal, the triple-peaked hill located in the heart of the city.'
+      },
+      "Toronto--ON--Canada": {
+        fbID: 110941395597405,
+        desc: 'Canada’s most cosmopolitan city is situated on beautiful Lake Ontario, and is the cultural heart of south central Ontario and of English-speaking Canada.'
+      }
     };
     _.str = _String;
     $.ajaxSetup({
@@ -200,9 +206,10 @@
     });
     Parse.FacebookUtils.init({
       appId: '387187337995318',
-      channelUrl: '//clevertower.dev:3000/fb-channel',
+      channelUrl: "//" + window.location.host + "/fb-channel",
       cookie: true,
-      xfbml: true
+      xfbml: false,
+      status: true
     });
     Parse.Collection.prototype.where = function(attrs, first) {
       if (_.isEmpty(attrs)) {

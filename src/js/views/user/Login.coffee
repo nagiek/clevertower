@@ -31,7 +31,7 @@ define [
       Parse.User.logIn email, password,
         success: (user) =>
           @$('> #login-modal').modal('hide')
-          Parse.Dispatcher.trigger "user:loginStart", user
+          Parse.Dispatcher.trigger "user:loginStart"
 
         error: (error) =>
           @$("> #login-modal #login-modal-form button").removeProp "disabled"
@@ -53,10 +53,16 @@ define [
           @$('> #login-modal').modal('hide')
           @$('> #signup-modal').modal('hide')
 
-          # Must run through login-start process in-sync, without trigger, as we may change the profile.
-          Parse.User.current().setup().then =>
-            unless Parse.User.current().get("email")
-              FB.api '/me', (response) ->
+          if user.existed() then Parse.Dispatcher.trigger "user:loginStart"
+          else
+
+            # Must run through login-start process in-sync, without trigger, as we may change the profile.
+            Parse.User.current().setup().then =>
+              # User signed up and logged in through Facebook
+              FB.api '/me', 
+              fields: 'first_name, last_name, email, birthday, about_me, website, gender, picture.width(270).height(270)', # picture?width=400&height=400
+              (response) =>
+
                 userVars = 
                   email: response.email
                   birthday: new Date response.birthday
@@ -67,49 +73,23 @@ define [
                   email: response.email
                   first_name: response.first_name
                   last_name: response.last_name
+                  bio: response.about_me
+                  website: response.website
 
-              # We need at least width=270
-              FB.api '/me/picture?width=400&height=400', (response) ->
-                if response.data and not response.data.is_silhouette
+                if response.picture.data and not response.picture.data.is_silhouette
 
                   Parse.Cloud.run "SetPicture", {
-                    url: response.data.url
+                    url: response.picture.data.url
                   },
-                  success: (res) ->
+                  success: (res) =>
                     Parse.User.current().get("profile").set
                       image_full: res
                       image_profile: res
                       image_thumb: res
+                    Parse.Dispatcher.trigger "user:loginEnd"
                   error: (res) -> console.log res
 
-              # Have the user set a password before moving on.
-              Parse.history.navigate "account/edit", true
-
-            else
-
-              # Normal Login Routing.
-              if Parse.User.current().get("network") or Parse.User.current().get("property")
-                # Reload the current path. 
-                # Don't use navigate, as it will fail.
-                # The route functions themselves are responsible for altering content.
-                Parse.history.loadUrl location.pathname
-              else
-                # require ["views/helper/Alert", 'i18n!nls/property'], (Alert, i18nProperty) =>
-                #   new Alert
-                #     event:    'no_network'
-                #     type:     'warning'
-                #     fade:     true
-                #     heading:  i18nProperty.errors.network_not_set
-                Parse.history.navigate "account/setup", true
-
-            Parse.Dispatcher.trigger "user:login", user
-            Parse.Dispatcher.trigger "user:change", user
-            @$('#reset-password-modal').remove()
-            @$('#signup-modal').remove()
-            @$('#login-modal').remove()
-
-            @stopListening()
-            @undelegateEvents()
-            delete this
+                else 
+                  Parse.Dispatcher.trigger "user:loginEnd"
 
         error: (error) =>

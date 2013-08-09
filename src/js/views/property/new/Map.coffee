@@ -35,7 +35,7 @@ define [
       @wizard = attrs.wizard
       @listenTo @wizard, "wizard:finish wizard:cancel", @clear
       
-      @geocoder = new google.maps.Geocoder
+      window.geocoder = window.geocoder || new google.maps.Geocoder
       @results = new PropertyList [], forNetwork: @forNetwork
       @listenTo @results, "reset", @processResults
 
@@ -98,7 +98,7 @@ define [
 
     geocode : (e) =>      
       e.preventDefault()
-      @geocoder.geocode address: @$searchInput.val(), @handleGeocodeResults
+      window.geocoder.geocode address: @$searchInput.val(), @handleGeocodeResults
 
     handleGeocodeResults: (results, status) =>
       if status is google.maps.GeocoderStatus.OK
@@ -134,12 +134,12 @@ define [
           # Set current user location, if available
           navigator.geolocation.getCurrentPosition (position) =>
             @model.set "center", new Parse.GeoPoint(position.coords)
-            @geocoder.geocode latLng: @model.GPoint(), @handleGeocodeResults
+            window.geocoder.geocode latLng: @model.GPoint(), @handleGeocodeResults
       
         # If browser geolication is not supoprted, try ip location
         else if google.loader.ClientLocation
           @model.set "center", new Parse.GeoPoint(google.loader.ClientLocation)
-          @geocoder.geocode latLng: @model.GPoint(), @handleGeocodeResults
+          window.geocoder.geocode latLng: @model.GPoint(), @handleGeocodeResults
         else
           @model.set "center", new Parse.GeoPoint()
           alert i18nProperty.errors.no_geolocaiton

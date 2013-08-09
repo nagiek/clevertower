@@ -39,8 +39,7 @@
           this.model.set("network", Parse.User.current().get("network"));
         }
         this.listenTo(Parse.Dispatcher, 'user:logout', function() {
-          Parse.history.navigate("/", true);
-          return this.clear();
+          return Parse.history.navigate("", true);
         });
         this.listenTo(this.model, "invalid", function(error) {
           var args, fn, msg;

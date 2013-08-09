@@ -45,9 +45,7 @@ define [
       @model = new Property
       @model.set "network", Parse.User.current().get("network") if @forNetwork 
 
-      @listenTo Parse.Dispatcher, 'user:logout', ->
-        Parse.history.navigate "/", true
-        @clear()
+      @listenTo Parse.Dispatcher, 'user:logout', -> Parse.history.navigate "", true
 
       @listenTo @model, "invalid", (error) =>
         @buttonsForward()

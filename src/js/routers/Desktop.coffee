@@ -10,9 +10,9 @@ define [
     routes:
       ""                            : "index"
       "places/:country/:region/:city/:id/:slug" : "propertiesPublic"
-      "posts/:id"                 : "activityShow"
+      "posts/:id"                   : "activityShow"
       "outside/*splat"              : "search"
-      "outside"                     : "search"
+      "outside*splat"               : "search"
       # "inside"                      : "propertiesManage"
       # "inside/*splat"               : "propertiesManage"
       "network/new"                 : "networkNew"

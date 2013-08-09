@@ -92,11 +92,21 @@
         return Parse.App.countryCodes[this.get("country")];
       },
       city: function() {
-        return this.get("locality").replace(/\s+/g, '-') + "--" + this.get("administrative_area_level_1").replace(/\s+/g, '-') + "--" + Parse.App.countryCodes[this.get("country")].replace(/\s+/g, '-');
+        this.get("locality").replace(/\s+/g, '-') + "--";
+        +this.get("administrative_area_level_1").replace(/\s+/g, '-') + "--";
+        return +Parse.App.countryCodes[this.get("country")].replace(/\s+/g, '-');
       },
       cover: function(format) {
         var img;
 
+        switch (format) {
+          case "micro":
+          case "tiny":
+            format = "thumb";
+            break;
+          case "large":
+            format = "full";
+        }
         img = this.get("image_" + format);
         if (img === '' || (img == null)) {
           img = "/img/fallback/property-" + format + ".png";

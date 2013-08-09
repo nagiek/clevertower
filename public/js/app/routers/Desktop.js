@@ -26,7 +26,7 @@
         "places/:country/:region/:city/:id/:slug": "propertiesPublic",
         "posts/:id": "activityShow",
         "outside/*splat": "search",
-        "outside": "search",
+        "outside*splat": "search",
         "network/new": "networkNew",
         "listings/new": "listingsNew",
         "leases/new": "leasesNew",

@@ -56,8 +56,6 @@ define [
         public: true
         isEvent: false
 
-      @dragListener = google.maps.event.addListener @view.map, 'dragend', @updateCenter
-
 
     # Mid level functions
     # -------------------
@@ -192,6 +190,9 @@ define [
       super
 
     render: =>
+
+      # Put listener in render, after the "undelegateEvents" call
+      @dragListener = google.maps.event.addListener @view.map, 'dragend', @updateCenter
 
       # Model may change, so have to re-establish listeners on render.
       @listenTo @model, 'invalid', @handleError
@@ -350,13 +351,10 @@ define [
           that._trigger "photo:remove", e
       @
 
-
-
     showActivityForm : (e) => 
       return if @shown
       @shown = true
       @$('#activity-options').removeClass 'hide'
-      # if @hasProperty then @$("#centered-on-property").prop("disabled", true)
       @marker.bindTo 'position', @view.map, 'center'
       @marker.setVisible true
       $("#redo-search").prop('checked', false).trigger("change") if $("#redo-search").is(":checked")
@@ -365,8 +363,6 @@ define [
       if @hasProperty
         @$(".no-property").addClass "hide"
         @$(".title-group").removeClass "hide"
-        # @$("#activity-title").removeProp 'disabled'
-        # @$("#activity-options").removeClass "hide"
       else
         @$(".no-property").removeClass "hide"
 
@@ -380,70 +376,100 @@ define [
 
     save : (e) ->
       e.preventDefault() if e
-
-      @$('button.save').prop "disabled", true
-      data = @$('form').serializeObject()
+      @$('button.save').button("loading")
       @$('.error').removeClass('error')
+
+      data = @$('form').serializeObject()
 
       return @model.trigger "invalid", error: message: i18nCommon.errors.no_data unless data.activity.title or @model.get("image")
 
       attrs = 
         title: data.activity.title
 
-      if @model.get("isEvent")
-        
+      if @model.get("isEvent")            
         return @model.trigger "invalid", error: message: i18nCommon.errors.no_start_date unless data.activity.start_date
         attrs.startDate = new Date("#{data.activity.start_date} #{data.activity.start_time}")
         if @$('#toggle-end-date').is ":checked"
           return @model.trigger "invalid", error: message: i18nCommon.errors.no_end_date unless data.activity.end_date
           attrs.endDate = new Date("#{data.activity.end_date} #{data.activity.end_time}") if data.activity.end_date
 
-      @model.save(attrs).then (model) => 
-        # Add to appropriate collection
-        if @model.get("property")
-          Parse.User.current().activity.add @model, silent: true
-        else Parse.App.activity.add @model, silent: true
+      # Fix the point, to know more about city/location.
+      window.geocoder = window.geocoder || new google.maps.Geocoder
+      window.geocoder.geocode latLng: @model.GPoint(), (results, status) =>
+        console.log status
+        if status is google.maps.GeocoderStatus.OK
 
-        @trigger "model:save", @model
+          # Process geocode results.
+          _.each results[0].address_components, (c) ->
+            switch c.types[0]
+              when 'locality'
+                attrs.locality = c.long_name
+              when 'administrative_area_level_1'
+                attrs.administrative_area_level_1 = c.short_name.substr(0,2).toUpperCase()
+              when 'administrative_area_level_2'
+                attrs.administrative_area_level_2 = c.short_name.substr(0,2).toUpperCase()
+              when 'country'
+                attrs.country = c.short_name.substr(0,2).toUpperCase()
+              when 'postal_code'
+                attrs.postal_code = c.long_name
 
-        # Share on FB?
-        if data.share.fb is "on" or data.share.fb is "1"
-          vars =
-            object: window.location.origin + @model.publicUrl()
-            message: @model.get("title")
-            place: @model.GPoint()
+          @model.save(attrs).then (model) => 
+            # Add to appropriate collection
+            if @model.get("property")
+              Parse.User.current().activity.add @model, silent: true
+            else Parse.App.activity.add @model, silent: true
 
-          # Optional Event params.
-          vars.start_time = attrs.startDate if attrs.startDate
-          vars.end_time = attrs.endDate if attrs.endDate
+            @trigger "model:save", @model
 
-          # Add city if we have set one up.
-          city = @model.city()
-          if _.contains _.keys(Parse.App.cities), city
-            vars.city = window.location.origin + city
+            # Share on FB?
+            if data.share.fb is "on" or data.share.fb is "1"
+              vars =
+                object: window.location.origin + @model.url()
+                message: @model.get("title")
+                "fb:explicitly_shared": true
 
-          window.FB.api 'me/og:posts',
-            'post', vars,
-            (response) -> # handle the response
+              # Optional params.
+              vars.picture = @model.image("full") if @model.image("full")
+              vars.start_time = attrs.startDate if attrs.startDate
+              vars.end_time = attrs.endDate if attrs.endDate
 
-        # Reset
-        @model = new Activity
-          activity_type: "new_post"
-          profile: Parse.User.current().get("profile")
-          public: true
-          isEvent: false
+              # Add city if we have set one up.
+              city = @model.city()
+              if _.contains _.keys(Parse.App.cities), city
+                vars.place = Parse.App.cities.fbID
+                  # id: Parse.App.cities.fbID
+                  # name: Parse.App.cities.fbName
+                  # location:
+                  #   country: @model.country()
+                  #   latitude: @model.get("center")._latitude
+                  #   longitude: @model.get("center")._longitude
+                vars.city = window.location.origin + city
 
-        @listenTo @model, 'invalid', @handleError
-        @marker.setMap null
-        @view.map.setOptions draggable: true
-        @shown = false
-        @render()
-      , (error) => console.log error
+              window.FB.api 'me/og.posts',
+                'post', vars,
+                (response) -> console.log response # handle the response
+
+            # Reset
+            @model = new Activity
+              activity_type: "new_post"
+              profile: Parse.User.current().get("profile")
+              public: true
+              isEvent: false
+
+            @listenTo @model, 'invalid', @handleError
+            @marker.setMap null
+            @view.map.setOptions draggable: true
+            @shown = false
+            @render()
+          , (model, error) => @model.trigger "invalid", error
+        else @model.trigger "invalid", message: "no_results"
+
 
     # attachPhoto: ->
     handleError: (error) =>
       @$('.error').removeClass('error')
-      @$('button.save').removeProp "disabled"
+      @$('button.save').button("complete")
+      @$('button.save').html i18nCommon.actions.save
 
       console.log error
 

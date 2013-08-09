@@ -56,7 +56,6 @@ define [
         done: (e, data) =>
           file = data.result
           @model.save image_thumb: file.url, image_profile: file.url, image_full: file.url
-          @$()
           @$('#preview-property-picture img').prop('src', file.url)
           @$(".delete").removeClass("hide")
 

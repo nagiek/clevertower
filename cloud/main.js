@@ -24,15 +24,13 @@
   });
 
   Parse.Cloud.define("SetPicture", function(req, res) {
-    var Buffer;
-
-    Buffer = require('buffer').Buffer;
     return Parse.Cloud.httpRequest({
       method: "GET",
       url: req.params.url,
       success: function(httpres) {
-        var buf, file;
+        var Buffer, buf, file;
 
+        Buffer = require('buffer').Buffer;
         buf = new Buffer(httpres.buffer);
         file = new Parse.File(req.user.getUsername() + "-picture.jpeg", {
           base64: buf.toString('base64')

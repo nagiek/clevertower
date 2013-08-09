@@ -261,15 +261,19 @@ require [
 
   Parse.App.featuredListings = new FeaturedListingList 
 
-  Parse.App.fbPerms = "email, publish_actions"
+  Parse.App.fbPerms = "email, publish_actions" #, publish_stream, read_stream"
 
   Parse.App.countryCodes = 
     CA: "Canada"
     US: "United States"
 
   Parse.App.cities = 
-    "Montreal--QC--Canada": 'Originally called Ville-Marie, or "City of Mary", it is named after Mount Royal, the triple-peaked hill located in the heart of the city.'
-    "Toronto--ON--Canada": 'Canada’s most cosmopolitan city is situated on beautiful Lake Ontario, and is the cultural heart of south central Ontario and of English-speaking Canada.'
+    "Montreal--QC--Canada": 
+      fbID: 102184499823699
+      desc: 'Originally called Ville-Marie, or "City of Mary", it is named after Mount Royal, the triple-peaked hill located in the heart of the city.'
+    "Toronto--ON--Canada": 
+      fbID: 110941395597405
+      desc: 'Canada’s most cosmopolitan city is situated on beautiful Lake Ontario, and is the cultural heart of south central Ontario and of English-speaking Canada.'
 
 
   # Bootstrap
@@ -293,10 +297,10 @@ require [
   # init the FB JS SDK
   Parse.FacebookUtils.init
     appId      : '387187337995318'                        # Facebook App ID
-    channelUrl : '//clevertower.dev:3000/fb-channel'      # Channel File (must be absolute path)
+    channelUrl : "//#{window.location.host}/fb-channel"   # Channel File (must be absolute path)
     cookie     : true                                     # enable cookies to allow Parse to access the session
-    xfbml      : true                                     # parse XFBML
-    # status     : true                                     # check login status
+    xfbml      : false                                    # parse XFBML
+    status     : true                                     # check login status
 
 
   # Bring Parse Collection up to speed with Backbone methods.

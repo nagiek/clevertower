@@ -83,7 +83,6 @@ define [
         @$loading.html i18nCommon.activity.exhausted
 
       @on "view:empty", =>
-        console.log "view:empty"
         @moreToDisplay = false
         @$loading.html i18nListing.listings.empty.index
 
@@ -337,7 +336,7 @@ define [
 
     renderCity : =>
       if _.contains _.keys(Parse.App.cities), @location
-        desc = Parse.App.cities[@location]
+        desc = Parse.App.cities[@location].desc
         title = @location.substring 0, @location.indexOf("-")
         image = "/img/city/#{@location}.jpg"
 
@@ -619,8 +618,6 @@ define [
       # item = new infinity.ListItem view.render().$el
       item = new infinity.ListItem @renderTemplate(a, liked, true, a.get("property").pos())
 
-      console.log item
-
       item.marker = a.get("property").marker
       a.get("property").marker.items.push item
       @listViews[@shortestColumnIndex()].append item
@@ -699,8 +696,6 @@ define [
 
         if Parse.User.current().get("property")
 
-          console.log Parse.User.current().get("property").shown
-
           # Visibility counter
           if Parse.User.current().get("property").shown is true
             userCountQuery.containedIn "property", Parse.User.current().get("property")
@@ -712,11 +707,7 @@ define [
 
           properties = Parse.User.current().get("network").properties.filter (p) -> p.shown is true
           userCountQuery.containedIn "property", properties
-          console.log userCountQuery
-          console.log properties
           userCounting = userCountQuery.count()
-
-        console.log userCountQuery
 
       else 
         userCounting = undefined
@@ -725,7 +716,6 @@ define [
       .when(counting, userCounting)
       .then (count, userCount) =>
         # remaining pages
-        console.log userCount
 
         userCount = 0 unless userCount
         @pages = Math.ceil((count + userCount)/ @resultsPerPage)
@@ -744,9 +734,6 @@ define [
               pCount = Parse.User.current().activity.countByProperty()
               Parse.User.current().get("network").properties.each (p) -> 
                 collectionLength += pCount[p.id] if p.shown is true
-
-          console.log count + userCount
-          console.log collectionLength
 
           if count + userCount <= collectionLength 
             @trigger "view:exhausted"

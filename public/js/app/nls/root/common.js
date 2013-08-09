@@ -298,6 +298,7 @@
       no_permission: "You do not have permission to do that.",
       unknown: "An unknown error has occured.",
       not_logged_in: "You are not logged in.",
+      geocode_error: "We were unable to determine your location.",
       no_results: "No results found.",
       not_yet_accepted: "You haven't been accepted into this network yet. <br/> You can only see what is publicly visible. Most things will not work correctly.",
       pending_approval: "Pending approval."

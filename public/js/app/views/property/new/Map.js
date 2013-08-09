@@ -41,7 +41,7 @@
         this.mapId = "mapCanvas";
         this.wizard = attrs.wizard;
         this.listenTo(this.wizard, "wizard:finish wizard:cancel", this.clear);
-        this.geocoder = new google.maps.Geocoder;
+        window.geocoder = window.geocoder || new google.maps.Geocoder;
         this.results = new PropertyList([], {
           forNetwork: this.forNetwork
         });
@@ -123,7 +123,7 @@
 
       GMapView.prototype.geocode = function(e) {
         e.preventDefault();
-        return this.geocoder.geocode({
+        return window.geocoder.geocode({
           address: this.$searchInput.val()
         }, this.handleGeocodeResults);
       };
@@ -167,13 +167,13 @@
           if (navigator.geolocation) {
             return navigator.geolocation.getCurrentPosition(function(position) {
               _this.model.set("center", new Parse.GeoPoint(position.coords));
-              return _this.geocoder.geocode({
+              return window.geocoder.geocode({
                 latLng: _this.model.GPoint()
               }, _this.handleGeocodeResults);
             });
           } else if (google.loader.ClientLocation) {
             this.model.set("center", new Parse.GeoPoint(google.loader.ClientLocation));
-            return this.geocoder.geocode({
+            return window.geocoder.geocode({
               latLng: this.model.GPoint()
             }, this.handleGeocodeResults);
           } else {
