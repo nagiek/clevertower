@@ -15,7 +15,7 @@ define [
 
     tagName : "form"
     id: "new-property-picture-form"
-    className: "span12"
+    className: "col-xs-12"
 
     events:
       "click .delete" : "resetImage"

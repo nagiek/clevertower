@@ -71,7 +71,7 @@ define [
 
       # Activity that we find on the map.
       unless Parse.App.activity
-        Parse.App.activity = new ActivityList([], {})
+        Parse.App.activity = new ActivityList [], {}
         Parse.App.activity.query
         .include("property")
         .containedIn("activity_type", ["new_photo", "new_listing", "new_post"])
@@ -699,7 +699,7 @@ define [
         url = model.get('property').publicUrl()
       profileInfo = """
               <header class="clearfix">
-                <div class="photo photo-thumbnail stay-left">
+                <div class="photo photo-thumbnail pull-left">
                   <a href="#{url}"><img src="#{profilePic}" alt="Profile" class="img-rounded profile-picture"></a>
                 </div>
                 <div class="photo-float thumbnail-float">
@@ -730,7 +730,7 @@ define [
                         </div>
                         #{profileInfo}
                         <strong>#{title}</strong>
-                        <div class="rent stay-right">#{rent}</div>
+                        <div class="rent pull-right">#{rent}</div>
                       </div>
                     </div>
                     """

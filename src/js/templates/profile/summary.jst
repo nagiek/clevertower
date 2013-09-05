@@ -1,12 +1,14 @@
-<div class="photo">
+<div class="photo photo-profile pull-left">
   <a href="/users/<%= objectId %>">
-    <img src="<%=url%>" class="img-rounded photo-profile" width="100">
+    <img src="<%= url %>" class="img-rounded photo-profile" width="100">
   </a>
-  <div class="photo-actions hide">
-    <button class="delete btn btn-mini" title="<%= i18nCommon.actions.delete %>">
+  <div class="photo-actions">
+    <button class="delete btn btn-mini btn-danger" type="button" title="<%= i18nCommon.actions.delete %>">
       <strong>&times;</strong>
     </button>
   </div>
 </div>
-<p><a href="/users/<%= objectId %>"><strong><%= name %></strong></a></p>
-<p><span class="label label-<%= status == 'confirmed' ? 'success' : 'warning' %>"><%= status %></span></p>
+<div class="photo-float profile-float">
+  <a href="/users/<%= objectId %>"><strong><%= name %></strong></a>
+  <span class="label label-<%= status == 'current' ? 'success' : 'warning' %>"><%= status %></span>
+</div>

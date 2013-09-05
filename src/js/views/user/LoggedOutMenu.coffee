@@ -23,7 +23,7 @@ define [
 
     render: =>
       @$el.html JST["src/js/templates/user/logged_out_menu.jst"](i18nCommon: i18nCommon, i18nDevise: i18nDevise)
-      $("#panel-user-menu").html JST["src/js/templates/user/logged_out_panel.jst"](i18nCommon: i18nCommon, i18nDevise: i18nDevise)
+      $("#sidebar-user-menu").html JST["src/js/templates/user/logged_out_panel.jst"](i18nCommon: i18nCommon, i18nDevise: i18nDevise)
       @
 
     clear: =>

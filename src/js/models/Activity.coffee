@@ -2,8 +2,9 @@ define [
   'underscore'
   'backbone'
   "moment"
+  "collections/CommentList"
   "gmaps"
-], (_, Parse, moment) ->
+], (_, Parse, moment, CommentList) ->
 
   Activity = Parse.Object.extend "Activity",
 
@@ -47,20 +48,45 @@ define [
       + Parse.App.countryCodes[@get("country")].replace(/\s+/g, '-')
 
 
+    prep: (collectionName, options) ->
+      return @[collectionName] if @[collectionName]
+
+      user = Parse.User.current()
+      network = user.get("network") if user
+      basedOnNetwork = user and network and @get("network") and @get("network").id is network.id
+
+      @[collectionName] = switch collectionName
+        when "comments"
+          if basedOnNetwork then network.comments 
+          else if @property() and @property().comments then @property().comments
+          else
+            new CommentList [], property: @
+
+      @[collectionName]
+
+
+    # Accessing data functions
+    # Avoid double-loading of profile/property data
+    # ------------------------
+
+    profile: -> if @collection and @collection.profile then @collection.profile else @get("profile") 
+    property: -> if @collection and @collection.property then @collection.property else @get("property")
+
+
     # Display functions
     # -----------------
 
-    name: -> if @linkedToProperty() then @get('property').get("title") else @get('profile').name()
-    profilePic: (size) -> if @linkedToProperty() then @get('property').cover(size) else @get('profile').cover(size)
-    profileUrl: -> if @linkedToProperty() then @get('property').publicUrl() else @get('profile').url()
-    linkedToProperty: -> @get('property') and not @get('profile')
-    liked: -> Parse.User.current() and Parse.User.current().get("profile").likes.find (l) => l.id is @id
+    name: -> if @linkedToProperty() then @property().get("title") else @profile().name()
+    profilePic: (size) -> if @linkedToProperty() then @property().cover(size) else @profile().cover(size)
+    profileUrl: -> if @linkedToProperty() then @property().publicUrl() else @profile().url()
+    linkedToProperty: -> @property() and not @profile()
+    liked: -> Parse.User.current() and Parse.User.current().get("profile").likes.some (l) => l.id is @id
 
     title: ->
       switch @get "activity_type"
         when "new_post", "new_listing", "new_property" then @get("title")
-        # when "new_property" then @get("property").get("title")
-        when "new_photo" then @get("property").get("title")
+        # when "new_property" then @property().get("title")
+        when "new_photo" then @property().get("title")
         else false
 
     icon: ->
@@ -74,9 +100,9 @@ define [
 
     image: (size) ->
       switch @get("activity_type")
-        when "new_listing", "new_property" then @get('property').cover(size)
+        when "new_listing", "new_property" then @property().cover(size)
         when "new_post", "new_photo" then @get("image") || false
-        when "new_tenant", "new_manager" then @get('profile').cover(size)
+        when "new_tenant", "new_manager" then @profile().cover(size)
         else false
 
 

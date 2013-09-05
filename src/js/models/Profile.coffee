@@ -60,7 +60,7 @@ define [
       return @[collectionName] if @[collectionName]
       @[collectionName] = switch collectionName
         when "applicants"   then new ApplicantList [], profile: @
-        when "activities"   then new ActivityList [], profile: @
+        when "activity"     then new ActivityList [], profile: @
         when "tenants"      then new TenantList [], profile: @
       @[collectionName]
 

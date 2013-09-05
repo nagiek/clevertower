@@ -1,13 +1,13 @@
 <div class="container">
   <div class="row">
-  	<div class="offset3 span6">
+    <div class="col-md-offset-3 col-md-6">
       <div class="well">
         <h1><%= i18nDevise.setup.confirm_details %></h1>
         <p><%= i18nDevise.setup.confirm_info %></p>
         <form class="form-horizontal form-large" method="post" id="confirm-form">
           
           <fieldset>
-            <div class="control-group type-group">
+            <div class="form-group type-group">
               <label for="type" class="control-label"><%= i18nDevise.form.type.label %>:</label>
               <div class="controls">
                 <div class="toggle">
@@ -23,28 +23,28 @@
           <hr>
 
           <fieldset>
-            <div class="email-group control-group">
+            <div class="email-group form-group">
               <label for="user-email" class="control-label"><%= i18nDevise.form.email %></label>
               <div class="controls">
-                <input class="input-large" type="text" name="user[email]" value="<%= email %>" maxlength="64" />
+                <input class="input-lg" type="text" name="user[email]" value="<%= email %>" maxlength="64" />
               </div>
             </div>
 
-            <div class="new-password-group control-group">
+            <div class="new-password-group form-group">
               <label for="user-email" class="control-label"><%= i18nDevise.form.new_password %></label>
               <div class="controls">
-                <input class="span2" type="password" name="user[new_password]" maxlength="64" />
+                <input class="col-md-2" type="password" name="user[new_password]" maxlength="64" />
               </div>
               <label for="user-email" class="control-label"><%= i18nDevise.form.new_password_confirm %></label>
               <div class="controls">
-                <input class="span2" type="password" name="user[new_password_confirm]" maxlength="64" />
+                <input class="col-md-2" type="password" name="user[new_password_confirm]" maxlength="64" />
               </div>
             </div>
           </fieldset>
 
           <div class="form-actions">
             <button class="save btn btn-primary"><%= i18nCommon.actions.save %></button>
-            <a href="/account/setup" class="btn"><%= i18nCommon.expressions.skip_this_step %></a>
+            <a href="/account/setup" class="btn btn-default"><%= i18nCommon.expressions.skip_this_step %></a>
           </div>
         </form>
       </div>

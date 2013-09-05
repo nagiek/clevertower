@@ -27,7 +27,7 @@ __p += '\n        <a href="' +
  } ;
 __p += '</td>\n    ';
  } ;
-__p += '\n    <td class="delete">\n      <button class="btn btn-danger">\n        <i class="icon-trash icon-white"></i>\n        <span>Delete</span>\n      </button>\n      <input type="checkbox" name="delete" value="1">\n    </td>\n  </tr>\n';
+__p += '\n    <td class="delete">\n      <button class="btn btn-danger">\n        <i class="glyphicon glyphicon-trash icon-white"></i>\n        <span>Delete</span>\n      </button>\n      <input type="checkbox" name="delete" value="1">\n    </td>\n  </tr>\n';
  } ;
 
 

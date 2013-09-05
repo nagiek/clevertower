@@ -54,8 +54,6 @@ define [
 
     addAll: =>
 
-      console.log Parse.User.current().get("property").tenants
-
       @$tList.html ""
       @$rList.html ""
 

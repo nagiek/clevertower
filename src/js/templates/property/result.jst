@@ -1,9 +1,9 @@
-<div class="photo photo-thumbnail photo-elastic pull-left tablet-left">
-  <img src="<%= cover %>" alt="Profile" class="profile-picture">
+<div class="photo photo-thumbnail pull-left">
+  <img src="<%= cover %>" alt="Profile" class="media-object profile-picture">
 </div>
 
-<div class="photo-float thumbnail-float elastic-float">    
-  <h4><%= formatted_address %></h4>
+<div class="photo-float thumbnail-float media-body">    
+  <h4 class="media-heading"><%= formatted_address %></h4>
   <button type="button" class="join btn btn-primary">
     <% if (forNetwork) { %>
       <%= i18nCommon.actions.manage %>
@@ -11,7 +11,7 @@
       <%= i18nCommon.actions.join %>
     <% } %>
   </button>
-   <ul class="property-info inline inline-condensed">
+   <ul class="property-info list-inline inline-condensed">
     <li class="position"><%= pos %></li>
   </ul>
 </div>

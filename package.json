@@ -12,7 +12,6 @@
   "devDependencies": {
     "coffee-script": "1.5.x",
     "express" : "3.x",
-    "express-messages-bootstrap" : "0.0.8",
     "nib" : "0.3.2",
     "crypto" : "0.0.3",
     "pusher" : "0.0.2",

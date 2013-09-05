@@ -17,7 +17,7 @@
 
       PhotoView.prototype.tagName = "li";
 
-      PhotoView.prototype.className = "span4";
+      PhotoView.prototype.className = "col-md-4 col-sm-6";
 
       PhotoView.prototype.events = {
         "click .photo-destroy": "kill"

@@ -1,21 +1,17 @@
-<fieldset class="form-xlarge">
+<fieldset>
   <!-- <legend><%= i18nProperty.form.building %></legend> -->
   <div class="row">
-    <div id="property-title-group" class="control-group span">
+    <div id="property-title-group" class="form-group col-sm-6">
       <label for="property-title" class="control-label"><%= i18nProperty.fields.title %></label>
-      <div class="controls">
-        <input type="text" name="property[title]" id="property-title" class="span6" value="<%= property.title %>">
-      </div>
+      <input type="text" name="property[title]" id="property-title" class="form-control input-lg" value="<%= property.title %>">
     </div>
-    <div class="control-group span">
+    <div class="form-group col-sm-6">
       <label for="property-email" class="control-label"><%= i18nProperty.fields.property_type.label %></label>
-      <div class="controls">
-        <select name="property[property_type]" id="property-property_type" class="span">
-          <option value="" ><%= i18nCommon.form.select.select_value %></option>
-          <option value="1" <%= property.property_type == 1 ? 'selected="selected"' : ''  %>><%= i18nProperty.fields.property_type.condo %></option>
-          <option value="2" <%= property.property_type == 2 ? 'selected="selected"' : ''  %>><%= i18nProperty.fields.property_type.apartment %></option>
-        </select>
-      </div>
+      <select name="property[property_type]" id="property-property_type" class="form-control input-lg">
+        <option value="" ><%= i18nCommon.form.select.select_value %></option>
+        <option value="1" <%= property.property_type == 1 ? 'selected="selected"' : ''  %>><%= i18nProperty.fields.property_type.condo %></option>
+        <option value="2" <%= property.property_type == 2 ? 'selected="selected"' : ''  %>><%= i18nProperty.fields.property_type.apartment %></option>
+      </select>
     </div>
   </div>
 </fieldset>

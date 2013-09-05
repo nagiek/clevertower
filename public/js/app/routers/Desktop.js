@@ -11,6 +11,9 @@
 
       function DesktopRouter() {
         this.profileShow = __bind(this.profileShow, this);
+        this.tenantsNew = __bind(this.tenantsNew, this);
+        this.leasesNew = __bind(this.leasesNew, this);
+        this.listingsNew = __bind(this.listingsNew, this);
         this.propertiesPublic = __bind(this.propertiesPublic, this);
         this.propertiesManage = __bind(this.propertiesManage, this);
         this.propertiesNew = __bind(this.propertiesNew, this);
@@ -59,6 +62,9 @@
         new UserMenuView().render();
         new NavMenuView().render();
         Parse.App.search = new SearchView().render();
+        $("#sidebar-toggle").click(function() {
+          return $("body").toggleClass("active");
+        });
         this.listenTo(Parse.Dispatcher, "user:login", function() {
           if (Parse.User.current().get("network") || Parse.User.current().get("property")) {
             return Parse.history.loadUrl(location.pathname);
@@ -199,30 +205,36 @@
             });
           } else if (Parse.User.current().get("property")) {
             if (Parse.User.current().get("property").mgr === void 0) {
-              return Parse.User.current().get("property").get("mgrRole").getUsers().query().get(Parse.User.current().id, {
-                success: function(user) {
-                  if (user) {
-                    Parse.User.current().get("property").mgr = true;
-                    return _this.propertiesManage(Parse.User.current().get("property").id, splat);
-                  } else {
-                    Parse.User.current().get("property").mgr = false;
-                    return require(["views/lease/Manage"], function(LeaseView) {
-                      var vars;
+              if (Parse.User.current().get("property").get("mgrRole")) {
+                return Parse.User.current().get("property").get("mgrRole").getUsers().query().get(Parse.User.current().id, {
+                  success: function(user) {
+                    if (user) {
+                      Parse.User.current().get("property").mgr = true;
+                      return _this.propertiesManage(Parse.User.current().get("property").id, splat);
+                    } else {
+                      Parse.User.current().get("property").mgr = false;
+                      return require(["views/lease/Manage"], function(LeaseView) {
+                        var vars;
 
-                      vars = _this.deparamAction(splat);
-                      if (!view || !(view instanceof LeaseView)) {
-                        vars.model = Parse.User.current().get("lease");
-                        return _this.view = new LeaseView(vars);
-                      } else {
-                        return view.changeSubView(vars.path, vars.params);
-                      }
-                    });
+                        vars = _this.deparamAction(splat);
+                        if (!view || !(view instanceof LeaseView)) {
+                          vars.model = Parse.User.current().get("lease");
+                          return _this.view = new LeaseView(vars);
+                        } else {
+                          return view.changeSubView(vars.path, vars.params);
+                        }
+                      });
+                    }
+                  },
+                  error: function(error) {
+                    Parse.User.current().get("property").mgr = false;
+                    return _this.insideManage(splat);
                   }
-                },
-                error: function(error) {
-                  return Parse.User.current().get("property").mgr = false;
-                }
-              });
+                });
+              } else {
+                Parse.User.current().get("property").mgr = false;
+                return this.insideManage(splat);
+              }
             } else {
               if (Parse.User.current().get("property").mgr) {
                 return this.propertiesManage(Parse.User.current().get("property").id, splat);
@@ -337,6 +349,57 @@
               return _this.accessDenied();
             }
           });
+        });
+      };
+
+      DesktopRouter.prototype.listingsNew = function() {
+        var view,
+          _this = this;
+
+        view = this.view;
+        return require(["views/listing/new"], function(NewListingView) {
+          if (!view || !(view instanceof NewListingView)) {
+            _this.view = new NewListingView({
+              forNetwork: true,
+              baseUrl: "/inside/listings"
+            });
+            _this.view.setElement("#main");
+            return _this.view.render();
+          }
+        });
+      };
+
+      DesktopRouter.prototype.leasesNew = function() {
+        var view,
+          _this = this;
+
+        view = this.view;
+        return require(["views/lease/new"], function(NewLeaseView) {
+          if (!view || !(view instanceof NewLeaseView)) {
+            _this.view = new NewLeaseView({
+              forNetwork: true,
+              baseUrl: "/inside/tenants"
+            });
+            _this.view.setElement("#main");
+            return _this.view.render();
+          }
+        });
+      };
+
+      DesktopRouter.prototype.tenantsNew = function() {
+        var view,
+          _this = this;
+
+        view = this.view;
+        return require(["views/tenant/new"], function(NewTenantView) {
+          if (!view || !(view instanceof NewTenantView)) {
+            _this.view = new NewTenantView({
+              forNetwork: true,
+              baseUrl: "/inside/tenants"
+            });
+            _this.view.setElement("#main");
+            return _this.view.render();
+          }
         });
       };
 

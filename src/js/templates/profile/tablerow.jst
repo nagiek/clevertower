@@ -9,16 +9,15 @@
 </td>
 <td>
   <span class="label label-large label-<%= status == 'current' ? 'success' : 'warning' %>"><%= status %></span>
-  <% if (admin) { %><small>(<%= i18nCommon.adjectives.admin %>)</small><% } %>
+  <% if (admin) { %><span class="label label-large label-info"><%= i18nCommon.adjectives.admin %></span><% } %>
 </td>
 <td>
   <% if (mgr == true && status == 'pending') { %>
-    <button class="accept btn">
+    <button class="accept btn btn-default">
       <%= i18nCommon.actions.accept %>
     </button>
   <% } %>
-  <button class="<% if (current_user) { %>current <% } %>delete btn">
+  <button class="<% if (current_user) { %>current <% } %>delete btn btn-default">
     <% if (current_user) { %> <%= current_user_leave %> <% } else { %> <%= i18nCommon.actions.remove %> <% } %>
   </button>
 </td>
-

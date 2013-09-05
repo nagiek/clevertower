@@ -5,7 +5,7 @@ obj || (obj = {});
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
 with (obj) {
-__p += '<select name="lease[unit]" id="lease-unit" class="span2" required="true">\n  <option value="">' +
+__p += '<select name="lease[unit]" id="lease-unit" class="col-md-2" required="true">\n  <option value="">' +
 ((__t = ( i18nCommon.form.select.select_value )) == null ? '' : __t) +
 '</option>\n  ';
  units.each(function(unit) { ;

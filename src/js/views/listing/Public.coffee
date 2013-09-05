@@ -32,8 +32,6 @@ define [
 
     initialize: (attrs) ->
 
-      _.bindAll @, 'render', 'addOne', 'addAll', 'showModal', 'apply', 'setThisMonth', 'setNextMonth', 'setJulyJune'
-
       @property = attrs.property
       @photos = new PhotoList [], property: @property
 

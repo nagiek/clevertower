@@ -7,11 +7,15 @@ function print() { __p += __j.call(arguments, '') }
 with (obj) {
 __p += '<div id="alert-' +
 ((__t = ( event )) == null ? '' : __t) +
-'" class="alert alert-block alert-' +
+'" class="alert alert-' +
 ((__t = ( type )) == null ? '' : __t) +
-' fade in">\n  ';
+' ';
  if (dismiss) { ;
-__p += '<button type="button" class="close stay-right" data-dismiss="alert">&times;</button>';
+__p += ' alert-dismissable';
+ } ;
+__p += 'fade in">\n  ';
+ if (dismiss) { ;
+__p += '<button type="button" class="close pull-right" data-dismiss="alert">&times;</button>';
  } ;
 __p += '\n  <div class="inline-block">\n  ';
  if (heading) { ;

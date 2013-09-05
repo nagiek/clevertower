@@ -10,7 +10,7 @@ define
     extend:               "Extend lease"
   attributes:
     starting:             "Starting"
-    ending:               "Ending"
+    ending:               "Lease End Date"
     lease_on_unit:        "Lease on Unit"
     rent_this_month:      "Rent this month"
   dates:

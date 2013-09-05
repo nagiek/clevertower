@@ -24,7 +24,7 @@ define [
 
     el: undefined
     tagName : "form"
-    className: "join-form span12"
+    className: "join-form col-xs-12"
 
     initialize: (attrs) ->
       
@@ -38,11 +38,8 @@ define [
       # Don't set the property on the lease, as we may not have access to it.
       @model = new Lease(forNetwork: false)
             
-      @listenTo @model, 'invalid', (error, second) =>
-        console.log error
-        console.log second
-        @$('.error').removeClass('error')
-        @$('button.save').removeProp "disabled"
+      @listenTo @model, 'invalid', (error) =>
+        @$('.has-error').removeClass('has-error')
 
         msg = if error.message.indexOf(":") > 0
             args = error.message.split ":"
@@ -60,9 +57,9 @@ define [
         new Alert event: 'model-save', fade: false, message: msg, type: 'error'
         switch error.message
           when 'unit_missing', 'no_title'
-            @$('.unit-group').addClass('error')
+            @$('.unit-group').addClass('has-error')
           when 'dates_missing', 'dates_incorrect'
-            @$('.date-group').addClass('error')
+            @$('.date-group').addClass('has-error')
       
       @current = new Date().setDate(1)
       @dates =

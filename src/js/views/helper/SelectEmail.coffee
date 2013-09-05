@@ -11,7 +11,7 @@ define [
   class SelectEmailView extends Parse.View
     
     # id: 'select-email-modal'
-    className: 'modal modal-form fade hide'
+    className: 'modal fade'
 
     events:
       "click .done" : 'close'

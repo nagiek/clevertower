@@ -1,11 +1,11 @@
 // Put the navbar btn on the left.
-.navbar .btn-navbar {
+.navbar .navbar-btn {
   float: left;
 }
 
 @media (min-width: 767px) and (max-width: 979px) {
   // Put the navbar btn on the left.
-  .navbar .btn-navbar {
+  .navbar .navbar-btn {
     display: none;
   }
 }
@@ -15,24 +15,22 @@
 // -------------
 
 .btn-xlarge {
-  padding: 15px 40px;
-  font-size: 24px;
+  padding: @padding-xlarge-vertical @padding-xlarge-horizontal;
+  font-size: @font-size-xlarge;
   line-height: normal;
-  -webkit-border-radius: 6px;
-  -moz-border-radius: 6px;
-  border-radius: 8px;
+  border-radius: @border-radius-xlarge;
 }
 
 td.btn-group > .btn {
   float:none;
 }
 
-// Create default spacing
-.btn + .btn,
-// Tooltips for icon buttons are inserted after the button, thus breaking spacing.
-.tooltip + .btn {
-  margin-left: 5px;
-}
+// // Create default spacing
+// .btn + .btn,
+// // Tooltips for icon buttons are inserted after the button, thus breaking spacing.
+// .tooltip + .btn {
+//   margin-left: 5px;
+// }
 
 // Restore old styles
 .btn-group {
@@ -42,7 +40,7 @@ td.btn-group > .btn {
   }
 }
 
-.btn-large {
+.btn-lg {
   small {
     font-size: 70%;
   }
@@ -51,18 +49,18 @@ td.btn-group > .btn {
 .btn-facebook {
   padding-left: 35px !important;
   min-height: 26px;
-  background-image: url("@{imagesFolder}/vendor/facebook/fb-sprites.png"); // url(https://static.ak.fbcdn.net/rsrc.php/v2/yL/r/FGFbc80dUKj.png);
+  background-image: url("@{images-folder}/vendor/facebook/fb-sprites.png"); // url(https://static.ak.fbcdn.net/rsrc.php/v2/yL/r/FGFbc80dUKj.png);
   background-repeat: no-repeat;
   background-position: -1px -138px;
-  background-color: #5B74A8;
-  border-color: #879AC0 #29447E #1A356E;
+  background-color: @fb-blue;
+  border-color: @fb-border-color;
   border-width: 1px;
   border-style: solid;
   font-family: 'Lucida Grande', Tahoma, Verdana, Arial, sans-serif;
   color: @white;
   font-weight: bold;
   text-shadow: none;
-  .border-radius(0);
+  border-radius: 0;
 /*  border: 1px solid @gray;
   border-bottom-color: @grayLight;*/
   //@shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05);
@@ -78,24 +76,27 @@ td.btn-group > .btn {
   &:hover,
   &:active,
   &.active {
-    background-color: @fbBlue;
+    background-color: @fb-blue-active;
     text-shadow: 0 -1px 0 rgba(0,0,0,.25);
   }
-  &.btn-large {
-    background-position: -1px -60px;
+  &.btn-lg {
+    background-position: -1px -1px;
   }
 }
 
 .btn-google-maps {
-  background-color: #fff;
+  background-color: @goog-bg-color;
   background-image: none;
-  padding: 7px 10px 8px;
-  .box-shadow(0 1px 3px rgba(0,0,0, 0.65));
-  border-color: #aaa;
-  .border-radius(3px);
+  color: @goog-text-color;
+  padding: 8px 9px 5px;
+  background-image: none;
+  padding: 8px 9px 5px;
+  border-color: @goog-border-color;
+  border-radius: @border-radius-small;
 
   &:hover {
     background-color: #fbfbfb;
+    color: @text-color;
   }
   &:active,
   &.active {

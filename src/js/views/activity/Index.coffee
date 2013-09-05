@@ -12,6 +12,7 @@ define [
   'templates/activity/index'
   'templates/activity/summary'
   'templates/activity/modal'
+  'templates/comment/summary'
   # 'masonry'
   # 'jqueryui'
   "gmaps"
@@ -22,17 +23,17 @@ define [
     el: "#main"
 
     events:
-      'click #filters > button'         : 'changeFilter'
-      'click #search-map'               : 'searchMap'
-      # 'click .pagination > ul > li > a' : 'changePage'
-      'click .thumbnails a.content'     : 'showModal'
-      "mouseover .thumbnails .activity" : "highlightMarkerFromCard"
-      "mouseout .thumbnails .activity"  : "unhighlightMarkerFromCard"
-      'hide #view-content-modal'        : 'hideModal'
-      'click .modal .caption a'         : 'closeModal'
-      'click .modal .left'              : 'prevModal'
-      'click .modal .right'             : 'nextModal'
-      "click .like-button"              : "likeOrLogin"
+      'click #filters > button'                 : 'changeFilter'
+      'click #search-map'                       : 'searchMap'
+      # 'click .pagination > ul > li > a'       : 'changePage'
+      'click .thumbnails a.content'             : 'showModal'
+      "mouseover .thumbnails .activity"         : "highlightMarkerFromCard"
+      "mouseout .thumbnails .activity"          : "unhighlightMarkerFromCard"
+      # 'hide #view-content-modal'              : 'hideModal'
+      # 'click #view-content-modal .caption a'  : 'closeModal'
+      # 'click #view-content-modal .left'       : 'prevModal'
+      # 'click #view-content-modal .right'      : 'nextModal'
+      "click .like-button"                      : "likeOrLogin"
     
     initialize : (attrs) =>
 
@@ -46,7 +47,7 @@ define [
       # Give the user the chance to contribute
       @listenTo Parse.Dispatcher, "user:login", => 
         # Check for likes.
-        @listenTo Parse.User.current().get("profile").likes, "reset", @checkIfLiked
+        @listenTo Parse.User.current().get("profile").likes, "reset", @checkForLikes
         # Get the activity in the user properties.
         @getUserActivity()
         # Get the user's personal likes.
@@ -55,6 +56,8 @@ define [
         @newPostView = new NewActivityView(view: @).render()
         @listenTo @newPostView, "view:resize", @bindMapPosition
         @listenTo @newPostView, "model:save", @prependNewPost
+
+      $('#view-content-modal').on 'hide.bs.modal', @hideModal
 
       @listenTo Parse.Dispatcher, "user:logout", => 
         _.each @listViews, (lv) -> 
@@ -108,7 +111,7 @@ define [
       @listenTo Parse.App.activity, "add", @addOne
 
       if Parse.User.current()
-        @listenTo Parse.User.current().get("profile").likes, "reset", @checkIfLiked
+        @listenTo Parse.User.current().get("profile").likes, "reset", @checkForLikes
         
         # Get the activity in the user properties.
         @getUserActivity()
@@ -116,12 +119,12 @@ define [
         # Get the user's personal likes.
         if Parse.User.current().get("profile").likes.length is 0 then Parse.User.current().get("profile").likes.fetch()
 
-    checkIfLiked: ->
+    checkForLikes: ->
       Parse.User.current().get("profile").likes.each (l) =>
         _.each @listViews, (lv) ->
           activity = lv.find("#activity-#{l.id}")
           if activity.length > 0
-            activity[0].$el.data "liked", true
+            activity[0].$el.attr "data-liked", "true"
             activity[0].$el.find(".like-button").addClass "active"
 
     resetListViews: ->
@@ -223,8 +226,8 @@ define [
       @$('[rel=tooltip]').tooltip placement: 'bottom'
 
       @$list = @$(".content > .thumbnails")
-      if @$list.width() < 767 then @$list.html '<div class="list-view span8"></div>'
-      else @$list.html '<div class="list-view span4"></div><div class="list-view span4"></div>'
+      if @$list.width() < 767 then @$list.html '<div class="list-view col-md-12"></div>'
+      else @$list.html '<div class="list-view col-md-6"></div><div class="list-view col-md-6"></div>'
       
       @listViews = []
       @$listViews = @$list.find('.list-view')
@@ -350,8 +353,8 @@ define [
           <div class="fade in" style="background-image: url('#{image}');">
             <button type="button" class="close" data-dismiss="alert">&times;</button>
             <div class="row">
-              <h1 class="span3">#{title}</h1>
-              <p class="span4">#{desc}</p>
+              <h1 class="col-md-3">#{title}</h1>
+              <p class="col-md-6">#{desc}</p>
             </div>
           </div>
         """
@@ -551,6 +554,7 @@ define [
         end: moment(model.get("endDate")).format("LLL")
         postDate: moment(model.createdAt).fromNow()
         postImage: model.image("large") # Keep this in for template logic.
+        profileUrl: model.get("profile").url()
         liked: liked
         icon: model.icon()
         name: model.name()
@@ -599,9 +603,8 @@ define [
       #   model: a
       #   view: @
       #   liked: Parse.User.current() and Parse.User.current().get("profile").likes.find (l) -> l.id is a.id
-      liked = Parse.User.current() and Parse.User.current().get("profile").likes.find (l) -> l.id is a.id
       # @listViews[@shortestColumnIndex()].append view.render().$el
-      @listViews[@shortestColumnIndex()].append @renderTemplate(a, liked, false, a.pos())
+      @listViews[@shortestColumnIndex()].append @renderTemplate(a, a.liked(), false, a.pos())
       # @$list.append view.render().el
 
     addOnePropertyActivity: (a) =>
@@ -613,10 +616,9 @@ define [
       #   linkedToProperty: true
       #   liked: Parse.User.current() and Parse.User.current().get("profile").likes.find (l) -> l.id is a.id
 
-      liked = Parse.User.current() and Parse.User.current().get("profile").likes.find (l) -> l.id is a.id
-
       # item = new infinity.ListItem view.render().$el
-      item = new infinity.ListItem @renderTemplate(a, liked, true, a.get("property").pos())
+
+      item = new infinity.ListItem @renderTemplate(a, a.liked(), true, a.get("property").pos())
 
       item.marker = a.get("property").marker
       a.get("property").marker.items.push item
@@ -843,12 +845,18 @@ define [
       # @off "view:change"
 
       _.each @listViews, (lv) -> lv.cleanup()
+      @detachModalEvents() if @modal
 
       $(window).off "resize scroll"
       $(document.documentElement).off "resize scroll"
       # google.maps.event.removeListener @dragListener
       # google.maps.event.removeListener @zoomListener
       super
+
+    clear: =>
+      @undelegateEvents()
+      @stopListening()
+      delete this
 
     withinBounds : (center) ->
 
@@ -866,6 +874,7 @@ define [
     # --------------
 
     likeOrLogin: (e) =>
+      e.preventDefault()
       button = @$(e.currentTarget)
       activity = button.closest(".activity")
       likes = Number activity.find(".like-count").html()
@@ -875,20 +884,20 @@ define [
       else Parse.App.activity.at(data.index)
 
       if Parse.User.current()
-        unless data.liked
-          button.addClass "active"
-          activity.find(".like-count").html(likes + 1)
-          model.increment likeCount: +1
-          Parse.User.current().get("profile").relation("likes").add model
-          Parse.User.current().get("profile").likes.add model
-          activity.data "liked", true
-        else
+        if data.liked
           button.removeClass "active"
           activity.find(".like-count").html(likes - 1)
           model.increment likeCount: -1
           Parse.User.current().get("profile").relation("likes").remove model
           Parse.User.current().get("profile").likes.remove model
-          activity.data "liked", false
+          activity.attr "data-liked", "false"
+        else
+          button.addClass "active"
+          activity.find(".like-count").html(likes + 1)
+          model.increment likeCount: +1
+          Parse.User.current().get("profile").relation("likes").add model
+          Parse.User.current().get("profile").likes.add model
+          activity.attr "data-liked", "true"
         Parse.Object.saveAll [model, Parse.User.current().get("profile")]
       else
         $("#signup-modal").modal()
@@ -943,8 +952,10 @@ define [
       marker.icon.origin = new google.maps.Point(marker.icon.origin.x - 25, marker.icon.origin.y)
       marker.setIcon marker.icon
 
-    # Modal
-    # -----
+
+    # Modal 
+    # @see profile:show and property:public
+    # --------------------------------------------
 
     showModal : (e) =>
       e.preventDefault()
@@ -957,23 +968,35 @@ define [
         Parse.User.current().activity.at(@index)
       else Parse.App.activity.at(@index)
       @renderModalContent model
-      @$("#view-content-modal").modal(keyboard: false)
+      $("#view-content-modal").modal(keyboard: false)
+
+      # Add events.
       $(document).on "keydown", @controlModalIfOpen
+      $('#view-content-modal').on 'click', '.caption a', @closeModal
+      $('#view-content-modal').on 'click', '.left', @prevModal
+      $('#view-content-modal').on 'click', '.right', @nextModal
 
     controlModalIfOpen : (e) =>
       return unless @modal
       switch e.which 
-        when 27 then @$("#view-content-modal").modal('hide')
+        when 27 then $("#view-content-modal").modal('hide')
         when 37 then @prevModal()
         when 39 then @nextModal()
 
     closeModal : =>
-      @$("#view-content-modal").modal('hide')
+      $("#view-content-modal").modal('hide')
 
     hideModal : =>
       return unless @modal
       @modal = false
+      @detachModalEvents()
+
+    detachModalEvents: ->
       $(document).off "keydown"
+      $('#view-content-modal').off "hide click"
+      # $('#view-content-modal .caption a').off 'click'
+      # $('#view-content-modal .left').off 'click'
+      # $('#view-content-modal .right').off 'click'
 
     nextModal : =>
       return unless @modal
@@ -997,12 +1020,7 @@ define [
         Parse.App.activity.at(@index)
       @renderModalContent model
 
-    clear: =>
-      @undelegateEvents()
-      @stopListening()
-      delete this
-
-    renderModalContent : (model) ->
+    renderModalContent : (model) =>
 
       # Add a building link if applicable.
       # Cache result
@@ -1023,7 +1041,12 @@ define [
         propertyTitle: if property then property.get("title") else false
         propertyCover: if property then property.cover("tiny") else false
         propertyUrl: if property then property.publicUrl() else false
+        current: Parse.User.current()
         i18nCommon: i18nCommon
+
+      if Parse.User.current()
+        vars.self = Parse.User.current().get("profile").name()
+        vars.selfProfilePic = Parse.User.current().get("profile").cover("tiny")
 
       # Default options. 
       _.defaults vars,
@@ -1037,4 +1060,34 @@ define [
       # Override default title.
       vars.title = model.title()
 
-      @$("#view-content-modal").html JST["src/js/templates/activity/modal.jst"](vars)
+      $("#view-content-modal").html JST["src/js/templates/activity/modal.jst"](vars)
+
+      # Comments
+      @$comments = $("#view-content-modal .list-comments")
+      @$comments.html ""
+      model.prep "comments"
+      if model.comments.length > 0
+        visible = model.comments.select (c) => c.get("activity") and c.get("activity").id is collection.model.id
+        if visible.length > 0 then _.each visible, @renderOneModalComment
+      else 
+        model.comments.model = model
+        @listenToOnce model.comments, "reset", @renderAllModalComments, model
+        model.comments.fetch()
+
+    renderAllModalComments : (collection) =>
+      visible = collection.select (c) => c.get("activity") and c.get("activity").id is collection.model.id
+      if visible.length > 0 then _.each visible, @renderOneModalComment
+
+    renderOneModalComment : (comment) =>
+
+      vars =
+        title: comment.get "title"
+        postDate: moment(comment.createdAt).fromNow()
+        name: comment.name()
+        profilePic: comment.profilePic("tiny")
+        profileUrl: comment.profileUrl()
+        i18nCommon: i18nCommon
+
+      # fn = if isNew then "append" else "prepend"
+
+      @$comments.append JST["src/js/templates/comment/summary.jst"](vars)

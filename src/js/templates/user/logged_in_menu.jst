@@ -1,41 +1,42 @@
-<li class="phone-hidden">
+<li class="hidden-sm hidden-xs">
   <a id="profile-link" class="clearfix" href="/users/<%= objectId %>">
-    <img src="<%= src %>" class="stay-left photo photo-micro img-circle" alt="<%= photo_alt %>" width="23" height="23">
-    <span class="photo-float micro-float"><%= name %></span>
+    <img src="<%= src %>" class="pull-left photo photo-tiny img-circle" alt="<%= photo_alt %>" width="32" height="32">
+    <span class="photo-float tiny-float"><%= name %></span>
   </a>
 </li>
 <li id="memos" class="dropdown list-item-icon">
   <a id="mLabel" data-target="#" data-toggle="dropdown" role="menu" class="dropdown-toggle">
-    <i class="icon icon-flag"></i>
+    <span class="glyphicon glyphicon-flag"></span>
     <span id="memos-count" class="badge badge-important hide">0</span>
   </a>
-  <div aria-labelledby="mLabel" role="menu" class="dropdown-menu notifications-menu pull-right">
+  <div aria-labelledby="mLabel" role="menu" class="dropdown-menu notifications-menu">
     <ul></ul>
     <a href="/notifications" class="dropdown-bottom"><%= i18nCommon.expressions.see_all %></a>
   </div>
 </li>
 <li id="friend-requests" class="dropdown list-item-icon">
   <a id="fLabel" data-target="#" data-toggle="dropdown" role="menu" class="dropdown-toggle">
-    <i class="icon icon-user"></i>
+    <span class="glyphicon glyphicon-user"></span>
     <span id="friend-requests-count" class="badge badge-important hide">0</span>
   </a>
-  <div aria-labelledby="fLabel" role="menu" class="dropdown-menu notifications-menu pull-right">
+  <div aria-labelledby="fLabel" role="menu" class="dropdown-menu notifications-menu">
     <ul></ul>
     <a href="/notifications" class="dropdown-bottom"><%= i18nCommon.expressions.see_all %></a>
   </div>
 </li>
-<li class="dropdown phone-hidden list-item-icon">
+<li class="dropdown hidden-sm hidden-xs list-item-icon">
   <a id="pLabel" data-target="#" data-toggle="dropdown" role="menu" class="dropdown-toggle">
-    <i class="icon icon-cog"></i>
+    <span class="glyphicon glyphicon-cog"></span>
   </a>
-  <ul aria-labelledby="pLabel" role="menu" class="dropdown-menu pull-right">
-    <li><a href="/account/building"><i class="icon icon-building"></i> <%= i18nCommon.nouns.building %></a></li>
-    <li><a href="/account/history"><i class="icon icon-file"></i> <%= i18nCommon.nouns.history %></a></li>
+  <ul aria-labelledby="pLabel" role="menu" class="dropdown-menu">
+    <li><a href="/account/building"><span class="glyphicon glyphicon-home glyphicon-building"></span> <%= i18nCommon.nouns.building %></a></li>
+    <li><a href="/account/history"><span class="glyphicon glyphicon-file"></span> <%= i18nCommon.nouns.history %></a></li>
     <li class="divider">
-    <li><a href="/account/settings"><i class="icon icon-user"></i> <%= i18nUser.menu.account_settings %></a></li>
-    <li><a href="/account/privacy"><i class="icon icon-lock"></i> <%= i18nUser.menu.privacy_settings %></a></li>
-    <li><a href="/account/apps"><i class="icon icon-th"></i> <%= i18nUser.menu.apps %></a></li>
+    <li><a href="/account/settings"><span class="glyphicon glyphicon-user"></span> <%= i18nUser.menu.account_settings %></a></li>
+    <li><a href="/account/privacy"><span class="glyphicon glyphicon-lock"></span> <%= i18nUser.menu.privacy_settings %></a></li>
+    <li><a href="/account/apps"><span class="glyphicon glyphicon-th"></span> <%= i18nUser.menu.apps %></a></li>
     <li class="divider">
     <li><a id="logout" href="#"><%= i18nDevise.actions.logout %></a></li>
   </ul>
 </li>
+<li class="visible-sm list-item-icon"><a href="#" data-target="#search-menu" data-toggle="collapse"><span class="glyphicon glyphicon-search"></span></a></li>

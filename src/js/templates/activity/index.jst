@@ -1,54 +1,44 @@
 <div class="container">
   <div class="row">
-    <div id="city" class="span8"></div>
-    <div class="pull-right span4">
-      <div class="row">
-        <div id="user-container" class="span4">
-          <div id="property-prompt"></div>
-          <div id="new-activity"></div>
-        </div>
-        <div class="span4">
-          <form id="activity-filter-form" class="well well-small">
-            <div id="general-controls">
-              <div class="control-group center">
-                <div class="controls">
-                  <div id="filters" class="btn-group" data-toggle="buttons-radio">
-                    <button type="button" class="btn active"><%= i18nCommon.adjectives.all %></button>
+    <div id="city" class="col-sm-8"></div>
+    <div class="right-lg right-md col-sm-4">
+      <div id="user-container">
+        <div id="property-prompt"></div>
+        <div id="new-activity"></div>
+      </div>
+      <form id="activity-filter-form">
+        <div id="general-controls" class="form-group center clearfix">
+          <div id="filters" class="btn-group btn-group-justified" data-toggle="buttons-radio">
+            <a href="#" class="btn btn-default active"><%= i18nCommon.adjectives.all %></a>
 
-                    <button data-filter="new_listing" type="button" class="btn" rel="tooltip" data-original-title="<%= i18nCommon.classes.Listing %>">
-                      <i class="icon icon-listing"></i>
-                    </button>
-                    <button data-filter="new_property" type="button" class="btn" rel="tooltip" data-original-title="<%= i18nCommon.nouns.building %>">
-                      <i class="icon icon-building"></i>
-                    </button>
-                    <button data-filter="new_post" type="button" class="btn" rel="tooltip" data-original-title="<%= i18nCommon.classes.Posts %>">
-                      <i class="icon icon-status"></i>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div id="specific-controls" class="form-horizontal"></div>
-          </form>
-        </div>
-        <div id="map-container" class="pull-right span4">
-          <div class="position-relative">
-            <button type="button" id="search-map" class="btn btn-google-maps" rel="tooltip" title="<%= i18nListing.map.redo_search %>"><i class="icon icon-repeat"></i></button>
-            <div id="mapCanvas"></div>
+            <a data-filter="new_listing" href="#" class="btn btn-default" rel="tooltip" data-container="body" title="<%= i18nCommon.classes.Listing %>">
+              <span class="glyphicon glyphicon-certificate glyphicon-listing"></span>
+            </a>
+            <a data-filter="new_property" href="#" class="btn btn-default" rel="tooltip" data-container="body" title="<%= i18nCommon.nouns.building %>">
+              <span class="glyphicon glyphicon-home glyphicon-building"></span>
+            </a>
+            <a data-filter="new_post" href="#" class="btn btn-default" rel="tooltip" data-container="body" title="<%= i18nCommon.classes.Posts %>">
+              <span class="glyphicon glyphicon-comment"></span>
+            </a>
           </div>
+        </div>
+        <div id="specific-controls" class="form-horizontal"></div>
+      </form>
+      <div id="map-container" class="map-container-fixed">
+        <div class="position-relative">
+          <button type="button" id="search-map" class="btn btn-google-maps" rel="tooltip" data-container="body" title="<%= i18nListing.map.redo_search %>"><span class="glyphicon glyphicon-repeat"></span></button>
+          <div id="mapCanvas"></div>
         </div>
       </div>
     </div>
-    <div class="span8 content">
-      <div id="activities" class="thumbnails"></div>
-      <div class="loading center">
+    <div class="col-sm-8 content">
+      <div id="activities" class="thumbnails row"></div>
+      <div class="loading center col-xs-12">
         <img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" />
       </div>
-      <div class="pagination">
+      <div class="pagination col-xs-12">
         <ul></ul>
       </div>
     </div>
   </div>
 </div>
-
-<div id="view-content-modal" class="modal modal-wide modal-picture hide"></div>

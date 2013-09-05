@@ -34,11 +34,11 @@
     left: 0;
   }
   .toggle-radio {
-    background: url("@{imagesFolder}/vendor/flat-ui/toggle/icon-on.png") right top no-repeat;
+    background: url("@{images-folder}/vendor/flat-ui/toggle/icon-on.png") right top no-repeat;
     color: #1abc9c;
     display: block;
     font-weight: 700;
-    height: 21px;
+    // height: 21px;
     left: 120%;
     margin-left: -13px;
     padding: 5px 32px 3px;
@@ -54,7 +54,7 @@
       text-align: left;
     }
     .toggle-radio {
-      background-image: url("@{imagesFolder}/vendor/flat-ui/toggle/block-on.png");
+      background-image: url("@{images-folder}/vendor/flat-ui/toggle/block-on.png");
       background-position: 62px 0;
       border-radius: 6px;
       min-width: 27px;
@@ -66,8 +66,7 @@
     position: absolute;
     outline: none !important;
     display: block\9;
-    opacity: 0.01;
-    filter: alpha(opacity=1);
+    .opacity(0.01);
     zoom: 1;
   }
   &.toggle-off {
@@ -76,7 +75,7 @@
       left: -120%;
     }
     .toggle-radio {
-      background-image: url("@{imagesFolder}/vendor/flat-ui/toggle/icon-off.png");
+      background-image: url("@{images-folder}/vendor/flat-ui/toggle/icon-off.png");
       background-position: 0 0;
       color: white;
       left: 0;
@@ -88,7 +87,7 @@
   &.toggle-icon.toggle-off {
     border-radius: 7px 6px 6px 7px;
     .toggle-radio {
-      background-image: url("@{imagesFolder}/vendor/flat-ui/toggle/block-off.png");
+      background-image: url("@{images-folder}/vendor/flat-ui/toggle/block-off.png");
       background-position: 0 0;
     }
   }

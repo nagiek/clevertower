@@ -33,78 +33,88 @@ html(lang="en")
       script(src="//html5shiv.googlecode.com/svn/trunk/html5.js")
     
   body
-    #frame
-
-      #panel.menu.collapse.width
-        .collapse-inner
-          ul#panel-nav-menu.nav
-            li#panel-home-nav.home-nav
-              a(href="/outside") Outside
-            li#panel-network-nav.network-nav
-              a(href="/inside") Inside
-
-          ul#panel-user-menu.nav.position-bottom
+    #view(role="main")
+      nav.navbar.navbar-default.navbar-fixed-top(role="navigation")
+        .container
+          .navbar-header.pull-left
+            button#sidebar-toggle.navbar-toggle.visible-sm.visible-md
+              span.sr-only Toggle navigation
+              span.icon-bar
+              span.icon-bar
+              span.icon-bar
+            a.navbar-brand.left-sm(href="/", title="Home")
+              img(src="/img/logo/logo.png", alt="logo")
+            ul#primary-nav.nav.navbar-nav.visible-md.visible-lg
+              li#home-nav
+                a(href="/outside") Outside
+              li#network-nav
+                a(href="/inside") Inside
+          ul#user-menu.nav.navbar-nav.navbar-right.pull-right
             li
-              a#panel-login-link.login-link(href="/account/login") Login
-            li
-              a#panel-signup-link.signup-link(href="/account/signup") Sign up
+              a#login-link(href="#") Login
+            li.hidden-sm.hidden-xs
+              a#signup-link(href="#") Sign up
+            li.visible-sm
+              a(href="#", type="button", data-target="#search-menu", data-toggle="collapse")
+                span.glyphicon.glyphicon-search
+                // b.caret
+          #search-menu.nav-collapse.collapse.navbar-left.clearfix
+            form.navbar-form.form-search
+              button.btn.btn-link.hidden-sm(type="button")
+                span.glyphicon.glyphicon-search
+              input.form-control.search-query(type="text", name="q", placeholder="Search", autocomplete="off", spellcheck="off")
 
-      #view
+      // Branding
+      #brand-strip.hide
 
-        header(data-role='header', role="navigation")
-          .navbar.navbar-fixed-top
-            .navbar-inner
-              .container
-                button.btn.btn-navbar(data-target="#panel", data-toggle="collapse")
-                  span.icon-bar
-                  span.icon-bar
-                  span.icon-bar
-                a.brand(href="/", title="Home")
-                  img(src="/img/logo/logo.png", alt="logo")
-                ul#primary-nav.nav.phone-hidden.tablet-hidden
-                  li#home-nav.home-nav
-                    a(href="/outside") Outside
-                  li#network-nav.network-nav
-                    a(href="/inside") Inside
-                button.btn.stay-right.desktop-hidden(data-target="#search-menu", data-toggle="collapse")
-                  i.icon.icon-search
-                  b.caret
-                ul#user-menu.nav.stay-right
-                  li
-                    a#login-link(href="#") Login
-                  li.phone-hidden
-                    a#signup-link(href="#") Sign up
-                #search-menu.nav-collapse.collapse.height.pull-left
-                  form.form-search.navbar-search
-                    .controls
-                      .input-append.stay-right
-                          button.btn(type="submit", rel="tooltip", data-original-title="Search")
-                            i.icon.icon-search
-                      .input-append.bar-append
-                        input.input-block-level.typeahead.search.search-query(type="text", name="q", placeholder="Search", autocomplete="off", spellcheck="false", dir="auto")
+      // Messages
+      #messages.container
 
-        // Branding
-        #brand-strip.hide
+      // Facebook root.
+      #fb-root
 
-        // Messages
-        #messages.container
+      // Page wrapper
+      #page.page(data-role='page')
 
-        // Facebook root.
-        #fb-root
+        // Main
+        #main.main
+          block content
 
-        // Page wrapper
-        #page.page(data-role='page')
+        // People modal, for viewing lists of people.
+        #people-modal.modal.fade
+          .modal-dialog
+            .modal-content
+              .modal-header
+                button.close(type="button", data-dismiss="modal") &times;
+                h3.modal-title People who like this
+              .modal-body
+              .modal-footer
+                button.btn.btn-default(data-dismiss="modal") Close
 
-          // Main
-          #main.main
-            block content
+        // Content modal, for viewing content
+        #view-content-modal.modal.fade
+          .modal-dialog
+            .modal-content
 
-          // Full-page modal, for wizards
-          // #full-modal.hide.main
-              
-          // Footer
-          // footer.footer(data-role='footer')
-          //   .navbar.navbar-fixed-bottom
-          //     .navbar-inner
-          //       .container
-          //         p Made by Keigan
+        // Full-page modal, for wizards
+        // #full-modal.hide.main
+            
+        // Footer
+        // footer.footer(data-role='footer')
+        //   .navbar.navbar-fixed-bottom
+        //     .navbar-inner
+        //       .container
+        //         p Made by Keigan
+
+    #sidebar.menu(role="complementary")
+      ul#sidebar-nav-menu.nav
+        li#sidebar-home-nav.home-nav
+          a(href="/outside") Outside
+        li#sidebar-network-nav.network-nav
+          a(href="/inside") Inside
+
+      ul#sidebar-user-menu.nav.position-bottom
+        li
+          a#sidebar-login-link.login-link(href="/account/login") Login
+        li
+          a#sidebar-signup-link.signup-link(href="/account/signup") Sign up

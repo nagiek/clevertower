@@ -59,7 +59,7 @@ define [
 
         switch error.message
           when 'title_missing' then @$('#property-title-group').addClass('error')
-          else @$('#address-search-group').addClass('error')
+          else @$('#address-search-group').addClass('has-error')
         
         new Alert event: 'model-save', fade: false, message: msg, type: 'error'
 
@@ -72,7 +72,7 @@ define [
           lease: lease
           unit: lease.get "unit"
           property: lease.get "property"
-        Parse.User.current().save(vars)
+        Parse.User.current().set(vars)
         @path = "/account/building"
 
       @on "wizard:finish", => Parse.history.navigate @path, true
@@ -94,7 +94,7 @@ define [
 
     join : (existingProperty) =>
       return if @state is 'join'
-      @$('.error').removeClass('error')
+      @$('.has-error').removeClass('has-error')
       @$('button.next').button('loading') # prop "disabled", true
       @$('button.join').button('loading') # prop "disabled", true
       @state = 'join'
@@ -105,7 +105,7 @@ define [
       @animate 'forward'
 
     manage : (existingProperty) =>
-      @$('.error').removeClass('error')
+      @$('.has-error').removeClass('has-error')
       @$('button.next').button('loading') # prop "disabled", true
       @$('button.join').button('loading') # prop "disabled", true
 
@@ -120,7 +120,7 @@ define [
 
 
     next : (e) =>
-      @$('.error').removeClass('error')
+      @$('.has-error').removeClass('has-error')
       @$('button.next').button('loading') # prop "disabled", true
       @$('button.join').button('loading') # prop "disabled", true
       switch @state
@@ -205,7 +205,7 @@ define [
                 profile: Parse.User.current().get("profile")
                 ACL: activityACL
               .then ->
-                Parse.User.current().activity = Parse.User.current().activity || new ActivityList {}, []
+                Parse.User.current().activity = Parse.User.current().activity || new ActivityList [], {}
                 Parse.User.current().activity.add activity
 
               # Share on FB?
@@ -236,10 +236,14 @@ define [
           data = @form.$el.serializeObject()
           attrs = @form.model.scrub data.lease
           attrs = @assignAdditionalToLease data, attrs
-          
-          @form.model.save attrs,
-            success: (lease) => @trigger "lease:save", @form.model; @trigger "wizard:finish"
-            error: (error) =>   @form.model.trigger "invalid", error
+
+          # new Lease(forNetwork: @forNetwork, property: @existingProperty).save().then (lease) =>           
+          @form.model.save(attrs).then (lease) => 
+            @trigger "lease:save", @form.model
+            @trigger "wizard:finish"
+          , (error) => 
+            @buttonsForward()
+            @form.model.trigger "invalid", error
 
     back : (e) =>
       return if @state is 'address'
@@ -301,32 +305,43 @@ define [
             when "property", "join"
               @trigger "view:advance"
               @$('.back').removeProp "disabled"
-              @map.$el.animate left: "-150%", 500
-              @form.$el.animate left: "0", 500, 'swing', @buttonsForward
+              @map.$el.transition left: "-150%"
+              @form.$el.transition left: "0", @buttonsForward
+              # @form.$el.animate left: "0", 500, 'swing', @buttonsForward
             when "picture"
-              @form.$el.animate left: "-150%", 500
-              @picture.$el.animate left: "0", 500, 'swing', @buttonsForward
+              # @form.$el.animate left: "-150%", 500
+              @form.$el.transition left: "-150%"
+              @picture.$el.transition left: "0", @buttonsForward
+              # @picture.$el.animate left: "0", 500, 'swing', @buttonsForward
             when "share"
               @$('.next').html i18nCommon.actions.finish
-              @picture.$el.animate left: "-150%", 500
-              @share.$el.animate left: "0", 500, 'swing', @buttonsForward
+              # @picture.$el.animate left: "-150%", 500
+              @picture.$el.transition left: "-150%"
+              @share.$el.transition left: "0", @buttonsForward
+              # @share.$el.animate left: "0", 500, 'swing', @buttonsForward
         when 'backward'
           switch @state
             when "property", "join"
               @trigger "view:retreat"
-              @map.$el.animate left: "0%", 500
-              @form.$el.animate left: "150%", 500, 'swing', => @form.clear();  @$('.back').prop "disabled", true
+              # @map.$el.animate left: "0%", 500
+              @map.$el.transition left: "0"
+              @form.$el.transition left: "150%", => @form.clear();  @$('.back').prop "disabled", true
+              # @form.$el.animate left: "150%", 500, 'swing', => @form.clear();  @$('.back').prop "disabled", true
               delete @existingProperty
               @state = 'address'
               @$('.back').prop "disabled", true
             when "picture"
-              @form.$el.animate left: "0%", 500
-              @picture.$el.animate left: "150%", 500, 'swing', @picture.clear
+              # @form.$el.animate left: "0%", 500
+              @form.$el.transition left: "0"
+              @picture.$el.transition left: "150%", @picture.clear
+              # @picture.$el.animate left: "150%", 500, 'swing', @picture.clear
               @state = 'property'
             when "share"
-              @$('.next').html i18nCommon.actions.next
-              @picture.$el.animate left: "0%", 500
-              @share.$el.animate left: "150%", 500, 'swing', @share.clear
+              # @$('.next').html i18nCommon.actions.next
+              # @picture.$el.animate left: "0%", 500
+              @picture.$el.transition left: "0"
+              @share.$el.transition left: "150%", @share.clear
+              # @share.$el.animate left: "150%", 500, 'swing', @share.clear
               @state = 'picture'
 
     buttonsForward: =>

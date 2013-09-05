@@ -1,11 +1,11 @@
 <div class="container">
   <header class="fade in row">
-    <h1 class="offset1 span6"><%= i18nUser.setup.welcome_message %></h1>
+    <h1 class="col-md-offset-1 col-sm-6"><%= i18nUser.setup.welcome_message %></h1>
 
-    <form class="span5 form-horizontal form-condensed" method="post" id="settings-form">      
-      <div id="user-type-group" class="control-group">
-        <label for="user-type" class="control-label"><%= i18nUser.setup.performing_setup_for %>:</label>
-        <div class="controls">
+    <form class="col-sm-6 col-md-5 form-horizontal form-condensed" id="settings-form">      
+      <div id="user-type-group" class="form-group">
+        <label for="user-type" class="control-label col-xs-6"><%= i18nUser.setup.performing_setup_for %>:</label>
+        <div class="col-xs-6">
           <div class="toggle">
           <label class="toggle-radio" for="typeOption1"><%= i18nDevise.form.type.tenant %></label>
           <input type="radio" name="user-type" id="typeOption1" value="tenant" <%= type == 'tenant' ? checked="checked" : '' %>>

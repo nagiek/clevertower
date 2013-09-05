@@ -8,11 +8,9 @@
     <% } %>
   </div>
   <% if (objectId) { %><div class="view-specific view-edit<% if (!editing) { %> hide<% } %>"><% } %>
-    <div class="control-group">
-  		<div class="controls">
-  			<input type="text" maxlength="8" name="title" class="span1 title" value="<%= title %>">
-  		</div>
-  	</div>
+    <div class="form-group">
+      <input type="text" maxlength="8" name="title" class="form-control title" value="<%= title %>">
+    </div>
   <% if (objectId) { %></div><% } %>
 </td>
 <td>
@@ -39,76 +37,76 @@
   </td>
 <% } %>
 <td class="view-specific view-edit<% if (!editing) { %> hide<% } %>">
-  <div class="control-group">
-		<div class="controls">
-			<select name="bedrooms">
-			  <option value="0" <%= bedrooms == 0 ? 'selected' : '' %>><%= i18nUnit.form.bedrooms.zero %></option>
-			  <option value="1" <%= bedrooms == 1 ? 'selected' : '' %>><%= i18nUnit.form.bedrooms.one %></option>
-			  <option value="2" <%= bedrooms == 2 ? 'selected' : '' %>><%= i18nUnit.form.bedrooms.two %></option>
-			  <option value="3" <%= bedrooms == 3 ? 'selected' : '' %>><%= i18nUnit.form.bedrooms.three %></option>
-			  <option value="4" <%= bedrooms == 4 ? 'selected' : '' %>><%= i18nUnit.form.bedrooms.four %></option>
-			  <option value="5" <%= bedrooms == 5 ? 'selected' : '' %>><%= i18nUnit.form.bedrooms.five %></option>
-			</select>
-		</div>
-	</div>
+  <div class="form-group bedrooms-group">
+    <select class="form-control" name="bedrooms">
+      <option value="0" <%= bedrooms == 0 ? 'selected' : '' %>><%= i18nUnit.form.bedrooms.zero %></option>
+      <option value="1" <%= bedrooms == 1 ? 'selected' : '' %>><%= i18nUnit.form.bedrooms.one %></option>
+      <option value="2" <%= bedrooms == 2 ? 'selected' : '' %>><%= i18nUnit.form.bedrooms.two %></option>
+      <option value="3" <%= bedrooms == 3 ? 'selected' : '' %>><%= i18nUnit.form.bedrooms.three %></option>
+      <option value="4" <%= bedrooms == 4 ? 'selected' : '' %>><%= i18nUnit.form.bedrooms.four %></option>
+      <option value="5" <%= bedrooms == 5 ? 'selected' : '' %>><%= i18nUnit.form.bedrooms.five %></option>
+    </select>
+  </div>
 </td>
 <td class="view-specific view-edit<% if (!editing) { %> hide<% } %>">
-  <div class="control-group">
-		<div class="controls">
-			<select name="bathrooms">
-			  <option value="0" <%= bathrooms == 0 ? 'selected' : '' %>><%= i18nUnit.form.bathrooms.zero %></option>
-			  <option value="1" <%= bathrooms == 1 ? 'selected' : '' %>><%= i18nUnit.form.bathrooms.one %></option>
-			  <option value="1.5" <%= bathrooms == 1.5 ? 'selected' : '' %>><%= i18nUnit.form.bathrooms.oneandahalf %></option>
-			  <option value="2" <%= bathrooms == 2 ? 'selected' : '' %>><%= i18nUnit.form.bathrooms.two %></option>
-			  <option value="2.5" <%= bathrooms == 2.5 ? 'selected' : '' %>><%= i18nUnit.form.bathrooms.twoandahalf %></option>
-			  <option value="3" <%= bathrooms == 3 ? 'selected' : '' %>><%= i18nUnit.form.bathrooms.three %></option>
-			  <option value="3.5" <%= bathrooms == 3.5 ? 'selected' : '' %>><%= i18nUnit.form.bathrooms.threeandahalf %></option>
-			</select>
-		</div>
-	</div>
+  <div class="form-group bathrooms-group">
+    <select name="bathrooms" class="form-control">
+      <option value="0" <%= bathrooms == 0 ? 'selected' : '' %>><%= i18nUnit.form.bathrooms.zero %></option>
+      <option value="1" <%= bathrooms == 1 ? 'selected' : '' %>><%= i18nUnit.form.bathrooms.one %></option>
+      <option value="1.5" <%= bathrooms == 1.5 ? 'selected' : '' %>><%= i18nUnit.form.bathrooms.oneandahalf %></option>
+      <option value="2" <%= bathrooms == 2 ? 'selected' : '' %>><%= i18nUnit.form.bathrooms.two %></option>
+      <option value="2.5" <%= bathrooms == 2.5 ? 'selected' : '' %>><%= i18nUnit.form.bathrooms.twoandahalf %></option>
+      <option value="3" <%= bathrooms == 3 ? 'selected' : '' %>><%= i18nUnit.form.bathrooms.three %></option>
+      <option value="3.5" <%= bathrooms == 3.5 ? 'selected' : '' %>><%= i18nUnit.form.bathrooms.threeandahalf %></option>
+    </select>
+  </div>
 </td>
 <td class="view-specific view-edit<% if (!editing) { %> hide<% } %>">
-  <div class="control-group">
-		<div class="controls input-append">
-			<input type="text" maxlength="6" name="square_feet" class="span1" value="<%= square_feet %>">
-			<div class="add-on"><%= i18nUnit.form.squarefeetsymbol %></div>
-		</div>
-	</div>
+  <div class="square-feet-group form-group">
+    <div class="input-group">
+      <input type="text" maxlength="6" name="square_feet" class="form-control" value="<%= square_feet %>">
+      <div class="input-group-addon"><%= i18nUnit.form.squarefeetsymbol %></div>
+    </div>
+  </div>
 </td>
 <td>
   <% if (objectId) { %>
-    <a class="btn btn-mini add-lease view-specific view-show<% if (editing) { %> hide<% } %>"
+    <a class="btn btn-link add-lease view-specific view-show<% if (editing) { %> hide<% } %>"
        href="<%= baseUrl %>/add/lease?unitId=<%= objectId %>" 
        rel="tooltip" 
-       data-original-title="<%= i18nLease.actions.add_new_lease %>">
-      <i class="icon-plus"></i>
+       title="<%= i18nLease.actions.add_new_lease %>">
+      <span class="glyphicon glyphicon-plus"></span>
     </a>
-    <a class="btn btn-mini add-listing view-specific view-show<% if (editing) { %> hide<% } %>"
+    <a class="btn btn-link add-listing view-specific view-show<% if (editing) { %> hide<% } %>"
        href="<%= baseUrl %>/add/listing?unitId=<%= objectId %>"
        rel="tooltip" 
-       data-original-title="<%= i18nListing.actions.add_listing %>">
-      <i class="icon-listing"></i>
+       title="<%= i18nListing.actions.add_listing %>">
+      <span class="glyphicon glyphicon-certificate glyphicon-listing"></span>
     </a>
     <% if (activeLease) { %>
-      <a class="btn btn-mini add-tenants view-specific view-show<% if (editing) { %> hide<% } %>"
+      <a class="btn btn-link add-tenants view-specific view-show<% if (editing) { %> hide<% } %>"
          href="<%= baseUrl %>/add/tenants?leaseId=<%= activeLease.id %>" 
          rel="tooltip" 
-         data-original-title="<%= i18nLease.actions.add_tenants %>">
-        <i class="icon-user"></i>
+         title="<%= i18nLease.actions.add_tenants %>">
+        <span class="glyphicon glyphicon-user"></span>
       </a>
-      <a class="btn btn-mini extend view-specific view-show<% if (editing) { %> hide<% } %>"
+      <a class="btn btn-link extend view-specific view-show<% if (editing) { %> hide<% } %>"
          href="<%= baseUrl %>/leases/<%= activeLease.id %>/extend"
          rel="tooltip" 
-         data-original-title="<%= i18nLease.actions.extend %>">
-        <i class="icon-repeat"></i>
+         title="<%= i18nLease.actions.extend %>">
+        <span class="glyphicon glyphicon-repeat"></span>
       </a>
     <% } %>
-    <button class="btn btn-mini btn-danger delete view-specific view-edit<% if (!editing) { %> hide<% } %>"
-            rel="tooltip"
-            data-original-title="<%= i18nCommon.actions.delete %>">
-      <i class="icon-trash icon-white"></i>
-    </button>
+    <span class="view-specific view-edit<% if (!editing) { %> hide<% } %>">
+      <button class="btn btn-small btn-danger delete view-specific view-edit<% if (!editing) { %> hide<% } %>"
+              rel="tooltip"
+              data-original-title="<%= i18nCommon.actions.delete %>">
+        <span class="glyphicon glyphicon-trash"></span>
+      </button>
+    </span>
   <% } else { %>
-    <button class="btn btn-mini btn-danger remove"><%= i18nCommon.actions.remove %></button>
+    <span class="view-specific view-edit<% if (!editing) { %> hide<% } %>">
+      <button class="btn btn-small btn-danger remove"><%= i18nCommon.actions.remove %></button>
+    </span>
   <% } %>
 </td>

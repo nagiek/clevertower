@@ -96,7 +96,7 @@
                 _this.model.photos.add(photo);
               }
               activity = new Activity({
-                image: arguments[0].get("name"),
+                image: arguments[0].get("url"),
                 title: i18nProperty.activity.added_photos(arguments.length),
                 "public": true,
                 property: _this.model

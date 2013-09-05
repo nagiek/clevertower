@@ -13,7 +13,7 @@
       h1 {
         margin-left:0;
         margin-bottom:0;
-        color:@white;      
+        color:@fff;      
         padding-left: 18px;
         padding-bottom: 5px;
         
@@ -39,13 +39,13 @@
     margin-bottom:18px;
   }
   .main {
-    padding-top: @anonNavbarHeight;
+    padding-top: @navbar-height-anon;
   }
   #header {
     padding-top:0;
   }
   .page-header {
-    background-image: url("@{imagesFolder}/background-building-wrapper.png");
+    background-image: url("@{images-folder}/background/background-building-wrapper.png");
     background-repeat: no-repeat;
     background-position: 50% -50px;
     padding-top: 180px;
@@ -59,12 +59,12 @@ body {
   &.logged-in {
     &.page-tour {
       .main {
-        padding-top: @navbarHeight;
+        padding-top: @navbar-height;
       }
     }
     .page-branding {
       .main {
-        padding-top: @brandStripHeight + @navbarHeight + 15px;
+        padding-top: @brand-strip-height + @navbar-height + 15px;
       }
     }
   }
@@ -73,17 +73,17 @@ body {
 
 .page-branding {
   .main {
-    padding-top: @anonNavbarHeight + @brandStripHeight + 15px;
+    padding-top: @brand-strip-height + @navbar-height-anon + 15px;
   }
   .brand-strip {
-    background-image:url(../../images/background-skyline-strip-c.jpg);
+    background-image:url("@{images-folder}/background/background-skyline-strip-c.jpg");
     background-repeat:no-repeat;
     background-position:50% 50%;
-    height:@brandStripHeight;
+    height:@brand-strip-height;
     width:100%;
     margin-bottom:9px;
     position:absolute;
-    top:@anonNavbarHeight;
+    top:@navbar-height-anon;
     left:0;
   }
 }

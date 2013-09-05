@@ -3,34 +3,28 @@
     <div id="backdrops" class="position-absolute box-fill"></div><!-- Photos are inserted here -->
     <div class="container">
       <div class="row">
-        <div class="span6">
-          <div class="hero-unit">
+        <div class="col-sm-6">
+          <div class="jumbotron">
             <h1>Splash page</h1>
-            <form class="navbar-search form-search form-large">
-              <div class="controls">
-                <div class="input-append stay-right">
-                  <button class="btn" type="submit" rel="tooltip" data-original-title="<%= i18nCommon.actions.search %>">
-                    <i class="icon icon-search"></i>
-                  </button>
-                </div>
-                <div class="input-append bar-append">
-                  <input class="input-xlarge search-query" type="text" name="q" placeholder="<%= i18nCommon.actions.search %>" autocomplete="off" spellcheck="off">
-                </div>
-              </div>
+            <form class="form-search navbar-search">
+              <button type="button" class="btn btn-lg btn-link hidden-sm">
+                <span class="glyphicon glyphicon-search"></span>
+              </button>
+              <input class="form-control input-lg search-query" type="text" name="q" placeholder="<%= i18nCommon.actions.search %>" autocomplete="off" spellcheck="off">
             </form>
           </div>
         </div>
-        <div id="featured-listings-wrapper" class="carousel span4 offset1">
+        <div id="featured-listings-wrapper" class="carousel col-sm-4 col-md-offset-1">
           <!-- Carousel items -->
-          <ul id="featured-listings" class="carousel-inner unstyled"></ul>
+          <ul id="featured-listings" class="carousel-inner list-unstyled"></ul>
           <!-- Carousel nav -->
           <a class="fade left carousel-control" href="#featured-listings-wrapper" data-slide="prev">&lsaquo;</a>
           <a class="fade right carousel-control" href="#featured-listings-wrapper" data-slide="next">&rsaquo;</a>
 
           <div id="caption" class="carousel-caption fade">
-            <div id="network-photo" class="photo photo-mini stay-left"></div>
+            <div id="network-photo" class="photo photo-mini pull-left"></div>
             <div class="photo-float mini-float">
-              <p class="stay-right"><span id="rent"></span> <%= i18nCommon.dates.per_month %></p>
+              <p class="pull-right"><span id="rent"></span> <%= i18nCommon.dates.per_month %></p>
               <h4 id="title"></h4>
               <p id="locality" class="small"></p>
             </div>
@@ -45,4 +39,3 @@
     <h2 class="text-center">Thousands use CleverTower to manage their real estate</h2>
   </div>
 </div>
-

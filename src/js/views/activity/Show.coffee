@@ -31,6 +31,8 @@ define [
         @listenTo Parse.User.current().get("profile").likes, "reset", @checkIfLiked
         @checkIfLiked()
 
+      $('#view-content-modal').on 'hide', @hideModal
+
     checkIfLiked: ->
       @markAsLiked() if Parse.User.current().get("profile").likes.find (l) => l.id is @model.id
 
@@ -73,12 +75,19 @@ define [
         end: moment(@model.get("endDate")).format("LLL")
         postDate: moment(@model.createdAt).fromNow()
         liked: @liked
-        postImage: @model.image("large")
+        postImage: @model.image("span4")
         icon: @model.icon()
         name: @model.name()
         profilePic: @model.profilePic("tiny")
+        profileUrl: @model.get("profile").url()
+        linkedToProperty: @model.linkedToProperty()
         pos: @pos % 20 # This will be incremented in the template.
+        current: Parse.User.current()
         i18nCommon: i18nCommon
+
+      if Parse.User.current()
+        vars.self = Parse.User.current().get("profile").name()
+        vars.selfProfilePic = Parse.User.current().get("profile").cover("tiny")
 
       # Default options. 
       _.defaults vars,

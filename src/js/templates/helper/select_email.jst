@@ -1,33 +1,35 @@
-<form id="select-email-form">
-  <div class="modal-header clearfix">
-    <div class="stay-left">
-      <h3 class="inline"><%= i18nCommon.actions.select_contacts %></h3>
-      <p class="inline">(<span class="start">1</span> - <span class="end"></span>)</p>
-    </div>
+<form id="select-email-form" class="modal-dialog modal-form">
+  <div class="modal-content">
+    <div class="modal-header clearfix">
+      <div class="pull-left">
+        <h3 class="inline"><%= i18nCommon.actions.select_contacts %></h3>
+        <p class="inline">(<span class="start">1</span> - <span class="end"></span>)</p>
+      </div>
 
-    <div class="btn-group stay-right">
-      <button type="button" class="prev btn disabled"><i class="icon icon-arrow-left"></i></button>
-      <button type="button" class="next btn"><i class="icon icon-arrow-right"></i></button>
+      <div class="btn-group pull-right">
+        <button type="button" class="prev btn btn-default disabled"><span class="glyphicon glyphicon-arrow-left"></span></button>
+        <button type="button" class="next btn btn-default"><span class="glyphicon glyphicon-arrow-right"></span></button>
+      </div>
     </div>
-  </div>
-  <div class="modal-body">
-    <table class="table">
-      <thead>
-        <tr>
-          <th><%= i18nCommon.fields.email %></th>
-          <th><span class="element-invisible"><%= i18nCommon.nouns.Operations %></span></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr class="empty">
-          <td>
-            <div class="text-center"><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>"></div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="done btn"><%= i18nCommon.actions.close %></button>
+    <div class="modal-body">
+      <table class="table">
+        <thead>
+          <tr>
+            <th><%= i18nCommon.fields.email %></th>
+            <th><span class="element-invisible"><%= i18nCommon.nouns.Operations %></span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="empty">
+            <td>
+              <div class="text-center"><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>"></div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="done btn btn-default"><%= i18nCommon.actions.close %></button>
+    </div>
   </div>
 </form>

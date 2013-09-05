@@ -12,7 +12,7 @@ define [
   class PropertyResultView extends Parse.View
   
     tagName: "li"
-    className: "result clearfix lifted position-relative"
+    className: "result media clearfix lifted position-relative"
 
     events:
       'click .join'         : 'join'

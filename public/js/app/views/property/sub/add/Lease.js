@@ -21,31 +21,34 @@
         this.on("view:change", this.clear);
         this.baseUrl = attrs.baseUrl;
         this.forNetwork = attrs.forNetwork;
+        this.params = attrs.params;
         vars = {
           property: this.model,
           network: this.model.get("network")
         };
         if (attrs.params && attrs.params.unit) {
-          this.model.prep('units');
-          if (this.model.units.length === 0) {
-            this.model.units.fetch();
-          }
           vars.unit = {
             __type: "Pointer",
             className: "Unit",
-            objectId: attrs.params.unit
+            objectId: attrs.params.unit.id
           };
         }
         return this.lease = new Lease(vars);
       };
 
       AddLeaseToPropertyView.prototype.render = function() {
-        this.form = new NewLeaseView({
+        var vars;
+
+        vars = {
           model: this.lease,
           property: this.model,
           baseUrl: this.baseUrl,
           forNetwork: this.forNetwork
-        }).render();
+        };
+        if (this.params) {
+          vars.unitId = this.params.unitId;
+        }
+        this.form = new NewLeaseView(vars).render();
         return this;
       };
 

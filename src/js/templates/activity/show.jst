@@ -1,12 +1,12 @@
 <div class="container">
   <div class="row">
-    <div class="offset3 span6">
+    <div class="col-md-offset-3 col-md-6">
       <div class="thumbnail clearfix activity fade in">
         <div class="content">
           <% if (postImage) { %>
-            <div class="photo photo-grid6"><img src="<%= postImage %>" alt="<%= i18nCommon.nouns.cover_photo %>"></div>
+            <div class="photo photo-full"><img class="img-responsive" src="<%= postImage %>" alt="<%= i18nCommon.nouns.cover_photo %>"></div>
             <div class="caption">
-              <% if (rent) { %><div class="rent stay-right">$<%= rent %></div><% } %>
+              <% if (rent) { %><div class="rent pull-right">$<%= rent %></div><% } %>
               <p><strong><%= title %></strong></p>
           <% } else { %>
             <blockquote><%= title %></blockquote>
@@ -17,22 +17,22 @@
         </div>
 
         <footer>
-          <div class="photo photo-micro stay-left">
+          <div class="photo photo-micro pull-left">
             <img src="<%= profilePic %>" alt="<%= name %>" width="23" height="23">
           </div>
           <div class="photo-float micro-float">
             <small><%= i18nCommon.fields.posted %> <%= postDate %></small>   
-            <% if (icon) { %><span><i class="icon icon-<%= icon %>"></i></span><% } %>
-            <ul class="activity-actions inline stay-right align-bottom">
+            <% if (icon) { %><span class="glyphicon glyphicon-<%= icon %>"></span><% } %>
+            <ul class="activity-actions list-inline pull-right align-bottom">
               <li>
                 <a href="#" class="like-button<% if (liked) { %> active<% } %>" >
-                  <i class="icon icon-sprite icon-like"></i>
+                  <span class="glyphicon glyphicon-thumbs-up"></span>
                 </a>
                 <small class="like-count"><%= likeCount %></small>
               </li>
               <li>
                 <a href="#" class="comment-button">
-                  <i class="icon icon-status"></i>
+                  <span class="glyphicon glyphicon-comment"></span>
                 </a>
                 <small class="comment-count"><%= commentCount %></small>
               </li>

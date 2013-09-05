@@ -87,7 +87,7 @@ define [
           new Parse.Query("Tenant").equalTo("listing", @model).include("profile").find()
           .then (objs) -> network.tenants.add objs
         
-        Parse.history.navigate "#{@baseUrl}/#{model.id}", true
+        Parse.history.navigate "#{@baseUrl}/listings/#{model.id}", true
         # require ["views/listing/Show"], (ShowListingView) =>
         #   # Alert the user and move on
         #   new ShowListingView(model: model, property: model.get("property")).render()
@@ -97,14 +97,10 @@ define [
       # @unit = @model.get("unit")
       unless @unit
         if @property
-          console.log @property.units
-          debugger
           @property.prep("units")
           @listenTo @property.units, "add", @addOne
           @listenTo @property.units, "reset", @addAll
         else 
-          console.log Parse.User.current().get("network")
-          debugger
           Parse.User.current().get("network").prep("units")
           @listenTo Parse.User.current().get("network").units, "add", @addOne
           @listenTo Parse.User.current().get("network").units, "reset", @addAll

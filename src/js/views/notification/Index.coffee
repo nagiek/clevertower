@@ -22,7 +22,6 @@ define [
       @listenTo Parse.User.current().notifications, "add", @addOne
       @listenTo Parse.User.current().notifications, "reset", @addAll
       
-      
     markMemosAsRead: =>
       @$mCount.html(0).addClass("hide")
       _.each Parse.User.current().notifications.unread(), (n) -> 

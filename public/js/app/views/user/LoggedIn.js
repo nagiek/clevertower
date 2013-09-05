@@ -27,8 +27,7 @@
           this.listenTo(Parse.User.current().get("network").properties, "add", this.subscribeProperty);
         }
         this.listenTo(Parse.User.current().get("profile"), "change:image_profile", this.updatePic);
-        this.listenTo(Parse.User.current().get("profile"), "change:first_name change:last_name", this.updateName);
-        return this.render();
+        return this.listenTo(Parse.User.current().get("profile"), "change:first_name change:last_name", this.updateName);
       };
 
       LoggedInView.prototype.subscribeProperty = function(obj) {
@@ -62,7 +61,7 @@
           i18nCommon: i18nCommon
         };
         this.$el.html(JST["src/js/templates/user/logged_in_menu.jst"](vars));
-        $("#panel-user-menu").html(JST["src/js/templates/user/logged_in_panel.jst"](vars));
+        $("#sidebar-user-menu").html(JST["src/js/templates/user/logged_in_panel.jst"](vars));
         this.notificationsView = new NotificationsView;
         this.notificationsView.render();
         return this;
@@ -70,12 +69,12 @@
 
       LoggedInView.prototype.updateNav = function() {
         this.$('#profile-link img').prop("src", Parse.User.current().get("profile").cover("micro"));
-        return $('#panel-profile-link img').prop("src", Parse.User.current().get("profile").cover("micro"));
+        return $('#sidebar-profile-link img').prop("src", Parse.User.current().get("profile").cover("micro"));
       };
 
       LoggedInView.prototype.updateName = function() {
         this.$('#profile-link span').html(Parse.User.current().get("profile").name());
-        return $('#panel-profile-link span').html(Parse.User.current().get("profile").name());
+        return $('#sidebar-profile-link span').html(Parse.User.current().get("profile").name());
       };
 
       return LoggedInView;

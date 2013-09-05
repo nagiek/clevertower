@@ -1,121 +1,139 @@
 <div id="property" class="container">
-  <div class="page-header clearfix">    
-    <div id="property-picture" class="photo photo-thumbnail photo-elastic pull-left tablet-left">
-      <a href="<%= baseUrl %>">
-        <img src="<%= cover %>" alt="Profile" class="img-rounded profile-picture">
-      </a>
-      <div class="photo-actions">
-        <button type="button" role="button" id="edit-property-picture" class="btn btn-small">
-          <i class="icon-edit"></i>
-        </button>
-      </div>
-    </div>
-    
-    <header class="header photo-float thumbnail-float elastic-float">
-
-      <h1 class="inline-block profile-inline">
-        <a href="<%= baseUrl %>"><%= title %></a>
-      </h1>
-
-      <ul class="inline pull-right">
-        <li><a href="<%= baseUrl %>/edit">
-          <i rel="tooltip" data-placement="bottom" title="<%= i18nProperty.menu.edit_property %>" class="icon-edit"></i>
-        </a></li>
-        <li><a href="<%= publicUrl %>">
-          <i rel="tooltip" data-placement="bottom" title="<%= i18nProperty.menu.view_public %>" class="icon-signout"></i>
-        </a></li>
-        <% if (!hasNetwork) { %>
-          <li><a href="/network/new" class="btn tablet-hidden phone-hidden"><i class="icon-arrow-up"></i><%= i18nCommon.actions.upgrade %></a></li>
-        <% } %>
-      </ul>
-
-      <ul class="nav nav-tabs inline-block profile-inline" role="navigation">
-        <li><a href="<%= baseUrl %>"><%= i18nProperty.menu.building %></a></li>
-        <li><a href="<%= baseUrl %>/tenants"><%= i18nProperty.menu.tenants %></a></li>
-        <li><a href="<%= baseUrl %>/listings"><%= i18nProperty.menu.listings %></a></li>
-        <li><a href="<%= baseUrl %>/photos"><%= i18nProperty.menu.photos %></a></li>
-
-        <!-- 
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-            <%= i18nProperty.menu.day_to_day %>
-            <b class="caret"></b>
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="page-header clearfix">    
+        <div id="property-picture" class="photo photo-thumbnail photo-elastic left-lg left-md">
+          <a href="<%= baseUrl %>">
+            <img src="<%= cover %>" alt="Profile" class="img-rounded profile-picture">
           </a>
-          <%= JST["src/js/templates/property/menu/show.jst"]({baseUrl: baseUrl, i18nProperty: i18nProperty}) %>
-        </li>
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-            <%= i18nProperty.menu.building %>
-            <b class="caret"></b>
-          </a>
-          <%= JST["src/js/templates/property/menu/building.jst"]({publicUrl: publicUrl, baseUrl: baseUrl, i18nProperty: i18nProperty}) %>
-        </li>
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-            <%= i18nProperty.menu.reports %>
-            <b class="caret"></b>
-          </a>
-          <%= JST["src/js/templates/property/menu/reports.jst"]({baseUrl: baseUrl, i18nProperty: i18nProperty}) %>
-        </li>
-        <li class="dropdown add-dropdown">
-          <a href="#" class="btn.btn-success dropdown-toggle" data-toggle="dropdown">
-            <%= i18nProperty.menu.actions %>
-            <b class="caret"></b>
-          </a>
-          <%= JST["src/js/templates/property/menu/actions.jst"]({baseUrl: baseUrl, i18nProperty: i18nProperty}) %>
-        </li>
-        -->
-      </ul>
-    </header>
-  </div>
-  <% if (!hasNetwork) { %>
-    <a href="/network/new" class="stay-right btn desktop-hidden"><i class="icon-arrow-up"></i><%= i18nCommon.actions.upgrade %></a>
-  <% } %>
-
-  <div class="content fade"></div>
-</div>
-
-<div id="edit-property-picture-modal" class="modal form-modal hide fade">
-  <form id="property-picture-upload-form" method="POST">
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-labelledby="edit-property-picture-modal-label" aria-hidden="true">&times;</button>
-      <h3 id="edit-property-picture-modal-label"><%= i18nCommon.actions.edit_picture %></h3>
-    </div>
-    <div class="modal-body">
-      <div class="row-fluid control-group">
-        <div id="preview-property-picture" class="preview template-upload">
-          <img src="<%= cover %>" alt="Profile" class="profile-picture span4 offset1">
-        </div>
-        <div id="property-picture-controls" class="span6 offset1">
-          <div class="fileupload-buttonbar">
-            <button type="button" id="file-input" class="btn fileinput-button">
-                <span><%= i18nCommon.actions.choose_file %></span>
-                <input type="file" name="files[]" accept="photo/*">
+          <div class="photo-actions">
+            <button type="button" role="button" class="edit-property-picture btn btn-default btn-small">
+              <span class="glyphicon glyphicon-picture"></span>
             </button>
           </div>
-          <!-- The global progress information -->
-          <div class="fileupload-progress fade hide">
-
-            <!-- The global progress bar -->
-            <div class="progress progress-success progress-striped active"
-              role="progressbar"
-              aria-valuemin="0"
-              aria-valuemax="100">
-              <div class="bar" style="width:0%;"></div>
-            </div>
-            <!-- The extended global progress information -->
-            <div class="progress-extended">&nbsp;</div>
-            
-          </div>
-
-          <!-- The loading indicator is shown during file processing -->
-          <div class="fileupload-loading"></div>
         </div>
-      </div>    
+        
+        <header class="header photo-float thumbnail-float elastic-float">
+          <ul class="pull-right list-unstyled actions">
+            <li class="right-lg right-md">
+              <a class="btn btn-link" href="<%= baseUrl %>/edit" rel="tooltip" data-placement="bottom" title="<%= i18nProperty.menu.edit_property %>">
+              <span class="glyphicon glyphicon-edit"></span>
+              </a>
+            </li>
+            <li class="right-lg right-md">
+              <a class="btn btn-link"  href="<%= publicUrl %>" rel="tooltip" data-placement="bottom" title="<%= i18nProperty.menu.view_public %>">
+                <span class="glyphicon glyphicon-signout"></span>
+              </a>
+            </li>
+            <li class="visible-sm">
+              <button type="button" role="button" class="edit-property-picture btn btn-link">
+                <span class="glyphicon glyphicon-picture"></span>
+              </button>
+            </li>
+            <% if (!hasNetwork) { %>
+              <li class="pull-right hidden-sm">
+                <a href="/network/new" class="btn btn-default">
+                  <span class="glyphicon glyphicon-arrow-up"></span> <%= i18nCommon.actions.upgrade %>
+                </a>
+              </li>
+            <% } %>
+          </ul>
+
+          <h1 class="inline-block profile-inline">
+            <a href="<%= baseUrl %>"><%= title %></a>
+          </h1>
+
+          <ul class="nav nav-tabs inline-block profile-inline" role="navigation">
+            <li id="units-tab" class="active"><a href="<%= baseUrl %>"><%= i18nProperty.menu.building %></a></li>
+            <li id="tenants-tab"><a href="<%= baseUrl %>/tenants"><%= i18nProperty.menu.tenants %></a></li>
+            <li id="listings-tab"><a href="<%= baseUrl %>/listings"><%= i18nProperty.menu.listings %></a></li>
+            <li id="photos-tab"><a href="<%= baseUrl %>/photos"><%= i18nProperty.menu.photos %></a></li>
+
+            <!-- 
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                <%= i18nProperty.menu.day_to_day %>
+                <b class="caret"></b>
+              </a>
+              <%= JST["src/js/templates/property/menu/show.jst"]({baseUrl: baseUrl, i18nProperty: i18nProperty}) %>
+            </li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                <%= i18nProperty.menu.building %>
+                <b class="caret"></b>
+              </a>
+              <%= JST["src/js/templates/property/menu/building.jst"]({publicUrl: publicUrl, baseUrl: baseUrl, i18nProperty: i18nProperty}) %>
+            </li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                <%= i18nProperty.menu.reports %>
+                <b class="caret"></b>
+              </a>
+              <%= JST["src/js/templates/property/menu/reports.jst"]({baseUrl: baseUrl, i18nProperty: i18nProperty}) %>
+            </li>
+            <li class="dropdown add-dropdown">
+              <a href="#" class="btn.btn-success dropdown-toggle" data-toggle="dropdown">
+                <%= i18nProperty.menu.actions %>
+                <b class="caret"></b>
+              </a>
+              <%= JST["src/js/templates/property/menu/actions.jst"]({baseUrl: baseUrl, i18nProperty: i18nProperty}) %>
+            </li>
+            -->
+          </ul>
+        </header>
+      </div>
+      <div class="content fade"></div>
+      <% if (!hasNetwork) { %>
+        <!-- <a href="/network/new" class="btn btn-default visible-sm"><i class="glyphicon glyphicon-arrow-up"></i><%= i18nCommon.actions.upgrade %></a> -->
+      <% } %>
     </div>
-    <div class="modal-footer">
-      <button class="save btn btn-primary"><%= i18nCommon.actions.save %></button>
-      <button class="btn" data-dismiss="modal"><%= i18nCommon.actions.cancel %></button>
+
+    <div id="edit-property-picture-modal" class="modal fade">
+      <div class="modal-dialog">
+        <form id="property-picture-upload-form" class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-labelledby="edit-property-picture-modal-label" aria-hidden="true">&times;</button>
+            <h3 id="edit-property-picture-modal-label" class="modal-title"><%= i18nCommon.actions.edit_picture %></h3>
+          </div>
+          <div class="modal-body">
+            <div class="row form-group">
+              <div id="preview-property-picture" class="preview template-upload">
+                <img src="<%= cover %>" alt="Profile" class="profile-picture col-md-4 col-md-offset-1">
+              </div>
+              <div id="property-picture-controls" class="col-md-6 col-md-offset-1">
+                <div class="fileupload-buttonbar">
+                  <button type="button" id="file-input" class="btn btn-default fileinput-button">
+                      <span><%= i18nCommon.actions.choose_file %></span>
+                      <input type="file" name="files[]" accept="photo/*">
+                  </button>
+                </div>
+                <!-- The global progress information -->
+                <div class="fileupload-progress fade hide">
+
+                  <!-- The global progress bar -->
+                  <div class="progress progress-success progress-striped active"
+                    role="progressbar"
+                    aria-valuemin="0"
+                    aria-valuemax="100">
+                    <div class="bar" style="width:0%;"></div>
+                  </div>
+                  <!-- The extended global progress information -->
+                  <div class="progress-extended">&nbsp;</div>
+                  
+                </div>
+
+                <!-- The loading indicator is shown during file processing -->
+                <div class="fileupload-loading"></div>
+              </div>
+            </div>    
+          </div>
+          <div class="modal-footer">
+            <button class="save btn btn-primary"><%= i18nCommon.actions.save %></button>
+            <button class="btn btn-default" data-dismiss="modal"><%= i18nCommon.actions.cancel %></button>
+          </div>
+        </form>
+      </div>
     </div>
-  </form>
+  </div>
 </div>
+    </div>

@@ -3,24 +3,20 @@
     <h3 class="inline-block"><%= i18nProperty.form.building %></h3>
     <span class="label label-large label-info"><%= i18nCommon.adjectives.public %></span>
   </hgroup>
-  <fieldset class="form-large form-inline">
+  <fieldset>
     <!-- <legend><%= i18nProperty.form.building %></legend> -->
     <div class="row">
-      <div id="property-title-group" class="control-group span6">
+      <div id="property-title-group" class="form-group col-md-6">
         <label for="property-title" class="control-label"><%= i18nProperty.fields.title %></label>
-        <div class="controls">
-          <input type="text" name="property[title]" id="property-title" class="input-xlarge" value="<%= property.title %>">
-        </div>
+        <input type="text" name="property[title]" id="property-title" class="form-control input-xlarge" value="<%= property.title %>">
       </div>
-      <div class="control-group span6">
+      <div class="form-group col-md-6">
         <label for="property-email" class="control-label"><%= i18nProperty.fields.property_type.label %></label>
-        <div class="controls">
-          <select name="property[property_type]" id="property-property_type" class="span">
-            <option value="" ><%= i18nCommon.form.select.select_value %></option>
-            <option value="1" <%= property.property_type == 1 ? 'selected="selected"' : ''  %>><%= i18nProperty.fields.property_type.condo %></option>
-            <option value="2" <%= property.property_type == 2 ? 'selected="selected"' : ''  %>><%= i18nProperty.fields.property_type.apartment %></option>
-          </select>
-        </div>
+        <select name="property[property_type]" id="property-property_type" class="form-control">
+          <option value="" ><%= i18nCommon.form.select.select_value %></option>
+          <option value="1" <%= property.property_type == 1 ? 'selected="selected"' : ''  %>><%= i18nProperty.fields.property_type.condo %></option>
+          <option value="2" <%= property.property_type == 2 ? 'selected="selected"' : ''  %>><%= i18nProperty.fields.property_type.apartment %></option>
+        </select>
       </div>
     </div>
   </fieldset>

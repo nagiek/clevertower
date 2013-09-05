@@ -1,40 +1,40 @@
 <div class="container">
-  <section class="section">
-    <div class="row">
-      <div class="span8 content fade in"></div>
-      <div class="span4">
-        <ul class="nav nav-list well">
-          <li>
-            <a class="stay-right" href="/inside/edit" rel="tooltip" data-original-title="<%= i18nCommon.actions.edit %>">
-              <i class="icon icon-edit"></i>
-            </a>
-            <h3><%= title %></h3>
-          </li>
-          <li id="properties-link">
+  <div class="row">
+    <section class="col-sm-8 content fade in"></section>
+    <section class="col-sm-4">
+      <div class="panel panel-info">
+        <div class="panel-heading">
+          <a class="pull-right" href="/inside/edit" rel="tooltip" data-original-title="<%= i18nCommon.actions.edit %>">
+            <span class="glyphicon glyphicon-edit"></span>
+          </a>
+          <h3 class="panel-title"><%= title %></h3>
+        </div>
+        <ul class="list-group">
+          <li id="properties-link" class="list-group-item">
             <a href="/inside"><%= i18nCommon.classes.Properties %>
-              <span class="stay-right badge count"></span>
+              <span class="pull-right badge count"></span>
             </a>
           </li>
-          <li id="listings-link">
+          <li id="listings-link" class="list-group-item">
             <a href="/inside/listings"><%= i18nCommon.classes.Listings %>
-              <span class="stay-right badge count"></span>
+              <span class="pull-right badge count"></span>
             </a>
           </li>
-          <li id="tenants-link">
+          <li id="tenants-link" class="list-group-item">
             <a href="/inside/tenants"><%= i18nCommon.classes.Tenants %>
-              <span class="stay-right badge count"></span>
+              <span class="pull-right badge count"></span>
             </a>
           </li>
           <li class="divider"></li>
-          <li id="managers-link">
+          <li id="managers-link" class="list-group-item">
             <a href="/inside/managers"><%= i18nCommon.classes.Managers %>
-              <span class="stay-right badge count"></span>
+              <span class="pull-right badge count"></span>
             </a>
           </li>
           <!--
           <li id="reports-link">
             <a href="/inside/reports"><%= i18nProperty.menu.reports %>
-              <span class="stay-right badge count"></span>
+              <span class="pull-right badge count"></span>
             </a>
           </li>
           <li class="divider"></li>
@@ -47,7 +47,6 @@
           -->
         </ul>
       </div>
-    </div>
-  </section>
-  <div id="full-modal" class="hide"></div>
+    </section>
+  </div>
 </div>

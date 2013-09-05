@@ -14,11 +14,11 @@ __p +=
 __p +=
 ((__t = ( i18nProperty.search.map_instructions_tnt )) == null ? '' : __t);
  } ;
-__p += '\n</p>\n</div>\n<div id="address-search-group" class="control-group form-large text-center">\n  <div class="controls inline-block form-condensed ">\n    <div class="input-append">\n      <input type="text" name="search" id="geolocation-search" class="span5" placeholder="' +
+__p += '\n</p>\n<div id="address-search-group" class="form-group form-inline form-condensed">\n  <div class="row">\n    <div class="col-xs-9 col-sm-6 col-sm-offset-2">\n      <div class="input-group">\n        <input type="text" name="search" id="geolocation-search" class="form-control input-lg" placeholder="' +
 ((__t = ( i18nProperty.actions.search )) == null ? '' : __t) +
-'">\n      <button class="search btn btn-info">\n        <i class="icon icon-white icon-search"></i>\n      </button>\n    </div>\n  </div>\n  <a class="geolocate btn inline-block" href="#" style="display:none;">\n    <i class="icon icon-map-marker"></i>\n    <span class="text">' +
+'">\n        <span class="input-group-btn">\n          <button class="search btn btn-info btn-lg">\n            <span class="glyphicon glyphicon-search"></span>\n          </button>\n        </span>\n      </div>\n    </div>\n    <div class="col-xs-3 col-sm-2 text-right">\n      <button type="button" class="geolocate btn btn-default btn-lg" style="display:none;">\n        <span class="glyphicon glyphicon-map-marker"></span>\n        <span class="text">' +
 ((__t = ( i18nProperty.actions.geolocate )) == null ? '' : __t) +
-'</span>\n  </a>\n</div>\n\n<div class="row">\n  <div class="map_container span8 pull-right">\n    <div id="mapCanvas" class="map"></div>\n  </div>\n  <div class="span4">\n    <ul id="property-search-results" class="search-results unstyled">\n      <li class="empty text-center font-large">' +
+'</span>\n      </button>\n    </div>\n  </div>\n</div>\n\n<div class="row">\n  <div class="map_container col-sm-8 right-md right-lg">\n    <div id="mapCanvas" class="map"></div>\n  </div>\n  <div class="col-sm-4">\n    <ul id="property-search-results" class="search-results list-unstyled">\n      <li class="empty text-center font-large">' +
 ((__t = ( i18nProperty.search.awaiting_search )) == null ? '' : __t) +
 '</li>\n    </ul>\n    <p class="help-block">' +
 ((__t = ( i18nProperty.search.private_property )) == null ? '' : __t) +

@@ -131,8 +131,7 @@ define [
 
     setProperty : =>
       p = @$('#property-options select :selected').val()
-      property = Parse.User.current().get("network").properties.get(p)
-      unless property then property = Parse.User.current().get("property")
+      property = Parse.User.current().get("network").properties.get(p) || Parse.User.current().get("property")
       @model.set "property", property
 
 
@@ -147,25 +146,24 @@ define [
 
     handleNoProperty : ->
       @hasProperty = false
-      # Set to building-type, to show the user that they still need to join/add a property
-      # @$("#activity-type :nth-child(4) input").prop('checked', true)
-      # @$("#activity-input-caret").data "position", 3
-      # @$("#centered-on-property").parent().append("<p class='empty'><small>(#{i18nProperty.empty.properties})</small></p>")
-      if Parse.User.current().get("network")
-        @$('.no-property').html """
-                          <p>CleverTower is more fun when you're connected, but you haven't added any property yet.</p>
-                          <a class="btn btn-primary btn-block" href='#{Parse.User.current().get("network").privateUrl()}'>
-                            #{i18nProperty.actions.add_a_property}
-                          </a>
-                          """
-      else 
-        @$('.no-property').html """
-                    <p>CleverTower is more fun when you're connected, but you haven't joined a property yet.</p>
-                    <a class="btn btn-primary btn-block" href='/account/setup'>
-                      #{i18nCommon.expressions.get_started}
-                    </a>
-                    """
-      # @changeActivityType()
+      @$form.popover('show')
+      @$('> .popover .popover-title').append('<button type="button" class="close">&times;</button>')
+      @$('> .popover .close').click => @$form.popover('hide')
+
+      # if Parse.User.current().get("network")
+      #   @$('.no-property').html """
+      #                     <p>CleverTower is more fun when you're connected, but you haven't added any properties yet.</p>
+      #                     <a class="btn btn-primary btn-block" href='#{Parse.User.current().get("network").privateUrl()}'>
+      #                       #{i18nProperty.actions.add_a_property}
+      #                     </a>
+      #                     """
+      # else 
+      #   @$('.no-property').html """
+      #               <p>CleverTower is more fun when you're connected, but you haven't joined a property yet.</p>
+      #               <a class="btn btn-primary btn-block" href='/account/setup'>
+      #                 #{i18nCommon.expressions.get_started}
+      #               </a>
+      #               """
 
     handlePossiblePropertyAdd : =>
       if Parse.User.current().get("network")
@@ -254,7 +252,7 @@ define [
 
       @$(".toggle").toggler()
 
-      @$form = @$("> #activity-form")
+      @$form = @$("> #new-activity-form")
 
       # Set a placeholder
       rand = Math.floor Math.random() * i18nUser.form.share.length
@@ -279,7 +277,7 @@ define [
 
         # Render asynchronously, while we wait for the property
         # info to come in so we can determine our center & radius
-        @$("#property-options .controls").html "<select></select>"
+        @$("#property-options .controls").html "<select class='form-control'></select>"
         @listenTo Parse.User.current().get("network").properties, "add reset", @populatePropertySelectFromNetwork
         unless Parse.User.current().get("network").properties.length is 0
           @populatePropertySelectFromNetwork()
@@ -307,6 +305,7 @@ define [
         uploadTemplateId: "src/js/templates/activity/pending_photo.jst"
         downloadTemplateId: "src/js/templates/activity/photo.jst"
         add: (e, data) ->
+
           _this.showActivityForm()
 
           # Copy/Paste from jquery.fileupload-ui
@@ -332,7 +331,6 @@ define [
           delete data.headers['Content-Disposition']; # Parse does not accept this header.
         done: (e, data) ->
           file = data.result
-
           _this.model.set image: file.url
 
         stop: (e) ->
@@ -396,7 +394,6 @@ define [
       # Fix the point, to know more about city/location.
       window.geocoder = window.geocoder || new google.maps.Geocoder
       window.geocoder.geocode latLng: @model.GPoint(), (results, status) =>
-        console.log status
         if status is google.maps.GeocoderStatus.OK
 
           # Process geocode results.

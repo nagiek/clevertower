@@ -57,8 +57,7 @@ define [
       @$el.html JST["src/js/templates/property/sub/units.jst"](vars)      
       
       @$table     = @$("#units-table")
-      @$actions   = @$(".form-actions")
-      @$undo      = @$actions.find('.undo')
+      @$undo      = @$('.undo')
 
       if @model.units.length is 0 then @model.units.fetch() else @addAll()
       @
@@ -71,7 +70,6 @@ define [
       e.preventDefault()
       @$('#units-edit').toggleClass('active')
       @$table.find('.view-specific').toggleClass('hide')
-      @$actions.toggleClass('hide')
       @editing = if @editing then false else true
 
     switchToShow: (e) => @switchMode if @editing  

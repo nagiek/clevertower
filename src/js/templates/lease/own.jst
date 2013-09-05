@@ -1,15 +1,15 @@
-<hgroup class="span4">
+<hgroup class="col-md-4">
   <h4><a href="<%= propertyUrl %>"><%= propertyTitle %></a> - <%= unitTitle %></h4>
   <h5><%= start_date %> - <%= end_date %></h5>
 </hgroup>
 
-<div class="span">
+<div class="col-md-8">
   <% if (primary) { %>
     <span class="label label-large label-info">
       <%= i18nCommon.adjectives.primary %>
     </span>
   <% } else { %> 
-    <button class="btn make-primary">
+    <button class="btn btn-default make-primary">
       <%= i18nCommon.actions.make_primary %>
     </button>
   <% } %>

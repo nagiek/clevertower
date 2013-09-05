@@ -19,17 +19,22 @@ define [
 
       @baseUrl = attrs.baseUrl
       @forNetwork = attrs.forNetwork
+      @params = attrs.params
       
       vars = property: @model, network: @model.get("network")
-      if attrs.params and attrs.params.unit
-        @model.prep('units')
-        @model.units.fetch() if @model.units.length is 0
-        # vars.unit = @model.units.get attrs.params.unit # Won't complete in time
-        vars.unit = __type: "Pointer", className: "Unit", objectId: attrs.params.unit
+      if attrs.params and  attrs.params.unit
+          # vars.unit = @model.units.get attrs.params.unit # Won't complete in time
+          vars.unit = __type: "Pointer", className: "Unit", objectId: attrs.params.unit.id
       @listing = new Listing(vars)
       
     render : ->
-      @form = new NewListingView(model: @listing, property: @model, baseUrl: @baseUrl, forNetwork: @forNetwork).render()
+      vars = 
+        model: @listing
+        property: @model
+        baseUrl: @baseUrl
+        forNetwork: @forNetwork
+      if @params then vars.unitId = @params.unitId
+      @form = new NewListingView(vars).render()
       @
     
     clear : ->

@@ -11,7 +11,7 @@ define [
   
     #... is a list tag.
     tagName: "li"
-    className: "span4"
+    className: "col-md-4 col-sm-6"
     
     # The DOM events specific to an item.
     events:

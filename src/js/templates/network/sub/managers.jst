@@ -1,19 +1,25 @@
-<header>
-  <h2><%= i18nCommon.classes.Managers %></h2>
-</header>
 
-<p><%= i18nGroup.form.instructions %></p>
-<p><%= i18nGroup.manager.instructions %></p>
+<div class="row">
+  <div class="col-md-10">
+    <header>
+      <h2><%= i18nCommon.classes.Managers %></h2>
+      <p><%= i18nGroup.form.instructions %></p>
+      <p><%= i18nGroup.manager.instructions %></p>
+    </header>
 
-<form class="form-condensed">
-  <div class="control-group emails-group">
-    <label for="manager-email" class="control-label element-invisible"><%= i18nCommon.adjectives.new %></label>
-    <div class="controls inline-block align-top">
-      <input type="text" class="span3" name="manager[email]" maxlength="127" placeholder="<%= i18nCommon.nouns.sample_email %>" />
-    </div>
-    <button class="save btn"><%= i18nGroup.actions.invite_to_network %></button>
+    <form>
+      <div class="form-group emails-group">
+        <label for="manager-email" class="control-label element-invisible"><%= i18nCommon.adjectives.new %></label>
+        <div class="input-group">
+          <input type="text" class="form-control" name="manager[email]" maxlength="127" placeholder="<%= i18nCommon.nouns.sample_email %>" /> 
+          <span class="input-group-btn">
+            <button class="save btn btn-primary"><%= i18nGroup.actions.invite_to_network %></button>
+          </span>
+        </div>
+      </div>
+    </form>
   </div>
-</form>
+</div>
 
 <table id="managers" class="table table-middle">
   <thead class="element-invisible">
@@ -32,7 +38,7 @@
   </tbody>
   <tfoot>
     <tr>
-      <td class="empty" colspan="3"><%= i18nGroup.manager.deleted_if_empty %></td>
+      <td class="empty" colspan="3"><span class="help-block"><%= i18nGroup.manager.deleted_if_empty %></span></td>
     </tr>
   </tfoor>
 </table>

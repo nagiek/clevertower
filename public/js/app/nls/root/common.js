@@ -65,6 +65,7 @@
       edit: "Edit",
       undo: "Undo",
       link: "Link",
+      like: "Like",
       leave: "Leave",
       apply: "Apply",
       select: "Select",
@@ -76,6 +77,7 @@
       upgrade: "Upgrade",
       add_more: "Add more",
       add_another: "Add another",
+      add_comment: "Add a comment",
       add_files: "Add files",
       add_photo: "Add photo",
       add_time: "Add event time",
@@ -114,6 +116,9 @@
       },
       new_inquiry: function(person, property) {
         return "<strong>" + (_.escape(person)) + "</strong> has applied to join <strong>" + (_.escape(property)) + "</strong>";
+      },
+      lease_join: function(person, property) {
+        return "<strong>" + (_.escape(person)) + "</strong> has joined <strong>" + (_.escape(property)) + "</strong>";
       },
       inquiry_invitation: {
         invited: function(person, property) {
@@ -247,6 +252,7 @@
       "new": "new",
       unsaved: "Unsaved",
       linked: "Linked",
+      liked: "Liked",
       joined: "Joined",
       open: "Open",
       closed: "Closed",

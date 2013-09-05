@@ -4,7 +4,6 @@ define [
   "backbone"
   'infinity'
   "moment"
-  'collections/ActivityList'
   "views/listing/Search"
   "views/activity/New"
   "views/activity/Summary"
@@ -14,7 +13,7 @@ define [
   'masonry'
   'jqueryui'
   "gmaps"
-], ($, _, Parse, infinity, moment, ActivityList, ListingSearchView, NewActivityView, ActivityView, i18nListing, i18nCommon) ->
+], ($, _, Parse, infinity, moment, ListingSearchView, NewActivityView, ActivityView, i18nListing, i18nCommon) ->
 
   class PaginationView extends Parse.View
   

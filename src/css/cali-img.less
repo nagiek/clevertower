@@ -6,77 +6,83 @@
 .photo {
   overflow:hidden;
   position:relative;
+  text-align: center;
   .photo-actions {
     display: none;
     position:absolute;
     top:4px;
     right:4px;
-    .opacity(50);
+    .opacity(0.5);
   }
 
   &:hover {
     .photo-actions {
       display:block;
       &:hover {
-        .opacity(100);
+        .opacity(1);
       }
     }
   }
+  .progress {
+    position: absolute;
+    bottom: 0;
+    left: 30px;
+    right: 30px;
+  }
 }
-
 
 img[class*="span"] {
   height: auto;
 }
 
 .photo-micro {
-  height:@microImgLength;
-  width:@microImgLength;
+  height:@img-length-micro;
+  width:@img-length-micro;
   img {
-    height:@microImgLength;
-    min-width:@microImgLength;
-    max-width:@tinyImgLength;
+    height:@img-length-micro;
+    min-width:@img-length-micro;
+    max-width:@img-length-tiny;
   }
 }
 
 .photo-tiny {
-  height:@tinyImgLength;
-  width:@tinyImgLength;
+  height:@img-length-tiny;
+  width:@img-length-tiny;
   img {
-    height:@tinyImgLength;
-    min-width:@tinyImgLength;
-    max-width:@thumbnailImgLength;
+    height:@img-length-tiny;
+    min-width:@img-length-tiny;
+    max-width:@img-length-thumbnail;
   }
 }
 
 .photo-thumbnail {
-  height:@thumbnailImgLength;
-  width:@thumbnailImgLength;
+  height:@img-length-thumbnail;
+  width:@img-length-thumbnail;
   img {
-    height:@thumbnailImgLength;
-    min-width:@thumbnailImgLength;
-    max-width:@profileImgLength + 28px;
+    height:@img-length-thumbnail;
+    min-width:@img-length-thumbnail;
+    max-width:@img-length-profile + 28px;
   }
 }
 
 .photo-profile {
-  height:@profileImgLength;
-  width:@profileImgLength;
+  height:@img-length-profile;
+  width:@img-length-profile;
   img {
-    min-height:@profileImgLength;
-    min-width:@profileImgLength;
-    max-height:@mediumImgLength;
-    max-width:@mediumImgLength;
+    min-height:@img-length-profile;
+    min-width:@img-length-profile;
+    max-height:@img-length-medium;
+    max-width:@img-length-medium;
   }
 }
 
 .photo-medium {
-  height:@mediumImgLength;
-  width:@mediumImgLength;
+  height:@img-length-medium;
+  width:@img-length-medium;
   img {
-    min-height:@mediumImgLength - 100;
-    max-height:@mediumImgLength + 100;
-    width:@mediumImgLength;
+    min-height:@img-length-medium - 100;
+    max-height:@img-length-medium + 100;
+    width:@img-length-medium;
   }
 }
 
@@ -89,9 +95,18 @@ img[class*="span"] {
 }
 
 .photo-grid6 {
+  height:300px;
   width:460px - 10px;
   img {
     width:460px - 10px;
+  }
+}
+
+.photo-full {
+  height:240px;
+  img.img-responsive {
+    margin-left: -25%;
+    max-width: 150%;
   }
 }
 
@@ -165,39 +180,47 @@ img[class*="span"] {
   vertical-align:top;
 }
 
-.micro-float        { margin-left: @microImgLength     + @microImgPadding;      }
-.tiny-float         { margin-left: @tinyImgLength      + @tinyImgPadding;       }
-.thumbnail-float    { margin-left: @thumbnailImgLength + @thumbnailImgPadding;  }
-.profile-float      { margin-left: @profileImgLength   + @profileImgPadding;    }
-.medium-float       { margin-left: @mediumImgLength    + @mediumImgPadding;     }
+.micro-float        { margin-left: @img-length-micro     + @img-padding-micro;      }
+.tiny-float         { margin-left: @img-length-tiny      + @img-padding-tiny;       }
+.thumbnail-float    { margin-left: @img-length-thumbnail + @img-padding-thumbnail;  }
+.profile-float      { margin-left: @img-length-profile   + @img-padding-profile;    }
+.medium-float       { margin-left: @img-length-medium    + @img-padding-medium;     }
                     
-.profile-inline     { margin-left: @profileImgPadding;  }
+.profile-inline     { margin-left: @img-padding-profile;  }
 
-.photo-elastic {
-  height:auto;
-  width:auto;
-}
+// .photo-elastic {
+//   height:auto;
+//   width:auto;
+// }
 
-@media (max-width: 979px) {
+// @media (max-width: @screen-md) {
+//   .photo-elastic {
+//     height:100%;
+//     img {
+//       height:auto;
+//     }
+//   }
+// }
+
+@media (max-width: @screen-sm) {
   .photo-elastic {
-    height:100%;
-    img {
-      height:auto;
-    }
-  }
-}
-
-@media (max-width: 480px) {
-  .photo-elastic {
-    height:80px;
-    width:100%;
+    position: absolute;
+    left: 15px;
+    right: 15px;
+    min-height: 80px;
+    max-height: 120px;
+    height: auto;
+    width: auto;
     img {
       max-height:none;
+      max-width:none;
+      height:auto;
       width: 100%;
     }
   }
-}
-
-@media (max-width: 480px) {
-  .elastic-float    { margin-left: auto; padding-left: @profileImgPadding; }
+  .elastic-float { 
+    margin-left: auto;
+    padding-left: @img-padding-profile; 
+    position: relative;
+  }
 }

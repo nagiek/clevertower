@@ -15,11 +15,11 @@ define [
 
       channels = ["profiles-#{Parse.User.current().get('profile').id}"]
       channels.push "networks-#{Parse.User.current().get('network').id}" if Parse.User.current().get('network')
-      #   channels.push "properties-#{Parse.User.current().get('property').id}" if Parse.User.current().get('property')
+      channels.push "properties-#{Parse.User.current().get('property').id}" if Parse.User.current().get('property')
 
       # LOL WTF.
       @query = new Parse.Query(Notification)
-                .containedIn("channel", channels)
+                .containedIn("channels", channels)
                 .include('network') # For mgr invitations.
                 .include('property')
                 .include('profile')
@@ -29,7 +29,6 @@ define [
                 .include('manager')
                 .descending("createdAt")
                 .limit(6) 
-
 
     comparator: (n) -> -n.createdAt
 

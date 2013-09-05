@@ -1,61 +1,82 @@
-<div class="row-fluid">
-  <% if (postImage) { %>
-    <div class="photo-container span8">
-      <div class="photo"><img src="<%= postImage %>" alt="<%= i18nCommon.nouns.cover_photo %>"></div>
-  <% } else { %>
-    <div class="position-relative span8">
-      <blockquote><%= title %></blockquote>
-  <% } %>
-    <% if (rent) { %><div class="rent">$<%= rent %></div><% } %>
-    <a class="left modal-control-area" href="#">
-      <span class="modal-control">&lsaquo;</span>
-    </a>
-    <a class="right modal-control-area" href="#">
-      <span class="modal-control">&rsaquo;</span>
-    </a>
-  </div>
-  <div class="caption span4">
-    <div class="clearfix">
-      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    </div>
-    <header class="clearfix">
-      <div class="photo photo-thumbnail stay-left">
-        <a href="<%= profileUrl %>"><img src="<%= profilePic %>" alt="Profile" class="img-rounded profile-picture"></a>
-      </div>
-      <div class="photo-float thumbnail-float">
-        <p><a href="<%= profileUrl %>"><strong><%= name %></strong></a></p>
-        <p><small><%= i18nCommon.fields.posted %> <%= postDate %></small></p>
-      </div>
-      <ul class="activity-actions inline center">
-        <li>
-          <a href="#" class="like-button<% if (liked) { %> active<% } %>" >
-            <i class="icon icon-sprite icon-like"></i>
-          </a>
-          <span class="like-count"><%= likeCount %></span>
-        </li>
-        <li>
-          <a href="#" class="comment-button">
-            <i class="icon icon-status"></i>
-          </a>
-          <span class="comment-count"><%= commentCount %></span>
-        </li>
-      </ul>
-    </header>
-    <div>
-      <% if (postImage) { %><p><strong><%= title %></strong></p><% } %>
-      <% if (isEvent) { %><p><strong><%= start %><% if (endDate) { %> - <%= end %><% } %></strong></p><% } %>
-    </div>
-    <% if (propertyTitle) { %>
-      <footer class="position-bottom">
-        <p>
-          <small><%= i18nCommon.fields.posted_at %>
-            <a class="clearfix" href="<%= propertyUrl %>">
-              <img src="<%= propertyCover %>" class="stay-left photo photo-micro img-circle" width="23" height="23">
-              <span class="photo-float micro-float"><%= propertyTitle %></span>
-            </a>
-          </small>
-        </p>
-      </footer>
+<div class="modal-dialog modal-wide modal-picture">
+  <div class="modal-content row">
+    <% if (postImage) { %>
+      <div class="photo-container col-md-8">
+        <div class="photo photo-full">
+          <img class="img-responsive" src="<%= postImage %>" alt="<%= i18nCommon.nouns.cover_photo %>">
+        </div>
+    <% } else { %>
+      <div class="position-relative col-md-8">
+        <blockquote><%= title %></blockquote>
     <% } %>
+      <% if (rent) { %><div class="rent">$<%= rent %></div><% } %>
+      <a class="left modal-control-area" href="#">
+        <span class="modal-control">&lsaquo;</span>
+      </a>
+      <a class="right modal-control-area" href="#">
+        <span class="modal-control">&rsaquo;</span>
+      </a>
+    </div>
+    <div class="col-md-4">
+      <div class="caption">
+        <div class="clearfix">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        </div>
+        <header class="clearfix">
+          <div class="photo photo-thumbnail pull-left">
+            <a href="<%= profileUrl %>"><img src="<%= profilePic %>" alt="Profile" class="img-rounded profile-picture"></a>
+          </div>
+          <div class="photo-float thumbnail-float">
+            <p><a href="<%= profileUrl %>"><strong><%= name %></strong></a></p>
+            <p><small><%= i18nCommon.fields.posted %> <%= postDate %></small></p>
+          </div>
+          <ul class="activity-actions list-inline center">
+            <li>
+              <a href="#" class="like-button<% if (liked) { %> active<% } %>" >
+                <span class="glyphicon glyphicon-thumbs-up"></span>
+              </a>
+              <span class="like-count"><%= likeCount %></span>
+            </li>
+            <li>
+              <a href="#" class="comment-button">
+                <span class="glyphicon glyphicon-comment"></span>
+              </a>
+              <span class="comment-count"><%= commentCount %></span>
+            </li>
+          </ul>
+        </header>
+        <div>
+          <% if (postImage) { %><p><strong><%= title %></strong></p><% } %>
+          <% if (isEvent) { %><p><strong><%= start %><% if (endDate) { %> - <%= end %><% } %></strong></p><% } %>
+        </div>
+        <div class="comments">
+          <ul class="list-comments list-unstyled"></ul>
+          <% if (current) { %>
+            <form class="new-comment-form form-condensed">
+              <div class="form-group">
+                <div class="photo photo-micro pull-left">
+                  <img src="<%= selfProfilePic %>" alt="<%= self %>" width="23" height="23">
+                </div>
+                <div class="photo-float micro-float">
+                  <input type="text" class="form-control input-sm" name="comment[title]" placeholder="<%= i18nCommon.actions.add_comment %>">
+                </div>
+              </div>
+            </form>
+          <% } %>
+        </div>
+        <% if (propertyTitle) { %>
+          <footer class="position-bottom">
+            <p>
+              <small><%= i18nCommon.fields.posted_at %>
+                <a class="clearfix" href="<%= propertyUrl %>">
+                  <img src="<%= propertyCover %>" class="pull-left photo photo-micro img-circle" width="23" height="23">
+                  <span class="photo-float micro-float"><%= propertyTitle %></span>
+                </a>
+              </small>
+            </p>
+          </footer>
+        <% } %>
+      </div>
+    </div>
   </div>
 </div>

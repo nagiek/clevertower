@@ -1,41 +1,42 @@
-<fieldset class="form-xlarge">
-  <div class="control-group title-group row">
-    <label for="listing-title" class="control-label span12"><%= i18nListing.fields.title %></label>
-    <div class="controls span12">
-      <input type="text" class="input-block-level" name="listing[title]" id="listing-title" maxlength="128" value="<%= listing.title %>" placeholder="<%=title_placeholder%>" required="required" />
+<!-- form-xlarge -->
+<fieldset>
+  <div class="form-group title-group">
+    <label for="listing-title" class="control-label"><%= i18nListing.fields.title %></label>
+    <input type="text" class="form-control input-lg" name="listing[title]" id="listing-title" maxlength="128" value="<%= listing.title %>" placeholder="<%=title_placeholder%>" required="required" />
       <p class="help-block"><%= i18nListing.form.title_help %></p>
-    </div>
   </div>
 </fieldset>
 
-<fieldset class="form-large">
+<!-- form-large -->
+<fieldset>
   <div class="row">
-    <div class="span4 form-inline">
+    <div class="col-md-4">
       <%= JST["src/js/templates/helper/field/unit.jst"]({unit: unit, required: true, i18nUnit: i18nUnit, i18nCommon: i18nCommon, help: true}) %>
-      
     </div>
-    <div class="date-group control-group span6">
+    <div class="date-group form-group col-md-6">
       <label for="listing-unit" class="control-label"><%= i18nListing.form.dates %></label>
-      <div class="controls inline-block">
-        <input type="text" class="span2 start-date datepicker" name="listing[start_date]" maxlength="12" required="required" value="<%= dates.start %>" data-date="<%= dates.start %>" data-date-format="<%= i18nCommon.dates.datepicker_format %>"  />
-        <input type="text" class="span2 end-date datepicker"   name="listing[end_date]"   maxlength="12" required="required"value="<%= dates.end %>" data-date="<%= dates.end %>"   data-date-format="<%= i18nCommon.dates.datepicker_format %>"  />
-      </div>
-      <div class="help-inline align-top">
-        <ul class="unstyled">
-          <li><small><a href="#" class="starting-this-month"><%= i18nListing.dates.starting_this_month %></a></small></li>
-          <li><small><a href="#" class="starting-next-month"><%= i18nListing.dates.starting_next_month %></a></small></li>
-          <li><small><a href="#" class="july-to-june"><%= i18nListing.dates.july_to_june %></a></small></li>
-        </ul>
+      <div class="row">
+        <div class="col-xs-6 col-sm-4">
+          <input type="text" class="form-control start-date datepicker" name="listing[start_date]" maxlength="12" required="required" value="<%= dates.start %>" data-date="<%= dates.start %>" data-date-format="<%= i18nCommon.dates.datepicker_format %>"  />
+        </div>
+        <div class="col-xs-6 col-sm-4">
+          <input type="text" class="form-control end-date datepicker"   name="listing[end_date]"   maxlength="12" required="required" value="<%= dates.end %>"   data-date="<%= dates.end %>"   data-date-format="<%= i18nCommon.dates.datepicker_format %>"  />
+        </div>
+        <div class="col-xs-12 col-sm-4 help-inline align-top">
+          <ul class="list-unstyled">
+            <li><small><a href="#" class="starting-this-month"><%= i18nListing.dates.starting_this_month %></a></small></li>
+            <li><small><a href="#" class="starting-next-month"><%= i18nListing.dates.starting_next_month %></a></small></li>
+            <li><small><a href="#" class="july-to-june"><%= i18nListing.dates.july_to_june %></a></small></li>
+          </ul>
+        </div>
       </div>
     </div>
 
-    <div class="control-group span2">
+    <div class="form-group col-md-2">
       <label for="listing-rent" class="control-label"><%= i18nListing.fields.rent %></label>
-      <div class="controls">
-        <div class="input-prepend">
-          <span class="field-prefix add-on">$</span>
-          <input type="number" class="span1" name="listing[rent]" id="listing-rent" maxlength="12" required="required" value="<%= listing.rent %>" />
-        </div>
+      <div class="input-group">
+        <span class="input-group-addon">$</span>
+        <input type="number" class="form-control" name="listing[rent]" id="listing-rent" maxlength="12" required="required" value="<%= listing.rent %>" />
       </div>
     </div>
   </div>

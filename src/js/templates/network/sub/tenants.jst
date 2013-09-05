@@ -1,8 +1,8 @@
 <header class="clearfix">
-  <h2 class="pull-left tablet-left"><%= i18nCommon.classes.Tenants %></h2>
-  <ul class="unstyled inline pull-right tablet-right">
-    <li><a href="/leases/new" id="new-lease-link" class="btn">
-      <i class="icon icon-plus"></i>
+  <h2 class="left-lg left-md"><%= i18nCommon.classes.Tenants %></h2>
+  <ul class="list-inline right-lg right-md">
+    <li><a href="/leases/new" id="new-lease-link" class="btn btn-success">
+      <span class="glyphicon glyphicon-plus"></span>
       <%= i18nLease.actions.add_new_lease %>
     </a></li>
   </ul>
@@ -21,6 +21,6 @@
   </li>
 </ul>
 
-<ul id="tenants" class="row no-bullet">
-  <img src='/img/misc/spinner.gif' class='span spinner' alt="<%= i18nCommon.verbs.loading %>" />
+<ul id="tenants" class="row list-unstyled">
+  <li class="loading col-xs-12 text-center"><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" /></li>
 </ul>

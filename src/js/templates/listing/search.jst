@@ -1,27 +1,31 @@
-<div id="slider-group" class="control-group">
-  <label class="control-label"><%= i18nListing.fields.rent %></label>
-  <div class="controls">
-    <div class="ui-label-wrapper inline-block text-right">
-      <span class="label label-large">$<span id="slider-min">0</span></span>
-    </div>
-    <div class="input-xsmall inline-block slider-wrapper ui-slider-wrapper">
-      <div id="price-slider" class="slider"></div>
-    </div>
-    <div class="ui-label-wrapper inline-block">
-      <span class="label label-large">$<span id="slider-max">6000</span></span>
+<div id="slider-group" class="form-group">
+  <div class="row">
+    <label class="control-label col-2"><%= i18nListing.fields.rent %></label>
+    <div class="col-10">
+      <div class="ui-label-wrapper inline-block text-right">
+        <span class="label label-large">$<span id="slider-min">0</span></span>
+      </div>
+      <div class="input-xsmall inline-block slider-wrapper ui-slider-wrapper">
+        <div id="price-slider" class="slider"></div>
+      </div>
+      <div class="ui-label-wrapper inline-block">
+        <span class="label label-large">$<span id="slider-max">6000</span></span>
+      </div>
     </div>
   </div>
 </div>
-<div id="display-group" class="control-group">
-  <label class="control-label"><%= i18nCommon.nouns.size %></label>
-  <div class="controls">
-    <div id="displays" class="btn-group inline-block" data-toggle="buttons-radio">
-      <button data-display="small" class="btn" rel="tooltip" data-original-title="<%= i18nCommon.adjectives.small %>">
-        <i class="icon icon-th-list"></i>
-      </button>
-      <button data-display="big" class="btn active" rel="tooltip" data-original-title="<%= i18nCommon.adjectives.big %>">
-        <i class="icon icon-th-large"></i>
-      </button>
+<div id="display-group" class="form-group">
+  <div class="row">
+    <label class="control-label col-2"><%= i18nCommon.nouns.size %></label>
+    <div class="col-10">
+      <div id="displays" class="btn-group inline-block" data-toggle="buttons-radio">
+        <button data-display="small" class="btn btn-default" rel="tooltip" data-original-title="<%= i18nCommon.adjectives.small %>">
+          <span class="glyphicon glyphicon-th-list"></span>
+        </button>
+        <button data-display="big" class="btn btn-default active" rel="tooltip" data-original-title="<%= i18nCommon.adjectives.big %>">
+          <span class="glyphicon glyphicon-th-large"></span>
+        </button>
+      </div>
     </div>
   </div>
 </div>

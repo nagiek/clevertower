@@ -21,7 +21,7 @@ define [
     events:
       "click #logout": "logOut"
 
-    initialize: (attrs) ->
+    initialize: (attrs) -> 
             
       @pusher = new Pusher 'dee5c4022be4432d7152'
 
@@ -31,7 +31,6 @@ define [
 
       @listenTo Parse.User.current().get("profile"), "change:image_profile", @updatePic
       @listenTo Parse.User.current().get("profile"), "change:first_name change:last_name", @updateName
-      @render()
                 
     subscribeProperty: (obj) =>
       @pusher.subscribe "properties-#{obj.id}"
@@ -62,15 +61,15 @@ define [
         i18nCommon: i18nCommon
 
       @$el.html JST["src/js/templates/user/logged_in_menu.jst"](vars)
-      $("#panel-user-menu").html JST["src/js/templates/user/logged_in_panel.jst"](vars)
+      $("#sidebar-user-menu").html JST["src/js/templates/user/logged_in_panel.jst"](vars)
       @notificationsView = new NotificationsView
       @notificationsView.render()
       @
 
     updateNav: -> 
       @$('#profile-link img').prop "src", Parse.User.current().get("profile").cover("micro")
-      $('#panel-profile-link img').prop "src", Parse.User.current().get("profile").cover("micro")
+      $('#sidebar-profile-link img').prop "src", Parse.User.current().get("profile").cover("micro")
 
     updateName: ->
       @$('#profile-link span').html Parse.User.current().get("profile").name()
-      $('#panel-profile-link span').html Parse.User.current().get("profile").name()
+      $('#sidebar-profile-link span').html Parse.User.current().get("profile").name()

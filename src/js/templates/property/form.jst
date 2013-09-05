@@ -1,33 +1,25 @@
 <fieldset>
   <!-- <legend><%= i18nProperty.form.building %></legend> -->
   <div class="row">
-    <div id="property-title-group" class="control-group span">
+    <div id="property-title-group" class="form-group col-sm-5">
       <label for="property-title" class="control-label"><%= i18nProperty.fields.title %></label>
-      <div class="controls">
-        <input type="text" name="property[title]" id="property-title" class="span4" value="<%= property.title %>">
-      </div>
+      <input type="text" name="property[title]" id="property-title" class="form-control" value="<%= property.title %>">
     </div>
-    <div class="control-group span">
+    <div class="form-group col-sm-3">
       <label for="property-email" class="control-label"><%= i18nProperty.fields.property_type.label %></label>
-      <div class="controls">
-        <select name="property[property_type]" id="property-property_type" class="span2">
-          <option value="" ><%= i18nCommon.form.select.select_value %></option>
-          <option value="1" <%= property.property_type == 1 ? 'selected="selected"' : ''  %>><%= i18nProperty.fields.property_type.condo %></option>
-          <option value="2" <%= property.property_type == 2 ? 'selected="selected"' : ''  %>><%= i18nProperty.fields.property_type.apartment %></option>
-        </select>
-      </div>
+      <select name="property[property_type]" id="property-property_type" class="form-control">
+        <option value="" ><%= i18nCommon.form.select.select_value %></option>
+        <option value="1" <%= property.property_type == 1 ? 'selected="selected"' : ''  %>><%= i18nProperty.fields.property_type.condo %></option>
+        <option value="2" <%= property.property_type == 2 ? 'selected="selected"' : ''  %>><%= i18nProperty.fields.property_type.apartment %></option>
+      </select>
     </div>
-    <div class="control-group span">
+    <div class="form-group col-xs-6 col-sm-2">
       <label for="property-year" class="control-label"><%= i18nProperty.fields.year %></label>
-      <div class="controls">
-        <input type="number" name="property[year]" id="property-year" class="span1" maxlength="4" <%= property.description ? 'value="' + property.description + '"' : ''  %>>
-      </div>
+      <input type="number" name="property[year]" id="property-year" class="form-control" maxlength="4" <%= property.description ? 'value="' + property.description + '"' : ''  %>>
     </div>
-    <div class="control-group span">
+    <div class="form-group col-xs-6 col-sm-2">
       <label for="property-mls" class="control-label"><%= i18nProperty.fields.mls %></label>
-      <div class="controls">
-        <input type="text" name="property[mls]" id="property-mls" class="span1" <%= property.description ? 'value="' + property.description + '"' : ''  %>>
-      </div>
+      <input type="text" name="property[mls]" id="property-mls" class="form-control" <%= property.description ? 'value="' + property.description + '"' : ''  %>>
     </div>
   </div>
 </fieldset>
@@ -37,35 +29,31 @@
 <fieldset>
   <!-- <legend><%= i18nProperty.form.marketing %></legend> -->
   <div class="row">
-    <div class="control-group span">
+    <div class="form-group col-md-5">
       <label for="property-description" class="control-label"><%= i18nProperty.fields.description %></label>
-      <div class="controls">
-        <textarea rows="6" name="property[description]" id="property-description" class="span4"><%= property.description ? property.description : ''  %></textarea>
-      </div>
+      <textarea rows="6" name="property[description]" id="property-description" class="form-control"><%= property.description ? property.description : ''  %></textarea>
     </div>
-    <div class="control-group span2">
+    <div class="form-group col-md-2">
       <label for="property-included" class="control-label"><%= i18nProperty.form.included %></label>
-      <div class="controls">
-        <label for="property-electricity" class="checkbox">
-          <input type="checkbox" name="property[electricity]" id="property-electricity" <%= property.electricity ? checked="checked" : '' %>><%= i18nProperty.fields.electricity %>
-        </label>
-        <label for="property-furniture" class="checkbox">
-          <input type="checkbox" name="property[furniture]" id="property-furniture" <%= property.furniture ? checked="checked" : '' %>><%= i18nProperty.fields.furniture %>
-        </label>
-        <label for="property-gas" class="checkbox">
-          <input type="checkbox" name="property[gas]" id="property-gas" <%= property.gas ? checked="checked" : '' %>><%= i18nProperty.fields.gas %>
-        </label>
-        <label for="property-heat" class="checkbox">
-          <input type="checkbox" name="property[heat]" id="property-heat" <%= property.heat ? checked="checked" : '' %>><%= i18nProperty.fields.heat %>
-        </label>
-        <label for="property-hot_water" class="checkbox">
-          <input type="checkbox" name="property[hot_water]" id="property-hot_water" <%= property.hot_water ? checked="checked" : '' %>><%= i18nProperty.fields.hot_water %>
-        </label>
-      </div>
+      <label for="property-electricity" class="checkbox">
+        <input type="checkbox" name="property[electricity]" id="property-electricity" <%= property.electricity ? checked="checked" : '' %>><%= i18nProperty.fields.electricity %>
+      </label>
+      <label for="property-furniture" class="checkbox">
+        <input type="checkbox" name="property[furniture]" id="property-furniture" <%= property.furniture ? checked="checked" : '' %>><%= i18nProperty.fields.furniture %>
+      </label>
+      <label for="property-gas" class="checkbox">
+        <input type="checkbox" name="property[gas]" id="property-gas" <%= property.gas ? checked="checked" : '' %>><%= i18nProperty.fields.gas %>
+      </label>
+      <label for="property-heat" class="checkbox">
+        <input type="checkbox" name="property[heat]" id="property-heat" <%= property.heat ? checked="checked" : '' %>><%= i18nProperty.fields.heat %>
+      </label>
+      <label for="property-hot_water" class="checkbox">
+        <input type="checkbox" name="property[hot_water]" id="property-hot_water" <%= property.hot_water ? checked="checked" : '' %>><%= i18nProperty.fields.hot_water %>
+      </label>
     </div>
-    <div class="control-group span4">
+    <div class="form-group col-md-5">
       <label for="property-amenities" class="control-label"><%= i18nProperty.form.amenities %></label>
-      <div class="controls three-column">
+      <div class="three-column">
         <label for="property-air_conditioning" class="checkbox">
           <input type="checkbox" name="property[air_conditioning]" id="property-air_conditioning" <%= property.air_conditioning ? checked="checked" : '' %>><%= i18nProperty.fields.air_conditioning %>
         </label>
@@ -130,23 +118,17 @@
 <fieldset>
   <!-- <legend><%= i18nProperty.form.contact %></legend> -->
   <div class="row">
-    <div class="control-group span">
+    <div class="form-group col-md-4">
       <label for="property-email" class="control-label"><%= i18nProperty.fields.email %></label>
-      <div class="controls">
-        <input type="email" name="property[email]" id="property-email" class="span3" <%= property.email ? 'value="' + property.email + '"' : ''  %>>
-      </div>
+      <input type="email" name="property[email]" id="property-email" class="form-control" <%= property.email ? 'value="' + property.email + '"' : ''  %>>
     </div>
-    <div class="control-group span">
-      <label for="property-phone" class="control-label"><%= i18nProperty.fields.phone %></label>
-      <div class="controls">
-        <input type="text" name="property[phone]" id="property-phone" class="span2" <%= property.phone ? 'value="' + property.phone + '"' : ''  %>>
-      </div>
+    <div class="form-group col-md-3">
+      <label for="property-sm" class="control-label"><%= i18nProperty.fields.phone %></label>
+      <input type="text" name="property[phone]" id="property-sm" class="form-control" <%= property.phone ? 'value="' + property.phone + '"' : ''  %>>
     </div>
-    <div class="control-group span">
+    <div class="form-group col-md-5">
       <label for="property-website" class="control-label"><%= i18nProperty.fields.website %></label>
-      <div class="controls">
-        <input type="text" name="property[website]" id="property-website" class="span3" <%= property.website ? 'value="' + property.website + '"' : ''  %>>
-      </div>
+      <input type="text" name="property[website]" id="property-website" class="form-control" <%= property.website ? 'value="' + property.website + '"' : ''  %>>
     </div>
   </div>
 </fieldset>

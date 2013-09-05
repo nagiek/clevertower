@@ -1,26 +1,28 @@
 <header class="clearfix">
-  <h2 class="pull-left tablet-left"><%= i18nCommon.classes.Listings %></h2>
-  <ul class="unstyled inline pull-right tablet-right">
-    <li><a href="/listings/new" id="new-listing-link" class="btn">
-      <i class="icon icon-plus"></i>
+  <h2 class="left-lg left-md"><%= i18nCommon.classes.Listings %></h2>
+  <ul class="list-inline right-lg right-md">
+    <li><a href="/listings/new" id="new-listing-link" class="btn btn-success">
+      <span class="glyphicon glyphicon-plus"></span>
       <%= i18nListing.actions.add_listing %>
     </a></li>
   </ul>
 </header>
 
-<table id="listings-table" class="table form-condensed">
-  <thead>
-    <tr>
-      <th><%= i18nCommon.classes.Listing %></th>
-      <th><%= i18nListing.fields.rent %></th>
-      <th><%= i18nCommon.fields.status %></th>
-      <th><%= i18nListing.inquiries.label %></th>
-      <th><span class="element-invisible"><%=i18nCommon.form.Operations%></span></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr><td class="spinner-cell" colspan="4">
-      <img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" />
-    </td></tr>
-  </tbody>
-</table>
+<div class="table-scrollable">
+  <table id="listings" class="table form-condensed">
+    <thead>
+      <tr>
+        <th><%= i18nCommon.classes.Listing %></th>
+        <th><%= i18nListing.fields.rent %></th>
+        <th><%= i18nCommon.fields.status %></th>
+        <th><%= i18nListing.inquiries.label %></th>
+        <th><span class="element-invisible"><%=i18nCommon.form.Operations%></span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="spinner-cell" colspan="4">
+        <img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" />
+      </td></tr>
+    </tbody>
+  </table>
+</div>

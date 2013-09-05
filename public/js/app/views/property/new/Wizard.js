@@ -51,7 +51,7 @@
               _this.$('#property-title-group').addClass('error');
               break;
             default:
-              _this.$('#address-search-group').addClass('error');
+              _this.$('#address-search-group').addClass('has-error');
           }
           return new Alert({
             event: 'model-save',
@@ -71,7 +71,7 @@
             unit: lease.get("unit"),
             property: lease.get("property")
           };
-          Parse.User.current().save(vars);
+          Parse.User.current().set(vars);
           return _this.path = "/account/building";
         });
         return this.on("wizard:finish", function() {
@@ -103,7 +103,7 @@
         if (this.state === 'join') {
           return;
         }
-        this.$('.error').removeClass('error');
+        this.$('.has-error').removeClass('has-error');
         this.$('button.next').button('loading');
         this.$('button.join').button('loading');
         this.state = 'join';
@@ -119,7 +119,7 @@
       PropertyWizardView.prototype.manage = function(existingProperty) {
         var alert, concierge;
 
-        this.$('.error').removeClass('error');
+        this.$('.has-error').removeClass('has-error');
         this.$('button.next').button('loading');
         this.$('button.join').button('loading');
         concierge = new Concierge({
@@ -144,7 +144,7 @@
         var attrs, center, data,
           _this = this;
 
-        this.$('.error').removeClass('error');
+        this.$('.has-error').removeClass('has-error');
         this.$('button.next').button('loading');
         this.$('button.join').button('loading');
         switch (this.state) {
@@ -243,7 +243,7 @@
                   profile: Parse.User.current().get("profile"),
                   ACL: activityACL
                 }).then(function() {
-                  Parse.User.current().activity = Parse.User.current().activity || new ActivityList({}, []);
+                  Parse.User.current().activity = Parse.User.current().activity || new ActivityList([], {});
                   return Parse.User.current().activity.add(activity);
                 });
                 if (data.share.fb === "on" || data.share.fb === "1") {
@@ -270,14 +270,12 @@
             data = this.form.$el.serializeObject();
             attrs = this.form.model.scrub(data.lease);
             attrs = this.assignAdditionalToLease(data, attrs);
-            return this.form.model.save(attrs, {
-              success: function(lease) {
-                _this.trigger("lease:save", _this.form.model);
-                return _this.trigger("wizard:finish");
-              },
-              error: function(error) {
-                return _this.form.model.trigger("invalid", error);
-              }
+            return this.form.model.save(attrs).then(function(lease) {
+              _this.trigger("lease:save", _this.form.model);
+              return _this.trigger("wizard:finish");
+            }, function(error) {
+              _this.buttonsForward();
+              return _this.form.model.trigger("invalid", error);
             });
         }
       };
@@ -342,27 +340,27 @@
               case "join":
                 this.trigger("view:advance");
                 this.$('.back').removeProp("disabled");
-                this.map.$el.animate({
+                this.map.$el.transition({
                   left: "-150%"
-                }, 500);
-                return this.form.$el.animate({
+                });
+                return this.form.$el.transition({
                   left: "0"
-                }, 500, 'swing', this.buttonsForward);
+                }, this.buttonsForward);
               case "picture":
-                this.form.$el.animate({
+                this.form.$el.transition({
                   left: "-150%"
-                }, 500);
-                return this.picture.$el.animate({
+                });
+                return this.picture.$el.transition({
                   left: "0"
-                }, 500, 'swing', this.buttonsForward);
+                }, this.buttonsForward);
               case "share":
                 this.$('.next').html(i18nCommon.actions.finish);
-                this.picture.$el.animate({
+                this.picture.$el.transition({
                   left: "-150%"
-                }, 500);
-                return this.share.$el.animate({
+                });
+                return this.share.$el.transition({
                   left: "0"
-                }, 500, 'swing', this.buttonsForward);
+                }, this.buttonsForward);
             }
             break;
           case 'backward':
@@ -370,12 +368,12 @@
               case "property":
               case "join":
                 this.trigger("view:retreat");
-                this.map.$el.animate({
-                  left: "0%"
-                }, 500);
-                this.form.$el.animate({
+                this.map.$el.transition({
+                  left: "0"
+                });
+                this.form.$el.transition({
                   left: "150%"
-                }, 500, 'swing', function() {
+                }, function() {
                   _this.form.clear();
                   return _this.$('.back').prop("disabled", true);
                 });
@@ -383,21 +381,20 @@
                 this.state = 'address';
                 return this.$('.back').prop("disabled", true);
               case "picture":
-                this.form.$el.animate({
-                  left: "0%"
-                }, 500);
-                this.picture.$el.animate({
+                this.form.$el.transition({
+                  left: "0"
+                });
+                this.picture.$el.transition({
                   left: "150%"
-                }, 500, 'swing', this.picture.clear);
+                }, this.picture.clear);
                 return this.state = 'property';
               case "share":
-                this.$('.next').html(i18nCommon.actions.next);
-                this.picture.$el.animate({
-                  left: "0%"
-                }, 500);
-                this.share.$el.animate({
+                this.picture.$el.transition({
+                  left: "0"
+                });
+                this.share.$el.transition({
                   left: "150%"
-                }, 500, 'swing', this.share.clear);
+                }, this.share.clear);
                 return this.state = 'picture';
             }
         }

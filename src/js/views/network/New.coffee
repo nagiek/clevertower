@@ -26,9 +26,9 @@ define [
 
       @listenTo @results, "reset", @addAll
       @listenTo @results, "network:join", => 
-        Parse.User.current().networkSetup()
-        Parse.history.navigate "/inside", true
-        @clear()
+        Parse.User.current().networkSetup().then ->
+          Parse.history.navigate "/inside", true
+          @clear()
 
       # Only do this on 'invalid', as we will reload the page 
       # for the user and we don't want them getting antsy

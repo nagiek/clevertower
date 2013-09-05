@@ -1,41 +1,29 @@
 <div class="row">
-  <fieldset class="form-xlarge <% if (isNew) { %>offset1 <% } %>span6">
-    <div class="title-group control-group">
+  <fieldset class="<% if (isNew) { %>col-md-offset-1 col-sm-6 col-md-5<% } else { %>col-xs-12<% } %>">
+    <div class="title-group form-group">
       <label for="network-title" class="control-label "><%= i18nProperty.network.give_network_a_title %> <span class="required">*</span></label>
-      <div class="controls">
-        <input type="text" id="network-title" class="span5" name="network[title]" maxlength="127" value="<%= network.title %>" required="required" />
-        <p class="help-block"><%= i18nProperty.network.can_be_anything %></p>
-      </div>
+      <input type="text" id="network-title" class="form-control input-lg" name="network[title]" maxlength="127" value="<%= network.title %>" required="required" />
+      <p class="help-block"><%= i18nProperty.network.can_be_anything %></p>
     </div>
-    <div class="name-group control-group">
+    <div class="name-group form-group">
       <label for="network-name" class="control-label"><%= i18nProperty.network.claim_username %> <span class="required">*</span></label>
-      <div class="controls">
-        <div class="input-append">
-          <input type="text" id="network-name" class="input-block input-large" name="network[name]" maxlength="32" value="<%= network.name %>" required="required" />
-        </div>
-        <p class="help-block"><%= i18nCommon.form.lowercase_only %></p>
-      </div>
+      <input type="text" id="network-name" class="form-control input-lg" name="network[name]" maxlength="32" value="<%= network.name %>" required="required" />
+      <p class="help-block"><%= i18nCommon.form.lowercase_only %></p>
     </div>
   </fieldset>
 <% if (!isNew) { %></div><div class="row"><% } %>
-  <fieldset class="span5 form-large">
-    <div class="control-group">
-      <label for="network-phone" class="control-label"><%= i18nProperty.fields.phone %></label>
-      <div class="controls">
-        <input type="text" class="span3" name="network[phone]" maxlength="127" value="<%= network.phone %>" />
-      </div>
+  <fieldset class="<% if (isNew) { %>col-md-offset-2 col-md-3 col-sm-5<% } else { %>col-xs-12<% } %>">
+    <div class="form-group">
+      <label for="network-sm" class="control-label"><%= i18nProperty.fields.phone %></label>
+      <input type="text" class="form-control" name="network[phone]" maxlength="127" value="<%= network.phone %>" />
     </div>
-    <div class="control-group">
+    <div class="form-group">
       <label for="network-email" class="control-label"><%= i18nProperty.fields.email %></label>
-      <div class="controls">
-        <input type="text" class="span3"  name="network[email]" maxlength="127" value="<%= network.email %>" />
-      </div>
+      <input type="text" class="form-control"  name="network[email]" maxlength="127" value="<%= network.email %>" />
     </div>
-    <div class="control-group">
+    <div class="form-group">
       <label for="network-website" class="control-label"><%= i18nProperty.fields.website %></label>
-      <div class="controls">
-        <input type="text" class="span3"  name="network[website]" maxlength="127" value="<%= network.website %>" />
-      </div>
+      <input type="text" class="form-control"  name="network[website]" maxlength="127" value="<%= network.website %>" />
     </div>
   </fieldset>
 </div>

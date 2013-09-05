@@ -1,5 +1,5 @@
 <td>
-  <% if (!onUnit) { %><a href="<%= baseUrl %>/units/<%= unitId %>"><%= unitTitle %></a> |<% }%>
+  <% if (!onUnit) { %><%= unitTitle %> |<% }%>
   <a href="<%= baseUrl %>/leases/<%= objectId %>"><%= link_text %></a>
 </td>
 <td><%= start_date %></td>
@@ -7,25 +7,25 @@
 <td><%= rent %></td>
 <td>
   <% if (objectId) { %>
-    <a href="<%= baseUrl %>/leases/<%= objectId %>/edit" class="btn btn-mini">
+    <a href="<%= baseUrl %>/leases/<%= objectId %>/edit" class="btn btn-small">
       <%= i18nCommon.actions.edit %>
     </a>
-    <button class="btn btn-mini add-tenants"
+    <button class="btn btn-small add-tenants"
             rel="tooltip"
             data-original-title="<%= i18nLease.actions.add_tenants %>">
-      <i class="icon-user"></i>
+      <span class="glyphicon glyphicon-user"></span>
     </button>
-    <button class="btn btn-mini extend"
+    <button class="btn btn-small extend"
             rel="tooltip"
             data-original-title="<%= i18nLease.actions.extend %>">
-      <i class="icon-repeat"></i>
+      <span class="glyphicon glyphicon-repeat"></span>
     </button>
-    <button class="btn btn-mini btn-danger delete"
+    <button class="btn btn-small btn-danger delete"
             rel="tooltip"
             data-original-title="<%= i18nCommon.actions.delete %>">
-      <i class="icon-trash icon-white"></i>
+      <span class="glyphicon glyphicon-trash icon-white"></span>
     </button>
   <% } else { %>
-    <button class="btn btn-mini btn-danger remove"><%= i18nCommon.actions.remove %></button>
+    <button class="btn btn-small btn-danger remove"><%= i18nCommon.actions.remove %></button>
   <% } %>
 </td>

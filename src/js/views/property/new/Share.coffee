@@ -18,7 +18,7 @@ define [
 
     tagName: "form"
     id: "new-property-activity-form"
-    className: "activity-form span12"
+    className: "activity-form col-xs-12"
 
     # attributes:
     #   id: "new-property-activity-form"

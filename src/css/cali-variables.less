@@ -1,258 +1,197 @@
-// Variables.less
-// Variables to customize the look and feel of Bootstrap
-// -----------------------------------------------------
+// // Variables.less
+// // Variables to customize the look and feel of Bootstrap
+// // -----------------------------------------------------
 
 
 
-// GLOBAL VALUES
-// --------------------------------------------------
+// // GLOBAL VALUES
+// // --------------------------------------------------
 
 
-// Grays
-// -------------------------
-@black:                 #000;
-@grayDarker:            #222;
-@grayDark:              #333;
-@gray:                  #555;
-@grayLight:             #999;
-@grayLighter:           #eee;
+// // Grays
+// // -------------------------
+// @black:                 #000;
+// @grayDarker:            #222;
+// @grayDark:              #333;
+// @gray:                  #555;
+// @grayLight:             #999;
+// @grayLighter:           #eee;
 @white:                 #fff;
 
 
-// Accent colors
-// -------------------------
-@blue:                  #049cdb;
-@blueDark:              #0064cd;
+// // Accent colors
+// // -------------------------
+// @blue:                  #049cdb;
+// @blueDark:              #0064cd;
 @green:                 #68b761;
-@red:                   #9d261d;
-@yellow:                #ffc40d;
+// @red:                   #9d261d;
+// @yellow:                #ffc40d;
 @orange:                #ef7c2a;
-@pink:                  #c3325f;
-@purple:                #7a43b6;
+// @pink:                  #c3325f;
+// @purple:                #7a43b6;
 @highlight:             #ffb;
 
-// Blues
+// // Blues
+// // -------------------------
+// @blueLight:             lighten(@blue, 50%);
+// @blueLighter:           lighten(@blue, 60%);
+// @blueLightest:          #f8f8ff;
+// @fbBlue:                #627aad;
+// @fbBlueDark:            #3b5998;
+
+@brand-primary-dark:        darken(@brand-primary, 5%);
+@brand-primary-light:       lighten(@brand-primary, 5%);
+
+@fb-blue:                   #627aad;
+@fb-blue-active:            #5B74A8;
+@fb-border-color:           #879AC0 #29447E #1A356E;
+
+@goog-bg-color:         	#fdfdfd;
+@goog-text-color: 			#555;
+@goog-border-color:         #bbb;
+
+// // Scaffolding
+// // -------------------------
+// @bodyBackground:        @white;
+// @textColor:             @grayDark;
+
+
+// // Links
+// // -------------------------
+// @linkColor:             #08c;
+// @linkColorHover:        darken(@linkColor, 15%);
+
+
+// // Properties
+// // -------------------------
+// @propertyLinkColor:       darken(@infoText, 15%);
+// @propertyLinkColorHover:  darken(@infoText, 25%);
+
+
+// // Typography
+// // -------------------------
+// @sansFontFamily:        "Helvetica Neue", Helvetica, Arial, sans-serif;
+// @serifFontFamily:       Georgia, "Times New Roman", Times, serif;
+//                         // "Asul", Georgia, "Times New Roman", "DejaVu Serif", serif;
+// @monoFontFamily:        Menlo, Monaco, Consolas, "Courier New", monospace;
+
+
+@line-height-xlarge:       ceil(@line-height-base * 1.50);
+@line-height-large:        ceil(@line-height-base * 1.25);
+@line-height-small:        ceil(@line-height-base * 0.85);
+@line-height-mini:         ceil(@line-height-base * 0.60);
+
+@font-size-xlarge:         ceil(@font-size-base * 1.50); // ~9px  
+@font-size-mini:           ceil(@font-size-base * 0.60); // ~9px
+
+@padding-xlarge-vertical:         15px;
+@padding-xlarge-horizontal:       40px;
+
+@border-radius-xlarge:            8px;
+
+// @baseFontSize:          13px;
+// @baseFontFamily:        @sansFontFamily;
+// @baseLineHeight:        18px;
+// @altFontFamily:         @serifFontFamily;
+
+// @largeFontSize:         16px;
+// @largeLineHeight:       21px;
+
+// @headingsFontFamily:    @sansFontFamily; // "Rokkitt",
+// @headingsFontWeight:    normal;
+// @headingsColor:         inherit; // empty to use BS default, @textColor
+
+
+// // Component sizing
+// // -------------------------
+// // Based on 14px font-size and 20px line-height
+
+// @lineHeightLarge:         @baseLineHeight * 1.25;
+// @lineHeightSmall:         @baseLineHeight * 0.85;
+// @lineHeightMini:          @baseLineHeight * 0.75;
+
+
+// // Tables
+// // -------------------------
+// @tableBackground:                   transparent; // overall background-color
+// @tableBackgroundAccent:             #f9f9f9; // for striping
+// @tableBackgroundHover:              #f5f5f5; // for hover
+// @tableBorder:                       #ddd; // table and cell border
+
+
+// // Buttons
+// // -------------------------
+// @btnBackground:                     @white;
+// @btnBackgroundHighlight:            darken(@white, 10%);
+// @btnBorder:                         #ccc;
+
+// @btnPrimaryBackground:              @linkColor;
+// @btnPrimaryBackgroundHighlight:     spin(@btnPrimaryBackground, 15%);
+
+// @btnInfoBackground:                 #5bc0de;
+// @btnInfoBackgroundHighlight:        #2f96b4;
+
+// @btnSuccessBackground:              #62c462;
+// @btnSuccessBackgroundHighlight:     #51a351;
+
+// @btnWarningBackground:              lighten(@orange, 15%);
+// @btnWarningBackgroundHighlight:     @orange;
+
+// @btnDangerBackground:               #ee5f5b;
+// @btnDangerBackgroundHighlight:      #bd362f;
+
+// @btnInverseBackground:              @gray;
+// @btnInverseBackgroundHighlight:     @grayDarker;
+
+
+// // Forms
+// // -------------------------
+// @inputBackground:               @white;
+// @inputBorder:                   #ccc;
+// @inputBorderRadius:             3px;
+// @inputDisabledBackground:       @grayLighter;
+// @formActionsBackground:         #f5f5f5;
+
+// // Dropdowns
+// // -------------------------
+// @dropdownBackground:            @white;
+// @dropdownBorder:                rgba(0,0,0,.2);
+// @dropdownLinkColor:             @grayDark;
+// @dropdownLinkColorHover:        @white;
+// @dropdownLinkBackgroundHover:   @linkColor;
+
+// Navbar
 // -------------------------
-@blueLight:             lighten(@blue, 50%);
-@blueLighter:           lighten(@blue, 60%);
-@blueLightest:          #f8f8ff;
-@fbBlue:                #627aad;
-@fbBlueDark:            #3b5998;
-
-
-// Scaffolding
-// -------------------------
-@bodyBackground:        @white;
-@textColor:             @grayDark;
-
-
-// Links
-// -------------------------
-@linkColor:             #08c;
-@linkColorHover:        darken(@linkColor, 15%);
-
-
-// Properties
-// -------------------------
-@propertyLinkColor:       darken(@infoText, 15%);
-@propertyLinkColorHover:  darken(@infoText, 25%);
-
-
-// Images
-// -------------------------
-@microImgLength:        23px;
-@tinyImgLength:         32px;
-@thumbnailImgLength:    64px;
-@profileImgLength:      100px;
-@mediumImgLength:       180px;
-
-@microImgPadding:       5px;
-@tinyImgPadding:        5px;
-@thumbnailImgPadding:   12px;
-@profileImgPadding:     12px;
-@mediumImgPadding:      12px;
-
-// Typography
-// -------------------------
-@sansFontFamily:        "Helvetica Neue", Helvetica, Arial, sans-serif;
-@serifFontFamily:       Georgia, "Times New Roman", Times, serif;
-                        // "Asul", Georgia, "Times New Roman", "DejaVu Serif", serif;
-@monoFontFamily:        Menlo, Monaco, Consolas, "Courier New", monospace;
-
-  
-
-@baseFontSize:          13px;
-@baseFontFamily:        @sansFontFamily;
-@baseLineHeight:        18px;
-@altFontFamily:         @serifFontFamily;
-
-@largeFontSize:         16px;
-@largeLineHeight:       21px;
-
-@headingsFontFamily:    @sansFontFamily; // "Rokkitt",
-@headingsFontWeight:    normal;
-@headingsColor:         inherit; // empty to use BS default, @textColor
-
-
-// Component sizing
-// -------------------------
-// Based on 14px font-size and 20px line-height
-
-@lineHeightLarge:         @baseLineHeight * 1.25;
-@lineHeightSmall:         @baseLineHeight * 0.85;
-@lineHeightMini:          @baseLineHeight * 0.75;
-
-
-// Tables
-// -------------------------
-@tableBackground:                   transparent; // overall background-color
-@tableBackgroundAccent:             #f9f9f9; // for striping
-@tableBackgroundHover:              #f5f5f5; // for hover
-@tableBorder:                       #ddd; // table and cell border
-
-
-// Buttons
-// -------------------------
-@btnBackground:                     @white;
-@btnBackgroundHighlight:            darken(@white, 10%);
-@btnBorder:                         #ccc;
-
-@btnPrimaryBackground:              @linkColor;
-@btnPrimaryBackgroundHighlight:     spin(@btnPrimaryBackground, 15%);
-
-@btnInfoBackground:                 #5bc0de;
-@btnInfoBackgroundHighlight:        #2f96b4;
-
-@btnSuccessBackground:              #62c462;
-@btnSuccessBackgroundHighlight:     #51a351;
-
-@btnWarningBackground:              lighten(@orange, 15%);
-@btnWarningBackgroundHighlight:     @orange;
-
-@btnDangerBackground:               #ee5f5b;
-@btnDangerBackgroundHighlight:      #bd362f;
-
-@btnInverseBackground:              @gray;
-@btnInverseBackgroundHighlight:     @grayDarker;
-
-
-// Forms
-// -------------------------
-@inputBackground:               @white;
-@inputBorder:                   #ccc;
-@inputBorderRadius:             3px;
-@inputDisabledBackground:       @grayLighter;
-@formActionsBackground:         #f5f5f5;
-
-// Dropdowns
-// -------------------------
-@dropdownBackground:            @white;
-@dropdownBorder:                rgba(0,0,0,.2);
-@dropdownLinkColor:             @grayDark;
-@dropdownLinkColorHover:        @white;
-@dropdownLinkBackgroundHover:   @linkColor;
-
-
+@navbar-height:                 40px;
+@navbar-height-anon:            50px;
+@navbar-height-splash:          65px;
+@brand-strip-height:            20px;
 
 
 // COMPONENT VARIABLES
 // --------------------------------------------------
 
-// Z-index master list
-// -------------------------
-// Used for a bird's eye view of components dependent on the z-axis
-// Try to avoid customizing these :)
-@zindexDropdown:          1000;
-@zindexPopover:           1010;
-@zindexTooltip:           1020;
-@zindexFixedNavbar:       1030;
-@zindexModalBackdrop:     1040;
-@zindexModal:             1050;
-@zindexMessages:          1060;
-
 // Sprite icons path
 // -------------------------
-@imagesFolder:            "../../img";
-@iconSpritePath:          "@{imagesFolder}/icon/glyphicons-halflings.png";
-@iconWhiteSpritePath:     "@{imagesFolder}/icon/glyphicons-halflings-white.png";
-@iconGraySpritePath:      "@{imagesFolder}/icon/glyphicons-gray.png";
-@iconBigSpritePath:       "@{imagesFolder}/icon/glyphicons-big.png";
-@iconBigWhiteSpritePath:  "@{imagesFolder}/icon/glyphicons-big-white.png";
-@iconActivitySpritePath:  "@{imagesFolder}/icon/icons-post.png";
+@images-folder:               "../../img";
+@icon-sprite-path:            "@{images-folder}/icon/glyphicons-halflings.png";
+@icon-white-sprite-path:      "@{images-folder}/icon/glyphicons-halflings-white.png";
+@icon-gray-sprite-path:       "@{images-folder}/icon/glyphicons-gray.png";
+@icon-big-sprite-path:        "@{images-folder}/icon/glyphicons-big.png";
+@icon-big-white-sprite-path:  "@{images-folder}/icon/glyphicons-big-white.png";
+@icon-activity-sprite-path:   "@{images-folder}/icon/icons-post.png";
 
 
-// Input placeholder text color
+// Images
 // -------------------------
-@placeholderText:         @grayLight;
+@img-length-micro:        23px;
+@img-length-tiny:         32px;
+@img-length-thumbnail:    64px;
+@img-length-profile:      100px;
+@img-length-medium:       180px;
 
-
-// Hr border color
-// -------------------------
-@hrBorder:                @grayLighter;
-
-
-// Navbar
-// -------------------------
-@navbarHeight:                    40px;
-@navbarBackground:                @grayLighter;
-@navbarBackgroundHighlight:       @white;
-
-@anonNavbarHeight:                48px;
-@splashNavbarHeight:              55px;
-@brandStripHeight:                48px; 
-
-@navbarText:                      lighten(@gray, 15%);
-@navbarLinkColor:                 lighten(@gray, 15%);
-@navbarLinkColorHover:            @black;
-@navbarLinkColorActive:           @grayDark;
-@navbarLinkBackgroundHover:       transparent;
-@navbarLinkBackgroundActive:      @navbarBackground;
-
-@navbarSearchBackground:          lighten(@navbarBackground, 25%);
-@navbarSearchBackgroundFocus:     @white;
-@navbarSearchBorder:              darken(@navbarSearchBackground, 30%);
-@navbarSearchPlaceholderColor:    #ccc;
-@navbarBrandColor:                @navbarLinkColor;
-
-
-// Hero unit
-// -------------------------
-@heroUnitBackground:              transparent;
-@heroUnitHeadingColor:            #355E7E;
-@heroUnitLeadColor:               #355E7E;
-
-
-// Form states and alerts
-// -------------------------
-@warningText:             #c09853;
-@warningBackground:       #fcf8e3;
-@warningBorder:           darken(spin(@warningBackground, -10), 3%);
-
-@errorText:               #b94a48;
-@errorBackground:         #f2dede;
-@errorBorder:             darken(spin(@errorBackground, -10), 3%);
-
-@successText:             #468847;
-@successBackground:       #dff0d8;
-@successBorder:           darken(spin(@successBackground, -10), 5%);
-
-@infoText:                #3a87ad;
-@infoBackground:          #d9edf7;
-@infoBorder:              darken(spin(@infoBackground, -10), 7%);
-
-
-
-// GRID
-// --------------------------------------------------
-
-// Default 940px grid
-// -------------------------
-@gridColumns:             12;
-@gridColumnWidth:         60px;
-@gridGutterWidth:         20px;
-@gridRowWidth:            (@gridColumns * @gridColumnWidth) + (@gridGutterWidth * (@gridColumns - 1));
-
-// Fluid grid
-// -------------------------
-@fluidGridColumnWidth:    6.382978723%;
-@fluidGridGutterWidth:    2.127659574%;
+@img-padding-micro:       5px;
+@img-padding-tiny:        5px;
+@img-padding-thumbnail:   12px;
+@img-padding-profile:     12px;
+@img-padding-medium:      12px;

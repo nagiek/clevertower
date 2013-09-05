@@ -1,5 +1,5 @@
 (function() {
-  define(['underscore', 'backbone', "collections/UnitList", "collections/LeaseList", "collections/InquiryList", "collections/TenantList", "collections/ApplicantList", "collections/ListingList", "collections/PhotoList", "collections/ActivityList", "models/Unit", "models/Lease", "underscore.inflection"], function(_, Parse, UnitList, LeaseList, InquiryList, TenantList, ApplicantList, ListingList, PhotoList, ActivityList, Unit, Lease, Listing, inflection) {
+  define(['underscore', 'backbone', "collections/UnitList", "collections/LeaseList", "collections/InquiryList", "collections/TenantList", "collections/ApplicantList", "collections/ListingList", "collections/PhotoList", "collections/ActivityList", "collections/CommentList", "models/Unit", "models/Lease", "underscore.inflection"], function(_, Parse, UnitList, LeaseList, InquiryList, TenantList, ApplicantList, ListingList, PhotoList, ActivityList, CommentList, Unit, Lease, Listing, inflection) {
     var Property;
 
     Property = Parse.Object.extend("Property", {
@@ -105,6 +105,9 @@
             format = "thumb";
             break;
           case "large":
+          case "profile":
+          case "span4":
+          case "span6":
             format = "full";
         }
         img = this.get("image_" + format);
@@ -149,6 +152,15 @@
                 return network.activity;
               } else {
                 return new ActivityList([], {
+                  property: this
+                });
+              }
+              break;
+            case "comments":
+              if (basedOnNetwork) {
+                return network.comments;
+              } else {
+                return new CommentList([], {
                   property: this
                 });
               }

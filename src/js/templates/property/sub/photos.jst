@@ -1,47 +1,45 @@
-<div id="photos">
-  <form id="fileupload" method="POST">
-    <div class="form-actions fileupload-buttonbar">
-      <button type="button" id="file-input" class="btn fileinput-button">
-          <i class="icon-plus"></i>
-          <span><%= i18nCommon.actions.add_photos %></span>
-          <input type="file" name="files[]" accept="photo/*"  multiple>
-      </button>
-      <!-- The fileinput-button span is used to style the file input field as button -->
-      <button type="submit" id="upload" class="start btn btn-primary">
-        <span><%= i18nCommon.actions.upload %></span>
-      </button>
-      <!-- <button type="button" class="btn btn-danger delete" disabled="disabled">
-        <i class="icon-trash icon-white"></i>
-        <span><%= i18nCommon.actions.delete %></span>
-      </button>
-      <input type="checkbox" class="toggle"> -->
-      <!-- <button type="reset" class="btn cancel">
-        <span><%= i18nCommon.actions.cancel %></span>
-      </button> -->
+<form id="fileupload">
+  <div class="form-actions fileupload-buttonbar">
+    <button type="button" id="file-input" class="btn btn-success fileinput-button">
+        <i class="glyphicon glyphicon-plus"></i>
+        <span><%= i18nCommon.actions.add_photos %></span>
+        <input type="file" name="files[]" accept="photo/*"  multiple>
+    </button>
+    <!-- The fileinput-button span is used to style the file input field as button -->
+    <button type="submit" id="upload" class="start btn btn-primary">
+      <span><%= i18nCommon.actions.upload %></span>
+    </button>
+    <!-- <button type="button" class="btn btn-danger delete" disabled="disabled">
+      <i class="glyphicon glyphicon-trash icon-white"></i>
+      <span><%= i18nCommon.actions.delete %></span>
+    </button>
+    <input type="checkbox" class="toggle"> -->
+    <!-- <button type="reset" class="btn btn-default cancel">
+      <span><%= i18nCommon.actions.cancel %></span>
+    </button> -->
+  </div>
+
+  <!-- The global progress information -->
+  <div class="fileupload-progress fade hide">
+    
+    <!-- The global progress bar -->
+    <div class="progress progress-success progress-striped active"
+      role="progressbar"
+      aria-valuemin="0"
+      aria-valuemax="100">
+      <div class="bar" style="width:0%;"></div>
     </div>
-  
-    <!-- The global progress information -->
-    <div class="fileupload-progress fade hide">
-      
-      <!-- The global progress bar -->
-      <div class="progress progress-success progress-striped active"
-        role="progressbar"
-        aria-valuemin="0"
-        aria-valuemax="100">
-        <div class="bar" style="width:0%;"></div>
-      </div>
-      <!-- The extended global progress information -->
-      <div class="progress-extended">&nbsp;</div>
-    </div>
+    <!-- The extended global progress information -->
+    <div class="progress-extended">&nbsp;</div>
+  </div>
 
-    <!-- The loading indicator is shown during file processing -->
-    <div class="fileupload-loading"></div>
+  <!-- The loading indicator is shown during file processing -->
+  <div class="fileupload-loading"></div>
 
-    <!-- The table listing the files available for upload/download -->
-    <ul id="non-uploaded-photo-list" class="row no-bullet" role="presentation"></ul>
+  <!-- The table listing the files available for upload/download -->
+  <ul id="non-uploaded-photo-list" class="row list-unstyled" role="presentation"></ul>
 
-    <ul id="photo-list" class="row no-bullet">
-      <li><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" /></li>
-    </ul>
-  </form>
-</div>
+  <ul id="photo-list" class="row list-unstyled">
+    <li><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" /></li>
+  </ul>
+</form>

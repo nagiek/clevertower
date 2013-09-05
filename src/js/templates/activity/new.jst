@@ -1,162 +1,191 @@
-<form id="new-activity-form" class="activity-form well well-small">
-  <div class="photo photo-tiny stay-left">
+<form id="new-activity-form" class="activity-form well well-sm"
+data-html="true"
+data-placement="bottom"
+data-trigger="manual"
+data-title="Missing something?"
+data-content="
+<% if (Parse.User.current().get("network")) { %> 
+  <p>CleverTower is more fun when you're connected, but you haven't added any properties yet.</p>
+  <a class='btn btn-primary btn-block' href='<%= Parse.User.current().get("network").privateUrl() %>'>
+    <%= i18nProperty.actions.add_a_property %>
+  </a>
+<% } else { %>
+  <p>CleverTower is more fun when you're connected, but you haven't joined a property yet.</p>
+  <a class='btn btn-primary btn-block' href='/account/setup'>
+    <%= i18nCommon.expressions.get_started %>
+  </a>
+<% } %>
+">
+  <div class="photo photo-tiny pull-left">
     <img id="activity-profile-pic" src="<%= profilePic %>" alt="<%= i18nCommon.classes.Profile %>">
   </div>
   <div class="photo-float tiny-float">
-    <div class="title-group control-group">
+    <div class="title-group form-group">
       <label for="activity-title" class="control-label element-invisible"><%= i18nCommon.fields.title %></label>
       <div class="controls position-relative with-caret">
         <b id="activity-input-caret" class="input-caret"></b>
-        <div class="form-large">
-          <textarea class="input-condensed input-block-level" name="activity[title]" id="activity-title" rows="4"></textarea>
-        </div>
-        <ul id="activity-buttons" class="unstyled">
-          <li class="clearfix" rel="tooltip" data-placement="top" data-original-title="<%= i18nCommon.actions.add_photo %>">
+        <textarea class="form-control" name="activity[title]" id="activity-title" rows="4"></textarea>
+        <ul id="activity-buttons" class="list-unstyled">
+          <li class="clearfix fileinput-buttonbar" rel="tooltip" data-placement="top" data-original-title="<%= i18nCommon.actions.add_photo %>">
             <a href="#" id="add-photo" class="fileinput-button">
-              <i class="icon icon-big icon-picture"></i>
-              <input type="file" name="files[]" accept="photo/*">
+              <span class="glyphicon glyphicon-picture">
+                <input type="file" name="files[]" accept="photo/*">
+              </span>
             </a>
           </li>
           <li class="clearfix" rel="tooltip" data-placement="top" data-original-title="<%= i18nCommon.activity.building %>">
             <a href="#" id="add-property">
-              <i class="icon icon-big icon-sprite icon-building"></i>
+              <span class="glyphicon glyphicon-home glyphicon-building"></span>
             </a>
           </li>
           <li class="clearfix" rel="tooltip" data-placement="top" data-original-title="<%= i18nCommon.actions.add_time %>">
             <a href="#" id="add-time">
-              <i class="icon icon-big icon-sprite icon-time"></i>
+              <span class="glyphicon glyphicon-time"></span>
             </a>
           </li>
         </ul>
       </div>
     </div>
-    <div id="activity-options" class="hide clearfix control-group with-caret">
-      <div id="event-options" class="control-group hide">
-        <div class="controls">
-          <input type="text" class="input-small start-date datepicker" name="activity[start_date]" maxlength="12" data-date-format="<%= i18nCommon.dates.datepicker_format %>" placeholder="<%= i18nCommon.dates.start_date %>" />
-          <select name="activity[start_time]">
-            <option value="00:00">00:00</option>
-            <option value="00:30">00:30</option>
-            <option value="00:00">01:00</option>
-            <option value="00:30">01:30</option>
-            <option value="00:00">02:00</option>
-            <option value="00:30">02:30</option>
-            <option value="00:00">03:00</option>
-            <option value="00:30">03:30</option>
-            <option value="00:00">04:00</option>
-            <option value="00:30">04:30</option>
-            <option value="00:00">05:00</option>
-            <option value="00:30">05:30</option>
-            <option value="00:00">06:00</option>
-            <option value="00:30">06:30</option>
-            <option value="00:00">07:00</option>
-            <option value="00:30">07:30</option>
-            <option value="00:00">08:00</option>
-            <option value="00:30">08:30</option>
-            <option value="00:00">09:00</option>
-            <option value="00:30">09:30</option>
-            <option value="00:00">10:00</option>
-            <option value="00:30">10:30</option>
-            <option value="00:00">11:00</option>
-            <option value="00:30">11:30</option>
-            <option value="00:00">12:00</option>
-            <option value="00:30">12:30</option>
-            <option value="00:00">13:00</option>
-            <option value="00:30">13:30</option>
-            <option value="00:00">14:00</option>
-            <option value="00:30">14:30</option>
-            <option value="00:00">15:00</option>
-            <option value="00:30">15:30</option>
-            <option value="00:00">16:00</option>
-            <option value="00:30">16:30</option>
-            <option value="00:00">17:00</option>
-            <option value="00:30">17:30</option>
-            <option value="00:00">18:00</option>
-            <option value="00:30">18:30</option>
-            <option value="00:00">19:00</option>
-            <option value="00:30">19:30</option>
-            <option value="00:00">20:00</option>
-            <option value="00:30">20:30</option>
-            <option value="00:00">21:00</option>
-            <option value="00:30">21:30</option>
-            <option value="00:00">22:00</option>
-            <option value="00:30">22:30</option>
-            <option value="00:00">23:00</option>
-            <option value="00:30">23:30</option>
-          </select>
-          <label for="toggle-end-date" class="checkbox inline-block">
-            <input type="checkbox" id="toggle-end-date"><%= i18nCommon.dates.add_end_date %>
-          </label>
-        </div>
-        <div id="end-date" class="controls hide">
-          <input type="text" class="input-small end-date datepicker"   name="activity[end_date]"   maxlength="12" data-date-format="<%= i18nCommon.dates.datepicker_format %>" placeholder="<%= i18nCommon.dates.end_date %>" />
-          <select name="activity[end_time]">
-            <option value="00:00">00:00</option>
-            <option value="00:30">00:30</option>
-            <option value="00:00">01:00</option>
-            <option value="00:30">01:30</option>
-            <option value="00:00">02:00</option>
-            <option value="00:30">02:30</option>
-            <option value="00:00">03:00</option>
-            <option value="00:30">03:30</option>
-            <option value="00:00">04:00</option>
-            <option value="00:30">04:30</option>
-            <option value="00:00">05:00</option>
-            <option value="00:30">05:30</option>
-            <option value="00:00">06:00</option>
-            <option value="00:30">06:30</option>
-            <option value="00:00">07:00</option>
-            <option value="00:30">07:30</option>
-            <option value="00:00">08:00</option>
-            <option value="00:30">08:30</option>
-            <option value="00:00">09:00</option>
-            <option value="00:30">09:30</option>
-            <option value="00:00">10:00</option>
-            <option value="00:30">10:30</option>
-            <option value="00:00">11:00</option>
-            <option value="00:30">11:30</option>
-            <option value="00:00">12:00</option>
-            <option value="00:30">12:30</option>
-            <option value="00:00">13:00</option>
-            <option value="00:30">13:30</option>
-            <option value="00:00">14:00</option>
-            <option value="00:30">14:30</option>
-            <option value="00:00">15:00</option>
-            <option value="00:30">15:30</option>
-            <option value="00:00">16:00</option>
-            <option value="00:30">16:30</option>
-            <option value="00:00">17:00</option>
-            <option value="00:30">17:30</option>
-            <option value="00:00">18:00</option>
-            <option value="00:30">18:30</option>
-            <option value="00:00">19:00</option>
-            <option value="00:30">19:30</option>
-            <option value="00:00">20:00</option>
-            <option value="00:30">20:30</option>
-            <option value="00:00">21:00</option>
-            <option value="00:30">21:30</option>
-            <option value="00:00">22:00</option>
-            <option value="00:30">22:30</option>
-            <option value="00:00">23:00</option>
-            <option value="00:30">23:30</option>
-          </select>
+    <div id="activity-options" class="hide clearfix form-group with-caret">
+      <div id="event-options" class="form-group hide">
+        <div class="row controls">
+          <div class="col-sm-12">
+            <div class="row">
+              <div class="col-sm-6">
+                <input type="text" class="input-sm form-control start-date datepicker" name="activity[start_date]" maxlength="12" data-date-format="<%= i18nCommon.dates.datepicker_format %>" placeholder="<%= i18nCommon.dates.start_date %>" />
+              </div>
+              <div class="col-sm-6">
+                <select name="activity[start_time]" class="input-sm form-control">
+                  <option value="00:00">00:00</option>
+                  <option value="00:30">00:30</option>
+                  <option value="00:00">01:00</option>
+                  <option value="00:30">01:30</option>
+                  <option value="00:00">02:00</option>
+                  <option value="00:30">02:30</option>
+                  <option value="00:00">03:00</option>
+                  <option value="00:30">03:30</option>
+                  <option value="00:00">04:00</option>
+                  <option value="00:30">04:30</option>
+                  <option value="00:00">05:00</option>
+                  <option value="00:30">05:30</option>
+                  <option value="00:00">06:00</option>
+                  <option value="00:30">06:30</option>
+                  <option value="00:00">07:00</option>
+                  <option value="00:30">07:30</option>
+                  <option value="00:00">08:00</option>
+                  <option value="00:30">08:30</option>
+                  <option value="00:00">09:00</option>
+                  <option value="00:30">09:30</option>
+                  <option value="00:00">10:00</option>
+                  <option value="00:30">10:30</option>
+                  <option value="00:00">11:00</option>
+                  <option value="00:30">11:30</option>
+                  <option value="00:00">12:00</option>
+                  <option value="00:30">12:30</option>
+                  <option value="00:00">13:00</option>
+                  <option value="00:30">13:30</option>
+                  <option value="00:00">14:00</option>
+                  <option value="00:30">14:30</option>
+                  <option value="00:00">15:00</option>
+                  <option value="00:30">15:30</option>
+                  <option value="00:00">16:00</option>
+                  <option value="00:30">16:30</option>
+                  <option value="00:00">17:00</option>
+                  <option value="00:30">17:30</option>
+                  <option value="00:00">18:00</option>
+                  <option value="00:30">18:30</option>
+                  <option value="00:00">19:00</option>
+                  <option value="00:30">19:30</option>
+                  <option value="00:00">20:00</option>
+                  <option value="00:30">20:30</option>
+                  <option value="00:00">21:00</option>
+                  <option value="00:30">21:30</option>
+                  <option value="00:00">22:00</option>
+                  <option value="00:30">22:30</option>
+                  <option value="00:00">23:00</option>
+                  <option value="00:30">23:30</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div id="end-date" class="col-sm-12 hide">
+            <div class="row">
+              <div class="col-sm-6">
+                <input type="text" class="input-sm form-control end-date datepicker"   name="activity[end_date]"   maxlength="12" data-date-format="<%= i18nCommon.dates.datepicker_format %>" placeholder="<%= i18nCommon.dates.end_date %>" />
+              </div>
+              <div class="col-sm-6">
+                <select name="activity[end_time]" class="input-sm form-control">
+                  <option value="00:00">00:00</option>
+                  <option value="00:30">00:30</option>
+                  <option value="00:00">01:00</option>
+                  <option value="00:30">01:30</option>
+                  <option value="00:00">02:00</option>
+                  <option value="00:30">02:30</option>
+                  <option value="00:00">03:00</option>
+                  <option value="00:30">03:30</option>
+                  <option value="00:00">04:00</option>
+                  <option value="00:30">04:30</option>
+                  <option value="00:00">05:00</option>
+                  <option value="00:30">05:30</option>
+                  <option value="00:00">06:00</option>
+                  <option value="00:30">06:30</option>
+                  <option value="00:00">07:00</option>
+                  <option value="00:30">07:30</option>
+                  <option value="00:00">08:00</option>
+                  <option value="00:30">08:30</option>
+                  <option value="00:00">09:00</option>
+                  <option value="00:30">09:30</option>
+                  <option value="00:00">10:00</option>
+                  <option value="00:30">10:30</option>
+                  <option value="00:00">11:00</option>
+                  <option value="00:30">11:30</option>
+                  <option value="00:00">12:00</option>
+                  <option value="00:30">12:30</option>
+                  <option value="00:00">13:00</option>
+                  <option value="00:30">13:30</option>
+                  <option value="00:00">14:00</option>
+                  <option value="00:30">14:30</option>
+                  <option value="00:00">15:00</option>
+                  <option value="00:30">15:30</option>
+                  <option value="00:00">16:00</option>
+                  <option value="00:30">16:30</option>
+                  <option value="00:00">17:00</option>
+                  <option value="00:30">17:30</option>
+                  <option value="00:00">18:00</option>
+                  <option value="00:30">18:30</option>
+                  <option value="00:00">19:00</option>
+                  <option value="00:30">19:30</option>
+                  <option value="00:00">20:00</option>
+                  <option value="00:30">20:30</option>
+                  <option value="00:00">21:00</option>
+                  <option value="00:30">21:30</option>
+                  <option value="00:00">22:00</option>
+                  <option value="00:30">22:30</option>
+                  <option value="00:00">23:00</option>
+                  <option value="00:30">23:30</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="col-xs-12">
+            <label for="toggle-end-date" class="checkbox inline-block">
+              <input type="checkbox" id="toggle-end-date"><%= i18nCommon.dates.add_end_date %>
+            </label>
+          </div>
         </div>
       </div>
       <fieldset class="share-options">
-        <legend><%= i18nCommon.actions.also_post_to %></legend>
-        <div class="facebook-group control-group clearfix">
-          <label for="type" class="control-label stay-left">Facebook</label>
-          <div class="controls stay-right">
-            <div class="toggle">
-              <label class="toggle-radio" for="fbOption1"><%= i18nCommon.affirmations.yes %></label>
-              <input type="radio" name="share[fb]" id="fbOption1" value="1"<% if (fbLinked) { %> checked="checked"<% } %>>
-              <input type="radio" name="share[fb]" id="fbOption2" value="0"<% if (!fbLinked) { %> checked="checked"<% } %>>
-              <label class="toggle-radio" for="fbOption2"><%= i18nCommon.affirmations.no %></label>
-            </div>
+        <div class="facebook-group form-group clearfix">
+          <label for="type" class="control-label pull-left"><%= i18nCommon.actions.also_post_to %> Facebook</label>
+          <div class="toggle pull-right">
+            <label class="toggle-radio" for="fbOption1"><%= i18nCommon.affirmations.yes %></label>
+            <input type="radio" name="share[fb]" id="fbOption1" value="1"<% if (fbLinked) { %> checked="checked"<% } %>>
+            <input type="radio" name="share[fb]" id="fbOption2" value="0"<% if (!fbLinked) { %> checked="checked"<% } %>>
+            <label class="toggle-radio" for="fbOption2"><%= i18nCommon.affirmations.no %></label>
           </div>
         </div>
       </fieldset>
-      <div id="property-options" class="pull-left hide">
+      <div id="property-options" class="left-lg hide">
         <div class="controls"></div>
         <label for="post-as-property" class="checkbox hide">
           <input type="checkbox" id="post-as-property"><%= i18nCommon.form.post_as_property %>
@@ -165,11 +194,10 @@
           <input type="checkbox" id="post-private" checked="checked"><%= i18nCommon.adjectives.private %>
         </label>
       </div>
-      <div class="pull-right">
-        <button class="btn btn-primary stay-right save"><%= i18nCommon.actions.post %></button>
+      <div class="right-lg">
+        <button class="btn btn-primary pull-right save"><%= i18nCommon.actions.post %></button>
       </div>
     </div>
-    <div id="preview-activity-photo" class="preview template-upload"></div>
-    <div class="no-property hide"></div>
   </div>
+  <div id="preview-activity-photo" class="preview template-upload"></div>
 </form>

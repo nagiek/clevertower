@@ -15,7 +15,7 @@ define [
 
     tagName : "form"
     id : "new-property-form"
-    className: "span12 form-large"
+    className: "col-xs-12"
 
     initialize: (attrs) ->
       

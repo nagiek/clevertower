@@ -1,10 +1,10 @@
 <header>
   <h1><%= i18nProperty.network.edit %></h1>
 </header>
-<form id="network-form" class="form-horizontal">
+<form id="network-form">
   <%= JST["src/js/templates/network/form.jst"]({network: network, i18nCommon: i18nCommon, i18nProperty: i18nProperty, isNew: false}) %>
   <div class="form-actions">
     <button class="save btn btn-primary"><%= i18nCommon.actions.save %></button>
-    <a href="/inside" class="cancel btn"><%= i18nCommon.actions.cancel %></a>
+    <a href="/inside" class="cancel btn btn-default"><%= i18nCommon.actions.cancel %></a>
   </div>
 </form>

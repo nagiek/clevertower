@@ -1,29 +1,29 @@
 <div class="container">
-  <div class="modal modal-form modal-large modal-thin show">
-    <form id="signup-form" class="form-xlarge">
+  <form id="signup-form" class="modal-dialog modal-form modal-large modal-thin">
+    <div class="modal-content">
       <div class="modal-header">
-        <h3 id="signup-label" class="inline-block"><%= i18nDevise.actions.signup %></h3>
-        <p class="inline-block">(<a id="switch-login" href="/account/login"><%= i18nDevise.switch.login %></a>)</p>
+        <h3 id="signup-label" class="modal-title inline-block"><%= i18nDevise.actions.signup %></h3>
+        <p class="inline-block">(<a id="switch-login-modal" href="/account/login"><%= i18nDevise.switch.login %></a>)</p>
       </div>
       <div class="modal-body">
-        <button type="button" class="btn-facebook btn-large btn-block"><%= i18nDevise.actions.sign_up_with("Facebook") %></button>
+        <button type="button" class="btn-facebook btn-lg btn-block"><%= i18nDevise.actions.sign_up_with("facebook") %></button>
         <hr>
         <div class="alert alert-error" style="display:none"></div>
         <fieldset>
-          <legend class="text-center">- <%= i18nCommon.conjuctions.or %> <%= i18nDevise.actions.sign_up_with("Email") %> -</legend>
-          <div class="control-group username-group">
+          <legend class="text-center">- <%= i18nCommon.conjuctions.or %> <%= i18nDevise.actions.sign_up_with("email") %> -</legend>
+          <div class="form-group username-group">
             <label for="signup-username" class="control-label element-invisible"><%= i18nDevise.form.email %>:</label>
             <div class="controls">
-              <input type="email" name="signup-username" id="signup-username" class="input-block-level" placeholder="<%= i18nDevise.form.email %>">
+              <input type="email" name="signup-username" id="signup-username" class="form-control input-lg" placeholder="<%= i18nDevise.form.email %>">
             </div>
           </div>
-          <div class="control-group password-group">
+          <div class="form-group password-group">
             <label for="signup-password" class="control-label element-invisible"><%= i18nDevise.form.password %>:</label>
             <div class="controls">
-              <input type="password" name="signup-password" id="signup-password" class="input-block-level" placeholder="<%= i18nDevise.form.password %>">
+              <input type="password" name="signup-password" id="signup-password" class="form-control input-lg" placeholder="<%= i18nDevise.form.password %>">
             </div>
           </div>
-          <div class="control-group type-group">
+          <div class="form-group type-group">
             <label for="type" class="control-label inline-block"><%= i18nDevise.form.type.label %>:</label>
             <div class="controls inline-block">
               <div class="toggle">
@@ -37,8 +37,8 @@
         </fieldset>
       </div>
       <div class="modal-footer">
-        <button type="submit" class="btn btn-primary btn-large btn-block"><%= i18nDevise.actions.signup %></button>
+        <button type="submit" class="btn btn-primary btn-lg btn-block"><%= i18nDevise.actions.signup %></button>
       </div>
-    </form>
-  </div>
+    </div>
+  </form>
 </div>

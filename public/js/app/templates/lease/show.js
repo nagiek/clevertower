@@ -5,7 +5,7 @@ obj || (obj = {});
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
 with (obj) {
-__p += '<header class="row">\n  <hgroup class="span">\n    <h2>' +
+__p += '<header class="clearfix">\n  <hgroup class="left-lg">\n    <h2>' +
 ((__t = ( i18nLease.attributes.lease_on_unit )) == null ? '' : __t) +
 ' <span id="unit-title">' +
 ((__t = ( title )) == null ? '' : __t) +
@@ -13,29 +13,29 @@ __p += '<header class="row">\n  <hgroup class="span">\n    <h2>' +
 ((__t = ( start_date )) == null ? '' : __t) +
 ' - ' +
 ((__t = ( end_date )) == null ? '' : __t) +
-'</h4>\n  </hgroup>\n  <ul class="span offset1 inline">\n    <li>\n      <a href="' +
+'</h4>\n  </hgroup>\n  <ul class="left-lg left-md col-md-offset-1 list-inline">\n    <li>\n      <a href="' +
 ((__t = ( baseUrl )) == null ? '' : __t) +
 '/leases/' +
 ((__t = ( objectId )) == null ? '' : __t) +
-'/edit" class="btn">\n      ' +
+'/edit" class="btn btn-default">\n      ' +
 ((__t = ( i18nCommon.actions.edit )) == null ? '' : __t) +
 '\n      </a>\n    </li>\n    <li>\n      <a href="' +
 ((__t = ( baseUrl )) == null ? '' : __t) +
 '/add/tenants?leaseId=' +
 ((__t = ( objectId )) == null ? '' : __t) +
-'" class="btn add-tenants"\n          rel="tooltip"\n          data-original-title="' +
+'" class="btn btn-default add-tenants"\n          rel="tooltip"\n          data-original-title="' +
 ((__t = ( i18nLease.actions.add_tenants )) == null ? '' : __t) +
-'">\n        <i class="icon-user"></i>\n      </a>\n    </li>\n    <li>\n      <a href="' +
+'">\n        <span class="glyphicon glyphicon-user"></span>\n      </a>\n    </li>\n    <li>\n      <a href="' +
 ((__t = ( baseUrl )) == null ? '' : __t) +
 '/leases/' +
 ((__t = ( objectId )) == null ? '' : __t) +
-'/extend"\n          class="btn extend"\n          rel="tooltip"\n          data-original-title="' +
+'/extend"\n          class="btn btn-default extend"\n          rel="tooltip"\n          data-original-title="' +
 ((__t = ( i18nLease.actions.extend )) == null ? '' : __t) +
-'">\n        <i class="icon-repeat"></i>\n      </a>\n    </li>\n  </ul>\n</header>\n<div class="row">\n  <div class="span9">\n    <div>\n      <h3>' +
+'">\n        <span class="glyphicon glyphicon-repeat"></span>\n      </a>\n    </li>\n  </ul>\n</header>\n<div class="row">\n  <div class="col-md-9">\n    <div>\n      <h3>' +
 ((__t = ( i18nLease.form.tenants )) == null ? '' : __t) +
 '</h3> \n      <p class="empty">' +
 ((__t = ( i18nLease.empty.tenants )) == null ? '' : __t) +
-'</p>\n      <ul id="tenants" class="row no-bullet"></ul>\n    </div>\n    \n    ';
+'</p>\n      <ul id="tenants" class="row list-unstyled"></ul>\n    </div>\n    \n    ';
  if (isMgr && rent) { ;
 __p += '\n    <div>\n      <h3>' +
 ((__t = ( i18nLease.form.payments )) == null ? '' : __t) +
@@ -47,7 +47,7 @@ __p += '\n    <div>\n      <h3>' +
  } ;
 __p += '\n  </div>\n  ';
  if (isMgr) { ;
-__p += '\n    <div class="span3">\n      ';
+__p += '\n    <div class="col-md-3">\n      ';
  if (parking_fee || parking_space || garage_remotes) { ;
 __p += '\n      <div>\n        <h3>' +
 ((__t = ( i18nLease.form.parking )) == null ? '' : __t) +

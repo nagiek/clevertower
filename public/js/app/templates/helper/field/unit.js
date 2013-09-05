@@ -7,50 +7,50 @@ function print() { __p += __j.call(arguments, '') }
 with (obj) {
 
  if (unit) { ;
-__p += '\n  <div class="control-group">\n    <label for="unit[attributes][title]" class="control-label">' +
+__p += '\n  <div class="row">\n    <div class="form-group col-sm-4">\n      <label for="unit[attributes][title]" class="control-label">' +
 ((__t = ( i18nCommon.classes.Unit )) == null ? '' : __t);
  if (required) { ;
 __p += ' <span class="required">*</span>';
  } ;
-__p += '</label>\n    <div class="controls">\n      <input type="text" name="unit[attributes][title]" placeholder="' +
+__p += '</label>\n      <input type="text" name="unit[attributes][title]" placeholder="' +
 ((__t = ( i18nUnit.form.unit_number )) == null ? '' : __t) +
-'" class="new-unit input-xsmall" maxlength="16" value="' +
+'" class="form-control new-unit" maxlength="16" value="' +
 ((__t = ( unit.title )) == null ? '' : __t) +
-'">\n    </div>\n  </div>\n  <div class="control-group">\n    <label for="unit[attributes][bedrooms]" class="control-label">' +
+'">\n    </div>\n    <div class="form-group col-sm-4">\n      <label for="unit[attributes][bedrooms]" class="control-label">' +
 ((__t = ( i18nUnit.fields.bedrooms )) == null ? '' : __t);
  if (required) { ;
 __p += ' <span class="required">*</span>';
  } ;
-__p += '</label>\n    <div class="controls">\n      <select name="unit[attributes][bedrooms]">\n        <option value="0" ' +
+__p += '</label>\n      <select class="form-control" name="unit[attributes][bedrooms]">\n          <option value="0" ' +
 ((__t = ( unit.bedrooms == 0 ? 'selected' : '' )) == null ? '' : __t) +
 '>' +
 ((__t = ( i18nUnit.form.bedrooms.zero )) == null ? '' : __t) +
-'</option>\n        <option value="1" ' +
+'</option>\n          <option value="1" ' +
 ((__t = ( unit.bedrooms == 1 ? 'selected' : '' )) == null ? '' : __t) +
 '>' +
 ((__t = ( i18nUnit.form.bedrooms.one )) == null ? '' : __t) +
-'</option>\n        <option value="2" ' +
+'</option>\n          <option value="2" ' +
 ((__t = ( unit.bedrooms == 2 ? 'selected' : '' )) == null ? '' : __t) +
 '>' +
 ((__t = ( i18nUnit.form.bedrooms.two )) == null ? '' : __t) +
-'</option>\n        <option value="3" ' +
+'</option>\n          <option value="3" ' +
 ((__t = ( unit.bedrooms == 3 ? 'selected' : '' )) == null ? '' : __t) +
 '>' +
 ((__t = ( i18nUnit.form.bedrooms.three )) == null ? '' : __t) +
-'</option>\n        <option value="4" ' +
+'</option>\n          <option value="4" ' +
 ((__t = ( unit.bedrooms == 4 ? 'selected' : '' )) == null ? '' : __t) +
 '>' +
 ((__t = ( i18nUnit.form.bedrooms.four )) == null ? '' : __t) +
-'</option>\n        <option value="5" ' +
+'</option>\n          <option value="5" ' +
 ((__t = ( unit.bedrooms == 5 ? 'selected' : '' )) == null ? '' : __t) +
 '>' +
 ((__t = ( i18nUnit.form.bedrooms.five )) == null ? '' : __t) +
-'</option>\n      </select>\n    </div>\n  </div>\n  <div class="control-group">\n    <label for="unit[attributes][bathrooms]" class="control-label">' +
+'</option>\n        </select>\n    </div>\n    <div class="form-group col-sm-4">\n      <label for="unit[attributes][bathrooms]" class="control-label">' +
 ((__t = ( i18nUnit.fields.bathrooms )) == null ? '' : __t);
  if (required) { ;
 __p += ' <span class="required">*</span>';
  } ;
-__p += '</label>\n    <div class="controls">\n      <select name="unit[attributes][bathrooms]">\n        <option value="0" ' +
+__p += '</label>\n      <select class="form-control" name="unit[attributes][bathrooms]">\n        <option value="0" ' +
 ((__t = ( unit.bathrooms == 0 ? 'selected' : '' )) == null ? '' : __t) +
 '>' +
 ((__t = ( i18nUnit.form.bathrooms.zero )) == null ? '' : __t) +
@@ -80,18 +80,18 @@ __p += '</label>\n    <div class="controls">\n      <select name="unit[attribute
 ((__t = ( i18nUnit.form.bathrooms.threeandahalf )) == null ? '' : __t) +
 '</option>\n      </select>\n    </div>\n  </div>\n';
  } else { ;
-__p += '\n  <div class="unit-group control-group">\n    <label for="unit-select" class="control-label">' +
+__p += '\n  <div class="unit-group form-group">\n    <label for="unit-select" class="control-label">' +
 ((__t = ( i18nCommon.classes.Unit )) == null ? '' : __t);
  if (required) { ;
 __p += ' <span class="required">*</span>';
  } ;
-__p += '</label>\n    <div class="controls">\n      <input type="hidden" name="unit[__type]" value="Pointer">\n      <input type="hidden" name="unit[className]" value="Unit">\n      <select name="unit[id]" class="span unit-select" required="' +
+__p += '</label>\n    <div class="row">\n      <div class="col-xs-6">\n        <select name="unit[id]" class="form-control unit-select" required="' +
 ((__t = ( required )) == null ? '' : __t) +
-'">\n        <option value="">' +
+'">\n          <option value="">' +
 ((__t = ( i18nCommon.form.select.select_value )) == null ? '' : __t) +
-'</option>\n      </select>\n\n      <input type="text" name="unit[attributes][title]" placeholder="' +
+'</option>\n        </select>\n      </div>\n      <div class="col-xs-6">\n        <input type="text" name="unit[attributes][title]" placeholder="' +
 ((__t = ( i18nUnit.form.unit_number )) == null ? '' : __t) +
-'" class="new-unit input-xsmall" maxlength="16" style="display:none;">\n    </div>\n  </div>\n  ';
+'" class="form-control new-unit" maxlength="16" style="display:none;">\n      </div>\n    </div>\n  </div>\n  <input type="hidden" name="unit[__type]" value="Pointer">\n    <input type="hidden" name="unit[className]" value="Unit">\n  ';
  if (help) { ;
 __p += '\n    <p class="help-block">\n      <span class="label label-large">' +
 ((__t = ( i18nCommon.adjectives.private )) == null ? '' : __t) +
@@ -101,7 +101,7 @@ __p += '\n    <p class="help-block">\n      <span class="label label-large">' +
  } ;
 __p += '\n';
  } ;
-__p += '\n';
+
 
 }
 return __p

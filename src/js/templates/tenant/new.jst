@@ -1,24 +1,28 @@
 <div class="container">
   <h2><%= i18nLease.headers.add_tenants %></h2>
-  <form class="tenants-form" method="post">
+  <form class="tenants-form">
     <div class="row">
-      <fieldset class="span6">
+      <fieldset class="col-sm-6">
         <legend><%= i18nCommon.form.info %></legend>
-        <div class="lease-group control-group">
+        <div class="lease-group form-group">
           <label for="lease[id]" class="control-label"><%= i18nLease.attributes.lease_on_unit %> <span class="required">*</span></label>
-          <div class="controls">
-            <input type="hidden" name="lease[__type]" value="Pointer">
-            <input type="hidden" name="lease[className]" value="Lease">
-            <select name="lease[id]" class="lease-select pull-left" required="true">
-              <option value=''><%= i18nCommon.form.select.select_value %></option>
-              <optgroup class="group-active" label="<%= i18nLease.dates.active %>"></optgroup>
-              <optgroup class="group-inactive" label="<%= i18nLease.dates.inactive %>"></optgroup>
-            </select>
-            <a class="span inline-block" href="<%= baseUrl %>/add/lease"><%= i18nLease.actions.add_new_lease %></a>
+          <div class="row controls">
+            <div class="col-sm-6">
+              <select name="lease[id]" class="lease-select form-control" required="true">
+                <option value=''><%= i18nCommon.form.select.select_value %></option>
+                <optgroup class="group-active" label="<%= i18nLease.dates.active %>"></optgroup>
+                <optgroup class="group-inactive" label="<%= i18nLease.dates.inactive %>"></optgroup>
+              </select>
+            </div>
+            <div class="col-sm-6">
+              <a class="span inline-block" href="<%= baseUrl %>/add/lease"><%= i18nLease.actions.add_new_lease %></a>
+            </div>
           </div>
+          <input type="hidden" name="lease[__type]" value="Pointer">
+          <input type="hidden" name="lease[className]" value="Lease">
         </div>
       </fieldset>
-      <fieldset class="span6">
+      <fieldset class="col-sm-6">
         <legend><%= i18nLease.form.tenants %></legend>
         <%= JST["src/js/templates/helper/field/tenant.jst"]({emails: '', label: false, i18nCommon: i18nCommon}) %>
       </fieldset>
@@ -26,7 +30,7 @@
     
     <div class="form-actions">
       <button class="save btn btn-primary"><%= i18nCommon.actions.save %></button>
-      <a href="<%= baseUrl %>" class="cancel btn"><%= i18nCommon.actions.cancel %></a>
+      <a href="<%= baseUrl %>" class="cancel btn btn-default"><%= i18nCommon.actions.cancel %></a>
     </div>
   </form>
 </div>

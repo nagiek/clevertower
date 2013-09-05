@@ -1,17 +1,12 @@
 <div id="lease" class="container">
   <div class="clearfix">    
-    <div class="photo photo-thumbnail photo-elastic pull-left tablet-left">
+    <div class="photo photo-thumbnail photo-elastic left-lg left-md">
       <a href="<%= baseUrl %>">
         <img src="<%= cover %>" alt="Profile" class="img-rounded profile-picture">
       </a>
     </div>
     
     <header class="header page-header photo-float thumbnail-float elastic-float">
-
-      <% if (!hasNetwork) { %>
-        <a href="/network/new" class="pull-right btn tablet-hidden phone-hidden"><i class="icon-arrow-up"></i><%= i18nCommon.actions.upgrade %></a>
-      <% } %>
-
       <hgroup class="inline-block align-top">
         <a href="<%= baseUrl %>">
           <h1 class="property-title"><%= title %></h1>
@@ -19,34 +14,37 @@
           <h4 class="inline-block"><span class="start-date"><%= startDate %></span> - <span class="end-date"><%= endDate %></span></h4>
         </a>
       </hgroup>
-      <ul class="inline-block align-top offset1 inline">
+      <ul class="inline-block align-top list-inline right-lg right-md col-md-offset-1">
         <li>
-          <a href="<%= baseUrl %>/edit" class="btn">
+          <a href="<%= baseUrl %>/edit" class="btn btn-default">
           <%= i18nCommon.actions.edit %>
           </a>
         </li>
         <li>
-          <a href="<%= baseUrl %>/add/tenants" class="btn add-tenants"
+          <a href="<%= baseUrl %>/add/tenants" class="btn btn-default add-tenants"
               rel="tooltip"
               data-placement="bottom"
               data-original-title="<%= i18nLease.actions.add_tenants %>">
-            <i class="icon-user"></i>
+            <span class="glyphicon glyphicon-user"></span>
           </a>
         </li>
         <li>
-          <a href="<%= baseUrl %>/add/listing" class="btn add-listing"
+          <a href="<%= baseUrl %>/add/listing" class="btn btn-default add-listing"
               rel="tooltip"
               data-placement="bottom"
               data-original-title="<%= i18nListing.actions.add_listing %>">
-            <i class="icon-listing"></i>
+            <span class="glyphicon glyphicon-certificate glyphicon-listing"></span>
           </a>
         </li>
       </ul>
     </header>
   </div>
-  <% if (!hasNetwork) { %>
-    <a href="/network/new" class="stay-right btn desktop-hidden"><i class="icon-arrow-up"></i><%= i18nCommon.actions.upgrade %></a>
-  <% } %>
 
   <div class="content fade in"></div>
+
+<!--   <% if (!hasNetwork) { %>
+    <a href="/network/new" class="pull-right btn btn-default">
+      <span class="glyphicon glyphicon-arrow-up"></span><%= i18nCommon.actions.upgrade %>
+    </a>
+  <% } %> -->
 </div>

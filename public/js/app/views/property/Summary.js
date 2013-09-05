@@ -19,8 +19,6 @@
 
       PropertySummaryView.prototype.tagName = "li";
 
-      PropertySummaryView.prototype.className = "row";
-
       PropertySummaryView.prototype.initialize = function() {
         this.model.prep('units');
         this.model.prep('listings');

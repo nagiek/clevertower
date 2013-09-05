@@ -1,6 +1,6 @@
 define [
-  'underscore',
-  'backbone',
+  'underscore'
+  'backbone'
   "collections/UnitList"
   "collections/LeaseList"
   "collections/InquiryList"
@@ -9,10 +9,11 @@ define [
   "collections/ListingList"
   "collections/PhotoList"
   "collections/ActivityList"
+  "collections/CommentList"
   "models/Unit"
   "models/Lease"
   "underscore.inflection"
-], (_, Parse, UnitList, LeaseList, InquiryList, TenantList, ApplicantList, ListingList, PhotoList, ActivityList, Unit, Lease, Listing, inflection) ->
+], (_, Parse, UnitList, LeaseList, InquiryList, TenantList, ApplicantList, ListingList, PhotoList, ActivityList, CommentList, Unit, Lease, Listing, inflection) ->
 
   Property = Parse.Object.extend "Property",
   # class Property extends Parse.Object
@@ -123,7 +124,7 @@ define [
     cover: (format) ->
       switch format
         when "micro", "tiny" then format = "thumb"
-        when "large" then format = "full"
+        when "large", "profile", "span4", "span6" then format = "full"
       img = @get "image_#{format}"
       img = "/img/fallback/property-#{format}.png" if img is '' or !img?
       img 
@@ -178,6 +179,8 @@ define [
           new PhotoList [], property: @
         when "activity"
           if basedOnNetwork then network.activity else new ActivityList [], property: @
+        when "comments"
+          if basedOnNetwork then network.comments else new CommentList [], property: @
         when "units" 
           if basedOnNetwork then network.units else new UnitList [], property: @
         when "inquiries"

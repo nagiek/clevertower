@@ -15,7 +15,6 @@ define [
   class PropertySummaryView extends Parse.View
   
     tagName: "li"
-    className: "row"
   
     initialize: ->
 

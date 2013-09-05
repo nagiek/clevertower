@@ -9,19 +9,19 @@ __p += '<header>\n  <h2>' +
 ((__t = (i18nCommon.classes.Unit)) == null ? '' : __t) +
 ' ' +
 ((__t = ( title )) == null ? '' : __t) +
-'</a></h2>  \n  <div>\n    <a  class="btn add-lease"\n        href="' +
+'</a></h2>  \n  <div>\n    <a  class="btn btn-default add-lease"\n        href="' +
 ((__t = ( baseUrl )) == null ? '' : __t) +
 '/add/lease?unit=' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '"\n        rel="tooltip"\n        data-original-title="' +
 ((__t = ( i18nLease.actions.add_new_lease )) == null ? '' : __t) +
-'">\n      <i class="icon-plus"></i>\n    </a>\n    <a  class="btn add-listing"\n        href="' +
+'">\n      <span class="glyphicon glyphicon-plus"></span>\n    </a>\n    <a  class="btn btn-default add-listing"\n        href="' +
 ((__t = ( baseUrl )) == null ? '' : __t) +
 '/add/listing?unit=' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '"\n        rel="tooltip"\n        data-original-title="' +
 ((__t = ( i18nListing.actions.add_listing )) == null ? '' : __t) +
-'">\n      <i class="icon-listing"></i>\n    </a>\n  </div>\n</header>\n<div class="row">\n  <div class="span9">\n    <div class="well">\n      <h2>' +
+'">\n      <span class="glyphicon glyphicon-certificate glyphicon-listing"></span>\n    </a>\n  </div>\n</header>\n<div class="row">\n  <div class="col-sm-9">\n    <div class="well">\n      <h2>' +
 ((__t = ( i18nUnit.show.leases )) == null ? '' : __t) +
 '</h2>\n      <table id="leases-table" class="table">\n        <thead>\n          <tr>\n            <th>' +
 ((__t = (i18nCommon.classes.Lease)) == null ? '' : __t) +
@@ -35,7 +35,7 @@ __p += '<header>\n  <h2>' +
 ((__t = (i18nCommon.form.Operations)) == null ? '' : __t) +
 '</span></th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr><td class="spinner-cell" colspan="5">\n            <img src=\'/img/misc/spinner.gif\' class=\'spinner\' alt="' +
 ((__t = ( i18nCommon.verbs.loading )) == null ? '' : __t) +
-'" />\n          </td></tr>\n        </tbody>\n      </table>\n    </div>\n  </div>\n  <div class="span3">\n    ';
+'" />\n          </td></tr>\n        </tbody>\n      </table>\n    </div>\n  </div>\n  <div class="col-sm-3">\n    ';
  if (bathrooms || bedrooms || square_feet) { ;
 __p += '\n    <div>\n      <h3>' +
 ((__t = ( i18nUnit.show.layout )) == null ? '' : __t) +

@@ -2,6 +2,7 @@
   "name": "clevertower",
   "version": "0.0.0",
   "dependencies": {
+    "bootstrap" : "3.x",
     "requirejs-plugins": "~1.0.2"
   }
 }

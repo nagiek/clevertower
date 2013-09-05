@@ -34,9 +34,10 @@ require.config
     filePicker:               "app/plugins/file_picker"
     # toggler:                  "app/plugins/toggler"
     masonry:                  "libs/jquery/jquery.masonry"
+    transit:                  "libs/jquery/jquery.transit"
     infinity:                 "libs/jquery/infinity"
     rangeSlider:              "libs/jquery/jquery.rangeSlider"
-    slideshowify:              "libs/jquery/jquery.slideshowify"
+    slideshowify:             "libs/jquery/jquery.slideshowify"
     "jquery.fileupload-pr":   "app/plugins/jquery-fileupload-pr"  # Profile  (single)
     "jquery.fileupload-ui":   "app/plugins/jquery-fileupload-ui"  # UI       (multiple)
     "jquery.fileupload-fp":   "app/plugins/jquery-fileupload-fp"  # File Processing
@@ -161,6 +162,7 @@ require [
   "serializeObject"
   "typeahead"
   "masonry"
+  "transit"
 ], ($, _, Parse, FB, Property, Unit, Lease, Profile, FeaturedListingList, ActivityList, NotificationList, AppRouter, _String) ->
 
   # Events
@@ -261,7 +263,7 @@ require [
 
   Parse.App.featuredListings = new FeaturedListingList 
 
-  Parse.App.fbPerms = "email, publish_actions" #, publish_stream, read_stream"
+  Parse.App.fbPerms = "email, publish_actions, user_location, user_about_me, user_birthday, user_website" #, publish_stream, read_stream"
 
   Parse.App.countryCodes = 
     CA: "Canada"
@@ -333,6 +335,7 @@ require [
 
   # Load all the stuff
   Parse.User::setup = ->
+
     new Parse.Query("_User")
     .include('lease')
     .include('unit')
@@ -347,8 +350,8 @@ require [
 
       # Profile.
       profile = user.get "profile"
-      profile.likes = new ActivityList([], {})
-      profile.likes.query = profile.relation("likes").query()
+      profile.likes = new ActivityList([], profile: profile)
+      profile.likes.query = profile.relation("likes").query().include("property")
       @set "profile", profile
 
       # Notifications.
@@ -382,6 +385,7 @@ require [
     network.prep("properties").fetch()
     network.prep("units").fetch()
     network.prep("activity").fetch()
+    network.prep("comments").fetch()
     network.prep("managers").fetch()
     network.prep("tenants").fetch()
     network.prep("listings").fetch()
@@ -390,9 +394,9 @@ require [
 
     # Set the network and the role on the user.
     role = network.get("role")
-    role.getUsers().query().get Parse.User.current().id,
-      success: (user) => network.mgr = true; @set "network", network
-      error: => network.mgr = false; @set "network", network
+    role.getUsers().query().equalTo("objectId", Parse.User.current().id).first()
+    .then (user) => network.mgr = true; @set "network", network
+      , => network.mgr = false; @set "network", network
 
   # Set up Dispatcher for global events
   Parse.Dispatcher = {}

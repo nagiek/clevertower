@@ -10,32 +10,43 @@
   }
 }
 
+.likers {
+  &.active {
+    color: @brand-success;
+  }
+}
+
+
+@media (min-width: @screen-tablet)      { .map-container-fixed { width: (4 / @grid-columns) * (@container-tablet) - @grid-gutter-width; }     }
+@media (min-width: @screen-desktop)     { .map-container-fixed { width: (4 / @grid-columns) * (@container-desktop) - @grid-gutter-width; }    }
+@media (min-width: @screen-lg-desktop)  { .map-container-fixed { width: (4 / @grid-columns) * (@container-lg-desktop) - @grid-gutter-width; } }
+
 #city {
   > div {
     margin-bottom:18px;
     background-repeat:none;
     background-position:50% 50%;
-    .border-radius(4px);
+    border-radius: @border-radius-base;
     > div {
       padding: 40px 15px 0 15px;
     }
   }
   h1 {
-    color:@white;
-    text-shadow:0 1px 25px @grayDark;
+    color: #fff;
+    text-shadow:0 1px 25px @gray-dark;
   }
   p {
-    color:@white;
-    text-shadow:0 1px 14px @grayDark;
+    color: #fff;
+    text-shadow:0 1px 14px @gray-dark;
   }
   .close {
     color:@white;
     font-size:20px;
     font-weight: 400;
     padding: 5px 10px;
-    .opacity(90);
+    .opacity(0.9);
     &:hover {
-      .opacity(100);
+      .opacity(1);
     }
   }
 }
@@ -43,8 +54,8 @@
 // All forms where an activity is posted
 .activity-form {
   legend {
-    font-size: @baseFontSize + 2px;
-    line-height: @baseLineHeight + 2px;
+    font-size: @font-size-large;
+    line-height: @line-height-large;
     border: none;
     margin: 0;
     padding: 0;
@@ -64,12 +75,12 @@
     .activity {
       // Make .photo-grid4 behave as photo-thumbnail
       .photo-grid4 {
-        height:@thumbnailImgLength;
-        width:@thumbnailImgLength;
+        height:@img-length-thumbnail;
+        width:@img-length-thumbnail;
         img {
-          height:@thumbnailImgLength;
-          min-width:@thumbnailImgLength;
-          max-width:@profileImgLength + 28px;
+          height:@img-length-thumbnail;
+          min-width:@img-length-thumbnail;
+          max-width:@img-length-profile + 28px;
           width: auto;
         }
       }
@@ -77,14 +88,14 @@
       .caption {
         float: none;
         display:block;
-        margin-left: @thumbnailImgLength + @thumbnailImgPadding; 
-        padding-top: 15px;
-        padding-bottom: 15px;
+        margin-left: @img-length-thumbnail + @img-padding-thumbnail; 
+        padding-top: @padding-large-vertical;
+        padding-bottom: @padding-large-vertical;
       }
     }
   }
   // Special wide-activity formatting
-  > .span8 {
+  > .col-md-12 {
     .photo-grid4 {
       height: 260px;
       width: 620px - 10px;
@@ -99,7 +110,7 @@
 @media (min-width: 1200px) {
   #activities {
     // Special wide-activity formatting
-    > .span8 {
+    > .col-md-12 {
       .photo-grid4 {
         width: 770px - 10px;
         img {
@@ -113,7 +124,7 @@
 @media (max-width: 979px) and (min-width: 768px) {
   #activities {
     // Special wide-activity formatting
-    > .span8 {
+    > .col-lg-12 {
       .photo-grid4 {
         width: 476px - 10px;
         img {
@@ -127,7 +138,7 @@
 @media (max-width: 767px) {
   #activities {
     // Special wide-activity formatting
-    > .span8 {
+    > .col-lg-12 {
       .photo-grid4 {
         width: 100%;
       }
@@ -171,7 +182,7 @@
     }
   }
   .caption {
-    padding:0 15px;
+    padding:0 @padding-large-horizontal;
     margin-bottom: 15px;
   }
 
@@ -179,7 +190,7 @@
     text-decoration: none;
   }
   &.active {
-    border-color: @blue;
+    border-color: @brand-primary;
     .box-shadow(0 1px 4px rgba(0, 105, 214, 0.25))
   }
   .rent {
@@ -190,7 +201,7 @@
     line-height: 24px;
     font-weight: 100;
     vertical-align: middle;
-    padding: 15px;
+    padding: @padding-large-vertical @padding-large-horizontal;
     margin-bottom:15px;
   }
   .activity-actions {
@@ -206,7 +217,7 @@
     width: 21px;
     height: 23px;
     line-height: 23px;
-    font-size: 9px;
+    font-size: @font-size-mini;
     background-color: @orange;
     color: @white;
     &.property-linked {
@@ -253,7 +264,7 @@
 
 #activity-buttons {
   position: absolute;
-  top: 1px;
+  top: 3px;
   right: 6px;
   // li {
   //   position: static;

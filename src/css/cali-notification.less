@@ -5,13 +5,11 @@
       > a {
         &.unclicked,
         &:hover {
-          #gradient > .vertical(lighten(@blueLight, 5%), @blueLight);
-          background-color:@blueLight;
-          color:@black;
+          #gradient > .vertical(@brand-primary-light, @brand-primary);
+          color:@text-color;
         }
         &.unclicked:hover {
-          #gradient > .vertical(@blueLight, darken(@blueLight, 5%));
-          background-color:darken(@blueLight, 5%);
+          #gradient > .vertical(@brand-primary, @brand-primary-dark);
         }
       }
     }
@@ -19,14 +17,14 @@
 }
 #friend-requests {
   .notifications-menu {
-    right: -26px;
+    right: -30px;
     &:before { right: 31px; }
     &:after  { right: 32px; }
   }
 }
 #memos {
   .notifications-menu {
-    right: -52px;
+    right: -60px;
     &:before { right: 57px; }
     &:after  { right: 58px; }
   }

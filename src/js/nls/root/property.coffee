@@ -54,7 +54,7 @@ define
                                       ]
                                       titles[Math.floor(Math.random() * titles.length)]
 
-    added_photos:          (count) -> "We added #{count} photos."
+    added_photos:          (count) -> "We added " + if count is 1 then "a new photo." else "#{count} photos."
   listing:
     public:                           "Display Public"
     public_info:                      "Whether this property will appear in search results"
@@ -63,6 +63,7 @@ define
   network:
     edit:                             "Edit network"
     setup:                            "Set up network"
+    unique_name:                      "Unique username"
     claim_username:                   "Claim your network's unique username."
     claim_domain:                     "Claim your network's unique domain name."
     find_username:                    "Enter the unique username of the network you wish to join."

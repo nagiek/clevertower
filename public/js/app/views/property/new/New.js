@@ -18,7 +18,7 @@
 
       NewPropertyView.prototype.id = "new-property-form";
 
-      NewPropertyView.prototype.className = "span12 form-large";
+      NewPropertyView.prototype.className = "col-xs-12";
 
       NewPropertyView.prototype.initialize = function(attrs) {
         this.wizard = attrs.wizard;

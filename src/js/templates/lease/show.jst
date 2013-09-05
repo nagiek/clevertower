@@ -1,37 +1,37 @@
-<header class="row">
-  <hgroup class="span">
+<header class="clearfix">
+  <hgroup class="left-lg">
     <h2><%= i18nLease.attributes.lease_on_unit %> <span id="unit-title"><%= title %></span></h2>
     <h4><%= start_date %> - <%= end_date %></h4>
   </hgroup>
-  <ul class="span offset1 inline">
+  <ul class="left-lg left-md col-md-offset-1 list-inline">
     <li>
-      <a href="<%= baseUrl %>/leases/<%= objectId %>/edit" class="btn">
+      <a href="<%= baseUrl %>/leases/<%= objectId %>/edit" class="btn btn-default">
       <%= i18nCommon.actions.edit %>
       </a>
     </li>
     <li>
-      <a href="<%= baseUrl %>/add/tenants?leaseId=<%= objectId %>" class="btn add-tenants"
+      <a href="<%= baseUrl %>/add/tenants?leaseId=<%= objectId %>" class="btn btn-default add-tenants"
           rel="tooltip"
           data-original-title="<%= i18nLease.actions.add_tenants %>">
-        <i class="icon-user"></i>
+        <span class="glyphicon glyphicon-user"></span>
       </a>
     </li>
     <li>
       <a href="<%= baseUrl %>/leases/<%= objectId %>/extend"
-          class="btn extend"
+          class="btn btn-default extend"
           rel="tooltip"
           data-original-title="<%= i18nLease.actions.extend %>">
-        <i class="icon-repeat"></i>
+        <span class="glyphicon glyphicon-repeat"></span>
       </a>
     </li>
   </ul>
 </header>
 <div class="row">
-  <div class="span9">
+  <div class="col-md-9">
     <div>
       <h3><%= i18nLease.form.tenants %></h3> 
       <p class="empty"><%= i18nLease.empty.tenants %></p>
-      <ul id="tenants" class="row no-bullet"></ul>
+      <ul id="tenants" class="row list-unstyled"></ul>
     </div>
     
     <% if (isMgr && rent) { %>
@@ -42,7 +42,7 @@
     <% } %>
   </div>
   <% if (isMgr) { %>
-    <div class="span3">
+    <div class="col-md-3">
       <% if (parking_fee || parking_space || garage_remotes) { %>
       <div>
         <h3><%= i18nLease.form.parking %></h3> 

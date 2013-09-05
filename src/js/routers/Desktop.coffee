@@ -47,7 +47,9 @@ define [
       
       new UserMenuView().render()
       new NavMenuView().render()
-      Parse.App.search = new SearchView().render()          
+      Parse.App.search = new SearchView().render()
+
+      $("#sidebar-toggle").click -> $("body").toggleClass("active")
           
       @listenTo Parse.Dispatcher, "user:login", =>
         if Parse.User.current().get("network") or Parse.User.current().get("property")
@@ -155,22 +157,27 @@ define [
               view.changeSubView(vars.path, vars.params)
         else if Parse.User.current().get("property")
           if Parse.User.current().get("property").mgr is undefined
-            Parse.User.current().get("property").get("mgrRole").getUsers().query().get Parse.User.current().id,
-              success: (user) =>
-                if user
-                  Parse.User.current().get("property").mgr = true
-                  @propertiesManage Parse.User.current().get("property").id, splat
-                else
+            if Parse.User.current().get("property").get("mgrRole") 
+              Parse.User.current().get("property").get("mgrRole").getUsers().query().get Parse.User.current().id,
+                success: (user) =>
+                  if user
+                    Parse.User.current().get("property").mgr = true
+                    @propertiesManage Parse.User.current().get("property").id, splat
+                  else
+                    Parse.User.current().get("property").mgr = false
+                    require ["views/lease/Manage"], (LeaseView) => 
+                      vars = @deparamAction splat
+                      if !view or view !instanceof LeaseView
+                        vars.model = Parse.User.current().get("lease")
+                        @view = new LeaseView(vars)
+                      else
+                        view.changeSubView(vars.path, vars.params)
+                error: (error) =>
                   Parse.User.current().get("property").mgr = false
-                  require ["views/lease/Manage"], (LeaseView) => 
-                    vars = @deparamAction splat
-                    if !view or view !instanceof LeaseView
-                      vars.model = Parse.User.current().get("lease")
-                      @view = new LeaseView(vars)
-                    else
-                      view.changeSubView(vars.path, vars.params)
-              error: (error) =>
-                Parse.User.current().get("property").mgr = false
+                  @insideManage(splat)
+            else
+              Parse.User.current().get("property").mgr = false
+              @insideManage(splat)
           else 
             # Cached answer
             if Parse.User.current().get("property").mgr
@@ -260,6 +267,34 @@ define [
           success: (model) =>
             @view = new PublicPropertyView(model: model, place: place).render()
           error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
+
+
+    # New
+    # --------------
+    
+    listingsNew: =>
+      view = @view
+      require ["views/listing/new"], (NewListingView) =>
+        if !view or view !instanceof NewListingView
+          @view = new NewListingView(forNetwork: true, baseUrl: "/inside/listings")
+          @view.setElement "#main"
+          @view.render()
+
+    leasesNew: =>
+      view = @view
+      require ["views/lease/new"], (NewLeaseView) =>
+        if !view or view !instanceof NewLeaseView
+          @view = new NewLeaseView(forNetwork: true, baseUrl: "/inside/tenants")
+          @view.setElement "#main"
+          @view.render()
+
+    tenantsNew: =>
+      view = @view
+      require ["views/tenant/new"], (NewTenantView) =>
+        if !view or view !instanceof NewTenantView
+          @view = new NewTenantView(forNetwork: true, baseUrl: "/inside/tenants")
+          @view.setElement "#main"
+          @view.render()
 
 
     # User

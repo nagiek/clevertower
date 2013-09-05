@@ -10,12 +10,12 @@
   <% if (newInquiries) { %><small>(<%= newInquiries %> <%= i18nCommon.adjectives.new %>)</small><% } %>
 </td>
 <td>
-  <a href="<%= baseUrl %>/listings/<%= objectId %>/edit" class="btn btn-mini">
+  <a href="<%= baseUrl %>/listings/<%= objectId %>/edit" class="btn btn-small">
     <%= i18nCommon.actions.edit %>
   </a>
-  <button class="btn btn-mini delete"
+  <button class="btn btn-small delete"
           rel="tooltip"
           data-original-title="<%= i18nCommon.actions.delete %>">
-    <i class="icon-trash"></i>
+    <span class="glyphicon glyphicon-trash"></span>
   </button>
 </td>

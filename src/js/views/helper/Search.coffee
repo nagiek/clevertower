@@ -37,7 +37,7 @@ define [
     initDatasets: ->
       @vars = [
         name: 'properties'
-        header: "<span class='nav-header'>#{i18nCommon.classes.Properties}</span>"
+        header: "<span class='dropdown-header'>#{i18nCommon.classes.Properties}</span>"
         remote:
           url: "https://api.parse.com/1/classes/Property"
           replace: (url, uriEncodedQuery) ->
@@ -77,7 +77,7 @@ define [
                               """
       ,
         name: 'people'
-        header: "<span class='nav-header'>#{i18nCommon.nouns.People}</span>"
+        header: "<span class='dropdown-header'>#{i18nCommon.nouns.People}</span>"
         remote:
           url: "https://api.parse.com/1/classes/Profile"
           replace: (url, uriEncodedQuery) ->
@@ -110,9 +110,9 @@ define [
                               """
       ,
         name: 'places'
-        header: "<span class='nav-header'>#{i18nCommon.nouns.places}</span>"
+        header: "<span class='dropdown-header'>#{i18nCommon.nouns.places}</span>"
         footer: """
-                <span class='nav-header'>
+                <span class='dropdown-header'>
                   <img src='https://maps.gstatic.com/mapfiles/powered-by-google-on-white.png' alt='Powered by Google'>
                 </span>
                 """
@@ -136,7 +136,7 @@ define [
       
         # XML HTTP Request code
         # name: 'places'
-        # header: "<span class='nav-header'>#{i18nCommon.nouns.Places}</span>"
+        # header: "<span class='dropdown-header'>#{i18nCommon.nouns.Places}</span>"
 
         # remote:
         #   method: "GET"
@@ -175,7 +175,7 @@ define [
 
         @vars[3] = 
           name: 'tenants'
-          header: "<span class='nav-header'>#{i18nCommon.classes.Tenants}</span>"
+          header: "<span class='dropdown-header'>#{i18nCommon.classes.Tenants}</span>"
           local: Parse.User.current().get("network").tenants.map (t) ->
             p = t.get("profile")
             value: p.name()

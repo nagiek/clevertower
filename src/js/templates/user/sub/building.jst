@@ -1,22 +1,21 @@
 <header class="clearfix">
-  <h3 class="pull-left"><%= property.title %></h3>
-  <a href="/movein" id="new-property-link" class="btn btn-success pull-right">
-    <i class="icon icon-white icon-plus"></i>
+  <h3 class="left-lg left-md"><%= property.title %></h3>
+  <a href="/movein" id="new-property-link" class="btn btn-default right-lg right-md">
     <%= i18nProperty.actions.new_property %>
   </a>
 </header>
 <div class="row">
-  <div class="span6">
+  <div class="col-sm-6">
     <% if (property && unit && lease) { %>
       <div>
         <h4><%= i18nCommon.nouns.tenants %></h4> 
-        <ul id="tenants" class="unstyled no-bullet">
+        <ul id="tenants" class="list-unstyled list-unstyled">
           <li><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" /></li>
         </ul>
       </div>
       <div>
         <h4><%= i18nCommon.nouns.roommates %></h4> 
-        <ul id="roommates" class="unstyled no-bullet">
+        <ul id="roommates" class="list-unstyled list-unstyled">
           <li><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" /></li>
         </ul>
       </div>
@@ -25,7 +24,7 @@
     <% } %>
   </div>
 
-  <div class="span6">
+  <div class="col-sm-6">
     <% if (property && unit && lease) { %>
       <div id="profile-property">
         <hgroup>
@@ -67,7 +66,7 @@
     <% } %>
 <!--     <div>
       <h4><%= i18nUser.building.past_leases %></h4>
-      <ul id="past-leases" class="unstyled no-bullet">
+      <ul id="past-leases" class="list-unstyled list-unstyled">
         <li><img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" /></li>
       </ul>
     </div> -->

@@ -1,22 +1,22 @@
 <header>
   <h2><%=i18nCommon.classes.Unit%> <%= title %></a></h2>  
   <div>
-    <a  class="btn add-lease"
+    <a  class="btn btn-default add-lease"
         href="<%= baseUrl %>/add/lease?unit=<%= objectId %>"
         rel="tooltip"
         data-original-title="<%= i18nLease.actions.add_new_lease %>">
-      <i class="icon-plus"></i>
+      <span class="glyphicon glyphicon-plus"></span>
     </a>
-    <a  class="btn add-listing"
+    <a  class="btn btn-default add-listing"
         href="<%= baseUrl %>/add/listing?unit=<%= objectId %>"
         rel="tooltip"
         data-original-title="<%= i18nListing.actions.add_listing %>">
-      <i class="icon-listing"></i>
+      <span class="glyphicon glyphicon-certificate glyphicon-listing"></span>
     </a>
   </div>
 </header>
 <div class="row">
-  <div class="span9">
+  <div class="col-sm-9">
     <div class="well">
       <h2><%= i18nUnit.show.leases %></h2>
       <table id="leases-table" class="table">
@@ -37,7 +37,7 @@
       </table>
     </div>
   </div>
-  <div class="span3">
+  <div class="col-sm-3">
     <% if (bathrooms || bedrooms || square_feet) { %>
     <div>
       <h3><%= i18nUnit.show.layout %></h3> 

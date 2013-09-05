@@ -20,11 +20,11 @@ define [
 
     attributes:
       id: "new-property-address-form"
-      class: "span12"
+      class: "col-xs-12"
       style: "left: 0%;"
     
     events:
-      'keypress #geolocation-search' : 'checkForSubmit'
+      # 'keypress #geolocation-search' : 'checkForSubmit'
       'click .search'                : 'geocode'
       'click .geolocate'             : 'geolocate'
 
@@ -92,9 +92,9 @@ define [
               scaledSize: null
 
 
-    checkForSubmit : (e) =>
-      return unless e.keyCode is 13
-      @geocode(e)
+    # checkForSubmit : (e) =>
+    #   return unless e.keyCode is 13
+    #   @geocode(e)
 
     geocode : (e) =>      
       e.preventDefault()
@@ -102,7 +102,7 @@ define [
 
     handleGeocodeResults: (results, status) =>
       if status is google.maps.GeocoderStatus.OK
-        $(".wizard-actions .next").removeProp("disabled") if $(".wizard-actions .next").is("[disabled]")
+        $(".form-actions .next").removeProp("disabled") if $(".form-actions .next").is("[disabled]")
         if Parse.User.current() and Parse.User.current().get("network")
           for p in Parse.User.current().get("network").properties.models
             if results[0].geometry.location.equals p.GPoint()

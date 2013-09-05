@@ -83,13 +83,14 @@ define [
             Parse.User.current().setup().then =>
               # User signed up and logged in through Facebook
               FB.api '/me', 
-              fields: 'first_name, last_name, email, birthday, about_me, website, gender, picture.width(270).height(270)', # picture?width=400&height=400
+              fields: 'first_name, last_name, email, birthday, bio, website, gender, picture.width(270).height(270)', # picture?width=400&height=400
               (response) =>
 
                 userVars = 
                   email: response.email
                   birthday: new Date response.birthday
                   gender: response.gender
+                  ACL: new Parse.ACL()
                 userVars.location = response.location.name if response.location
                 Parse.User.current().save userVars
                 Parse.User.current().get("profile").save

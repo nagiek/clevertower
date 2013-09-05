@@ -16,7 +16,7 @@
 
       TenantSummaryView.prototype.tagName = "li";
 
-      TenantSummaryView.prototype.className = "span";
+      TenantSummaryView.prototype.className = "col-sm-6 col-md-4 thumbnail";
 
       TenantSummaryView.prototype.events = {
         'click .delete': 'kill'

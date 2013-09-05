@@ -69,8 +69,7 @@
         };
         this.$el.html(JST["src/js/templates/property/sub/units.jst"](vars));
         this.$table = this.$("#units-table");
-        this.$actions = this.$(".form-actions");
-        this.$undo = this.$actions.find('.undo');
+        this.$undo = this.$('.undo');
         if (this.model.units.length === 0) {
           this.model.units.fetch();
         } else {
@@ -88,7 +87,6 @@
         e.preventDefault();
         this.$('#units-edit').toggleClass('active');
         this.$table.find('.view-specific').toggleClass('hide');
-        this.$actions.toggleClass('hide');
         return this.editing = this.editing ? false : true;
       };
 

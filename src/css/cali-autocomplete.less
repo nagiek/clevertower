@@ -1,38 +1,44 @@
 .typeahead {
   margin-top:0; // Override a default Twitter Bootstrap setting
-  background-color: #fff;
+  background-color: @input-bg;
+}
+
+.twitter-typeahead {
+  .form-control:first-child {
+    border-radius: @border-radius-base;
+  }
 }
 
 .tt-dropdown-menu {
   margin-top: 12px;
   padding: 8px 0;
-  background-color: #fff;
-  border: 1px solid #ccc;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  .border-radius(8);
+  background-color: @dropdown-bg;
+  border: 1px solid @dropdown-fallback-border; // IE8 fallback
+  border: 1px solid @dropdown-border;
+  border-radius: @border-radius-base;
   .box-shadow(0 5px 10px rgba(0,0,0,.2));
-  .nav-header {
-    margin:0;
-    text-transform:uppercase;
-  }
+  // .dropdown-header {
+  //   margin:0;
+  //   text-transform:uppercase;
+  // }
 }
 
 .tt-suggestion {
-  a {
-    padding: 3px 15px;
+  > a {
+    padding: 3px 20px;
     display:block;
     &:hover {
       text-decoration:none;
     }
   }
   .empty {
-    padding: 3px 15px;
+    padding: 3px 20px;
     display:block;
   }
   &.tt-is-under-cursor {
     a {
-      color: #fff;
-      background-color: #0097cf; 
+      color: @dropdown-link-active-color;
+      #gradient > .vertical(@start-color: @dropdown-link-active-bg; @end-color: darken(@dropdown-link-active-bg, 5%));
     }
   }
 }

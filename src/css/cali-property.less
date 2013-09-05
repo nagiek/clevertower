@@ -14,19 +14,11 @@
 //   }
 // }
 
-@media (min-width:767px) and (max-width:979px) {
-  #network-form {
-    #network-name {
-      width:110px;
-    }
-  }
-}
-
 /**
  * New Property Forms
  */
 
-@media (min-width:767px) {
+@media (min-width:@screen-md) {
   #new-property-picture-form {
     #property-picture-controls {
       margin-top: 120px;
@@ -47,60 +39,54 @@
       margin-bottom:9px;
       &.template-upload {
         .preview {
-          .opacity(30)
+          .opacity(0.3)
         }
       }
     }
+    .form-actions {
+      margin-bottom: 18px;
+    }
   }
-  #back-to-property {
-    margin-top:9px;
-    margin-left:18px;
+  #units {
+    .title-group,
+    .bedrooms-group,
+    .bathrooms-group,
+    .square-feet-group {
+      width: 100px;
+    }
+    #units-controls {
+      .btn {
+        vertical-align: bottom;
+      }
+      #add-units-group {
+        width: 140px;
+      }
+    }
   }
   .page-header {
-    margin:0 0 9px;
-    padding:;
-    border-bottom:0;
     h1 {
-      margin-bottom:12px;
-      min-height:44px;
-      a {
-        color:@propertyLinkColor;
-        text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
-        &:hover {
-          color:@propertyLinkColorHover;
-        }
-      }
-    }
-    .photo {
-      img {
-        max-height:95px; // Max height of the adjecent container.
-        max-width:200px;
-      }
+      margin-bottom:24px;
     }
     > .header {
-      min-height:64px - 8px; // Thumbnail height minus padding-top.
+      min-height:@img-length-thumbnail - @padding-base-vertical; // Thumbnail height minus padding-top.
       // min-width:430px; // Arbitrary
-      padding-top: 8px; // If the property title is less than the width of the tabs. 
-      padding-right: 12px; // If the property title is less than the width of the tabs. 
-      .border-radius(4px);
-      @shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05);
-      .box-shadow(@shadow);
-      #gradient > .vertical(lighten(#5bc0de, 20%), lighten(desaturate(#2f96b4, 20%), 10%));
-      &:hover {
-        background-color:#8fc8d9;
-      }
-    }
-    .nav {
-      margin-left:3px; // Override profile-inline class
+      padding-top: @padding-base-vertical; // If the property title is less than the width of the tabs. 
+      padding-right: @padding-base-horizontal; // If the property title is less than the width of the tabs. 
+      // border-radius: @border-radius-base;
+      // .box-shadow("inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05);");
+      // #gradient > .vertical(lighten(#5bc0de, 20%), lighten(desaturate(#2f96b4, 20%), 10%));
+      // &:hover {
+      //   background-color:#8fc8d9;
+      // }
     }
     .nav-tabs {
       vertical-align:bottom;
-      margin-right:3px; /* LTR */
-      margin-bottom:0;
+      margin-right: @padding-base-horizontal;
+      margin-bottom: -1px;
       // position:relative;
       // top:5px; // 4px border radius +1.
 
-      border-bottom:none;
+      // border-bottom:none;
 
       > li {
         &.open {
@@ -112,7 +98,7 @@
         &.active > a {
           color:@gray;
           .caret {
-            border-top-color:@grayDark;
+            border-top-color:@gray-dark;
           }
           &.btn-success {
             .caret {
@@ -124,12 +110,9 @@
           float:right;
         }
         > a {
-          text-shadow:none;
-          color:@propertyLinkColor;
-          border-bottom-color:@white;
           zoom:1; // Fix ie7.
           .caret {
-            border-top-color:@white;
+            border-top-color:#fff;
           }
           &.btn-success {
             background-color: #51A351;
@@ -137,16 +120,15 @@
             &:hover {
               border: 1px solid #DDD;
               border-bottom-color: transparent;
-              color:@white;
+              color:#fff;
               .caret {
-                border-top-color:@white;
+                border-top-color:#fff;
               }
             }
           }
           &:hover {
-            color:@propertyLinkColorHover;
             .caret {
-              border-top-color:@grayDark;
+              border-top-color:@gray-dark;
             }
           }
         }
@@ -158,55 +140,66 @@
 
 
 
-@media (max-width:979px) {
+@media (min-width: @screen-sm) and (max-width: @screen-md) {
   #property {
     .page-header {
       h1 {
-        margin-bottom:8px;
+        margin-bottom:16px;
+      }
+      .photo {
+        height: 96px;
+        width: 96px;
+        img {
+          height: 96px;
+        }
       }
     }
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: @screen-sm) {
+  .property {
+    .photo-float {
+      padding: @padding-base-vertical @padding-base-horizontal;
+    }
+    h2 {
+      height: 76px;
+      margin-bottom:7px;
+    }
+    a {
+      color:@text-color;
+    }
+  }
   #property {
     .page-header {
+      .photo-actions {
+        display: none;
+      }
       > .header {
-        min-width:0;
+        // min-width:0;
+        // height:30px;
         min-height:0;
-        height:30px;
         margin-left:0;
-        padding:0;
-        h1 {
-          position:relative;
-          top:-80px;
-          font-size:20px;
-          min-height:0;
-          margin-bottom:7px;
-          a {
-            color:@black;            
-          }
+      }
+      h1 {
+        display: block;
+        height: 76px;
+        margin-bottom:7px;
+        // Allow spacing for icons.
+        margin-right: 40px; 
+        a {
+          color:@text-color;            
         }
       }
-      .photo {
-        height:80px;
-        width:100%;
-        img {
-          max-height:none;
-          max-width: 100%;
+      .nav-tabs {
+        margin-left:3px;
+        > li > a {
+          font-size:12px;
+          padding-left:12px;
+          padding-right:11px;
+          padding-top:5px;
+          padding-bottom:5px;
         }
-      }
-    }
-    .nav-tabs {
-      position:relative;
-      top: -42px;
-      margin-left:3px;
-      > li > a {
-        font-size:12px;
-        padding-left:12px;
-        padding-right:11px;
-        padding-top:5px;
-        padding-bottom:5px;
       }
     }
   }

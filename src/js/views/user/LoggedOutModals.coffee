@@ -57,15 +57,16 @@ define [
       Parse.User.requestPasswordReset $("#reset-email").val(),
         success: ->
           new Alert(event: 'reset-password', message: i18nDevise.messages.password_reset)
-          @$('> #reset-password-modal').find('.error').removeClass('error')
+          @$('> #reset-password-modal').find('.has-error').removeClass('has-error')
           @$('> #reset-password-modal').modal('hide')
         error: (error) ->
+          console.log error
           msg = switch error.code
             when 125 then i18nDevise.errors.invalid_email_format
             when 205 then i18nDevise.errors.username_doesnt_exist
             else error.message
             
-          $("#reset-email-group").addClass('error')
+          $("#reset-email-group").addClass('has-error')
           new Alert(event: 'reset-password', fade: false, message: msg, type: 'error')
 
     logIn: (e) =>
@@ -79,9 +80,10 @@ define [
           Parse.Dispatcher.trigger "user:loginStart", user
 
         error: (error) =>
+          console.log error
           @$("> #login-modal #login-modal-form button").removeProp "disabled"
-          @$('> #login-modal #login-modal-form .username-group').addClass('error')
-          @$('> #login-modal #login-modal-form .password-group').addClass('error')
+          @$('> #login-modal #login-modal-form .username-group').addClass('has-error')
+          @$('> #login-modal #login-modal-form .password-group').addClass('has-error')
 
           msg = switch error.code
             when -1   then i18nDevise.errors.fields_missing
@@ -105,13 +107,16 @@ define [
             Parse.User.current().setup().then =>
               # User signed up and logged in through Facebook
               FB.api '/me', 
-              fields: 'first_name, last_name, email, birthday, about_me, website, gender, picture.width(270).height(270)', # picture?width=400&height=400
+              fields: 'first_name, last_name, email, birthday, bio, website, gender, picture.width(270).height(270)', # picture?width=400&height=400
               (response) =>
+
+                console.log response
 
                 userVars = 
                   email: response.email
                   birthday: new Date response.birthday
                   gender: response.gender
+                  ACL: new Parse.ACL()
                 userVars.location = response.location.name if response.location
                 Parse.User.current().save userVars
                 Parse.User.current().get("profile").save
@@ -121,7 +126,7 @@ define [
                   bio: response.about_me
                   website: response.website
 
-                if response.picture.data and not response.picture.data.is_silhouette
+                if response.picture and response.picture.data and not response.picture.data.is_silhouette
 
                   Parse.Cloud.run "SetPicture", {
                     url: response.picture.data.url
@@ -137,7 +142,7 @@ define [
                 else 
                   Parse.Dispatcher.trigger "user:loginEnd"
 
-        error: (error) =>
+        error: (error) => console.log error
             
     signUp: (e) =>
       e.preventDefault()
@@ -164,7 +169,8 @@ define [
           Parse.history.navigate "/account/setup", trigger: true
 
         error: (error) =>
-          @$("> #signup-modal #signup-modal-form .error").removeClass 'error'
+          console.log error
+          @$("> #signup-modal #signup-modal-form .has-error").removeClass 'has-error'
           @$("> #signup-modal #signup-modal-form button").removeProp "disabled"
           msg = switch error.code
             when 125  then i18nDevise.errors.invalid_email_format
@@ -174,10 +180,10 @@ define [
 
           switch error.code
             when 125 or 202 
-              @$('.username-group').addClass('error')
+              @$('.username-group').addClass('has-error')
             when -1   
-              @$('> #signup-modal #signup-modal-form username-group').addClass('error')
-              @$('> #signup-modal #signup-modal-form password-group').addClass('error')
+              @$('> #signup-modal #signup-modal-form username-group').addClass('has-error')
+              @$('> #signup-modal #signup-modal-form password-group').addClass('has-error')
 
           @$("> #signup-modal #signup-modal-form .alert-error").html(msg).show()
 

@@ -1,9 +1,11 @@
-<form class="form-horizontal" method="post" id="settings-form">
+<form class="form-horizontal" id="settings-form">
 
   <%= JST["src/js/templates/user/form.jst"]({type: type, email: email, i18nCommon: i18nCommon, i18nDevise: i18nDevise}) %>
 
-  <div class="form-actions">
-    <button class="save btn btn-primary"><%= i18nCommon.actions.save %></button>
-    <a href="<%= cancel_path %>" class="back btn"><%= i18nDevise.actions.back_to_profile %></a>
+  <div class="form-actions row">
+  	<div class="col-md-offset-2 col-md-10">
+      <button class="save btn btn-primary"><%= i18nCommon.actions.save %></button>
+      <a href="<%= cancel_path %>" class="back btn btn-default"><%= i18nDevise.actions.back_to_profile %></a>
+     </div>
   </div>
 </form>

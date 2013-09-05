@@ -1,29 +1,27 @@
 <header class="clearfix">
-  <h2 class="pull-left"><%= i18nCommon.classes.Listings %></h2>
-  <div class="pull-right well well-small">
-    <form class="form-inline form-condensed pull-left">
-      <div class="control-group public-group">
+  <h2 class="left-lg left-md"><%= i18nCommon.classes.Listings %></h2>
+  <div class="right-lg right-md well well-sm">
+    <form class="form-inline form-condensed">
+      <div class="form-group public-group">
         <label for="type" class="control-label">
           <%= i18nCommon.adjectives.public %>
             <span class="help-info"
             data-trigger="hover"
             data-placement="bottom"
-            data-html="true"
+            data-html="false"
             title="<%= i18nProperty.listing.public %>"
-            data-content="<%= i18nProperty.listing.public_info %> <img src='/img/doodad/exact-vs-approx.png'>"
+            data-content="<%= i18nProperty.listing.public_info %>"
             for="type"
             rel="popover">[ ? ]</span>
         </label>
-        <div class="controls">
-          <div class="toggle">
+        <div class="toggle">
           <label class="toggle-radio" for="publicOption1"><%= i18nCommon.prepositions.on %></label>
           <input type="radio" name="property[public]" id="publicOption1" value="1" <%= public ? checked="checked" : '' %>>
           <input type="radio" name="property[public]" id="publicOption2" value="0" <%= !public ? checked="checked" : '' %>>
           <label class="toggle-radio" for="publicOption2"><%= i18nCommon.prepositions.off %></label>
         </div>
-        </div>
       </div>
-      <div class="control-group address-group">
+      <div class="form-group address-group">
         <label class="control-label">
           <%= i18nCommon.classes.address %>
           <span class="help-info"
@@ -31,24 +29,22 @@
           data-placement="bottom"
           data-html="true"
           title="<%= i18nProperty.listing.approx %>"
-          data-content="<%= i18nProperty.listing.approx_info %>"
+          data-content="<p><%= i18nProperty.listing.approx_info %></p> <img src='/img/doodad/exact-vs-approx.png'>"
           for="type"
           rel="popover">[ ? ]</span>
         </label>
-        <div class="controls">
-          <div class="toggle">
+        <div class="toggle">
           <label class="toggle-radio" for="approxOption1"><%= i18nCommon.adjectives.approximate %></label>
           <input type="radio" name="property[approx]" id="approxOption1" value="1" <%= approx ? checked="checked" : '' %>>
           <input type="radio" name="property[approx]" id="approxOption2" value="0" <%= !approx ? checked="checked" : '' %>>
           <label class="toggle-radio" for="approxOption2"><%= i18nCommon.adjectives.exact %></label>
         </div>
-        </div>
       </div>
     </form>
   </div>
-  <ul class="inline pull-right">
-    <li><a class="btn" href="<%= baseUrl %>/add/listing">
-      <i class="icon-plus"></i> <%= i18nListing.actions.add_listing %>
+  <ul class="list-inline right-lg right-md">
+    <li><a class="btn btn-success" href="<%= baseUrl %>/add/listing">
+      <span class="glyphicon glyphicon-plus"></span> <%= i18nListing.actions.add_listing %>
     </a></li>
   </ul>
 </header>

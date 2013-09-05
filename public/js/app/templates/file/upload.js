@@ -19,7 +19,7 @@ __p += '\n      <td class="error" colspan="2"><span class="label label-important
  } else if (files.valid && !i) { ;
 __p += '\n      <td>\n        <div class="progress progress-success progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="bar" style="width:0%;"></div></div>\n      </td>\n      <td class="start">';
  if (!options.autoUpload) { ;
-__p += '\n        <button class="btn btn-primary">\n          <i class="icon-upload icon-white"></i>\n          <span>Start</span>\n        </button>\n      ';
+__p += '\n        <button class="btn btn-primary">\n          <i class="glyphicon glyphicon-upload icon-white"></i>\n          <span>Start</span>\n        </button>\n      ';
  } ;
 __p += '</td>\n    ';
  } else { ;
@@ -27,7 +27,7 @@ __p += '\n      <td colspan="2"></td>\n    ';
  } ;
 __p += '\n    <td class="cancel">';
  if (!i) { ;
-__p += '\n      <button class="btn btn-warning">\n        <i class="icon-ban-circle icon-white"></i>\n        <span>Cancel</span>\n      </button>\n    ';
+__p += '\n      <button class="btn btn-warning">\n        <i class="glyphicon glyphicon-ban-circle icon-white"></i>\n        <span>Cancel</span>\n      </button>\n    ';
  } ;
 __p += '</td>\n  </tr>\n';
  } ;

@@ -1,10 +1,10 @@
 <td><%= createdAt %></td>
-<td><ul class="applicants inline"></ul></td>
+<td><ul class="applicants list-inline"></ul></td>
 <td><%= comments %></td>
 <td>
   <% if (open) { %>
-  <a href="/properties/<%= propertyId %>/inquiries/<%= objectId %>/makelease" class="btn btn-mini btn-primary"><%= i18nGroup.actions.accept %></a>
-  <button class="btn btn-mini delete"><%= i18nGroup.actions.ignore %></button>
+  <a href="/properties/<%= propertyId %>/inquiries/<%= objectId %>/makelease" class="btn btn-small btn-primary"><%= i18nGroup.actions.accept %></a>
+  <button class="btn btn-small delete"><%= i18nGroup.actions.ignore %></button>
   <% } else { %>
     <% if (chosen) { %><span class="label label-success"><%= i18nListing.inquiries.chosen %></span><% } else { %>-<% } %>
   <% } %>

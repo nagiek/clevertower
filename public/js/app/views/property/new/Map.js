@@ -17,8 +17,7 @@
         this.processResults = __bind(this.processResults, this);
         this.geolocate = __bind(this.geolocate, this);
         this.handleGeocodeResults = __bind(this.handleGeocodeResults, this);
-        this.geocode = __bind(this.geocode, this);
-        this.checkForSubmit = __bind(this.checkForSubmit, this);        _ref = GMapView.__super__.constructor.apply(this, arguments);
+        this.geocode = __bind(this.geocode, this);        _ref = GMapView.__super__.constructor.apply(this, arguments);
         return _ref;
       }
 
@@ -26,12 +25,11 @@
 
       GMapView.prototype.attributes = {
         id: "new-property-address-form",
-        "class": "span12",
+        "class": "col-xs-12",
         style: "left: 0%;"
       };
 
       GMapView.prototype.events = {
-        'keypress #geolocation-search': 'checkForSubmit',
         'click .search': 'geocode',
         'click .geolocate': 'geolocate'
       };
@@ -114,13 +112,6 @@
         }
       };
 
-      GMapView.prototype.checkForSubmit = function(e) {
-        if (e.keyCode !== 13) {
-          return;
-        }
-        return this.geocode(e);
-      };
-
       GMapView.prototype.geocode = function(e) {
         e.preventDefault();
         return window.geocoder.geocode({
@@ -132,8 +123,8 @@
         var msg, p, _i, _len, _ref1;
 
         if (status === google.maps.GeocoderStatus.OK) {
-          if ($(".wizard-actions .next").is("[disabled]")) {
-            $(".wizard-actions .next").removeProp("disabled");
+          if ($(".form-actions .next").is("[disabled]")) {
+            $(".form-actions .next").removeProp("disabled");
           }
           if (Parse.User.current() && Parse.User.current().get("network")) {
             _ref1 = Parse.User.current().get("network").properties.models;

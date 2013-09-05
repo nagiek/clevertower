@@ -1,11 +1,15 @@
 <div class="container">
-  <h2><%= i18nListing.headers.add_listing %></h2>
-  <form class="listing-form" enctype="multipart/form-data" method="post">
-    <%= JST["src/js/templates/listing/form.jst"]({title_placeholder: title_placeholder, isNew: true, listing: listing, dates: dates, unit: unit, moment: moment, i18nCommon: i18nCommon, i18nUnit: i18nUnit, i18nListing: i18nListing}) %>
-    
-    <div class="form-actions">
-      <button class="save btn btn-primary"><%= i18nCommon.actions.save %></button>
-      <a href="<%= cancel_path %>" class="cancel btn"><%= i18nCommon.actions.cancel %></a>
+  <div class="row">
+  	<div class="col-xs-12">
+      <h2><%= i18nListing.headers.add_listing %></h2>
+      <form class="listing-form" enctype="multipart/form-data">
+        <%= JST["src/js/templates/listing/form.jst"]({title_placeholder: title_placeholder, isNew: true, listing: listing, dates: dates, unit: unit, moment: moment, i18nCommon: i18nCommon, i18nUnit: i18nUnit, i18nListing: i18nListing}) %>
+        
+        <div class="form-actions">
+          <button class="save btn btn-primary"><%= i18nCommon.actions.save %></button>
+          <a href="<%= cancel_path %>" class="cancel btn btn-default"><%= i18nCommon.actions.cancel %></a>
+        </div>
+      </form>
     </div>
-  </form>
+  </div>
 </div>

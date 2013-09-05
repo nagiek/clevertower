@@ -1,16 +1,16 @@
-<div class="container wizard">
-  <div class="row">
-    <div class="wizard-forms"></div>
-    <div class="wizard-actions span12">
-      <div class="form-actions">
-        <div class="row">
-          <button type="button" class="next btn btn-primary phone-right tablet-right offset2" disabled="disabled">
-            <%= i18nCommon.actions.next %>
-          </button>
-          <button type="button" class="back btn" disabled="disabled"><%= i18nCommon.actions.back %></button>
-          <% if (!setup) { %><a href="/inside" class="cancel btn"><%= i18nCommon.actions.cancel %></a><% } %>
-        </div>
-      </div>
+<div class="wizard container">
+  <div class="wizard-forms row"></div>
+  <div class="form-actions row">
+    <div class="col-md-offset-2 col-md-10">
+      <span class="right-sm right-md">
+        <button type="button" class="next btn btn-primary" disabled="disabled">
+          <%= i18nCommon.actions.next %>
+        </button>
+      </span>
+      <span class="left-sm left-md">
+        <button type="button" class="back btn btn-default" disabled="disabled"><%= i18nCommon.actions.back %></button>
+        <% if (!setup) { %><a href="/inside" class="cancel btn btn-link"><%= i18nCommon.actions.cancel %></a><% } %>
+      </span>
     </div>
   </div>
 </div>

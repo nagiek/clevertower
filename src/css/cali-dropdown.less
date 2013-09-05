@@ -12,9 +12,9 @@
   padding:5px 0;
   position:relative;
   top:6px;
-  background-color: @grayLighter;
-  color:@grayLight;
-  .border-radius(0 0 6px 6px);
+  background-color: @gray-lighter;
+  color:@gray-light;
+  .border-bottom-radius(@border-radius-base);
   &:hover {
     color:@gray;
     text-decoration: none;
@@ -42,37 +42,37 @@
   }
 
   // Inline items within the dropdown menu
-  .dropdown-inline {
-    display: block;
-    .clearfix();
+  // .dropdown-inline {
+  //   display: block;
+  //   .clearfix();
     
-    margin-top:0;
-    &:first-child {
-      margin-top:3px;
-    }
+  //   margin-top:0;
+  //   &:first-child {
+  //     margin-top:3px;
+  //   }
       
-    > a {
-      display: inline-block;
+  //   > a {
+  //     display: inline-block;
 
-      &.text {
-        margin-right:10px;
-        padding:3px 15px;
+  //     &.text {
+  //       margin-right:10px;
+  //       padding:3px 20px;
         
-        // Hover state
-        // -----------      
-        &:hover {
-          color: @dropdownLinkColorHover;
-          text-decoration: none;
-          background-color: @dropdownLinkBackgroundHover;
-        }
-      }
+  //       // Hover state
+  //       // -----------      
+  //       &:hover {
+  //         color: @dropdown-link-hover-color;
+  //         text-decoration: none;
+  //         background-color: @dropdown-link-hover-bg;
+  //       }
+  //     }
 
-      &.icon {
-        float:right;
-        margin-right:5px;
-      }
-    }
-  }
+  //     &.icon {
+  //       float:right;
+  //       margin-right:5px;
+  //     }
+  //   }
+  // }
   
   // Allow dropdown menu style to be applied to form/div tags as well
   > li {

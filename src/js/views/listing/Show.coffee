@@ -33,13 +33,8 @@ define [
     # Re-render the contents of the Unit item.
     render: ->
 
-      topDomain = location.host.split(".")
-      topDomain.shift()
-      topDomain = '//' + topDomain.join(".")
-
       vars = _.merge @model.toJSON(),
         posted: moment(@model.createdAt).fromNow()
-        topDomain: topDomain
         publicUrl: @property.publicUrl()
         baseUrl: @baseUrl
         property: @property.toJSON()

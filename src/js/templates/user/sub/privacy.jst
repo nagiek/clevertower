@@ -1,5 +1,5 @@
-<form method="post" id="privacy-form">
-  <div class="control-group">
+<form id="privacy-form">
+  <div class="form-group">
     <div class="controls">
       <label for="profile[privacy_building]" class="checkbox">
         <input type="checkbox" name="profile[privacy_building]" <%= privacy_building ? checked="checked" : '' %>>
@@ -11,6 +11,6 @@
 
   <div class="form-actions">
     <button class="save btn btn-primary"><%= i18nCommon.actions.save %></button>
-    <a href="<%= baseUrl %>" class="back btn"><%= i18nUser.actions.back_to_profile %></a>
+    <a href="<%= baseUrl %>" class="back btn btn-default"><%= i18nUser.actions.back_to_profile %></a>
   </div>
 </form>

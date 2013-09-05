@@ -56,7 +56,7 @@
         return titles[Math.floor(Math.random() * titles.length)];
       },
       added_photos: function(count) {
-        return "We added " + count + " photos.";
+        return "We added " + (count === 1 ? "a new photo." : "" + count + " photos.");
       }
     },
     listing: {
@@ -68,6 +68,7 @@
     network: {
       edit: "Edit network",
       setup: "Set up network",
+      unique_name: "Unique username",
       claim_username: "Claim your network's unique username.",
       claim_domain: "Claim your network's unique domain name.",
       find_username: "Enter the unique username of the network you wish to join.",

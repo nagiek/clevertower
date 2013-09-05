@@ -21,7 +21,7 @@ define [
     el: '#main'
     
     events:
-      'click #edit-property-picture': 'editProfilePicture'
+      'click .edit-property-picture': 'editProfilePicture'
       "submit #property-picture-upload-form" : 'save'
 
     initialize: (attrs) ->
@@ -65,9 +65,15 @@ define [
       # urlComponents = e.currentTarget.pathname.substring(1).split("/")
       
       action = if path then path.split("/") else Array('units')
+
+      @$(".page-header .nav-tabs > li.active").removeClass("active")
       
       if action.length is 1 or action[0] is "add"
         name = "views/property/sub/#{action.join("/")}"
+
+        # See if we should apply an active tab style
+        if action[0] isnt "add" then @$(".page-header .nav-tabs ##{action[0]}-tab").addClass("active")
+
         @renderSubView name, model: @model, params: params, forNetwork: true, baseUrl: @baseUrl
         
       else

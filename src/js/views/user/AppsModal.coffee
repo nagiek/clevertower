@@ -13,7 +13,7 @@ define [
   class AppsModalView extends UserAppsView
     
     id: "apps-modal"
-    className: 'modal modal-form fade in'
+    className: 'modal fade in'
     
     events:
       'click #fb-link'        : 'FBlink'

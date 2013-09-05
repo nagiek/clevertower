@@ -7,13 +7,9 @@ function print() { __p += __j.call(arguments, '') }
 with (obj) {
 __p += '<td>\n  ';
  if (!onUnit) { ;
-__p += '<a href="' +
-((__t = ( baseUrl )) == null ? '' : __t) +
-'/units/' +
-((__t = ( unitId )) == null ? '' : __t) +
-'">' +
+__p +=
 ((__t = ( unitTitle )) == null ? '' : __t) +
-'</a> |';
+' |';
  };
 __p += '\n  <a href="' +
 ((__t = ( baseUrl )) == null ? '' : __t) +
@@ -33,17 +29,17 @@ __p += '\n    <a href="' +
 ((__t = ( baseUrl )) == null ? '' : __t) +
 '/leases/' +
 ((__t = ( objectId )) == null ? '' : __t) +
-'/edit" class="btn btn-mini">\n      ' +
+'/edit" class="btn btn-small">\n      ' +
 ((__t = ( i18nCommon.actions.edit )) == null ? '' : __t) +
-'\n    </a>\n    <button class="btn btn-mini add-tenants"\n            rel="tooltip"\n            data-original-title="' +
+'\n    </a>\n    <button class="btn btn-small add-tenants"\n            rel="tooltip"\n            data-original-title="' +
 ((__t = ( i18nLease.actions.add_tenants )) == null ? '' : __t) +
-'">\n      <i class="icon-user"></i>\n    </button>\n    <button class="btn btn-mini extend"\n            rel="tooltip"\n            data-original-title="' +
+'">\n      <span class="glyphicon glyphicon-user"></span>\n    </button>\n    <button class="btn btn-small extend"\n            rel="tooltip"\n            data-original-title="' +
 ((__t = ( i18nLease.actions.extend )) == null ? '' : __t) +
-'">\n      <i class="icon-repeat"></i>\n    </button>\n    <button class="btn btn-mini btn-danger delete"\n            rel="tooltip"\n            data-original-title="' +
+'">\n      <span class="glyphicon glyphicon-repeat"></span>\n    </button>\n    <button class="btn btn-small btn-danger delete"\n            rel="tooltip"\n            data-original-title="' +
 ((__t = ( i18nCommon.actions.delete )) == null ? '' : __t) +
-'">\n      <i class="icon-trash icon-white"></i>\n    </button>\n  ';
+'">\n      <span class="glyphicon glyphicon-trash icon-white"></span>\n    </button>\n  ';
  } else { ;
-__p += '\n    <button class="btn btn-mini btn-danger remove">' +
+__p += '\n    <button class="btn btn-small btn-danger remove">' +
 ((__t = ( i18nCommon.actions.remove )) == null ? '' : __t) +
 '</button>\n  ';
  } ;

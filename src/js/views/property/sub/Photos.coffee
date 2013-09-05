@@ -109,7 +109,7 @@ define [
 
             # TODO: Have this be a modal prompt to confirm.
             activity = new Activity
-              image: arguments[0].get "name"
+              image: arguments[0].get "url"
               title: i18nProperty.activity.added_photos(arguments.length)
               public: true
               property: @model

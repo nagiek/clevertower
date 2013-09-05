@@ -34,7 +34,7 @@ define [
         i18nListing: i18nListing
       @$el.html JST["src/js/templates/network/sub/listings.jst"](vars)
       
-      @$list = @$("#listings-table tbody")
+      @$list = @$("#listings tbody")
 
       # Fetch all the property items for this user
       if @model.listings.length is 0 then @model.listings.fetch() else @addAll()

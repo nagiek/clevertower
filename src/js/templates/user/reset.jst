@@ -1,21 +1,21 @@
 <div class="container">
-  <div id="reset-password" class="modal modal-form modal-large show">
-    <form id="reset-password-form" class="form-xlarge">
+  <form id="reset-password-modal-form" class="modal-dialog modal-form modal-large">
+    <div class="modal-content">
       <div class="modal-header">
-        <h3 id="reset-password-label"><%= i18nDevise.actions.forgot_your_password %></h3>
+        <h3 id="reset-password-modal-label" class="modal-title"><%= i18nDevise.actions.forgot_your_password %></h3>
       </div>
       <div class="modal-body">
-        <div id="reset-email-group" class="control-group">
+        <div id="reset-email-group" class="form-group">
           <label for="email" class="control-label element-invisible"><%= i18nDevise.form.email %>:</label>
           <div class="controls">
-            <input type="email" name="email" id="reset-email" class="span input-tall input-block-level" size="22" placeholder="<%= i18nDevise.form.email %>">
+            <input type="email" name="email" id="reset-modal-email" class="form-control input-lg" size="22" placeholder="<%= i18nDevise.form.email %>">
             <p class="help-block"><%= i18nDevise.form.instructions_to_email %></p>
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="submit" class="btn btn-primary btn-large btn-block"><%= i18nDevise.actions.reset_password %></button>
+        <button type="submit" class="btn btn-primary btn-lg btn-block"><%= i18nDevise.actions.reset_password %></button>
       </div>
-    </form>
-  </div>
+    </div>
+  </form>
 </div>

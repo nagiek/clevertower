@@ -1,43 +1,49 @@
 <div class="container">
-  <div class="row"><p class="help-general offset1 span9"><%= i18nProperty.network.must_be_done %></p></div>
-  <ul class="nav nav-tabs">
-    <li class="offset1 active"><a id="create-link" href="#create"><%= i18nCommon.actions.create %></a></li>
-    <li><a id="join-link" href="#join"><%= i18nCommon.actions.join %></a></li>
-  </ul>
+  <div class="row">
+    <p class="help-general col-md-offset-1 col-md-10"><%= i18nProperty.network.must_be_done %></p>
+    <div class="col-xs-12">
+      <ul class="nav nav-tabs">
+        <li class="col-md-offset-1 active"><a id="create-link" href="#create"><%= i18nCommon.actions.create %></a></li>
+        <li><a id="join-link" href="#join"><%= i18nCommon.actions.join %></a></li>
+      </ul>
 
-  <div class="tab-content">
-    <div id="create" class="tab-pane active">
-      <form id="new-network-form">
-        <%= JST["src/js/templates/network/form.jst"]({network: network, i18nCommon: i18nCommon, i18nProperty: i18nProperty, isNew: true}) %>
-        <div class="form-actions">
-          <div class="row">
-            <div class="offset1 span">
-              <button class="save btn btn-primary"><%= i18nCommon.actions.save %></button>
+      <div class="tab-content">
+        <div id="create" class="tab-pane active">
+          <form id="new-network-form">
+            <%= JST["src/js/templates/network/form.jst"]({network: network, i18nCommon: i18nCommon, i18nProperty: i18nProperty, isNew: true}) %>
+            <div class="form-actions row">
+              <div class="col-md-offset-1 col-md-11">
+                <button class="save btn btn-primary"><%= i18nCommon.actions.save %></button>
+              </div>
             </div>
-          </div>
+          </form>
         </div>
-      </form>
-    </div>
-    <div id="join" class="tab-pane">
-      <form id="join-network-form" class="form-large row">
-        <div class="name-group control-group offset1 span">
-          <label for="network-search-input" class="control-label"><%= i18nProperty.network.find_domain %> <span class="required">*</span></label>
-          <div class="controls inline-block">
-            <div class="input-append">
-              <input type="text" id="network-search-input" class="input-block input-medium text-right" name="network[search]" maxlength="32" value="<%= network.name %>" required="required" />
-              <span class="add-on">.clevertower.com</span>
+        <div id="join" class="tab-pane">
+          <form id="join-network-form">
+            <div class="row">
+              <div class="col-md-offset-1 col-sm-6 col-md-5">
+                <div class="name-group form-group">
+                  <label for="network-search-input" class="control-label"><%= i18nProperty.network.find_domain %> <span class="required">*</span></label>
+                  <div class="input-group">
+                    <input type="text" id="network-search-input" class="form-control input-large" name="network[search]" maxlength="32" value="<%= network.name %>" placeholder="<%= i18nProperty.network.unique_name %>" required="required" />
+                    <span class="input-group-btn">
+                      <button id="network-search" class="search btn btn-lg btn-primary">
+                        <span class="glyphicon glyphicon-search"></span>
+                      </button>
+                    </span>
+                  </div>
+                  <p class="help-block"><%= i18nCommon.form.lowercase_only %></p>
+                </div>
+              </div>
+              <div class="col-md-offset-1 col-sm-6 col-md-4">
+                <ul id="network-search-results" class="search-results list-unstyled">
+                  <li class="empty text-center font-large"><%= i18nProperty.search.awaiting_search %></li>
+                </ul>
+              </div>
             </div>
-            <button id="network-search" class="search btn btn-primary align-top"><i class="icon-white icon-search"></i></button>
-            <p class="help-block"><%= i18nCommon.form.lowercase_only %></p>
-          </div>
+          </form>
         </div>
-        
-        <div class="offset1 span3">
-          <ul id="network-search-results" class="search-results unstyled">
-            <li class="empty text-center font-large"><%= i18nProperty.search.awaiting_search %></li>
-          </ul>
-        </div>
-      </form>
+      </div>
     </div>
   </div>
 </div>

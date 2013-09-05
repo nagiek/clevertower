@@ -13,6 +13,7 @@
       serializeObject: "app/plugins/serialize_object",
       filePicker: "app/plugins/file_picker",
       masonry: "libs/jquery/jquery.masonry",
+      transit: "libs/jquery/jquery.transit",
       infinity: "libs/jquery/infinity",
       rangeSlider: "libs/jquery/jquery.rangeSlider",
       slideshowify: "libs/jquery/jquery.slideshowify",
@@ -82,7 +83,7 @@
     return window.google.maps;
   });
 
-  require(["jquery", "underscore", "backbone", "facebook", "models/Property", "models/Unit", "models/Lease", "models/Profile", "collections/ListingFeaturedList", "collections/ActivityList", "collections/NotificationList", "routers/Desktop", "underscore.string", "json2", "bootstrap", "serializeObject", "typeahead", "masonry"], function($, _, Parse, FB, Property, Unit, Lease, Profile, FeaturedListingList, ActivityList, NotificationList, AppRouter, _String) {
+  require(["jquery", "underscore", "backbone", "facebook", "models/Property", "models/Unit", "models/Lease", "models/Profile", "collections/ListingFeaturedList", "collections/ActivityList", "collections/NotificationList", "routers/Desktop", "underscore.string", "json2", "bootstrap", "serializeObject", "typeahead", "masonry", "transit"], function($, _, Parse, FB, Property, Unit, Lease, Profile, FeaturedListingList, ActivityList, NotificationList, AppRouter, _String) {
     var eventSplitter, eventsApi, listenEvents, listenMethods;
 
     eventSplitter = /\s+/;
@@ -182,7 +183,7 @@
     Parse.initialize(window.APPID, window.JSKEY);
     Parse.App = {};
     Parse.App.featuredListings = new FeaturedListingList;
-    Parse.App.fbPerms = "email, publish_actions";
+    Parse.App.fbPerms = "email, publish_actions, user_location, user_about_me, user_birthday, user_website";
     Parse.App.countryCodes = {
       CA: "Canada",
       US: "United States"
@@ -262,8 +263,10 @@
           return;
         }
         profile = user.get("profile");
-        profile.likes = new ActivityList([], {});
-        profile.likes.query = profile.relation("likes").query();
+        profile.likes = new ActivityList([], {
+          profile: profile
+        });
+        profile.likes.query = profile.relation("likes").query().include("property");
         _this.set("profile", profile);
         _this.notifications = new NotificationList;
         _this.notifications.query.find().then(function(notifs) {
@@ -287,21 +290,19 @@
       network.prep("properties").fetch();
       network.prep("units").fetch();
       network.prep("activity").fetch();
+      network.prep("comments").fetch();
       network.prep("managers").fetch();
       network.prep("tenants").fetch();
       network.prep("listings").fetch();
       network.prep("applicants").fetch();
       network.prep("inquiries").fetch();
       role = network.get("role");
-      return role.getUsers().query().get(Parse.User.current().id, {
-        success: function(user) {
-          network.mgr = true;
-          return _this.set("network", network);
-        },
-        error: function() {
+      return role.getUsers().query().equalTo("objectId", Parse.User.current().id).first().then(function(user) {
+        network.mgr = true;
+        return _this.set("network", network, function() {
           network.mgr = false;
           return _this.set("network", network);
-        }
+        });
       });
     };
     Parse.Dispatcher = {};
