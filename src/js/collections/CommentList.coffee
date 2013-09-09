@@ -28,3 +28,7 @@ define [
         .withinKilometers("center", attrs.center, attrs.radius)
         .notEqualTo("activity_type", "new_comment")
         .equalTo("public", true)
+
+    setBounds: (sw, ne) -> @query.withinGeoBox('center', sw, ne)
+    countByProperty: -> @countBy (a) -> a.get("property").id
+    

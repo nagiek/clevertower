@@ -1,10 +1,11 @@
 define [
-  'underscore',
-  'backbone',
+  'underscore'
+  'backbone'
   'collections/ActivityList'
+  'collections/CommentList'
   'collections/ApplicantList'
   'collections/TenantList'
-], (_, Parse, ActivityList, ApplicantList, TenantList) ->
+], (_, Parse, ActivityList, CommentList, ApplicantList, TenantList) ->
 
   Profile = Parse.Object.extend "Profile",
     
@@ -58,8 +59,10 @@ define [
     
     prep: (collectionName, options) ->
       return @[collectionName] if @[collectionName]
+
       @[collectionName] = switch collectionName
         when "applicants"   then new ApplicantList [], profile: @
+        when "comments"     then new CommentList [], profile: @
         when "activity"     then new ActivityList [], profile: @
         when "tenants"      then new TenantList [], profile: @
       @[collectionName]

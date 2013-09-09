@@ -37,3 +37,4 @@ define [
 
     setBounds: (sw, ne) -> @query.withinGeoBox('center', sw, ne)
     countByProperty: -> @countBy (a) -> a.get("property").id
+    

@@ -21,9 +21,13 @@ define [
     el: '#main'
 
     events:
-      'click .nav a'                : 'showTab'
+      'click .nav a'                        : 'showTab'
       'click #activity ul > li > a.content' : 'showModal'
-      'click #new-lease'            : 'showLeaseModal'
+      'click #new-lease'                    : 'showLeaseModal'
+      # Activity events
+      "click .like-button"                  : "likeOrLogin"
+      "click .likers"                       : "showLikers"
+      "submit form.new-comment-form"        : "postComment"
 
     initialize: (attrs) ->
 
@@ -45,8 +49,6 @@ define [
       @model.listings.title = @model.get "title"
       @listenTo @model.listings, "add", @addOneListing
       @listenTo @model.listings, "reset", @addAllListings
-
-      $('#view-content-modal').on 'hide', @hideModal
 
     showTab : (e) ->
       e.preventDefault()
@@ -207,6 +209,9 @@ define [
       $('#view-content-modal').on 'click', '.left', @prevModal
       $('#view-content-modal').on 'click', '.right', @nextModal
       $('#view-content-modal').on 'hide.bs.modal', @hideModal
+      $('#view-content-modal').on 'click', '.like-button', @likeOrLogin
+      $('#view-content-modal').on 'click', '.likers', @showLikers
+      $('#view-content-modal').on 'submit', 'form', @postComment
 
     controlModalIfOpen : (e) =>
       return unless @modal

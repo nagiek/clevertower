@@ -5,6 +5,8 @@ define [
   'infinity'
   "moment"
   'collections/ActivityList'
+  'collections/CommentList'
+  "models/Comment"
   "views/listing/Search"
   "views/activity/New"
   "i18n!nls/listing"
@@ -16,7 +18,7 @@ define [
   # 'masonry'
   # 'jqueryui'
   "gmaps"
-], ($, _, Parse, infinity, moment, ActivityList, ListingSearchView, NewActivityView, i18nListing, i18nCommon) ->
+], ($, _, Parse, infinity, moment, ActivityList, CommentList, Comment, ListingSearchView, NewActivityView, i18nListing, i18nCommon) ->
 
   class ActivityIndexView extends Parse.View
   
@@ -33,7 +35,10 @@ define [
       # 'click #view-content-modal .caption a'  : 'closeModal'
       # 'click #view-content-modal .left'       : 'prevModal'
       # 'click #view-content-modal .right'      : 'nextModal'
+      # Activity events
       "click .like-button"                      : "likeOrLogin"
+      "click .likers"                           : "getLikers"
+      "submit form.new-comment-form"            : "postComment"
     
     initialize : (attrs) =>
 
@@ -56,8 +61,6 @@ define [
         @newPostView = new NewActivityView(view: @).render()
         @listenTo @newPostView, "view:resize", @bindMapPosition
         @listenTo @newPostView, "model:save", @prependNewPost
-
-      $('#view-content-modal').on 'hide.bs.modal', @hideModal
 
       @listenTo Parse.Dispatcher, "user:logout", => 
         _.each @listViews, (lv) -> 
@@ -107,8 +110,14 @@ define [
         .include("property")
         .containedIn("activity_type", ["new_property", "new_listing", "new_post"])
 
+      unless Parse.App.comments
+        Parse.App.comments = new CommentList [], {}
+
       @listenTo Parse.App.activity, "reset", @addAll
       @listenTo Parse.App.activity, "add", @addOne
+
+      @listenTo Parse.App.comments, "reset", @addAllComments
+      @listenTo Parse.App.comments, "add", @addOneComment
 
       if Parse.User.current()
         @listenTo Parse.User.current().get("profile").likes, "reset", @checkForLikes
@@ -121,17 +130,19 @@ define [
 
     checkForLikes: ->
       Parse.User.current().get("profile").likes.each (l) =>
-        _.each @listViews, (lv) ->
+        _.each @listViews, (lv) =>
           activity = lv.find("#activity-#{l.id}")
           if activity.length > 0
-            activity[0].$el.attr "data-liked", "true"
-            activity[0].$el.find(".like-button").addClass "active"
+            @markAsLiked activity[0].$el
+            # return false to avoid checking the other column.
+            false
 
     resetListViews: ->
 
       # Clean up old stuff
       _.each @listViews, (lv) -> lv.reset()
       Parse.App.activity.reset()
+      Parse.App.comments.reset()
       @resetUserActivity() if Parse.User.current()
       # @$list.find('> li.empty').remove()
 
@@ -169,19 +180,28 @@ define [
     getUserActivity : =>
       # Get the property from what we've already loaded.
       Parse.User.current().activity = new ActivityList [], {} unless Parse.User.current().activity
+      Parse.User.current().comments = new CommentList [], {} unless Parse.User.current().comments
       
+      @listenTo Parse.User.current().comments, "reset", @addAllComments
+      # @listenTo Parse.User.current().comments, "add", @addOneComment
+      @listenTo Parse.User.current().activity, 'add', @addOnePropertyActivity
+
       if Parse.User.current().get("property")
         # Activity list for *property*        
         Parse.User.current().activity.query.equalTo "property", Parse.User.current().get("property")
-        @listenTo Parse.User.current().activity, 'add', @addOnePropertyActivity
+        Parse.User.current().comments.query.equalTo "property", Parse.User.current().get("property")
+
         Parse.App.activity.query.notEqualTo "property", Parse.User.current().get("property")
+        Parse.App.comments.query.notEqualTo "property", Parse.User.current().get("property")
 
       else if Parse.User.current().get("network")
 
         # Activity list for *network*
         Parse.User.current().activity.query.equalTo "network", Parse.User.current().get("network")
-        @listenTo Parse.User.current().activity, 'add', @addOnePropertyActivity
+        Parse.User.current().comments.query.equalTo "network", Parse.User.current().get("network")
+
         Parse.App.activity.query.notEqualTo "network", Parse.User.current().get("network")
+        Parse.App.comments.query.notEqualTo "network", Parse.User.current().get("network")
 
       @resetUserActivity()
 
@@ -240,7 +260,7 @@ define [
             item.$el.data "pageIndex", index
             data = item.$el.data()
             if data.image then item.$el.find(".content .photo img").prop 'src', data.image
-            if data.profile then item.$el.find("footer img").prop 'src', data.profile
+            if data.profile then item.$el.find("footer img.profile-pic").prop 'src', data.profile
             unless item.marker
               originY = if data.collection is "user" then 25 else 0
 
@@ -385,7 +405,7 @@ define [
         streetViewControl : false
 
       if Parse.User.current()
-        Parse.User.current().activity.fetch() if Parse.User.current().activity
+
         if Parse.User.current().get("property")
           Parse.User.current().get("property").marker = new google.maps.Marker
             position:   Parse.User.current().get("property").GPoint()
@@ -434,13 +454,23 @@ define [
         @listenTo @newPostView, "view:resize", @bindMapPosition
         @listenTo @newPostView, "model:save", @prependNewPost
 
+      # Add listeners
+      @bindMapPosition()
       # @dragListener = google.maps.event.addListener @map, 'dragend', => @trigger "dragend"
       # @zoomListener = google.maps.event.addListener @map, 'zoom_changed', @checkIfShouldSearch
 
       # Search once the map is ready.
       google.maps.event.addListenerOnce @map, 'idle', @performSearchWithinMap
 
-      @bindMapPosition()
+      # Add user activity and comments 
+      Parse.Promise.when(
+        Parse.User.current().activity.query.find(),
+        Parse.User.current().comments.query.find()
+      ).then (objs, comms) =>
+        if objs then Parse.User.current().activity.add objs
+        # Reset the comments, to trigger bulk-add behaviour.
+        if comms then Parse.User.current().comments.reset comms
+
 
     initWithCenter : (place, status) =>
       @center = place.geometry.location if status is google.maps.places.PlacesServiceStatus.OK
@@ -463,6 +493,7 @@ define [
         @ne = new Parse.GeoPoint ne.lat(), ne.lng()
 
         Parse.App.activity.setBounds @sw, @ne
+        Parse.App.comments.setBounds @sw, @ne
 
         # Dump the collection if we are going somewhere different.
         # Parse.App.activity.reset() unless oldBounds.intersects newBounds
@@ -481,6 +512,7 @@ define [
       @sw = new Parse.GeoPoint(bounds.getSouthWest().lat(), bounds.getSouthWest().lng())
       @ne = new Parse.GeoPoint(bounds.getNorthEast().lat(), bounds.getNorthEast().lng())
       Parse.App.activity.setBounds @sw, @ne
+      Parse.App.comments.setBounds @sw, @ne
 
       @redoSearch()
 
@@ -496,22 +528,24 @@ define [
     search : =>
       @$loading.html "<img src='/img/misc/spinner.gif' class='spinner' alt='#{i18nCommon.verbs.loading}' />"
       @moreToDisplay = true
-      @handleUserActivity() if Parse.User.current()
-      @handleMapActivity()
 
-    handleUserActivity : ->
-      # Check if activity is visible or not.
-      if Parse.User.current().get("property") 
-        p = Parse.User.current().get("property") 
-        if @withinBounds p.get("center") then @showPropertyActivity p else @hidePropertyActivity p
-      else if Parse.User.current().get("network")
-        Parse.User.current().get("network").properties.each (p) => 
+      # handleUserActivity
+      if Parse.User.current()
+        # Check if activity is visible or not.
+        if Parse.User.current().get("property") 
+          p = Parse.User.current().get("property") 
           if @withinBounds p.get("center") then @showPropertyActivity p else @hidePropertyActivity p
+        else if Parse.User.current().get("network")
+          Parse.User.current().get("network").properties.each (p) => 
+            if @withinBounds p.get("center") then @showPropertyActivity p else @hidePropertyActivity p
 
-    handleMapActivity : ->
-      Parse.App.activity.query.skip(@resultsPerPage * (@page - 1)).limit(@resultsPerPage).find()
-      .then (objs) =>
+      # handleMapActivity
+      Parse.Promise.when(
+        Parse.App.activity.query.skip(@resultsPerPage * (@page - 1)).limit(@resultsPerPage).find(),
+        Parse.App.comments.query.find()
+      ).then (objs, comms) =>
         if objs then Parse.App.activity.add objs
+        if comms then Parse.App.comments.add comms
           # if objs.length < @resultsPerPage then @trigger "view:exhausted"
         # @refreshDisplay()
 
@@ -558,7 +592,12 @@ define [
         liked: liked
         icon: model.icon()
         name: model.name()
+        current: Parse.User.current()
         i18nCommon: i18nCommon
+
+      if Parse.User.current()
+        vars.self = Parse.User.current().get("profile").name()
+        vars.selfProfilePic = Parse.User.current().get("profile").cover("tiny")
 
       # Default options. 
       _.defaults vars,
@@ -573,6 +612,8 @@ define [
       vars.title = model.title()
 
       $el.html JST["src/js/templates/activity/summary.jst"](vars)
+
+      @checkIfLiked($el) if Parse.User.current() and not liked
 
       $el
 
@@ -607,6 +648,10 @@ define [
       @listViews[@shortestColumnIndex()].append @renderTemplate(a, a.liked(), false, a.pos())
       # @$list.append view.render().el
 
+    # Add all items in the Properties collection at once.
+    addAll: (collection, filter) =>
+      Parse.App.activity.each @addOne if Parse.App.activity.length > 0
+
     addOnePropertyActivity: (a) =>
       # view = new ActivityView
       #   model: a
@@ -615,6 +660,16 @@ define [
       #   view: @
       #   linkedToProperty: true
       #   liked: Parse.User.current() and Parse.User.current().get("profile").likes.find (l) -> l.id is a.id
+
+      # We need the original property, for the position
+      # within the collection, as well as for map markers.
+      if Parse.User.current()
+        if Parse.User.current().get("property")
+          a.set "property", Parse.User.current().get("property")
+        else if Parse.User.current().get("network")
+          property = Parse.User.current().get("network").properties.find((p) -> p.id is a.get("property").id)
+          a.set "property", property
+      
 
       # item = new infinity.ListItem view.render().$el
 
@@ -625,10 +680,6 @@ define [
       @listViews[@shortestColumnIndex()].append item
 
       # @$list.append view.render().el
-
-    # Add all items in the Properties collection at once.
-    addAll: (collection, filter) =>
-      Parse.App.activity.each @addOne if Parse.App.activity.length > 0
     
     # Show activity where we have already loaded the property
     showPropertyActivity: (property) =>
@@ -640,8 +691,7 @@ define [
           (!@specificSearchControls or @specificSearchControls.filter(a)) 
         .each (a) =>
           property.shown = true
-          # We need the property's position within the collection.
-          a.set "property", property
+
           @addOnePropertyActivity a
 
     hidePropertyActivity: (property) =>
@@ -870,7 +920,7 @@ define [
         lng < @ne.longitude
 
 
-    # Model-specific
+    # Activity
     # --------------
 
     likeOrLogin: (e) =>
@@ -887,20 +937,207 @@ define [
         if data.liked
           button.removeClass "active"
           activity.find(".like-count").html(likes - 1)
+          activity.find(".likers").removeClass "active"
+          activity.find(".like-button").text i18nCommon.verbs.like
+          activity.data "liked", false
+          # activity.attr "data-liked", "false"
           model.increment likeCount: -1
+          model.relation("likers").remove Parse.User.current().get("profile")
           Parse.User.current().get("profile").relation("likes").remove model
           Parse.User.current().get("profile").likes.remove model
-          activity.attr "data-liked", "false"
         else
           button.addClass "active"
           activity.find(".like-count").html(likes + 1)
+          @markAsLiked(activity)
           model.increment likeCount: +1
+          model.relation("likers").add Parse.User.current().get("profile")
           Parse.User.current().get("profile").relation("likes").add model
+          # Adding to a relation will somehow add to collection..?
           Parse.User.current().get("profile").likes.add model
-          activity.attr "data-liked", "true"
         Parse.Object.saveAll [model, Parse.User.current().get("profile")]
       else
         $("#signup-modal").modal()
+
+    getLikers: (e) ->
+      e.preventDefault()
+      button = @$(e.currentTarget)
+      activity = button.closest(".activity")
+      likes = Number activity.find(".like-count").html()
+      data = activity.data()
+      model = if data.collection is "user"
+        Parse.User.current().activity.at(data.index)
+      else Parse.App.activity.at(data.index)
+
+      model.prep("likers")
+      @listenToOnce model.likers, "reset", @showLikers
+      model.likers.fetch()
+
+    showLikers: (collection) ->
+      # visible = collection
+      # .chain()
+      # .select((c) => c.get("activity") and c.get("activity").id is model.id)
+      # .map((c) => c.get("profile"))
+      # .value()
+
+      if collection.length > 0
+        # profiles = _.uniq(visible, false, (v) -> v.id)
+        $("#people-modal .modal-body").html "<ul class='list-unstyled' />"
+        collection.each (p) ->
+          $("#people-modal .modal-body ul").append """
+            <li class="clearfix">
+              <div class="photo photo-thumbnail stay-left">
+                <a href="#{p.url()}">
+                  <img src="#{p.cover("thumb")}" height="50" width="50">
+                </a>
+              </div>
+              <div class="photo-float thumbnail-float">
+                <h4><a href="#{p.url()}">#{p.name()}</a></h4>
+              </div>
+            </li>
+          """
+        $("#people-modal").modal()
+        
+      else
+        $("#people-modal .modal-body ul").append """
+          <li>Be the first one to like this</li>
+        """
+
+    checkIfLiked: (activity) =>
+      data = activity.data()
+
+      model = if data.collection is "user"
+        Parse.User.current().activity.at(data.index)
+      else Parse.App.activity.at(data.index)
+
+      @markAsLiked(activity) if Parse.User.current().get("profile").likes.find (l) => l.id is model.id
+
+    # Used just for display, not the action.
+    markAsLiked: (activity) =>
+      activity.find(".likers").addClass "active"
+      activity.find(".like-button").text i18nCommon.adjectives.liked
+      activity.data "liked", true
+      # activity.attr "data-liked", "true"
+
+    postComment: (e) ->
+      e.preventDefault()
+
+      return unless Parse.User.current()
+
+      button = @$(e.currentTarget)
+      activity = button.closest(".activity")
+      likes = Number activity.find(".like-count").html()
+      data = activity.data()
+      model = if data.collection is "user"
+        Parse.User.current().activity.at(data.index)
+      else Parse.App.activity.at(data.index)
+
+      formData = activity.find("form.new-comment-form").serializeObject()
+
+      return unless formData.comment and formData.comment.title
+
+      # Use a pointer, to make sure we don't run into double-save issues.
+      property = if model.get("property")
+        __type: "Pointer"
+        className: "Property"
+        objectId: model.get("property").id
+      else undefined
+
+      network = if model.get("network")
+        __type: "Pointer"
+        className: "Network"
+        objectId: model.get("network").id
+      else undefined
+
+      comment = new Comment
+        title: formData.comment.title
+        center: model.get "center"
+        profile: Parse.User.current().get "profile"
+        activity:
+          __type: "Pointer"
+          className: "Activity"
+          objectId: model.id
+        property: property
+        network: network
+
+      # Optimistic saving.
+      _.each @listViews, (lv) =>
+        listItem = lv.find("#activity-#{model.id}")
+        if listItem.length > 0 
+          @addOneComment comment, listItem[0]
+          # return false to avoid checking the other column.
+          false
+
+      activity.find("input.comment-title").val("")
+
+      # Count is incremented in Comment afterSave
+      newCount = model.get("commentCount") + 1
+      model.set "commentCount", newCount
+      activity.find(".comment-count").html newCount
+
+      comment.save().then (obj) -> , 
+      (error) =>
+        console.log error
+        new Alert event: 'model-save', fade: false, message: i18nCommon.errors.unknown, type: 'error'
+        model.set "commentCount", newCount - 1
+        activity.find(".comments > li:last-child").remove()
+        activity.find(".comment-count").html newCount - 1
+
+    addOneComment : (comment, listItem) =>
+      vars =
+        title: comment.get "title"
+        postDate: moment(comment.createdAt).fromNow()
+        name: comment.name()
+        profilePic: comment.profilePic("tiny")
+        profileUrl: comment.profileUrl()
+        i18nCommon: i18nCommon
+
+      # fn = if isNew then "append" else "prepend"
+
+      listItem.$el.find("ul.list-comments").append JST["src/js/templates/comment/summary.jst"](vars)
+
+      # Find and update the heights of the scroll view.
+      heightChange = listItem.$el.outerHeight(true) - listItem.height
+
+      # Item
+      listItem.height += heightChange
+      listItem.bottom += heightChange
+
+      # Page
+      listItem.parent.height += heightChange
+      listItem.parent.bottom += heightChange
+      listItem.parent.$el.height listItem.parent.height
+
+      # ListView
+      listItem.parent.parent.height += heightChange
+      listItem.parent.parent.bottom += heightChange
+      listItem.parent.parent.$el.height listItem.parent.parent.height
+
+      # Update positions for everything after index.
+      infinity.updateItemPosition listItem.parent.items, heightChange, listItem.index + 1
+      infinity.updatePagePosition listItem.parent.parent.pages, heightChange, listItem.parent.index + 1
+      
+    addAllComments: (collection, filter) =>
+
+      console.log collection
+      visible = collection.groupBy (c) => c.get("activity").id
+      console.log visible
+
+      if visible.length > 0
+
+        for modelId in _.keys visible
+          console.log modelId
+          
+          _.each @listViews, (lv) =>
+            listItem = lv.find("#activity-#{modelId}")
+            if listItem.length > 0
+              console.log visible[modelId]
+              for comment in visible[modelId]
+                @addOneComment comment, listItem[0]
+                # return false to avoid checking the other column.
+              false
+
+    # Map-specific
+    # --------------
 
     highlightMarkerFromCard : (e) ->
       $ref = $(e.currentTarget)
@@ -975,6 +1212,10 @@ define [
       $('#view-content-modal').on 'click', '.caption a', @closeModal
       $('#view-content-modal').on 'click', '.left', @prevModal
       $('#view-content-modal').on 'click', '.right', @nextModal
+      $('#view-content-modal').on 'hide.bs.modal', @hideModal
+      $('#view-content-modal').on 'click', '.like-button', @likeOrLogin
+      $('#view-content-modal').on 'click', '.likers', @getLikers
+      $('#view-content-modal').on 'submit', 'form', @postComment
 
     controlModalIfOpen : (e) =>
       return unless @modal
@@ -1067,7 +1308,7 @@ define [
       @$comments.html ""
       model.prep "comments"
       if model.comments.length > 0
-        visible = model.comments.select (c) => c.get("activity") and c.get("activity").id is collection.model.id
+        visible = model.comments.select (c) => c.get("activity") and c.get("activity").id is model.id
         if visible.length > 0 then _.each visible, @renderOneModalComment
       else 
         model.comments.model = model

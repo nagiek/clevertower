@@ -101,6 +101,7 @@
     this.height = 0;
 
     this.pages = [];
+    this.pageIndex = 0;
     this.startIndex = 0;
 
     this.$scrollParent = this.useElementScroll ? $el : $window;
@@ -164,7 +165,9 @@
     lastPage = pages[pages.length - 1];
 
     if(!lastPage || !lastPage.hasVacancy()) {
+      this.pageIndex += 1;
       lastPage = new Page(this);
+      lastPage.index = this.pageIndex
       pages.push(lastPage);
     }
 
@@ -764,6 +767,7 @@
   function Page(parent) {
     this.parent = parent;
 
+    this.itemIndex = 0;
     this.items = [];
     this.$el = blankDiv();
 
@@ -798,6 +802,8 @@
     this.width = this.width > item.width ? this.width : item.width;
     this.height = this.bottom - this.top;
 
+    item.index = this.itemIndex;
+    this.itemIndex += 1;
     items.push(item);
     item.parent = this;
     this.$el.append(item.$el);
@@ -1112,6 +1118,10 @@
   infinity.PageRegistry = PageRegistry;
   infinity.Page = Page;
   infinity.ListItem = ListItem;
+
+  // Methods
+  infinity.updateItemPosition = updateItemPosition;
+  infinity.updatePagePosition = updatePagePosition;
 
   // Constants:
   infinity.PAGE_ID_ATTRIBUTE = PAGE_ID_ATTRIBUTE;

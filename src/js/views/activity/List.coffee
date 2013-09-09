@@ -17,19 +17,18 @@ define [
     tagName: "li"
     className: "thumbnail clearfix activity fade in"
       
-
     events:
       "click .like-button"  : "likeOrLogin"
       "click .likers"       : "showLikers"
       "submit form"         : "postComment"
-      # "click a" : "goToProperty"
 
     initialize: (attrs) ->
-      @liked = attrs.liked || false
-      @currentProfile = attrs.currentProfile || false
-      @onProfile = attrs.onProfile || false
+      @liked          = attrs.liked           || false
+      @currentProfile = attrs.currentProfile  || false
+      @onProfile      = attrs.onProfile       || false
 
       @model.prep "comments"
+      @model.prep "likers"
       @listenTo @model.comments, "reset", @addAll
       
       if Parse.User.current()
@@ -47,7 +46,7 @@ define [
 
     showLikers: (e) ->
       e.preventDefault()
-      visible = @model.likes
+      visible = @model.likers
       .chain()
       .select((c) => c.get("activity") and c.get("activity").id is @model.id)
       .map((c) => c.get("profile"))
@@ -76,11 +75,12 @@ define [
       if Parse.User.current()
         if @liked
           @model.increment likeCount: -1
+          @model.relation("likers").remove Parse.User.current().get("profile")
+          Parse.User.current().get("profile").relation("likes").remove @model
+          Parse.User.current().get("profile").likes.remove @model
           @$(".like-count").html(likes - 1)
           @$(".likers").removeClass("active")
           @$(".like-button").text i18nCommon.actions.like
-          Parse.User.current().get("profile").relation("likes").remove @model
-          Parse.User.current().get("profile").likes.remove @model
           @liked = false
           Parse.Object.saveAll [@model, Parse.User.current().get("profile")]
           @clear() if @currentProfile
@@ -89,6 +89,7 @@ define [
           @markAsLiked()
           @$(".like-count").text(likes + 1)
           @model.increment likeCount: +1
+          @model.relation("likers").add Parse.User.current().get("profile")
           Parse.User.current().get("profile").relation("likes").add @model
           Parse.User.current().get("profile").likes.add @model
           @liked = true

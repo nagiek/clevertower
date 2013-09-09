@@ -3,8 +3,9 @@ define [
   'backbone'
   "moment"
   "collections/CommentList"
+  "collections/ProfileList"
   "gmaps"
-], (_, Parse, moment, CommentList) ->
+], (_, Parse, moment, CommentList, ProfileList) ->
 
   Activity = Parse.Object.extend "Activity",
 
@@ -60,7 +61,12 @@ define [
           if basedOnNetwork then network.comments 
           else if @property() and @property().comments then @property().comments
           else
-            new CommentList [], property: @
+            new CommentList [], activity: @
+        when "likers"
+          # Independent
+          likers = new ProfileList [], activity: @
+          likers.query = @relation("likers").query()
+          likers
 
       @[collectionName]
 

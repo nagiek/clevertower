@@ -18,9 +18,13 @@ define [
     el: "#main"
 
     events:
-      'click .edit-profile-picture': 'editProfilePicture'
-      'click ul > li > a.content' : 'showModal'
+      'click .edit-profile-picture'         : 'editProfilePicture'
+      'click ul > li > a.content'           : 'showModal'
       "submit #profile-picture-upload-form" : 'save'
+      # Activity events
+      "click .like-button"                  : "likeOrLogin"
+      "click .likers"                       : "showLikers"
+      "submit form.new-comment-form"        : "postComment"
 
     initialize: (attrs) ->
 
@@ -153,6 +157,123 @@ define [
       super
 
 
+    # Activities
+    # ----------
+
+    likeOrLogin: (e) =>
+      e.preventDefault()
+      if Parse.User.current()
+        if @liked
+          @model.increment likeCount: -1
+          @model.relation("likers").remove Parse.User.current().get("profile")
+          Parse.User.current().get("profile").relation("likes").remove @model
+          Parse.User.current().get("profile").likes.remove @model
+          @$(".like-count").html(likes - 1)
+          @$(".likers").removeClass("active")
+          @$(".like-button").text i18nCommon.actions.like
+          @liked = false
+          Parse.Object.saveAll [@model, Parse.User.current().get("profile")]
+          @clear() if @currentProfile
+        else
+          likes = @model.get "likeCount"
+          @markAsLiked()
+          @$(".like-count").text(likes + 1)
+          @model.increment likeCount: +1
+          @model.relation("likers").add Parse.User.current().get("profile")
+          Parse.User.current().get("profile").relation("likes").add @model
+          Parse.User.current().get("profile").likes.add @model
+          @liked = true
+          Parse.Object.saveAll [@model, Parse.User.current().get("profile")]
+
+    showLikers: (e) ->
+      e.preventDefault()
+      visible = @model.likers
+      .chain()
+      .select((c) => c.get("activity") and c.get("activity").id is @model.id)
+      .map((c) => c.get("profile"))
+      .value()
+
+      if visible.length > 0
+        profiles = _.uniq(visible, false, (v) -> v.id)
+        $("#people-modal .modal-body").html "<ul class='list-unstyled' />"
+        for p in profiles
+          $("#people-modal .modal-body ul").append """
+            <li class="clearfix">
+              <div class="photo photo-thumbnail stay-left">
+                <a href="#{p.url()}">
+                  <img src="#{p.cover("thumb")}" height="50" width="50">
+                </a>
+              </div>
+              <div class="photo-float thumbnail-float">
+                <h4><a href="#{p.url()}">#{p.name()}</a></h4>
+              </div>
+            </li>
+          """
+        $("#people-modal").modal()
+        
+      else
+        $("#signup-modal").modal()
+
+    checkIfLiked: ->
+      @markAsLiked() if Parse.User.current().get("profile").likes.find (l) => l.id is @model.id
+
+    # Used just for display, not the action.
+    markAsLiked: =>
+      @$(".likers").addClass "active"
+      @$(".like-button").text i18nCommon.adjectives.liked
+
+    postComment: (e) ->
+      e.preventDefault()
+
+      return unless Parse.User.current()
+
+      data = @$form.serializeObject()
+
+      return unless data.comment and data.comment.title
+
+      # Use a pointer, to make sure we don't run into double-save issues.
+      activity = 
+        __type: "Pointer"
+        className: "Activity"
+        objectId: @model.id
+
+      property = if @model.get("property")
+        __type: "Pointer"
+        className: "Property"
+        objectId: @model.get("property").id
+      else undefined
+
+      network = if @model.get("network")
+        __type: "Pointer"
+        className: "Network"
+        objectId: @model.get("network").id
+      else undefined
+
+      comment = new Comment
+        title: data.comment.title
+        center: @model.get "center"
+        profile: Parse.User.current().get "profile"
+        activity: activity
+        property: property
+        network: network
+
+      # Optimistic saving.
+      @addOne comment, true
+      @$form.find("input").val("")
+      newCount = @model.get("commentCount") + 1
+      # Count is incremented in Comment afterSave
+      @model.set "commentCount", newCount
+      @$(".comment-count").html newCount
+
+      comment.save().then (obj) -> , 
+      (error) =>
+        console.log error
+        new Alert event: 'model-save', fade: false, message: i18nCommon.errors.unknown, type: 'error'
+        @$comments.children().last().remove()
+        @model.set "commentCount", newCount - 1
+        @$(".comment-count").html newCount - 1
+
+
     # Modal
     # @see profile:show and property:public
     # --------------------------------------------
@@ -179,6 +300,9 @@ define [
       $('#view-content-modal').on 'click', '.left', @prevModal
       $('#view-content-modal').on 'click', '.right', @nextModal
       $('#view-content-modal').on 'hide.bs.modal', @hideModal
+      $('#view-content-modal').on 'click', '.like-button', @likeOrLogin
+      $('#view-content-modal').on 'click', '.likers', @showLikers
+      $('#view-content-modal').on 'submit', 'form', @postComment
 
     controlModalIfOpen : (e) =>
       return unless @modal
@@ -198,7 +322,7 @@ define [
 
     detachModalEvents : ->
       $(document).off "keydown"
-      $('#view-content-modal').off "hide click"
+      $('#view-content-modal').off "hide click submit"
       # $('#view-content-modal .caption a').off 'click'
       # $('#view-content-modal .left').off 'click'
       # $('#view-content-modal .right').off 'click'
