@@ -34,6 +34,12 @@ define [
         .limit(100)
         .include("profile")
         .include("property")
+      else 
+        @query
+        .equalTo("public", true)
+        .limit(100)
+        .include("profile")
+        .include("property")
 
     setBounds: (sw, ne) -> @query.withinGeoBox('center', sw, ne)
     countByProperty: -> @countBy (a) -> a.get("property").id

@@ -54,7 +54,7 @@ define [
         # Check for likes.
         @listenTo Parse.User.current().get("profile").likes, "reset", @checkForLikes
         # Get the activity in the user properties.
-        @getUserActivity()
+        @prepUserActivity()
         # Get the user's personal likes.
         if Parse.User.current().get("profile").likes.length is 0 then Parse.User.current().get("profile").likes.fetch()
         # Post view
@@ -121,9 +121,6 @@ define [
 
       if Parse.User.current()
         @listenTo Parse.User.current().get("profile").likes, "reset", @checkForLikes
-        
-        # Get the activity in the user properties.
-        @getUserActivity()
 
         # Get the user's personal likes.
         if Parse.User.current().get("profile").likes.length is 0 then Parse.User.current().get("profile").likes.fetch()
@@ -177,14 +174,16 @@ define [
 
       @redoSearch()
 
-    getUserActivity : =>
+    prepUserActivity : =>
       # Get the property from what we've already loaded.
       Parse.User.current().activity = new ActivityList [], {} unless Parse.User.current().activity
       Parse.User.current().comments = new CommentList [], {} unless Parse.User.current().comments
       
-      @listenTo Parse.User.current().comments, "reset", @addAllComments
+      # @listenTo Parse.User.current().comments, "reset", @addAllComments
       # @listenTo Parse.User.current().comments, "add", @addOneComment
-      @listenTo Parse.User.current().activity, 'add', @addOnePropertyActivity
+
+      @listenTo Parse.User.current().activity, 'reset', @resetUserActivity
+      # @listenTo Parse.User.current().activity, 'add', @addOnePropertyActivity
 
       if Parse.User.current().get("property")
         # Activity list for *property*        
@@ -193,6 +192,27 @@ define [
 
         Parse.App.activity.query.notEqualTo "property", Parse.User.current().get("property")
         Parse.App.comments.query.notEqualTo "property", Parse.User.current().get("property")
+
+        Parse.User.current().get("property").marker = new google.maps.Marker
+            position:   Parse.User.current().get("property").GPoint()
+            map:        @map
+            items:      []
+            icon: 
+              url: "/img/icon/pins-sprite.png"
+              size: new google.maps.Size(25, 32, "px", "px")
+              origin: new google.maps.Point(50, 0)
+              anchor: null
+              scaledSize: null
+            ZIndex:     100
+            url:        Parse.User.current().get("property").publicUrl()
+            highlightCard: @highlightCard
+            highlightMarker: @highlightMarker
+            unhighlightCard: @unhighlightCard
+            unhighlightMarker: @unhighlightMarker
+
+          Parse.User.current().get("property").highlightListener = google.maps.event.addListener Parse.User.current().get("property").marker, "mouseover", @highlightCardsFromPropertyMarker
+          Parse.User.current().get("property").unhighlightListener = google.maps.event.addListener Parse.User.current().get("property").marker, "mouseout", @unhhighlightCardsFromPropertyMarker
+          Parse.User.current().get("property").clickListener = google.maps.event.addListener Parse.User.current().get("property").marker, "click", @goToPropertyFromPropertyMarker
 
       else if Parse.User.current().get("network")
 
@@ -203,17 +223,47 @@ define [
         Parse.App.activity.query.notEqualTo "network", Parse.User.current().get("network")
         Parse.App.comments.query.notEqualTo "network", Parse.User.current().get("network")
 
-      @resetUserActivity()
+        Parse.User.current().get("network").properties.each (p) =>
+            p.marker = new google.maps.Marker
+              position:   p.GPoint()
+              map:        @map
+              ZIndex:     100
+              url:        p.publicUrl()
+              items:      []
+              highlightCard: @highlightCard
+              highlightMarker: @highlightMarker
+              unhighlightCard: @unhighlightCard
+              unhighlightMarker: @unhighlightMarker
+              icon: 
+                url: "/img/icon/pins-sprite.png"
+                size: new google.maps.Size(25, 32, "px", "px")
+                origin: new google.maps.Point(50, p.pos() * 32)
+                anchor: null
+                scaledSize: null
+
+            p.highlightListener = google.maps.event.addListener p.marker, "mouseover", @highlightCardsFromPropertyMarker
+            p.unhighlightListener = google.maps.event.addListener p.marker, "mouseout", @unhighlightCardsFromPropertyMarker
+            p.clickListener = google.maps.event.addListener p.marker, "click", @goToPropertyFromPropertyMarker
+
+
+
+      @hideAllProperties()
 
     resetUserActivity : =>
-      if Parse.User.current().get("property")
-        # Visibility counter
-        Parse.User.current().get("property").shown = false
 
-      else if Parse.User.current().get("network")
+      @hideAllProperties()
 
-        # Visibility counter
-        Parse.User.current().get("network").properties.each (p) -> p.shown = false
+      # Handle User Activity
+      if Parse.User.current()
+        # Check if activity is visible or not.
+        if Parse.User.current().get("property") 
+          p = Parse.User.current().get("property") 
+          if @withinBounds p.get("center") then @showProperty p else @hideProperty p
+        else if Parse.User.current().get("network")
+          Parse.User.current().get("network").properties.each (p) => 
+            if @withinBounds p.get("center") then @showProperty p else @hideProperty p
+        Parse.User.current().activity.each @addOnePropertyActivity
+        @addAllComments Parse.User.current().comments
 
     getPersonalizedMapCenter : =>
       if Parse.User.current()
@@ -405,50 +455,7 @@ define [
         streetViewControl : false
 
       if Parse.User.current()
-
-        if Parse.User.current().get("property")
-          Parse.User.current().get("property").marker = new google.maps.Marker
-            position:   Parse.User.current().get("property").GPoint()
-            map:        @map
-            items:      []
-            icon: 
-              url: "/img/icon/pins-sprite.png"
-              size: new google.maps.Size(25, 32, "px", "px")
-              origin: new google.maps.Point(50, 0)
-              anchor: null
-              scaledSize: null
-            ZIndex:     100
-            url:        Parse.User.current().get("property").publicUrl()
-            highlightCard: @highlightCard
-            highlightMarker: @highlightMarker
-            unhighlightCard: @unhighlightCard
-            unhighlightMarker: @unhighlightMarker
-
-          Parse.User.current().get("property").highlightListener = google.maps.event.addListener Parse.User.current().get("property").marker, "mouseover", @highlightCardsFromPropertyMarker
-          Parse.User.current().get("property").unhighlightListener = google.maps.event.addListener Parse.User.current().get("property").marker, "mouseout", @unhhighlightCardsFromPropertyMarker
-          Parse.User.current().get("property").clickListener = google.maps.event.addListener Parse.User.current().get("property").marker, "click", @goToPropertyFromPropertyMarker
-        else if Parse.User.current().get("network")
-          Parse.User.current().get("network").properties.each (p) =>
-            p.marker = new google.maps.Marker
-              position:   p.GPoint()
-              map:        @map
-              ZIndex:     100
-              url:        p.publicUrl()
-              items:      []
-              highlightCard: @highlightCard
-              highlightMarker: @highlightMarker
-              unhighlightCard: @unhighlightCard
-              unhighlightMarker: @unhighlightMarker
-              icon: 
-                url: "/img/icon/pins-sprite.png"
-                size: new google.maps.Size(25, 32, "px", "px")
-                origin: new google.maps.Point(50, p.pos() * 32)
-                anchor: null
-                scaledSize: null
-
-            p.highlightListener = google.maps.event.addListener p.marker, "mouseover", @highlightCardsFromPropertyMarker
-            p.unhighlightListener = google.maps.event.addListener p.marker, "mouseout", @unhighlightCardsFromPropertyMarker
-            p.clickListener = google.maps.event.addListener p.marker, "click", @goToPropertyFromPropertyMarker
+        @prepUserActivity()
                 
         @newPostView = new NewActivityView(view: @).render()
         @listenTo @newPostView, "view:resize", @bindMapPosition
@@ -526,18 +533,11 @@ define [
       @updatePaginiation()
 
     search : =>
+
+      console.log 'search'
+
       @$loading.html "<img src='/img/misc/spinner.gif' class='spinner' alt='#{i18nCommon.verbs.loading}' />"
       @moreToDisplay = true
-
-      # handleUserActivity
-      if Parse.User.current()
-        # Check if activity is visible or not.
-        if Parse.User.current().get("property") 
-          p = Parse.User.current().get("property") 
-          if @withinBounds p.get("center") then @showPropertyActivity p else @hidePropertyActivity p
-        else if Parse.User.current().get("network")
-          Parse.User.current().get("network").properties.each (p) => 
-            if @withinBounds p.get("center") then @showPropertyActivity p else @hidePropertyActivity p
 
       # handleMapActivity
       Parse.Promise.when(
@@ -672,38 +672,34 @@ define [
       
 
       # item = new infinity.ListItem view.render().$el
+      if ((!@filter or @filter is a.get("activity_type")) and (!@specificSearchControls or @specificSearchControls.filter(a)))
 
-      item = new infinity.ListItem @renderTemplate(a, a.liked(), true, a.get("property").pos())
+        item = new infinity.ListItem @renderTemplate(a, a.liked(), true, a.get("property").pos())
+        item.marker = a.get("property").marker
 
-      item.marker = a.get("property").marker
-      a.get("property").marker.items.push item
-      @listViews[@shortestColumnIndex()].append item
+        a.get("property").marker.items.push item
+        @listViews[@shortestColumnIndex()].append item
 
       # @$list.append view.render().el
     
     # Show activity where we have already loaded the property
-    showPropertyActivity: (property) =>
-      Parse.User.current().activity.chain()
-        .filter (a) => 
-          !property.shown and
-          a.get("property").id is property.id and 
-          (!@filter or @filter is a.get("activity_type")) and 
-          (!@specificSearchControls or @specificSearchControls.filter(a)) 
-        .each (a) =>
-          property.shown = true
+    showProperty: (property) =>
+      property.shown = true
 
-          @addOnePropertyActivity a
+    hideProperty: (property) =>
+      property.shown = false
+      _.each property.marker.items, (a) -> a.remove()
 
-    hidePropertyActivity: (property) =>
-      Parse.User.current().activity.chain()
-        .filter((a) ->
-          property.shown is true and 
-          a.get("property").id is property.id and 
-          (!@filter or @filter isnt a.get("activity_type")) and 
-          (!@specificSearchControls or !@specificSearchControls.filter(a)))
-        .each (a) ->
-          property.shown = false
-          a.trigger('remove')
+    hideAllProperties: =>
+      # hide all properties
+      if Parse.User.current().get("property")
+        # Visibility counter
+        Parse.User.current().get("property").shown = false
+
+      else if Parse.User.current().get("network")
+
+        # Visibility counter
+        Parse.User.current().get("network").properties.each (p) -> p.shown = false
 
     # Pagination
     # ----------
@@ -908,7 +904,7 @@ define [
       @stopListening()
       delete this
 
-    withinBounds : (center) ->
+    withinBounds : (center) =>
 
       lat = center.latitude
       lng = center.longitude
@@ -1116,25 +1112,19 @@ define [
       infinity.updateItemPosition listItem.parent.items, heightChange, listItem.index + 1
       infinity.updatePagePosition listItem.parent.parent.pages, heightChange, listItem.parent.index + 1
       
-    addAllComments: (collection, filter) =>
+    addAllComments: (collection) =>
 
-      console.log collection
       visible = collection.groupBy (c) => c.get("activity").id
-      console.log visible
 
-      if visible.length > 0
+      for modelId in _.keys visible
 
-        for modelId in _.keys visible
-          console.log modelId
-          
-          _.each @listViews, (lv) =>
-            listItem = lv.find("#activity-#{modelId}")
-            if listItem.length > 0
-              console.log visible[modelId]
-              for comment in visible[modelId]
-                @addOneComment comment, listItem[0]
-                # return false to avoid checking the other column.
-              false
+        _.each @listViews, (lv) =>
+          listItem = lv.find("#activity-#{modelId}")
+          if listItem.length > 0
+            for comment in visible[modelId]
+              @addOneComment comment, listItem[0]
+              # return false to avoid checking the other column.
+            false
 
     # Map-specific
     # --------------
