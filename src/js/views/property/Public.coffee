@@ -2,7 +2,10 @@ define [
   "jquery"
   "underscore"
   "backbone"
+  'infinity'
+  'moment'
   "views/activity/List"
+  "views/activity/BaseIndex"
   "views/photo/Public"
   "views/listing/PublicSummary"
   "i18n!nls/property"
@@ -14,22 +17,24 @@ define [
   'templates/activity/modal'
   'templates/comment/summary'
   "gmaps"
-], ($, _, Parse, ActivityView, PhotoView, ListingView, i18nProperty, i18nListing, i18nUnit, i18nGroup, i18nCommon) ->
+], ($, _, Parse, infinity, moment, ActivityView, BaseIndexActivityView, PhotoView, ListingView, i18nProperty, i18nListing, i18nUnit, i18nGroup, i18nCommon) ->
 
-  class PublicPropertyView extends Parse.View
+  class PublicPropertyView extends BaseIndexActivityView
 
     el: '#main'
 
     events:
-      'click .nav a'                        : 'showTab'
-      'click #activity ul > li > a.content' : 'showModal'
-      'click #new-lease'                    : 'showLeaseModal'
+      'click .nav a'                          : 'showTab'
+      'click #activity .thumbnails a.content' : 'getModelDataToShowInModal'
+      'click #new-lease'                      : 'showLeaseModal'
       # Activity events
-      "click .like-button"                  : "likeOrLogin"
-      "click .likers"                       : "showLikers"
-      "submit form.new-comment-form"        : "postComment"
+      "click .like-button"                    : "likeOrLogin"
+      "click .likers"                         : "showLikers"
+      "submit form.new-comment-form"          : "getCommentDataToPost"
 
     initialize: (attrs) ->
+
+      super
 
       @place = if attrs.place then attrs.place else @model.city()
 
@@ -43,6 +48,9 @@ define [
       @listenTo @model.activity, "add", @addOneActivity
       @listenTo @model.activity, "reset", @addAllActivity
 
+      @listenTo @model.comments, "add", @addOneComment
+      @listenTo @model.comments, "reset", @addAllComments
+
       @listenTo @model.photos, "add", @addOnePhoto
       @listenTo @model.photos, "reset", @addAllPhotos
 
@@ -53,6 +61,13 @@ define [
     showTab : (e) ->
       e.preventDefault()
       $("#{e.currentTarget.hash}-link").tab('show')
+
+    checkIfLiked: (activity) =>
+      data = activity.data()
+
+      model = @model.activity.at(data.index)
+
+      @markAsLiked(activity) if Parse.User.current().get("profile").likes.find (l) => l.id is model.id
 
     render: ->
 
@@ -69,6 +84,19 @@ define [
       @$el.html JST["src/js/templates/property/public.jst"](vars)
 
       center = @model.GPoint()
+      
+      @listViews[0] = new infinity.ListView @$('#activity .list-view'), 
+        lazy: ->
+          pageId = Number $(this).attr(infinity.PAGE_ID_ATTRIBUTE)
+          page = infinity.PageRegistry.lookup pageId
+          _.each page.items, (item, index) ->
+            return if item.loaded
+            item.$el.data "pageIndex", index
+            data = item.$el.data()
+            if data.image then item.$el.find(".content .photo img").prop 'src', data.image
+            if data.profile then item.$el.find("footer img.profile-pic").prop 'src', data.profile
+            item.loaded = true
+
 
       map = new google.maps.Map document.getElementById(@mapId), 
         zoom          : 15
@@ -97,30 +125,127 @@ define [
             anchor: null
             scaledSize: null
 
-      @$activity = @$("#activity ul")
+      @$loading = @$("#activity .loading")
+
+      # @$activity = @$("#activity ul")
       @$photos = @$("#photos ul")
       @$listings = @$("#listings > table > tbody")
       
-      if @model.activity.length > 0 then @addAllActivity() else @model.activity.fetch()
+      # Start activity search.
+      if @model.activity.length > @resultsPerPage * (@page - 1) and @model.comments.length > @commentsPerPage * (@page - 1)
+        @addAllActivity()
+        @addAllComments @model.comments
+      else @search()
+      @updatePaginiation()
+
       if @model.photos.length > 0 then @addAllPhotos() else @model.photos.fetch()
       if @model.listings.length > 0 then @addAllListings() else @model.listings.fetch()
 
+      # Track scrolling for infinity
+      $(window).scroll @loadTracker
+      $(document.documentElement).scroll @loadTracker
+
       @
+
+
+    # BaseIndex Linkers
+    # ------------------
+
+    getModelDataToShowInModal: (e) ->
+      e.preventDefault()
+
+      @modal = true
+      data = $(e.currentTarget).parent().data()
+
+      # Keep track of where we are, for subsequent navigation.
+      # Convert the index to an array and find the "new" index.
+       
+      # This is using the cached results done in addAllActivity
+      # @modalCollection = @model.activity.select (a) => a.get("property") and a.get("property").id is @model.id
+      model = @model.activity.at data.index
+
+      ids = _.map(@modalCollection, (a) -> a.id)
+      @modalIndex = _.indexOf(ids, model.id)
+
+      console.log model.id
+      console.log ids
+      console.log data.index
+      console.log @modalIndex
+      console.log @modalCollection
+
+      @showModal()
+
+    getCommentDataToPost: (e) =>
+      e.preventDefault()
+
+      return unless Parse.User.current()
+
+      button = @$(e.currentTarget)
+      activity = button.closest(".activity")
+      data = activity.data()
+      model = @model.activity.at(data.index)
+
+      @postComment activity, data, model
+
 
     # Activity
     # ------
+    search : =>
 
-    addOneActivity : (activity) =>
-      view = new ActivityView(model: activity, onProfile: false)
-      @$activity.append view.render().el
-      
+      @$loading.html "<img src='/img/misc/spinner.gif' class='spinner' alt='#{i18nCommon.verbs.loading}' />"
+      @moreToDisplay = true
+
+      # handleMapActivity
+      Parse.Promise.when(
+        @model.activity.query.skip(@resultsPerPage * (@page - 1)).limit(@resultsPerPage).find(),
+        @model.comments.query.skip(@commentsPerPage * (@page - 1)).limit(@commentsPerPage).find()
+      ).then (objs, comms) =>
+        if objs
+          # Set the property, as we have not included it.
+          _.each objs, (o) => o.set "property", @model
+          @model.activity.add objs
+        if comms 
+          _.each comms, (c) => c.set "property", @model
+          @model.comments.add comms
+        @addAllComments comms
+          # if objs.length < @resultsPerPage then @trigger "view:exhausted"
+        # @refreshDisplay()
+
+        @checkIfEnd() if @activityCount
+
+    checkIfEnd : =>
+
+      # Check if we have hit the end.
+      if @model.activity.length >= @activityCount then @trigger "view:exhausted"
+
+    # addOneActivity : (activity) =>
+    #   view = new ActivityView(model: activity, onProfile: false)
+    #   @$activity.append view.render().el
+
+    updatePaginiation : =>
+      countQuery = @model.activity.query
+      # Reset old filters
+      countQuery.notContainedIn("objectId", [])
+      # Limit of -1 means do not send a limit.
+      countQuery.limit(-1).skip(0)
+
+      countQuery.count()
+      .then (count) =>
+
+        @activityCount = count
+        @pages = Math.ceil((count)/ @resultsPerPage)
+        # @$pagination.html ""
+        if count is 0 then @trigger "view:empty"
+
+        @checkIfEnd()
+          
+        #   @renderPaginiation()
+
     addAllActivity: (collection, filter) =>
 
-      @$activity.html ""
-
-      visible = @model.activity.select (a) => a.get("property") and a.get("property").id is @model.id
+      visible = @modalCollection = @model.activity.select (a) => a.get("property") and a.get("property").id is @model.id
       if visible.length > 0 then _.each visible, @addOneActivity
-      else @$activity.html '<li class="empty">' + i18nProperty.tenant_empty.activity + '</li>'
+      else @$loading.html '<div class="empty">' + i18nProperty.tenant_empty.activity + '</div>'
 
     # Photos
     # ------
@@ -180,132 +305,3 @@ define [
           new NewLeaseView(model: @lease, property: @model, network: @model.get("network"), modal: true).render().$el.modal()
       else
         $("#signup-modal").modal()
-
-    undelegateEvents : =>
-      @detachModalEvents() if @modal
-      super
-
-
-    # Modal
-    # @see profile:show and property:public
-    # --------------------------------------------
-
-    showModal : (e) =>
-      e.preventDefault()
-      @modal = true
-      @index = 0
-      @collection = @model.activity.select((a) => a.get("property") and a.get("property").id is @model.id)
-      # Find the model in the collection, while simultaneously recording the index of our new array.
-      data = $(e.currentTarget).data()
-      model = _.find @collection, (f) => @index++; f.id is data.id
-      # Correct for auto-increment
-      @index -= 1
-      @renderModalContent model
-      $("#view-content-modal").modal(keyboard: false)
-      
-      # Add events.
-      $(document).on "keydown", @controlModalIfOpen
-      $('#view-content-modal').on 'click', '.caption a', @closeModal
-      $('#view-content-modal').on 'click', '.left', @prevModal
-      $('#view-content-modal').on 'click', '.right', @nextModal
-      $('#view-content-modal').on 'hide.bs.modal', @hideModal
-      $('#view-content-modal').on 'click', '.like-button', @likeOrLogin
-      $('#view-content-modal').on 'click', '.likers', @showLikers
-      $('#view-content-modal').on 'submit', 'form', @postComment
-
-    controlModalIfOpen : (e) =>
-      return unless @modal
-      switch e.which 
-        when 27 then $("#view-content-modal").modal('hide')
-        when 37 then @prevModal()
-        when 39 then @nextModal()
-
-    closeModal : =>
-      $("#view-content-modal").modal('hide')
-
-    hideModal : =>
-      return unless @modal
-      @modal = false
-
-      @detachModalEvents()
-
-    detachModalEvents : ->
-      $(document).off "keydown"
-      $('#view-content-modal').off "hide click"
-      # $('#view-content-modal .caption a').off 'click'
-      # $('#view-content-modal .left').off 'click'
-      # $('#view-content-modal .right').off 'click'
-
-    nextModal : =>
-      return unless @modal
-      @index++
-      if @index >= @collection.length then @index = 0
-      @renderModalContent @collection[@index]
-
-    prevModal : =>
-      return unless @modal
-      @index--
-      if @index < 0 then @index = @collection.length - 1
-      @renderModalContent @collection[@index]
-
-    renderModalContent : (model) =>
-
-      # Add a building link if applicable.
-      # Cache result
-      property = if model.get("property") and not model.linkedToProperty() then model.get("property") else false
-
-      vars = _.merge model.toJSON(), 
-        url: model.url()
-        start: moment(model.get("startDate")).format("LLL")
-        end: moment(model.get("endDate")).format("LLL")
-        postDate: moment(model.createdAt).fromNow()
-        liked: model.liked()
-        postImage: model.image("large")
-        icon: model.icon()
-        name: model.name()
-        profileUrl: model.profileUrl()
-        profilePic: model.profilePic("thumb")
-        propertyLinked: if property then true else false
-        propertyTitle: if property then property.get("title") else false
-        propertyCover: if property then property.cover("tiny") else false
-        propertyUrl: if property then property.publicUrl() else false
-        current: Parse.User.current()
-        i18nCommon: i18nCommon
-
-      if Parse.User.current()
-        vars.self = Parse.User.current().get("profile").name()
-        vars.selfProfilePic = Parse.User.current().get("profile").cover("tiny")
-
-      # Default options. 
-      _.defaults vars,
-        rent: false
-        image: false
-        isEvent: false
-        endDate: false
-        likeCount: 0
-        commentCount: 0
-
-      # Override default title.
-      vars.title = model.title()
-
-      $("#view-content-modal").html JST["src/js/templates/activity/modal.jst"](vars)
-
-      # Comments
-      @$comments = $("#view-content-modal .list-comments")
-      @$comments.html ""
-      visible = model.comments.select (c) => c.get("activity") and c.get("activity").id is model.id
-      if visible.length > 0 then _.each visible, @renderOneModalComment
-
-    renderOneModalComment : (comment) =>
-
-      vars =
-        title: comment.get "title"
-        postDate: moment(comment.createdAt).fromNow()
-        name: comment.name()
-        profilePic: comment.profilePic("tiny")
-        profileUrl: comment.profileUrl()
-        i18nCommon: i18nCommon
-
-      # fn = if isNew then "append" else "prepend"
-
-      @$comments.append JST["src/js/templates/comment/summary.jst"](vars)

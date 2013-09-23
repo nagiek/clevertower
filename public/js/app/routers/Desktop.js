@@ -338,17 +338,54 @@
 
         place = "" + city + "--" + region + "--" + country;
         return require(["models/Property", "views/property/Public"], function(Property, PublicPropertyView) {
-          return new Parse.Query(Property).get(id, {
-            success: function(model) {
+          var model;
+
+          if (Parse.User.current()) {
+            if (Parse.User.current().get("property") && id === Parse.User.current().get("property").id) {
               return _this.view = new PublicPropertyView({
+                params: {},
+                model: Parse.User.current().get("property"),
+                place: place
+              }).render();
+            } else if (Parse.User.current().get("network") && Parse.User.current().get("network").properties.find(function(p) {
+              return p.id === id;
+            })) {
+              model = Parse.User.current().get("network").properties.find(function(p) {
+                return p.id === id;
+              });
+              return _this.view = new PublicPropertyView({
+                params: {},
                 model: model,
                 place: place
               }).render();
-            },
-            error: function(object, error) {
-              return _this.accessDenied();
+            } else {
+              return new Parse.Query(Property).get(id, {
+                success: function(model) {
+                  return _this.view = new PublicPropertyView({
+                    params: {},
+                    model: model,
+                    place: place
+                  }).render();
+                },
+                error: function(object, error) {
+                  return _this.accessDenied();
+                }
+              });
             }
-          });
+          } else {
+            return new Parse.Query(Property).get(id, {
+              success: function(model) {
+                return _this.view = new PublicPropertyView({
+                  params: {},
+                  model: model,
+                  place: place
+                }).render();
+              },
+              error: function(object, error) {
+                return _this.accessDenied();
+              }
+            });
+          }
         });
       };
 

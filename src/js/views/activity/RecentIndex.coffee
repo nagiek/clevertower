@@ -29,7 +29,7 @@ define [
       'click #filters > button'                 : 'changeFilter'
       'click #search-map'                       : 'searchMap'
       # 'click .pagination > ul > li > a'       : 'changePage'
-      'click .thumbnails a.content'             : 'getModelDataToShowInModal'
+      'click .thumbnails a.content'             : 'showModal'
       "mouseover .thumbnails .activity"         : "highlightMarkerFromCard"
       "mouseout .thumbnails .activity"          : "unhighlightMarkerFromCard"
       # 'hide #view-content-modal'              : 'hideModal'
@@ -39,26 +39,49 @@ define [
       # Activity events
       "click .like-button"                      : "likeOrLogin"
       "click .likers"                           : "getLikers"
-      "submit form.new-comment-form"            : "getCommentDataToPost"
+      "submit form.new-comment-form"            : "postComment"
     
     initialize : (attrs) =>
 
       super
 
-      @onMap
       @location = attrs.location || ""
       @locationAppend = if attrs.params.lat and attrs.params.lng then "?lat=#{attrs.params.lat}&lng=#{attrs.params.lng}" else ''
+      @page = attrs.params.page || 1
       @center = new google.maps.LatLng attrs.params.lat, attrs.params.lng if attrs.params.lat and attrs.params.lng
+      @updateScheduled = false
+      @moreToDisplay = true
 
       # Give the user the chance to contribute
       @listenTo Parse.Dispatcher, "user:login", => 
+        # Check for likes.
+        @listenTo Parse.User.current().get("profile").likes, "reset", @checkForLikes
         # Get the activity in the user properties.
         @prepUserActivity()
-
+        # Get the user's personal likes.
+        if Parse.User.current().get("profile").likes.length is 0 then Parse.User.current().get("profile").likes.fetch()
         # Post view
         @newPostView = new NewActivityView(view: @).render()
         @listenTo @newPostView, "view:resize", @bindMapPosition
         @listenTo @newPostView, "model:save", @prependNewPost
+
+        # Add comment bar
+        _.each @listViews, (lv) -> 
+          _.each lv.pages, (page) ->
+            _.each page.item, (item) ->
+              if item.$el.find(".comments").append
+                """
+                <form class="new-comment-form form-condensed">
+                  <div class="form-group">
+                    <div class="photo photo-micro pull-left">
+                      <img src="#{Parse.User.current().get("profile").cover("tiny")}" alt="#{Parse.User.current().get("profile").name()}" width="23" height="23">
+                    </div>
+                    <div class="photo-float micro-float">
+                      <input type="text" class="comment-title form-control input-sm" name="comment[title]" placeholder="<%= i18nCommon.actions.add_comment %>">
+                    </div>
+                  </div>
+                </form>
+                """
 
       @listenTo Parse.Dispatcher, "user:logout", => 
         _.each @listViews, (lv) -> 
@@ -78,10 +101,29 @@ define [
           @renderCity()
         @placesService.getDetails reference: data.reference, @googleSearch
 
+      @on "model:view", @showModal
+      # @on "dragend", @handleMapMove
+      @on "view:change", @clear
+
+      @on "view:exhausted", =>
+        @moreToDisplay = false
+        @$loading.html i18nCommon.activity.exhausted
+
+      @on "view:empty", =>
+        @moreToDisplay = false
+        @$loading.html i18nListing.listings.empty.index
+
       # Create a timer to buffer window re-draws.
       @time = null
 
       @mapId = "mapCanvas"
+
+      @resultsPerPage = 20
+      @commentsPerPage = 40
+      # The chunkSize is the number of pages displayed in a group
+      @chunkSize = 10
+      # The chunk is the start of the group of pages we are displaying
+      @chunk = Math.floor(@page / @resultsPerPage) + 1
 
       # Activity that we find on the map.
       unless Parse.App.activity
@@ -93,24 +135,31 @@ define [
       unless Parse.App.comments
         Parse.App.comments = new CommentList [], {}
 
-      @listenTo Parse.App.activity, "reset", @addAllActivity
-      @listenTo Parse.App.activity, "add", @addOneActivity
+      @listenTo Parse.App.activity, "reset", @addAll
+      @listenTo Parse.App.activity, "add", @addOne
 
       @listenTo Parse.App.comments, "reset", @addAllComments
       # @listenTo Parse.App.comments, "add", @addOneComment
 
-    checkIfLiked: (activity) =>
-      data = activity.data()
+      if Parse.User.current()
+        @listenTo Parse.User.current().get("profile").likes, "reset", @checkForLikes
 
-      model = if data.collection is "user"
-        Parse.User.current().activity.at(data.index)
-      else Parse.App.activity.at(data.index)
+        # Get the user's personal likes.
+        if Parse.User.current().get("profile").likes.length is 0 then Parse.User.current().get("profile").likes.fetch()
 
-      @markAsLiked(activity) if Parse.User.current().get("profile").likes.find (l) => l.id is model.id
+    checkForLikes: ->
+      Parse.User.current().get("profile").likes.each (l) =>
+        _.each @listViews, (lv) =>
+          activity = lv.find("#activity-#{l.id}")
+          if activity.length > 0
+            @markAsLiked activity[0].$el
+            # return false to avoid checking the other column.
+            false
 
     resetListViews: ->
 
-      super
+      # Clean up old stuff
+      _.each @listViews, (lv) -> lv.reset()
       @resetAppActivity()
 
     resetAppActivity: ->
@@ -119,6 +168,26 @@ define [
       Parse.App.comments.reset()
       @resetUserActivity() if Parse.User.current()
       # @$list.find('> li.empty').remove()
+
+
+    # refreshDisplay : ->
+    #   Parse.App.activity.each (a) -> a.trigger "refresh"
+    #   if Parse.User.current() and Parse.User.current().activity
+    #     Parse.User.current().activity.each (a) -> a.trigger "refresh" 
+    #   # @$list.masonry 'reload'
+
+    changeFilter: (e) ->
+      e.preventDefault()
+      
+      btn = @$(e.currentTarget)
+      filter = btn.data "filter"
+      return if filter is @filter
+      @filter = filter
+      @specificSearchControls.clear() if @specificSearchControls
+
+      if @filter then @filterCollections() else @resetFilters()
+
+      @redoSearch()
 
     filterCollections: ->
       # "Specific" filter
@@ -131,6 +200,7 @@ define [
     resetFilters: ->
       Parse.App.activity.query.containedIn "activity_type", ["new_listing", "new_post", "new_property"]
       Parse.User.current().activity.query.containedIn "activity_type", ["new_listing", "new_post", "new_property"] if Parse.User.current()
+
 
     prepUserActivity : =>
       # Get the property from what we've already loaded.
@@ -203,17 +273,9 @@ define [
             p.unhighlightListener = google.maps.event.addListener p.marker, "mouseout", @unhighlightCardsFromPropertyMarker
             p.clickListener = google.maps.event.addListener p.marker, "click", @goToPropertyFromPropertyMarker
 
-      @hideAllProperties()
 
-    getUserActivity : ->
-      # Add user activity and comments 
-      Parse.Promise.when(
-        Parse.User.current().activity.query.find(),
-        Parse.User.current().comments.query.find()
-      ).then (objs, comms) =>
-        if objs then Parse.User.current().activity.add objs
-        # Reset the comments, to trigger bulk-add behaviour.
-        if comms then Parse.User.current().comments.reset comms
+
+      @hideAllProperties()
 
     resetUserActivity : =>
 
@@ -230,8 +292,6 @@ define [
             if @withinBounds p.get("center") then @showProperty p else @hideProperty p
         Parse.User.current().activity.each @addOnePropertyActivity
         @addAllComments Parse.User.current().comments
-
-
 
     getPersonalizedMapCenter : =>
       if Parse.User.current()
@@ -267,6 +327,7 @@ define [
       if @$list.width() < 767 then @$list.html '<div class="list-view col-md-12"></div>'
       else @$list.html '<div class="list-view col-md-6"></div><div class="list-view col-md-6"></div>'
       
+      @listViews = []
       @$listViews = @$list.find('.list-view')
       @$listViews.each (i, el) => @listViews[i] = new infinity.ListView @$(el), 
         lazy: ->
@@ -435,7 +496,16 @@ define [
 
       # Search once the map is ready.
       google.maps.event.addListenerOnce @map, 'idle', @performSearchWithinMap
-      @getUserActivity() if Parse.User.current()
+
+      # Add user activity and comments 
+      Parse.Promise.when(
+        Parse.User.current().activity.query.find(),
+        Parse.User.current().comments.query.find()
+      ).then (objs, comms) =>
+        if objs then Parse.User.current().activity.add objs
+        # Reset the comments, to trigger bulk-add behaviour.
+        if comms then Parse.User.current().comments.reset comms
+
 
     initWithCenter : (place, status) =>
       @center = place.geometry.location if status is google.maps.places.PlacesServiceStatus.OK
@@ -481,6 +551,15 @@ define [
 
       @redoSearch()
 
+    redoSearch : =>
+
+      @chunk = 1
+      @page = 1
+
+      @resetListViews()
+      @search()
+      @updatePaginiation()
+
     search : =>
 
       @$loading.html "<img src='/img/misc/spinner.gif' class='spinner' alt='#{i18nCommon.verbs.loading}' />"
@@ -516,42 +595,72 @@ define [
 
 
 
+    # Adding from Collections
+    # -----------------------
 
-    # BaseIndex Linkers
-    # ------------------
+    renderTemplate: (model, liked, linked, pos) =>
 
-    getModelDataToShowInModal: (e) ->
-      e.preventDefault()
+      # Create new element with extra details for infinity.js
+      if linked
+        collection = "user"
+        propertyId = model.get("property").id
+        propertyIndex = model.get("property").pos()
+      else
+        collection = "external"
+        propertyId = false
+        propertyIndex = false
 
-      @modal = true
-      data = $(e.currentTarget).parent().data()
-      # Keep track of where we are, for subsequent navigation.
-      @modalIndex = data.index
-       
-      @modalCollection = if data.collection is "user"
-        Parse.User.current().activity
-      else Parse.App.activity
+      $el = $ """
+      <div class="thumbnail clearfix activity fade in"
+        id="activity-#{model.id}"
+        data-liked="#{liked}"
+        data-property-index="#{propertyIndex}" 
+        data-property-id="#{propertyId}"
+        data-index="#{model.pos()}"
+        data-lat="#{model.GPoint().lat()}"
+        data-lng="#{model.GPoint().lng()}"
+        data-collection="#{collection}"
+        data-profile="#{model.profilePic("tiny")}"
+        data-image="#{model.image("large")}"
+      />
+      """
 
-      @showModal()
+      vars = _.merge model.toJSON(), 
+        url: model.url()
+        pos: pos % 20 # This will be incremented in the template.
+        linkedToProperty: linked
+        start: moment(model.get("startDate")).format("LLL")
+        end: moment(model.get("endDate")).format("LLL")
+        postDate: moment(model.createdAt).fromNow()
+        postImage: model.image("large") # Keep this in for template logic.
+        profileUrl: model.get("profile").url()
+        liked: liked
+        icon: model.icon()
+        name: model.name()
+        current: Parse.User.current()
+        i18nCommon: i18nCommon
 
+      if Parse.User.current()
+        vars.self = Parse.User.current().get("profile").name()
+        vars.selfProfilePic = Parse.User.current().get("profile").cover("tiny")
 
-    getCommentDataToPost: (e) ->
-      e.preventDefault()
+      # Default options. 
+      _.defaults vars,
+        rent: false
+        image: false
+        isEvent: false
+        endDate: false
+        likeCount: 0
+        commentCount: 0
 
-      return unless Parse.User.current()
+      # Override default title.
+      vars.title = model.title()
 
-      button = @$(e.currentTarget)
-      activity = button.closest(".activity")
-      data = activity.data()
-      model = if data.collection is "user"
-        Parse.User.current().activity.at(data.index)
-      else Parse.App.activity.at(data.index)
+      $el.html JST["src/js/templates/activity/summary.jst"](vars)
 
-      @postComment activity, data, model
+      @checkIfLiked($el) if Parse.User.current() and not liked
 
-
-    # Activity
-    # --------
+      $el
 
     prependNewPost: (a) =>
       if a.get("property")
@@ -575,8 +684,17 @@ define [
         # # @listViews[@shortestColumnIndex()].prepend new infinity.ListItem view.render().$el
         @listViews[@shortestColumnIndex()].prepend @renderTemplate(a, false, false, a.pos())
 
+    addOne: (a) =>
+      # view = new ActivityView
+      #   model: a
+      #   view: @
+      #   liked: Parse.User.current() and Parse.User.current().get("profile").likes.find (l) -> l.id is a.id
+      # @listViews[@shortestColumnIndex()].append view.render().$el
+      @listViews[@shortestColumnIndex()].append @renderTemplate(a, a.liked(), false, a.pos())
+      # @$list.append view.render().el
+
     # Add all items in the Properties collection at once.
-    addAllActivity: (collection, filter) =>
+    addAll: (collection, filter) =>
       Parse.App.activity.each @addOne if Parse.App.activity.length > 0
 
     addOnePropertyActivity: (a) =>
@@ -628,6 +746,33 @@ define [
         # Visibility counter
         Parse.User.current().get("network").properties.each (p) -> p.shown = false
 
+    # Pagination
+    # ----------
+
+    # Find the shortest column.
+    # Returns the infinity.ListView
+    shortestColumnIndex: ->
+      return 0 if @listViews.length is 1
+      minIndex = 0
+      minHeight = 0
+      @$listViews.each (i, el) => 
+        $currCol = @$(el)
+        if i is 0 then minHeight = $currCol.height()
+        else if minHeight > $currCol.height() then minIndex = i; minHeight = $currCol.height()
+      return minIndex
+
+    endOfDocument: ->
+      viewportBottom = $(window).scrollTop() + $(window).height()
+      @$loading.offset().top <= viewportBottom
+
+    loadTracker: =>
+      if(!@updateScheduled and @moreToDisplay)
+        setTimeout =>
+          if @endOfDocument() then @nextPage()
+          @updateScheduled = false
+        , 1000
+        @updateScheduled = true
+
     # Update the pagination with appropriate count, pages and page numbers 
     updatePaginiation : =>
       countQuery = Parse.App.activity.query
@@ -678,6 +823,59 @@ define [
         #   @renderPaginiation()
           
     
+    # renderPaginiation : (e) =>
+
+    #   pages = @pages - @chunk + 1
+
+    #   if pages > @chunkSize then pages = @chunkSize; next = true
+
+    #   if @chunk > 1 then @$pagination.append "<li><a href='#' class='prev' data-page='prev'>...</a></li>"
+
+    #   url = "/search/#{@location}" 
+    #   for page in [@chunk..@chunk + pages - 1] by 1
+    #     if page > 1
+    #       append = @locationAppend + (if @locationAppend.length > 0 then "&" else "?") + "page=#{page}"
+    #     else 
+    #       append = @locationAppend
+    #     @$pagination.append "<li><a data-page='#{page}' href='#{url}#{append}'>#{page}</a></li>"
+    #   if next then @$pagination.append "<li><a href='#' class='next' data-page='next'>...</a></li>"
+
+    #   if @chunk <= @page and @page < @chunk + @chunkSize
+    #     # @chunk > 1 means that prev chunks exist, and a prev button is displayed
+    #     n = @page - @chunk + 1 + if @chunk > 1 then 1 else 0
+    #     @$pagination.find(":nth-child(#{n})").addClass('active')
+
+
+    # # Change the page within the current pagination.
+    # changePage : (e) =>
+    #   e.preventDefault()
+    #   selected = e.currentTarget.attributes["data-page"].value
+
+    #   if selected is 'next' or selected is 'prev'
+    #     # Change the chunk
+    #     @chunk = if selected is 'next' then @chunk + @chunkSize else @chunk - @chunkSize
+    #     @renderPaginiation()
+        
+    #   else
+    #     # Change the page within the chunk
+    #     @page = selected
+    #     @$pagination.find("li > .active").removeClass('active')
+
+    #     n = Math.round(@page / @chunkSize) + if @chunk > 1 then 1 else 0
+    #     @$pagination.find(":nth-child(#{n})").addClass('active')
+        
+    #     Parse.App.activity.query.skip(@resultsPerPage * (@page - 1))
+
+    #     # Reset and get new
+    #     Parse.App.activity.reset()
+    #     @search()
+
+    # Change the page within the current pagination.
+    nextPage : =>
+      @page += 1
+      @search()
+
+
     # MAP
     # ----------
 
@@ -752,6 +950,224 @@ define [
         @sw.longitude < lng and 
         lng < @ne.longitude
 
+
+    # Activity
+    # --------------
+
+    likeOrLogin: (e) =>
+      e.preventDefault()
+      button = @$(e.currentTarget)
+      activity = button.closest(".activity")
+      likes = Number activity.find(".like-count").html()
+      data = activity.data()
+      model = if data.collection is "user"
+        Parse.User.current().activity.at(data.index)
+      else Parse.App.activity.at(data.index)
+
+      if Parse.User.current()
+        if data.liked
+          button.removeClass "active"
+          activity.find(".like-count").html(likes - 1)
+          activity.find(".likers").removeClass "active"
+          activity.find(".like-button").text i18nCommon.verbs.like
+          activity.data "liked", false
+          # activity.attr "data-liked", "false"
+          model.increment likeCount: -1
+          model.relation("likers").remove Parse.User.current().get("profile")
+          Parse.User.current().get("profile").relation("likes").remove model
+          Parse.User.current().get("profile").likes.remove model
+        else
+          button.addClass "active"
+          activity.find(".like-count").html(likes + 1)
+          @markAsLiked(activity)
+          model.increment likeCount: +1
+          model.relation("likers").add Parse.User.current().get("profile")
+          Parse.User.current().get("profile").relation("likes").add model
+          # Adding to a relation will somehow add to collection..?
+          Parse.User.current().get("profile").likes.add model
+        Parse.Object.saveAll [model, Parse.User.current().get("profile")]
+      else
+        $("#signup-modal").modal()
+
+    getLikers: (e) ->
+      e.preventDefault()
+      button = @$(e.currentTarget)
+      activity = button.closest(".activity")
+      likes = Number activity.find(".like-count").html()
+      data = activity.data()
+      model = if data.collection is "user"
+        Parse.User.current().activity.at(data.index)
+      else Parse.App.activity.at(data.index)
+
+      model.prep("likers")
+      @listenToOnce model.likers, "reset", @showLikers
+      model.likers.fetch()
+
+    showLikers: (collection) ->
+      # visible = collection
+      # .chain()
+      # .select((c) => c.get("activity") and c.get("activity").id is model.id)
+      # .map((c) => c.get("profile"))
+      # .value()
+
+      if collection.length > 0
+        # profiles = _.uniq(visible, false, (v) -> v.id)
+        $("#people-modal .modal-body").html "<ul class='list-unstyled' />"
+        collection.each (p) ->
+          $("#people-modal .modal-body ul").append """
+            <li class="clearfix">
+              <div class="photo photo-thumbnail pull-left">
+                <a href="#{p.url()}">
+                  <img src="#{p.cover("thumb")}" height="50" width="50">
+                </a>
+              </div>
+              <div class="photo-float thumbnail-float">
+                <h4><a href="#{p.url()}">#{p.name()}</a></h4>
+              </div>
+            </li>
+          """
+        $("#people-modal").modal()
+        
+      else
+        $("#people-modal .modal-body ul").append """
+          <li>Be the first one to like this</li>
+        """
+
+    checkIfLiked: (activity) =>
+      data = activity.data()
+
+      model = if data.collection is "user"
+        Parse.User.current().activity.at(data.index)
+      else Parse.App.activity.at(data.index)
+
+      @markAsLiked(activity) if Parse.User.current().get("profile").likes.find (l) => l.id is model.id
+
+    # Used just for display, not the action.
+    markAsLiked: (activity) =>
+      activity.find(".likers").addClass "active"
+      activity.find(".like-button").text i18nCommon.adjectives.liked
+      activity.data "liked", true
+      # activity.attr "data-liked", "true"
+
+    postComment: (e) ->
+      e.preventDefault()
+
+      return unless Parse.User.current()
+
+      button = @$(e.currentTarget)
+      activity = button.closest(".activity")
+      likes = Number activity.find(".like-count").html()
+      data = activity.data()
+      model = if data.collection is "user"
+        Parse.User.current().activity.at(data.index)
+      else Parse.App.activity.at(data.index)
+
+      formData = activity.find("form.new-comment-form").serializeObject()
+
+      return unless formData.comment and formData.comment.title
+
+      # Use a pointer, to make sure we don't run into double-save issues.
+      property = if model.get("property")
+        __type: "Pointer"
+        className: "Property"
+        objectId: model.get("property").id
+      else undefined
+
+      network = if model.get("network")
+        __type: "Pointer"
+        className: "Network"
+        objectId: model.get("network").id
+      else undefined
+
+      comment = new Comment
+        title: formData.comment.title
+        center: model.get "center"
+        profile: Parse.User.current().get "profile"
+        activity:
+          __type: "Pointer"
+          className: "Activity"
+          objectId: model.id
+        property: property
+        network: network
+
+      # Optimistic saving.
+      _.each @listViews, (lv) =>
+        listItem = lv.find("#activity-#{model.id}")
+        if listItem.length > 0 
+          @addOneComment comment, listItem[0]
+          # return false to avoid checking the other column.
+          false
+
+      activity.find("input.comment-title").val("")
+
+      # Count is incremented in Comment afterSave
+      newCount = model.get("commentCount") + 1
+      model.set "commentCount", newCount
+      activity.find(".comment-count").html newCount
+
+      comment.save().then (obj) -> , 
+      (error) =>
+        console.log error
+        new Alert event: 'model-save', fade: false, message: i18nCommon.errors.unknown, type: 'error'
+        model.set "commentCount", newCount - 1
+        activity.find(".comments > li:last-child").remove()
+        activity.find(".comment-count").html newCount - 1
+
+    addOneComment : (comment, listItem) =>
+
+      vars =
+        title: comment.get "title"
+        postDate: moment(comment.createdAt).fromNow()
+        name: comment.name()
+        profilePic: comment.profilePic("tiny")
+        profileUrl: comment.profileUrl()
+        i18nCommon: i18nCommon
+
+      # fn = if isNew then "append" else "prepend"
+
+      listItem.$el.find("ul.list-comments").append JST["src/js/templates/comment/summary.jst"](vars)
+
+      # Find and update the heights of the scroll view.
+      heightChange = listItem.$el.outerHeight(true) - listItem.height
+
+      # Item
+      listItem.height += heightChange
+      listItem.bottom += heightChange
+
+      # Page
+      listItem.parent.height += heightChange
+      listItem.parent.bottom += heightChange
+      listItem.parent.$el.height listItem.parent.height
+
+      # ListView
+      listItem.parent.parent.height += heightChange
+      listItem.parent.parent.bottom += heightChange
+      listItem.parent.parent.$el.height listItem.parent.parent.height
+
+      # Update positions for everything after index.
+      infinity.updateItemPosition listItem.parent.items, heightChange, listItem.index + 1
+      infinity.updatePagePosition listItem.parent.parent.pages, heightChange, listItem.parent.index + 1
+      
+    addAllComments: (collection) =>
+
+      visible = if collection instanceof CommentList
+        collection.groupBy (c) => c.get("activity").id
+      else 
+        _.groupBy collection, (c) => c.get("activity").id
+
+      for modelId in _.keys visible
+
+        _.each @listViews, (lv) =>
+          listItem = lv.find("#activity-#{modelId}")
+          if listItem.length > 0
+            for comment in visible[modelId]
+              @addOneComment comment, listItem[0]
+              # return false to avoid checking the other column.
+            false
+
+    # Map-specific
+    # --------------
+
     highlightMarkerFromCard : (e) ->
       $ref = $(e.currentTarget)
       page = infinity.PageRegistry.lookup $ref.parent().attr(infinity.PAGE_ID_ATTRIBUTE)
@@ -801,3 +1217,147 @@ define [
     unhighlightMarker : (marker) ->
       marker.icon.origin = new google.maps.Point(marker.icon.origin.x - 25, marker.icon.origin.y)
       marker.setIcon marker.icon
+
+
+    # Modal 
+    # @see profile:show and property:public
+    # --------------------------------------------
+
+    showModal : (e) =>
+      e.preventDefault()
+      @modal = true
+      data = $(e.currentTarget).parent().data()
+      # Keep track of where we are, for subsequent navigation.
+      @index = data.index
+      @collection = data.collection
+      model = if @collection is "user"
+        Parse.User.current().activity.at(@index)
+      else Parse.App.activity.at(@index)
+      @renderModalContent model
+      $("#view-content-modal").modal(keyboard: false)
+
+      # Add events.
+      $(document).on "keydown", @controlModalIfOpen
+      $('#view-content-modal').on 'click', '.caption a', @closeModal
+      $('#view-content-modal').on 'click', '.left', @prevModal
+      $('#view-content-modal').on 'click', '.right', @nextModal
+      $('#view-content-modal').on 'hide.bs.modal', @hideModal
+      $('#view-content-modal').on 'click', '.like-button', @likeOrLogin
+      $('#view-content-modal').on 'click', '.likers', @getLikers
+      $('#view-content-modal').on 'submit', 'form', @postComment
+
+    controlModalIfOpen : (e) =>
+      return unless @modal
+      switch e.which 
+        when 27 then $("#view-content-modal").modal('hide')
+        when 37 then @prevModal()
+        when 39 then @nextModal()
+
+    closeModal : =>
+      $("#view-content-modal").modal('hide')
+
+    hideModal : =>
+      return unless @modal
+      @modal = false
+      @detachModalEvents()
+
+    detachModalEvents: ->
+      $(document).off "keydown"
+      $('#view-content-modal').off "hide click"
+      # $('#view-content-modal .caption a').off 'click'
+      # $('#view-content-modal .left').off 'click'
+      # $('#view-content-modal .right').off 'click'
+
+    nextModal : =>
+      return unless @modal
+      @index++
+      model = if @collection is "user"
+        if @index >= Parse.User.current().activity.length then @index = 0
+        Parse.User.current().activity.at(@index)
+      else
+        if @index >= Parse.App.activity.length then @index = 0
+        Parse.App.activity.at(@index)
+      @renderModalContent model
+
+    prevModal : =>
+      return unless @modal
+      @index--
+      model = if @collection is "user"
+        if @index < 0 then @index = Parse.User.current().activity.length - 1
+        Parse.User.current().activity.at(@index)
+      else
+        if @index < 0 then @index = Parse.App.activity.length - 1
+        Parse.App.activity.at(@index)
+      @renderModalContent model
+
+    renderModalContent : (model) =>
+
+      # Add a building link if applicable.
+      # Cache result
+      property = if model.get("property") and not model.linkedToProperty() then model.get("property") else false
+
+      vars = _.merge model.toJSON(), 
+        url: model.url()
+        profileUrl: model.profileUrl()
+        start: moment(model.get("startDate")).format("LLL")
+        end: moment(model.get("endDate")).format("LLL")
+        postDate: moment(model.createdAt).fromNow()
+        liked: model.liked()
+        postImage: model.image("large")
+        icon: model.icon()
+        name: model.name()
+        profilePic: model.profilePic("thumb")
+        propertyLinked: if property then true else false
+        propertyTitle: if property then property.get("title") else false
+        propertyCover: if property then property.cover("tiny") else false
+        propertyUrl: if property then property.publicUrl() else false
+        current: Parse.User.current()
+        i18nCommon: i18nCommon
+
+      if Parse.User.current()
+        vars.self = Parse.User.current().get("profile").name()
+        vars.selfProfilePic = Parse.User.current().get("profile").cover("tiny")
+
+      # Default options. 
+      _.defaults vars,
+        rent: false
+        image: false
+        isEvent: false
+        endDate: false
+        likeCount: 0
+        commentCount: 0
+
+      # Override default title.
+      vars.title = model.title()
+
+      $("#view-content-modal").html JST["src/js/templates/activity/modal.jst"](vars)
+
+      # Comments
+      @$comments = $("#view-content-modal .list-comments")
+      @$comments.html ""
+      model.prep "comments"
+      if model.comments.length > 0
+        visible = model.comments.select (c) => c.get("activity") and c.get("activity").id is model.id
+        if visible.length > 0 then _.each visible, @renderOneModalComment
+      else 
+        model.comments.model = model
+        @listenToOnce model.comments, "reset", @renderAllModalComments, model
+        model.comments.fetch()
+
+    renderAllModalComments : (collection) =>
+      visible = collection.select (c) => c.get("activity") and c.get("activity").id is collection.model.id
+      if visible.length > 0 then _.each visible, @renderOneModalComment
+
+    renderOneModalComment : (comment) =>
+
+      vars =
+        title: comment.get "title"
+        postDate: moment(comment.createdAt).fromNow()
+        name: comment.name()
+        profilePic: comment.profilePic("tiny")
+        profileUrl: comment.profileUrl()
+        i18nCommon: i18nCommon
+
+      # fn = if isNew then "append" else "prepend"
+
+      @$comments.append JST["src/js/templates/comment/summary.jst"](vars)

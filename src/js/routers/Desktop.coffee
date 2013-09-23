@@ -263,10 +263,22 @@ define [
     propertiesPublic: (country, region, city, id, slug) =>
       place = "#{city}--#{region}--#{country}"
       require ["models/Property", "views/property/Public"], (Property, PublicPropertyView) => 
-        new Parse.Query(Property).get id,
-          success: (model) =>
-            @view = new PublicPropertyView(model: model, place: place).render()
-          error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
+        if Parse.User.current()
+          if Parse.User.current().get("property") and id is Parse.User.current().get("property").id 
+            @view = new PublicPropertyView(params: {}, model: Parse.User.current().get("property"), place: place).render()
+          else if Parse.User.current().get("network") and Parse.User.current().get("network").properties.find((p) -> p.id is id)
+            model = Parse.User.current().get("network").properties.find((p) -> p.id is id)
+            @view = new PublicPropertyView(params: {}, model: model, place: place).render()
+          else
+            new Parse.Query(Property).get id,
+              success: (model) =>
+                @view = new PublicPropertyView(params: {}, model: model, place: place).render()
+              error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
+        else
+          new Parse.Query(Property).get id,
+            success: (model) =>
+              @view = new PublicPropertyView(params: {}, model: model, place: place).render()
+            error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
 
 
     # New
