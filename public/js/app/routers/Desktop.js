@@ -28,8 +28,8 @@
         "": "index",
         "places/:country/:region/:city/:id/:slug": "propertiesPublic",
         "posts/:id": "activityShow",
-        "outside/*splat": "search",
-        "outside*splat": "search",
+        "outside/*splat": "outside",
+        "outside*splat": "outside",
         "network/new": "networkNew",
         "listings/new": "listingsNew",
         "leases/new": "leasesNew",
@@ -75,14 +75,8 @@
         this.listenTo(Parse.Dispatcher, "user:logout", function() {
           return Parse.history.loadUrl(location.pathname);
         });
-        this.listenTo(Parse.history, "route", function(route) {
-          Parse.App.search.$('input').val("").blur();
-          if (_this.view) {
-            if (_this.oldCID && _this.oldCID !== _this.view.cid) {
-              _this.oldCID = _this.view.cid;
-              return _this.view.trigger("view:change");
-            }
-          }
+        this.listenTo(Parse.history, "route", function(router, route, params) {
+          return Parse.App.search.$('input').val("").blur();
         });
         return $(document).on("click", "a", function(e) {
           var href;
@@ -109,23 +103,29 @@
         if (Parse.User.current()) {
           return require(["views/activity/index"], function(ActivityIndexView) {
             if (!view || !(view instanceof ActivityIndexView)) {
-              return _this.view = new ActivityIndexView({
+              _this.view = new ActivityIndexView({
                 params: {}
               }).render();
+              if (view) {
+                return view.clear();
+              }
             }
           });
         } else {
           return require(["views/home/anon"], function(AnonHomeView) {
             if (!view || !(view instanceof AnonHomeView)) {
-              return _this.view = new AnonHomeView({
+              _this.view = new AnonHomeView({
                 params: {}
               }).render();
+              if (view) {
+                return view.clear();
+              }
             }
           });
         }
       };
 
-      DesktopRouter.prototype.search = function(splat) {
+      DesktopRouter.prototype.outside = function(splat) {
         var view,
           _this = this;
 
@@ -135,10 +135,13 @@
 
           if (!view || !(view instanceof ActivityIndexView)) {
             vars = _this.deparamAction(splat);
-            return _this.view = new ActivityIndexView({
+            _this.view = new ActivityIndexView({
               location: vars.path,
               params: vars.params
             }).render();
+            if (view) {
+              return view.clear();
+            }
           }
         });
       };
@@ -154,16 +157,22 @@
           Parse.App.activity = Parse.App.activity || new ActivityList([], {});
           model = Parse.App.activity.get(id);
           if (model) {
-            return _this.view = new ActivityShowView({
+            _this.view = new ActivityShowView({
               model: model
             }).render();
+            if (view) {
+              return view.clear();
+            }
           } else {
             return new Parse.Query("Activity").get(id, {
               success: function(model) {
                 Parse.App.activity.add(model);
-                return _this.view = new ActivityShowView({
+                _this.view = new ActivityShowView({
                   model: model
                 }).render();
+                if (view) {
+                  return view.clear();
+                }
               },
               error: function(object, error) {
                 return _this.accessDenied();
@@ -181,7 +190,10 @@
         return require(["views/network/New"], function(NewNetworkView) {
           _this.view = new NewNetworkView();
           _this.view.setElement("#main");
-          return _this.view.render();
+          _this.view.render();
+          if (view) {
+            return view.clear();
+          }
         });
       };
 
@@ -198,7 +210,10 @@
               vars = _this.deparamAction(splat);
               if (!view || !(view instanceof NetworkView)) {
                 vars.model = Parse.User.current().get("network");
-                return _this.view = new NetworkView(vars);
+                _this.view = new NetworkView(vars);
+                if (view) {
+                  return view.clear();
+                }
               } else {
                 return view.changeSubView(vars.path, vars.params);
               }
@@ -219,7 +234,10 @@
                         vars = _this.deparamAction(splat);
                         if (!view || !(view instanceof LeaseView)) {
                           vars.model = Parse.User.current().get("lease");
-                          return _this.view = new LeaseView(vars);
+                          _this.view = new LeaseView(vars);
+                          if (view) {
+                            return view.clear();
+                          }
                         } else {
                           return view.changeSubView(vars.path, vars.params);
                         }
@@ -245,7 +263,10 @@
                   vars = _this.deparamAction(splat);
                   if (!view || !(view instanceof LeaseView)) {
                     vars.model = Parse.User.current().get("lease");
-                    return _this.view = new LeaseView(vars);
+                    _this.view = new LeaseView(vars);
+                    if (view) {
+                      return view.clear();
+                    }
                   } else {
                     return view.changeSubView(vars.path, vars.params);
                   }
@@ -271,7 +292,10 @@
               forNetwork: false
             });
             _this.view.setElement("#main");
-            return _this.view.render();
+            _this.view.render();
+            if (view) {
+              return view.clear();
+            }
           }
         });
       };
@@ -287,7 +311,10 @@
               forNetwork: true
             });
             _this.view.setElement("#main");
-            return _this.view.render();
+            _this.view.render();
+            if (view) {
+              return view.clear();
+            }
           }
         });
       };
@@ -310,13 +337,19 @@
               }
               if (model) {
                 vars.model = model;
-                return _this.view = new PropertyView(vars);
+                _this.view = new PropertyView(vars);
+                if (view) {
+                  return view.clear();
+                }
               } else {
                 return new Parse.Query("Property").get(id, {
                   success: function(model) {
                     model.collection = Parse.User.current().get("network").properties;
                     vars.model = model;
-                    return _this.view = new PropertyView(vars);
+                    _this.view = new PropertyView(vars);
+                    if (view) {
+                      return view.clear();
+                    }
                   },
                   error: function(object, error) {
                     return _this.accessDenied();
@@ -333,39 +366,49 @@
       };
 
       DesktopRouter.prototype.propertiesPublic = function(country, region, city, id, slug) {
-        var place,
+        var place, view,
           _this = this;
 
+        view = this.view;
         place = "" + city + "--" + region + "--" + country;
         return require(["models/Property", "views/property/Public"], function(Property, PublicPropertyView) {
           var model;
 
           if (Parse.User.current()) {
             if (Parse.User.current().get("property") && id === Parse.User.current().get("property").id) {
-              return _this.view = new PublicPropertyView({
+              _this.view = new PublicPropertyView({
                 params: {},
                 model: Parse.User.current().get("property"),
                 place: place
               }).render();
+              if (view) {
+                return view.clear();
+              }
             } else if (Parse.User.current().get("network") && Parse.User.current().get("network").properties.find(function(p) {
               return p.id === id;
             })) {
               model = Parse.User.current().get("network").properties.find(function(p) {
                 return p.id === id;
               });
-              return _this.view = new PublicPropertyView({
+              _this.view = new PublicPropertyView({
                 params: {},
                 model: model,
                 place: place
               }).render();
+              if (view) {
+                return view.clear();
+              }
             } else {
               return new Parse.Query(Property).get(id, {
                 success: function(model) {
-                  return _this.view = new PublicPropertyView({
+                  _this.view = new PublicPropertyView({
                     params: {},
                     model: model,
                     place: place
                   }).render();
+                  if (view) {
+                    return view.clear();
+                  }
                 },
                 error: function(object, error) {
                   return _this.accessDenied();
@@ -375,11 +418,14 @@
           } else {
             return new Parse.Query(Property).get(id, {
               success: function(model) {
-                return _this.view = new PublicPropertyView({
+                _this.view = new PublicPropertyView({
                   params: {},
                   model: model,
                   place: place
                 }).render();
+                if (view) {
+                  return view.clear();
+                }
               },
               error: function(object, error) {
                 return _this.accessDenied();
@@ -401,7 +447,10 @@
               baseUrl: "/inside/listings"
             });
             _this.view.setElement("#main");
-            return _this.view.render();
+            _this.view.render();
+            if (view) {
+              return view.clear();
+            }
           }
         });
       };
@@ -418,7 +467,10 @@
               baseUrl: "/inside/tenants"
             });
             _this.view.setElement("#main");
-            return _this.view.render();
+            _this.view.render();
+            if (view) {
+              return view.clear();
+            }
           }
         });
       };
@@ -435,7 +487,10 @@
               baseUrl: "/inside/tenants"
             });
             _this.view.setElement("#main");
-            return _this.view.render();
+            _this.view.render();
+            if (view) {
+              return view.clear();
+            }
           }
         });
       };
@@ -454,21 +509,27 @@
               id = Parse.User.current().get("profile").id;
             }
             if (Parse.User.current() && Parse.User.current().get("profile") && id === Parse.User.current().get("profile").id) {
-              return _this.view = new ShowProfileView({
+              _this.view = new ShowProfileView({
                 path: vars.path,
                 params: vars.params,
                 model: Parse.User.current().get("profile"),
                 current: true
               });
+              if (view) {
+                return view.clear();
+              }
             } else {
               return (new Parse.Query(Profile)).get(id, {
                 success: function(obj) {
-                  return _this.view = new ShowProfileView({
+                  _this.view = new ShowProfileView({
                     path: vars.path,
                     params: vars.params,
                     model: obj,
                     current: false
                   });
+                  if (view) {
+                    return view.clear();
+                  }
                 }
               });
             }
@@ -479,11 +540,16 @@
       };
 
       DesktopRouter.prototype.accountSetup = function() {
-        var _this = this;
+        var view,
+          _this = this;
 
+        view = this.view;
         if (Parse.User.current()) {
           return require(["views/user/Setup"], function(UserSetupView) {
-            return _this.view = new UserSetupView().render();
+            _this.view = new UserSetupView().render();
+            if (view) {
+              return view.clear();
+            }
           });
         } else {
           return this.signupOrLogin();
@@ -497,10 +563,13 @@
         view = this.view;
         if (splat === 'edit') {
           return require(["views/profile/edit"], function(EditProfileView) {
-            return _this.view = new EditProfileView({
+            _this.view = new EditProfileView({
               model: Parse.User.current().get("profile"),
               current: true
             }).render();
+            if (view) {
+              return view.clear();
+            }
           });
         } else {
           return require(["views/user/Account"], function(UserAccountView) {
@@ -508,7 +577,10 @@
 
             vars = _this.deparamAction(splat);
             if (!view || !(view instanceof UserAccountView)) {
-              return _this.view = new UserAccountView(vars);
+              _this.view = new UserAccountView(vars);
+              if (view) {
+                return view.clear();
+              }
             } else {
               return view.changeSubView(vars.path, vars.params);
             }
@@ -517,11 +589,16 @@
       };
 
       DesktopRouter.prototype.notifications = function() {
-        var _this = this;
+        var view,
+          _this = this;
 
+        view = this.view;
         if (Parse.User.current()) {
           return require(["views/notification/All"], function(AllNotificationsView) {
-            return _this.view = new AllNotificationsView().render();
+            _this.view = new AllNotificationsView().render();
+            if (view) {
+              return view.clear();
+            }
           });
         } else {
           return this.signupOrLogin();
@@ -529,11 +606,16 @@
       };
 
       DesktopRouter.prototype.signup = function() {
-        var _this = this;
+        var view,
+          _this = this;
 
+        view = this.view;
         if (!Parse.User.current()) {
           return require(["views/user/Signup"], function(SignupView) {
-            return _this.view = new SignupView().render();
+            _this.view = new SignupView().render();
+            if (view) {
+              return view.clear();
+            }
           });
         } else {
           Parse.history.navigate("users/" + (Parse.User.current().get("profile").id));
@@ -542,11 +624,16 @@
       };
 
       DesktopRouter.prototype.login = function() {
-        var _this = this;
+        var view,
+          _this = this;
 
+        view = this.view;
         if (!Parse.User.current()) {
           return require(["views/user/Login"], function(LoginView) {
-            return _this.view = new LoginView().render();
+            _this.view = new LoginView().render();
+            if (view) {
+              return view.clear();
+            }
           });
         } else {
           Parse.history.navigate("users/" + (Parse.User.current().get("profile").id));
@@ -555,14 +642,22 @@
       };
 
       DesktopRouter.prototype.resetPassword = function() {
-        var _this = this;
+        var view,
+          _this = this;
 
+        view = this.view;
         return require(["views/user/Reset"], function(ResetView) {
-          return _this.view = new ResetView().render();
+          _this.view = new ResetView().render();
+          if (view) {
+            return view.clear();
+          }
         });
       };
 
       DesktopRouter.prototype.logout = function() {
+        var view;
+
+        view = this.view;
         if (Parse.User.current()) {
           Parse.User.logOut();
           Parse.Dispatcher.trigger("user:change");

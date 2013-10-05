@@ -623,7 +623,6 @@
   ListView.prototype.cleanup = function() {
     var pages = this.pages,
         page;
-    console.error("cleanup");
     DOMEvent.detach(this);
     while(page = pages.pop()) {
       page.cleanup();

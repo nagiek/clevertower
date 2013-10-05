@@ -32,9 +32,9 @@ define [
       @model.prep('inquiries')
       
       @listenTo @model, 'change:image_profile', @refresh
-      @listenTo @model, 'destroy', @clear
+      @listenTo @model, 'destroy', @run
 
-      @listenTo Parse.Dispatcher, 'user:logout', @clear
+      @listenTo Parse.Dispatcher, 'user:logout', @run
 
       @baseUrl = if @model.get("network") then "/properties/#{@model.id}" else "/inside"
 
@@ -114,8 +114,9 @@ define [
       @undelegateEvents()
       @stopListening()
       @subView.trigger "view:change" if @subView
-      Parse.history.navigate "", true
       delete this
+
+    run: => Parse.history.navigate "", true
     
     editProfilePicture: ->
       

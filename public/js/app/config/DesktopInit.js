@@ -5,7 +5,7 @@
       jquery: "//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min",
       jqueryui: "libs/jqueryui/jquery-ui-1.10.3.custom.min",
       underscore: "//cdnjs.cloudflare.com/ajax/libs/lodash.js/1.0.1/lodash.min",
-      backbone: "libs/parse/parse-1.2.8",
+      backbone: "libs/parse/parse-1.2.11",
       facebook: "//connect.facebook.net/en_US/all",
       jqueryuiwidget: "libs/jqueryui/jquery.ui.widget.min",
       jquerymobile: "//cdnjs.cloudflare.com/ajax/libs/jquery-mobile/1.2.0/jquery.mobile.min",
@@ -288,14 +288,14 @@
 
       network = this.get("network");
       network.prep("properties").fetch();
-      network.prep("units").fetch();
-      network.prep("activity").fetch();
-      network.prep("comments").fetch();
-      network.prep("managers").fetch();
-      network.prep("tenants").fetch();
-      network.prep("listings").fetch();
-      network.prep("applicants").fetch();
-      network.prep("inquiries").fetch();
+      network.prep("activity");
+      network.prep("comments");
+      network.prep("units");
+      network.prep("managers");
+      network.prep("tenants");
+      network.prep("listings");
+      network.prep("applicants");
+      network.prep("inquiries");
       role = network.get("role");
       return role.getUsers().query().equalTo("objectId", Parse.User.current().id).first().then(function(user) {
         network.mgr = true;

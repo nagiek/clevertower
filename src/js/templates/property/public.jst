@@ -4,16 +4,27 @@
       <div id="cover-photo" class="photo">
         <img class="img-responsive" src="<%= cover %>" alt="<%= i18nCommon.nouns.cover_photo %>">
       </div>
+    </div>
 
+    <div class="col-md-4 right-lg">
+      <div id="map-container">
+        <div id="mapCanvas"></div>
+      </div>
+    </div>
+
+    <div class="col-md-8">
       <header class="clearfix">
-        <hgroup class="left-lg">
+        <hgroup class="left-sm left-md left-lg">
           <h1 class="inline"><%= property.title %></h1><span class="h2">, </span>
           <h4 class="inline"><a href="/outside/<%= place %>"><%= property.locality %></a></h4>
         </hgroup>
-        <ul class="right-lg actions list-unstyled">
+        <ul class="right-sm right-md right-lg actions list-unstyled">
           <li class="center"><button id="new-lease" class="btn btn-default"><%= i18nGroup.tenant.do_you_live_here %></button></li>
         </ul>
       </header>
+    </div>
+
+    <div class="col-md-8">
 
       <ul class="nav nav-tabs">
         <li class="active col-md-offset-2"><a href="#activity" id="activity-link"><%= i18nCommon.nouns.public_activity %></a></li>
@@ -73,10 +84,7 @@
       </div>
 
     </div>
-    <div class="col-md-4">
-
-      <div id="mapCanvas"></div>
-
+    <div class="col-md-4 col-md-push-8">
 
       <% if (property.property_type) { %>
         <%= i18nProperty.fields.property_type.label %>

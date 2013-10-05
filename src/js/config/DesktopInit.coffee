@@ -15,8 +15,8 @@ require.config
     jqueryui:                 "libs/jqueryui/jquery-ui-1.10.3.custom.min",                  # includes core, widget, slider, datepicker
     # underscore:               "//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min"
     underscore:               "//cdnjs.cloudflare.com/ajax/libs/lodash.js/1.0.1/lodash.min" # "libs/underscore/lodash"
-    # backbone:                 "//www.parsecdn.com/js/parse-1.2.9"
-    backbone:                 "libs/parse/parse-1.2.8"
+    # backbone:                 "//www.parsecdn.com/js/parse-1.2.11"
+    backbone:                 "libs/parse/parse-1.2.11"
                               
     # Async Libraries         
     # ---------------         
@@ -245,12 +245,18 @@ require [
   _.extend Parse.View.prototype, listenEvents
   _.extend Parse.Object.prototype, listenEvents
 
+  # View
+  # -------
+
   # Remove this view by taking the element out of the DOM, and removing any
   # applicable Backbone.Events listeners.
   Parse.View::remove = ->
     @$el.remove()
     @stopListening()
     @
+
+  # Collection
+  # -------
 
   # Add missing countBy method.
   Parse.Collection::countBy = -> _.countBy.apply _, [this.models].concat(_.toArray(arguments))
@@ -383,14 +389,14 @@ require [
     # Create & fill our collections
     # Can't use a Promise here, as fetch does not return a promise.
     network.prep("properties").fetch()
-    network.prep("units").fetch()
-    network.prep("activity").fetch()
-    network.prep("comments").fetch()
-    network.prep("managers").fetch()
-    network.prep("tenants").fetch()
-    network.prep("listings").fetch()
-    network.prep("applicants").fetch()
-    network.prep("inquiries").fetch()
+    network.prep("activity") # .fetch()
+    network.prep("comments") # .fetch()
+    network.prep("units") # .fetch()
+    network.prep("managers") # .fetch()
+    network.prep("tenants") # .fetch()
+    network.prep("listings") # .fetch()
+    network.prep("applicants") # .fetch()
+    network.prep("inquiries") # .fetch()
 
     # Set the network and the role on the user.
     role = network.get("role")

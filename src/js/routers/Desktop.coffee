@@ -11,8 +11,8 @@ define [
       ""                            : "index"
       "places/:country/:region/:city/:id/:slug" : "propertiesPublic"
       "posts/:id"                   : "activityShow"
-      "outside/*splat"              : "search"
-      "outside*splat"               : "search"
+      "outside/*splat"              : "outside"
+      "outside*splat"               : "outside"
       # "inside"                      : "propertiesManage"
       # "inside/*splat"               : "propertiesManage"
       "network/new"                 : "networkNew"
@@ -71,19 +71,9 @@ define [
         # The route functions themselves are responsible for altering content.
         Parse.history.loadUrl location.pathname
       
-      
-      # Clean up after views
-      @listenTo Parse.history, "route", (route) =>
 
-        Parse.App.search.$('input').val("").blur()
-        if @view
-          if @oldCID and @oldCID isnt @view.cid
-            @oldCID = @view.cid
-            @view.trigger "view:change"
-            # @view.undelegateEvents()
-            # @view.stopListening()
-            # delete @view
-  
+      # Reset global view state.
+      @listenTo Parse.history, "route", (router, route, params) => Parse.App.search.$('input').val("").blur() 
       
       # Use delegation to avoid initial DOM selection and allow all matching elements to bubble
       $(document).on "click", "a", (e) ->
@@ -105,18 +95,21 @@ define [
       if Parse.User.current()
         require ["views/activity/index"], (ActivityIndexView) =>
           if !view or view !instanceof ActivityIndexView
-            @view = new ActivityIndexView(params: {}).render()  
+            @view = new ActivityIndexView(params: {}).render()
+            view.clear() if view
       else 
         require ["views/home/anon"], (AnonHomeView) =>
           if !view or view !instanceof AnonHomeView
             @view = new AnonHomeView(params: {}).render()
+            view.clear() if view
 
-    search: (splat) ->
+    outside: (splat) ->
       view = @view
       require ["views/activity/index"], (ActivityIndexView) =>
         if !view or view !instanceof ActivityIndexView
           vars = @deparamAction splat
           @view = new ActivityIndexView(location: vars.path, params: vars.params).render()
+          view.clear() if view
 
     # 
     # 
@@ -128,11 +121,13 @@ define [
         model = Parse.App.activity.get id
         if model 
           @view = new ActivityShowView(model: model).render()
+          view.clear() if view
         else
           new Parse.Query("Activity").get id,
             success: (model) =>
               Parse.App.activity.add model
               @view = new ActivityShowView(model: model).render()
+              view.clear() if view
             error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
 
     # Network
@@ -143,6 +138,7 @@ define [
         @view = new NewNetworkView()
         @view.setElement "#main"
         @view.render()
+        view.clear() if view
 
     insideManage: (splat) =>
       view = @view
@@ -153,6 +149,7 @@ define [
             if !view or view !instanceof NetworkView
               vars.model = Parse.User.current().get("network")
               @view = new NetworkView(vars)
+              view.clear() if view
             else
               view.changeSubView(vars.path, vars.params)
         else if Parse.User.current().get("property")
@@ -170,6 +167,7 @@ define [
                       if !view or view !instanceof LeaseView
                         vars.model = Parse.User.current().get("lease")
                         @view = new LeaseView(vars)
+                        view.clear() if view
                       else
                         view.changeSubView(vars.path, vars.params)
                 error: (error) =>
@@ -191,6 +189,7 @@ define [
                 if !view or view !instanceof LeaseView
                   vars.model = Parse.User.current().get("lease")
                   @view = new LeaseView(vars)
+                  view.clear() if view
                 else
                   view.changeSubView(vars.path, vars.params)
         else 
@@ -215,6 +214,7 @@ define [
           @view = new PropertyWizard forNetwork: false
           @view.setElement "#main"
           @view.render()
+          view.clear() if view
 
     propertiesNew: =>
       view = @view
@@ -223,6 +223,7 @@ define [
           @view = new PropertyWizard forNetwork: true
           @view.setElement "#main"
           @view.render()
+          view.clear() if view
 
     # DIFFERENT FROM NETWORK
     # FOR USER
@@ -243,6 +244,7 @@ define [
             if model
               vars.model = model
               @view = new PropertyView(vars)
+              view.clear() if view
             else
               new Parse.Query("Property").get id,
               success: (model) =>
@@ -252,6 +254,7 @@ define [
                 model.collection = Parse.User.current().get("network").properties
                 vars.model = model
                 @view = new PropertyView(vars)
+                view.clear() if view
               error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
           else
             view.changeSubView(vars.path, vars.params)
@@ -261,23 +264,28 @@ define [
         # @accountSetup()
 
     propertiesPublic: (country, region, city, id, slug) =>
+      view = @view
       place = "#{city}--#{region}--#{country}"
       require ["models/Property", "views/property/Public"], (Property, PublicPropertyView) => 
         if Parse.User.current()
           if Parse.User.current().get("property") and id is Parse.User.current().get("property").id 
             @view = new PublicPropertyView(params: {}, model: Parse.User.current().get("property"), place: place).render()
+            view.clear() if view
           else if Parse.User.current().get("network") and Parse.User.current().get("network").properties.find((p) -> p.id is id)
             model = Parse.User.current().get("network").properties.find((p) -> p.id is id)
             @view = new PublicPropertyView(params: {}, model: model, place: place).render()
+            view.clear() if view
           else
             new Parse.Query(Property).get id,
               success: (model) =>
                 @view = new PublicPropertyView(params: {}, model: model, place: place).render()
+                view.clear() if view
               error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
         else
           new Parse.Query(Property).get id,
             success: (model) =>
               @view = new PublicPropertyView(params: {}, model: model, place: place).render()
+              view.clear() if view
             error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
 
 
@@ -291,6 +299,7 @@ define [
           @view = new NewListingView(forNetwork: true, baseUrl: "/inside/listings")
           @view.setElement "#main"
           @view.render()
+          view.clear() if view
 
     leasesNew: =>
       view = @view
@@ -299,6 +308,7 @@ define [
           @view = new NewLeaseView(forNetwork: true, baseUrl: "/inside/tenants")
           @view.setElement "#main"
           @view.render()
+          view.clear() if view
 
     tenantsNew: =>
       view = @view
@@ -307,6 +317,7 @@ define [
           @view = new NewTenantView(forNetwork: true, baseUrl: "/inside/tenants")
           @view.setElement "#main"
           @view.render()
+          view.clear() if view
 
 
     # User
@@ -322,17 +333,21 @@ define [
 
           if Parse.User.current() and Parse.User.current().get("profile") and id is Parse.User.current().get("profile").id
             @view = new ShowProfileView path: vars.path, params: vars.params, model: Parse.User.current().get("profile"), current: true
+            view.clear() if view
           else
             (new Parse.Query(Profile)).get id,
             success: (obj) => 
               @view = new ShowProfileView path: vars.path, params: vars.params, model: obj, current: false
+              view.clear() if view
         else
           view.changeSubView vars.path, vars.params
 
     accountSetup : ->
+      view = @view
       if Parse.User.current()
         require ["views/user/Setup"], (UserSetupView) =>              
           @view = new UserSetupView().render()
+          view.clear() if view
       else
         @signupOrLogin()
 
@@ -348,19 +363,23 @@ define [
       if splat is 'edit'
         require ["views/profile/edit"], (EditProfileView) =>
           @view = new EditProfileView(model: Parse.User.current().get("profile"), current: true).render()
+          view.clear() if view
       else
         require ["views/user/Account"], (UserAccountView) =>
           vars = @deparamAction splat
 
           if !view or view !instanceof UserAccountView
             @view = new UserAccountView vars
+            view.clear() if view
           else
             view.changeSubView vars.path, vars.params
   
     notifications : ->
+      view = @view
       if Parse.User.current()
         require ["views/notification/All"], (AllNotificationsView) =>
           @view = new AllNotificationsView().render()
+          view.clear() if view
       else
         @signupOrLogin()
 
@@ -369,26 +388,33 @@ define [
     # --------------
 
     signup : ->
+      view = @view
       unless Parse.User.current()
         require ["views/user/Signup"], (SignupView) =>
           @view = new SignupView().render()
+          view.clear() if view
       else
         Parse.history.navigate "users/#{Parse.User.current().get("profile").id}"
         @profileShow()
 
     login : ->
+      view = @view
       unless Parse.User.current()
         require ["views/user/Login"], (LoginView) =>
           @view = new LoginView().render()
+          view.clear() if view
       else
         Parse.history.navigate "users/#{Parse.User.current().get("profile").id}"
         @profileShow()
 
     resetPassword : ->
+      view = @view
       require ["views/user/Reset"], (ResetView) =>
         @view = new ResetView().render()
+        view.clear() if view
 
     logout : ->
+      view = @view
       if Parse.User.current()
         Parse.User.logOut()
         Parse.Dispatcher.trigger "user:change"

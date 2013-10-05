@@ -207,13 +207,14 @@ define [
 
     getUserActivity : ->
       # Add user activity and comments 
-      Parse.Promise.when(
-        Parse.User.current().activity.query.find(),
-        Parse.User.current().comments.query.find()
-      ).then (objs, comms) =>
-        if objs then Parse.User.current().activity.add objs
-        # Reset the comments, to trigger bulk-add behaviour.
-        if comms then Parse.User.current().comments.reset comms
+      if Parse.User.current().activity.length is 0 and Parse.User.current().comments.length is 0
+        Parse.Promise.when(
+          Parse.User.current().activity.query.find(),
+          Parse.User.current().comments.query.find()
+        ).then (objs, comms) =>
+          if objs then Parse.User.current().activity.add objs
+          # Reset the comments, to trigger bulk-add behaviour.
+          if comms then Parse.User.current().comments.reset comms
 
     resetUserActivity : =>
 
@@ -500,6 +501,11 @@ define [
         @checkIfEnd() if @activityCount and @userActivityCount
 
 
+      # Save the hassle of updatePaginiation on the first go-round.
+      # We can infer whether we need it the second time around.
+      if @page is 2 then @updatePaginiation()
+      
+
     checkIfEnd : =>
 
         # Check if we have hit the end.
@@ -722,6 +728,9 @@ define [
       , 250
 
     undelegateEvents : =>
+
+      super
+
       # Break
       # @off "model:viewDetails"
       # @off "dragend"
@@ -734,7 +743,6 @@ define [
       $(document.documentElement).off "resize scroll"
       # google.maps.event.removeListener @dragListener
       # google.maps.event.removeListener @zoomListener
-      super
 
     clear: =>
       @undelegateEvents()

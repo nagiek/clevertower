@@ -26,8 +26,6 @@ define [
 
     events:
       'click .thumbnails a.content'             : 'getModelDataToShowInModal' # 'showModal'
-      "mouseover .thumbnails .activity"         : "highlightMarkerFromCard"
-      "mouseout .thumbnails .activity"          : "unhighlightMarkerFromCard"
       # Activity events
       "click .like-button"                      : "likeOrLogin"
       "click .likers"                           : "getLikers"
@@ -127,7 +125,6 @@ define [
 
       @resetListViews()
       @search()
-      @updatePaginiation()
 
     filterCollections: ->
       # "Specific" filter
@@ -486,8 +483,8 @@ define [
     # --------------------------------------------
 
     undelegateEvents : =>
-      @detachModalEvents() if @modal
       super
+      @detachModalEvents() if @modal
 
     showModal : =>
 

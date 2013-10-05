@@ -4,6 +4,7 @@ define [
   "backbone"
   'infinity'
   'moment'
+  "collections/ActivityList"
   "views/activity/List"
   "views/activity/BaseIndex"
   "views/photo/Public"
@@ -17,7 +18,7 @@ define [
   'templates/activity/modal'
   'templates/comment/summary'
   "gmaps"
-], ($, _, Parse, infinity, moment, ActivityView, BaseIndexActivityView, PhotoView, ListingView, i18nProperty, i18nListing, i18nUnit, i18nGroup, i18nCommon) ->
+], ($, _, Parse, infinity, moment, ActivityList, ActivityView, BaseIndexActivityView, PhotoView, ListingView, i18nProperty, i18nListing, i18nUnit, i18nGroup, i18nCommon) ->
 
   class PublicPropertyView extends BaseIndexActivityView
 
@@ -45,11 +46,15 @@ define [
       @model.prep "photos"
       @model.prep "listings"
 
-      @listenTo @model.activity, "add", @addOneActivity
-      @listenTo @model.activity, "reset", @addAllActivity
+      if Parse.App.activity and Parse.App.comments
+        @model.activity.add Parse.App.activity.select((a) => a.get("property") and a.get("property").id is @model.id)
+        @model.comments.add Parse.App.comments.select((c) => c.get("property") and c.get("property").id is @model.id)
 
-      @listenTo @model.comments, "add", @addOneComment
-      @listenTo @model.comments, "reset", @addAllComments
+      # @listenTo @model.activity, "add", @addOneActivity
+      # @listenTo @model.activity, "reset", @addAllActivity
+
+      # @listenTo @model.comments, "add", @addOneComment
+      # @listenTo @model.comments, "reset", @addAllComments
 
       @listenTo @model.photos, "add", @addOnePhoto
       @listenTo @model.photos, "reset", @addAllPhotos
@@ -133,10 +138,9 @@ define [
       
       # Start activity search.
       if @model.activity.length > @resultsPerPage * (@page - 1) and @model.comments.length > @commentsPerPage * (@page - 1)
-        @addAllActivity()
+        @addAllActivity @model.activity
         @addAllComments @model.comments
       else @search()
-      @updatePaginiation()
 
       if @model.photos.length > 0 then @addAllPhotos() else @model.photos.fetch()
       if @model.listings.length > 0 then @addAllListings() else @model.listings.fetch()
@@ -167,12 +171,6 @@ define [
       ids = _.map(@modalCollection, (a) -> a.id)
       @modalIndex = _.indexOf(ids, model.id)
 
-      console.log model.id
-      console.log ids
-      console.log data.index
-      console.log @modalIndex
-      console.log @modalCollection
-
       @showModal()
 
     getCommentDataToPost: (e) =>
@@ -201,17 +199,28 @@ define [
         @model.comments.query.skip(@commentsPerPage * (@page - 1)).limit(@commentsPerPage).find()
       ).then (objs, comms) =>
         if objs
-          # Set the property, as we have not included it.
-          _.each objs, (o) => o.set "property", @model
+
+          # Set the property, as we may have not included it for property-specific queries.
+          if objs[0] and not objs[0].get "property"
+            _.each objs, (o) => o.set "property", @model
+
           @model.activity.add objs
+
+          # We may be getting non-related models at this point.
+          @addAllActivity objs
         if comms 
           _.each comms, (c) => c.set "property", @model
           @model.comments.add comms
-        @addAllComments comms
+
+          @addAllComments comms
           # if objs.length < @resultsPerPage then @trigger "view:exhausted"
         # @refreshDisplay()
 
         @checkIfEnd() if @activityCount
+
+      # Save the hassle of updatePaginiation on the first go-round.
+      # We can infer whether we need it the second time around.
+      if @page is 2 then @updatePaginiation()
 
     checkIfEnd : =>
 
@@ -243,7 +252,13 @@ define [
 
     addAllActivity: (collection, filter) =>
 
-      visible = @modalCollection = @model.activity.select (a) => a.get("property") and a.get("property").id is @model.id
+      visible = @modalCollection = if collection instanceof ActivityList
+        collection.select (a) =>
+          a.get("property") and a.get("property").id is @model.id
+      else 
+        _.select collection, (a) =>
+          a.get("property") and a.get("property").id is @model.id
+
       if visible.length > 0 then _.each visible, @addOneActivity
       else @$loading.html '<div class="empty">' + i18nProperty.tenant_empty.activity + '</div>'
 
