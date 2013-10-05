@@ -1,11 +1,12 @@
 define [
   'underscore'
   'backbone'
-  'collections/ActivityList'
   'collections/CommentList'
+  # Cannot depend on ActivityList w/o creating dependency loop.
+  # 'collections/ActivityList'
   'collections/ApplicantList'
   'collections/TenantList'
-], (_, Parse, ActivityList, CommentList, ApplicantList, TenantList) ->
+], (_, Parse, CommentList, ApplicantList, TenantList) ->
 
   Profile = Parse.Object.extend "Profile",
     
@@ -63,7 +64,7 @@ define [
       @[collectionName] = switch collectionName
         when "applicants"   then new ApplicantList [], profile: @
         when "comments"     then new CommentList [], profile: @
-        when "activity"     then new ActivityList [], profile: @
+        # when "activity"     then new ActivityList [], profile: @
         when "tenants"      then new TenantList [], profile: @
       @[collectionName]
 
