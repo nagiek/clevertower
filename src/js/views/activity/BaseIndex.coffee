@@ -105,19 +105,6 @@ define [
       # Clean up old stuff
       _.each @listViews, (lv) -> lv.reset()
 
-    changeFilter: (e) ->
-      e.preventDefault()
-      
-      btn = @$(e.currentTarget)
-      filter = btn.data "filter"
-      return if filter is @filter
-      @filter = filter
-      @specificSearchControls.clear() if @specificSearchControls
-
-      if @filter then @filterCollections() else @resetFilters()
-
-      @redoSearch()
-
     redoSearch : =>
 
       @chunk = 1
@@ -356,15 +343,6 @@ define [
         $("#people-modal .modal-body ul").append """
           <li>Be the first one to like this</li>
         """
-
-    checkIfLiked: (activity) =>
-      data = activity.data()
-
-      model = if data.collection is "user"
-        Parse.User.current().activity.at(data.index)
-      else Parse.App.activity.at(data.index)
-
-      @markAsLiked(activity) if Parse.User.current().get("profile").likes.find (l) => l.id is model.id
 
     # Used just for display, not the action.
     markAsLiked: (activity) =>

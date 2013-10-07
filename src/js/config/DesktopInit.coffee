@@ -265,6 +265,7 @@ require [
   # ---------
 
   Parse.initialize window.APPID, window.JSKEY
+
   Parse.App = {}
 
   Parse.App.featuredListings = new FeaturedListingList 

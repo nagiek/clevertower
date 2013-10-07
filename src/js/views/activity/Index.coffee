@@ -26,7 +26,7 @@ define [
     el: "#main"
 
     events:
-      'click #filters > button'                 : 'changeFilter'
+      'change #filters input'                   : 'changeFilter'
       'click #search-map'                       : 'searchMap'
       # 'click .pagination > ul > li > a'       : 'changePage'
       'click .thumbnails a.content'             : 'getModelDataToShowInModal'
@@ -119,6 +119,19 @@ define [
       Parse.App.comments.reset()
       @resetUserActivity() if Parse.User.current()
       # @$list.find('> li.empty').remove()
+
+    changeFilter: (e) ->
+      e.preventDefault()
+      
+      filter = e.currentTarget.id
+      if filter is "all" then filter = ""
+      return if filter is @filter
+      @filter = filter
+      @specificSearchControls.clear() if @specificSearchControls
+
+      if @filter then @filterCollections() else @resetFilters()
+
+      @redoSearch()
 
     filterCollections: ->
       # "Specific" filter
@@ -492,7 +505,13 @@ define [
         Parse.App.activity.query.skip(@resultsPerPage * (@page - 1)).limit(@resultsPerPage).find(),
         Parse.App.comments.query.skip(@commentsPerPage * (@page - 1)).limit(@commentsPerPage).find()
       ).then (objs, comms) =>
-        if objs then Parse.App.activity.add objs
+
+        if objs
+          Parse.App.activity.add objs
+          if objs.length < @resultsPerPage then @trigger "view:exhausted"
+        else 
+          @trigger if Parse.App.activity.length > 0 then "view:exhausted" else "view:empty"
+          
         if comms then Parse.App.comments.add comms
         @addAllComments comms
           # if objs.length < @resultsPerPage then @trigger "view:exhausted"

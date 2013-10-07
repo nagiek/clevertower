@@ -8,18 +8,19 @@
       </div>
       <form id="activity-filter-form">
         <div id="general-controls" class="form-group center clearfix">
-          <div id="filters" class="btn-group btn-group-justified" data-toggle="buttons-radio">
-            <a href="#" class="btn btn-default active"><%= i18nCommon.adjectives.all %></a>
-
-            <a data-filter="new_listing" href="#" class="btn btn-default" rel="tooltip" data-container="body" title="<%= i18nCommon.classes.Listing %>">
-              <span class="glyphicon glyphicon-certificate glyphicon-listing"></span>
-            </a>
-            <a data-filter="new_property" href="#" class="btn btn-default" rel="tooltip" data-container="body" title="<%= i18nCommon.nouns.building %>">
-              <span class="glyphicon glyphicon-home glyphicon-building"></span>
-            </a>
-            <a data-filter="new_post" href="#" class="btn btn-default" rel="tooltip" data-container="body" title="<%= i18nCommon.classes.Posts %>">
-              <span class="glyphicon glyphicon-comment"></span>
-            </a>
+          <div id="filters" class="btn-group btn-group-justified" data-toggle="buttons">
+            <label class="btn btn-default active">
+              <input type="radio" name="filters" id="all" checked="checked"> <%= i18nCommon.adjectives.all %>
+            </label>
+            <label class="btn btn-default" rel="tooltip" data-container="body" title="<%= i18nCommon.classes.Listing %>">
+              <input type="radio" name="filters" id="new_listing"> <span class="glyphicon glyphicon-certificate glyphicon-listing"></span>
+            </label>
+            <label class="btn btn-default" rel="tooltip" data-container="body" title="<%= i18nCommon.nouns.building %>">
+              <input type="radio" name="filters" id="new_property"> <span class="glyphicon glyphicon-home glyphicon-building"></span>
+            </label>
+            <label class="btn btn-default" rel="tooltip" data-container="body" title="<%= i18nCommon.classes.Posts %>">
+              <input type="radio" name="filters" id="new_post"> <span class="glyphicon glyphicon-comment"></span>
+            </label>
           </div>
         </div>
         <div id="specific-controls" class="form-horizontal"></div>

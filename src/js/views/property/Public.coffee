@@ -46,10 +46,6 @@ define [
       @model.prep "photos"
       @model.prep "listings"
 
-      if Parse.App.activity and Parse.App.comments
-        @model.activity.add Parse.App.activity.select((a) => a.get("property") and a.get("property").id is @model.id)
-        @model.comments.add Parse.App.comments.select((c) => c.get("property") and c.get("property").id is @model.id)
-
       # @listenTo @model.activity, "add", @addOneActivity
       # @listenTo @model.activity, "reset", @addAllActivity
 
@@ -62,6 +58,15 @@ define [
       @model.listings.title = @model.get "title"
       @listenTo @model.listings, "add", @addOneListing
       @listenTo @model.listings, "reset", @addAllListings
+
+      if Parse.App.activity and Parse.App.comments
+        activity = Parse.App.activity.select((a) => a.get("property") and a.get("property").id is @model.id)
+        @model.activity.add activity
+        @model.activity.query.notContainedIn "objectId", _.map(activity, (a) -> a.id)
+
+        comments = Parse.App.comments.select((c) => c.get("property") and c.get("property").id is @model.id)
+        @model.comments.add comments
+        @model.comments.query.notContainedIn "objectId", _.map(comments, (c) -> c.id)
 
     showTab : (e) ->
       e.preventDefault()
@@ -136,11 +141,10 @@ define [
       @$photos = @$("#photos ul")
       @$listings = @$("#listings > table > tbody")
       
-      # Start activity search.
-      if @model.activity.length > @resultsPerPage * (@page - 1) and @model.comments.length > @commentsPerPage * (@page - 1)
-        @addAllActivity @model.activity
-        @addAllComments @model.comments
-      else @search()
+      # Start activity search.      
+      @addAllActivity @model.activity
+      @addAllComments @model.comments
+      @search() unless @model.activity.length > @resultsPerPage * @page
 
       if @model.photos.length > 0 then @addAllPhotos() else @model.photos.fetch()
       if @model.listings.length > 0 then @addAllListings() else @model.listings.fetch()
@@ -198,6 +202,7 @@ define [
         @model.activity.query.skip(@resultsPerPage * (@page - 1)).limit(@resultsPerPage).find(),
         @model.comments.query.skip(@commentsPerPage * (@page - 1)).limit(@commentsPerPage).find()
       ).then (objs, comms) =>
+
         if objs
 
           # Set the property, as we may have not included it for property-specific queries.
@@ -208,6 +213,11 @@ define [
 
           # We may be getting non-related models at this point.
           @addAllActivity objs
+          
+          if objs.length < @resultsPerPage then @trigger "view:exhausted"
+        else 
+          @trigger if @model.activity.length > 0 then "view:exhausted" else "view:empty"
+
         if comms 
           _.each comms, (c) => c.set "property", @model
           @model.comments.add comms

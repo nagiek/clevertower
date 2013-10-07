@@ -11,7 +11,7 @@ define [
 
   class ListingSearchView extends Parse.View
   
-    el: "#specific-controls"
+    el: "#specific-controls.form-group"
     
     initialize : (attrs) ->
 
