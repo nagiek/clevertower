@@ -2,15 +2,14 @@ define [
   "jquery"
   "underscore"
   "backbone"
-  "infinity"
+  'infinity'
   "collections/ActivityList"
   "views/activity/list"
   "views/activity/BaseIndex"
-  "i18n!nls/property"
   "i18n!nls/user"
   "i18n!nls/common"
   'templates/profile/show'
-], ($, _, Parse, infinity, ActivityList, ActivityView, BaseIndexActivityView, i18nProperty, i18nUser, i18nCommon) ->
+], ($, _, Parse, infinity, ActivityList, ActivityView, BaseIndexActivityView, i18nUser, i18nCommon) ->
 
   class ProfileLikesView extends BaseIndexActivityView
   
@@ -32,7 +31,8 @@ define [
       @modal = false
 
     render: ->
-      @listViews[0] = new infinity.ListView @$('#activity .list-view'), 
+
+      @listViews[0] = new infinity.ListView @$('.list-view'), 
         lazy: ->
           pageId = Number $(this).attr(infinity.PAGE_ID_ATTRIBUTE)
           page = infinity.PageRegistry.lookup pageId
@@ -44,7 +44,7 @@ define [
             if data.profile then item.$el.find("footer img.profile-pic").prop 'src', data.profile
             item.loaded = true
 
-      @$loading = @$("#activity .loading")
+      @$loading = @$(".loading")
 
       # Start activity search.      
       @addAllActivity @model.likes
@@ -66,7 +66,7 @@ define [
       # Convert the index to an array and find the "new" index.
        
       # This is using the cached results done in addAllActivity
-      # @modalCollection = @model.likes.select (a) => a.get("property") and a.get("property").id is @model.id
+      # @modalCollection = @model.likes.select (a) => a.get("profile") and a.get("profile").id is @model.id
       model = @model.likes.at data.index
 
       ids = _.map(@modalCollection, (a) -> a.id)
@@ -80,7 +80,7 @@ define [
       return unless Parse.User.current()
 
       button = @$(e.currentTarget)
-      activity = button.closest(".activity")
+      activity = button.closest(".likes")
       data = activity.data()
       model = @model.likes.at(data.index)
 
@@ -100,21 +100,22 @@ define [
       ).then (objs, comms) =>
 
         if objs
-          if objs.length < @resultsPerPage then @trigger "view:exhausted"
 
-          # Set the property, as we may have not included it for property-specific queries.
-          if objs[0] and not objs[0].get "property"
-            _.each objs, (o) => o.set "property", @model
+          # Set the profile, as we may have not included it for profile-specific queries.
+          if objs[0] and not objs[0].get "profile"
+            _.each objs, (o) => o.set "profile", @model
 
           @model.likes.add objs
 
           # We may be getting non-related models at this point.
           @addAllActivity objs
+
+          if objs.length < @resultsPerPage then @trigger "view:exhausted"
         else 
           @trigger if @model.likes.length > 0 then "view:exhausted" else "view:empty"
 
         if comms 
-          _.each comms, (c) => c.set "property", @model
+          _.each comms, (c) => c.set "profile", @model
           @model.comments.add comms
 
           @addAllComments comms
@@ -135,6 +136,13 @@ define [
     # addOneActivity : (activity) =>
     #   view = new ActivityView(model: activity, onProfile: false)
     #   @$activity.append view.render().el
+
+    checkIfLiked: (activity) =>
+      data = activity.data()
+
+      model = @model.likes.at(data.index)
+
+      @markAsLiked(activity) if Parse.User.current().get("profile").likes.find (l) => l.id is model.id
 
     updatePaginiation : =>
       countQuery = @model.likes.query
@@ -159,13 +167,13 @@ define [
 
       visible = @modalCollection = if collection instanceof ActivityList
         collection.select (a) =>
-          a.get("property") and a.get("property").id is @model.id
+          a.get("profile") and a.get("profile").id is @model.id
       else 
         _.select collection, (a) =>
-          a.get("property") and a.get("property").id is @model.id
+          a.get("profile") and a.get("profile").id is @model.id
 
       if visible.length > 0 then _.each visible, @addOneActivity
-      else @$loading.html '<div class="empty">' + i18nProperty.tenant_empty.activity + '</div>'
+      else @$loading.html '<div class="empty">' + if @current then i18nUser.empty.activities.self else i18nUser.empty.activities.other(@model.name()) + '</div>'
 
       
 
@@ -192,27 +200,4 @@ define [
 
     #   else 
     #     text = if @current then i18nUser.empty.activities.self else i18nUser.empty.activities.other @model.get("first_name") || @model.name()
-    #     @$list.html '<li class="empty">' + text + '</li>'
-    
-    # render: ->      
-
-    #   if @model.likes.length > 0 then @addAll() else @model.likes.fetch()
-    #   @
-      
-    # # Activity
-    # # ---------
-    # addOne : (a) =>
-    #   view = new ActivityView
-    #     model: a
-    #     liked: @current or (Parse.User.current() and Parse.User.current().get("profile").likes.contains a)
-    #     currentProfile: @current
-    #   @$list.append view.render().el
-
-    # addAll : =>
-    #   @$list.html ""
-
-    #   unless @model.likes.length is 0
-    #     @model.likes.each @addOne
-    #   else 
-    #     text = if @current then i18nUser.empty.likes.self else i18nUser.empty.likes.other @model.get("first_name") || @model.name()
     #     @$list.html '<li class="empty">' + text + '</li>'

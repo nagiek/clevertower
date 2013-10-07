@@ -105,14 +105,10 @@ define [
           if objs[0] and not objs[0].get "profile"
             _.each objs, (o) => o.set "profile", @model
 
-          console.log objs
-
           @model.activity.add objs
 
           # We may be getting non-related models at this point.
           @addAllActivity objs
-
-          console.log @model.activity
 
           if objs.length < @resultsPerPage then @trigger "view:exhausted"
         else 
