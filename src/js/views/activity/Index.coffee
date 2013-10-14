@@ -6,6 +6,7 @@ define [
   "moment"
   'collections/ActivityList'
   'collections/CommentList'
+  'models/Activity'
   "models/Comment"
   "views/listing/Search"
   "views/activity/New"
@@ -19,7 +20,7 @@ define [
   # 'masonry'
   # 'jqueryui'
   "gmaps"
-], ($, _, Parse, infinity, moment, ActivityList, CommentList, Comment, ListingSearchView, NewActivityView, BaseIndexActivityView, i18nListing, i18nCommon) ->
+], ($, _, Parse, infinity, moment, ActivityList, CommentList, Activity, Comment, ListingSearchView, NewActivityView, BaseIndexActivityView, i18nListing, i18nCommon) ->
 
   class ActivityIndexView extends BaseIndexActivityView
   
@@ -45,15 +46,31 @@ define [
 
       super
 
-      @onMap
+      @time = null            # Create a timer to buffer window re-draws.
+      @mapId = "mapCanvas"
+      @onMap = true
+
       @location = attrs.location || ""
-      @locationAppend = if attrs.params.lat and attrs.params.lng then "?lat=#{attrs.params.lat}&lng=#{attrs.params.lng}" else ''
-      @center = new google.maps.LatLng attrs.params.lat, attrs.params.lng if attrs.params.lat and attrs.params.lng
+      if attrs.params.lat and attrs.params.lng 
+        @locationAppend = "?lat=#{attrs.params.lat}&lng=#{attrs.params.lng}"
+        @center = new google.maps.LatLng attrs.params.lat, attrs.params.lng
+
+      # Activity that we find on the map.
+      Parse.App.activity || Parse.App.activity = new ActivityList [], {}
+      Parse.App.comments || Parse.App.comments = new CommentList [], {}
+      
+      # Listen to 
+      @listenTo Parse.App.activity, "reset", @addAllActivity
+      @listenTo Parse.App.activity, "add", @addOneActivity
+
+      # Better off to use addAllComments manually.
+      @listenTo Parse.App.comments, "reset", @addAllComments
 
       # Give the user the chance to contribute
       @listenTo Parse.Dispatcher, "user:login", => 
         # Get the activity in the user properties.
         @prepUserActivity()
+        @createQueries()
 
         # Post view
         @newPostView = new NewActivityView(view: @).render()
@@ -78,193 +95,6 @@ define [
           @renderCity()
         @placesService.getDetails reference: data.reference, @googleSearch
 
-      # Create a timer to buffer window re-draws.
-      @time = null
-
-      @mapId = "mapCanvas"
-
-      # Activity that we find on the map.
-      unless Parse.App.activity
-        Parse.App.activity = new ActivityList [], {}
-        Parse.App.activity.query
-        .include("property")
-        .containedIn("activity_type", ["new_property", "new_listing", "new_post"])
-
-      unless Parse.App.comments
-        Parse.App.comments = new CommentList [], {}
-
-      @listenTo Parse.App.activity, "reset", @addAllActivity
-      @listenTo Parse.App.activity, "add", @addOneActivity
-
-      @listenTo Parse.App.comments, "reset", @addAllComments
-      # @listenTo Parse.App.comments, "add", @addOneComment
-
-    checkIfLiked: (activity) =>
-      data = activity.data()
-
-      model = if data.collection is "user"
-        Parse.User.current().activity.at(data.index)
-      else Parse.App.activity.at(data.index)
-
-      @markAsLiked(activity) if Parse.User.current().get("profile").likes.find (l) => l.id is model.id
-
-    resetListViews: ->
-
-      super
-      @resetAppActivity()
-
-    resetAppActivity: ->
-
-      Parse.App.activity.reset()
-      Parse.App.comments.reset()
-      @resetUserActivity() if Parse.User.current()
-      # @$list.find('> li.empty').remove()
-
-    changeFilter: (e) ->
-      e.preventDefault()
-      
-      filter = e.currentTarget.id
-      if filter is "all" then filter = ""
-      return if filter is @filter
-      @filter = filter
-      @specificSearchControls.clear() if @specificSearchControls
-
-      if @filter then @filterCollections() else @resetFilters()
-
-      @redoSearch()
-
-    filterCollections: ->
-      # "Specific" filter
-      Parse.App.activity.query.containedIn "activity_type", [@filter]
-      Parse.User.current().activity.query.containedIn "activity_type", [@filter] if Parse.User.current()
-
-      switch @filter
-        when "new_listing" then @specificSearchControls = new ListingSearchView(view: @).render()
-
-    resetFilters: ->
-      Parse.App.activity.query.containedIn "activity_type", ["new_listing", "new_post", "new_property"]
-      Parse.User.current().activity.query.containedIn "activity_type", ["new_listing", "new_post", "new_property"] if Parse.User.current()
-
-    prepUserActivity : =>
-      # Get the property from what we've already loaded.
-      Parse.User.current().activity = new ActivityList [], {} unless Parse.User.current().activity
-      Parse.User.current().comments = new CommentList [], {} unless Parse.User.current().comments
-      
-      # @listenTo Parse.User.current().comments, "reset", @addAllComments
-      # @listenTo Parse.User.current().comments, "add", @addOneComment
-
-      @listenTo Parse.User.current().activity, 'reset', @resetUserActivity
-      # @listenTo Parse.User.current().activity, 'add', @addOnePropertyActivity
-
-      if Parse.User.current().get("property")
-        # Activity list for *property*        
-        Parse.User.current().activity.query.equalTo "property", Parse.User.current().get("property")
-        Parse.User.current().comments.query.equalTo "property", Parse.User.current().get("property")
-
-        Parse.App.activity.query.notEqualTo "property", Parse.User.current().get("property")
-        Parse.App.comments.query.notEqualTo "property", Parse.User.current().get("property")
-
-        Parse.User.current().get("property").marker = new google.maps.Marker
-            position:   Parse.User.current().get("property").GPoint()
-            map:        @map
-            items:      []
-            icon: 
-              url: "/img/icon/pins-sprite.png"
-              size: new google.maps.Size(25, 32, "px", "px")
-              origin: new google.maps.Point(50, 0)
-              anchor: null
-              scaledSize: null
-            ZIndex:     100
-            url:        Parse.User.current().get("property").publicUrl()
-            highlightCard: @highlightCard
-            highlightMarker: @highlightMarker
-            unhighlightCard: @unhighlightCard
-            unhighlightMarker: @unhighlightMarker
-
-          Parse.User.current().get("property").highlightListener = google.maps.event.addListener Parse.User.current().get("property").marker, "mouseover", @highlightCardsFromPropertyMarker
-          Parse.User.current().get("property").unhighlightListener = google.maps.event.addListener Parse.User.current().get("property").marker, "mouseout", @unhhighlightCardsFromPropertyMarker
-          Parse.User.current().get("property").clickListener = google.maps.event.addListener Parse.User.current().get("property").marker, "click", @goToPropertyFromPropertyMarker
-
-      else if Parse.User.current().get("network")
-
-        # Activity list for *network*
-        Parse.User.current().activity.query.equalTo "network", Parse.User.current().get("network")
-        Parse.User.current().comments.query.equalTo "network", Parse.User.current().get("network")
-
-        Parse.App.activity.query.notEqualTo "network", Parse.User.current().get("network")
-        Parse.App.comments.query.notEqualTo "network", Parse.User.current().get("network")
-
-        Parse.User.current().get("network").properties.each (p) =>
-            p.marker = new google.maps.Marker
-              position:   p.GPoint()
-              map:        @map
-              ZIndex:     100
-              url:        p.publicUrl()
-              items:      []
-              highlightCard: @highlightCard
-              highlightMarker: @highlightMarker
-              unhighlightCard: @unhighlightCard
-              unhighlightMarker: @unhighlightMarker
-              icon: 
-                url: "/img/icon/pins-sprite.png"
-                size: new google.maps.Size(25, 32, "px", "px")
-                origin: new google.maps.Point(50, p.pos() * 32)
-                anchor: null
-                scaledSize: null
-
-            p.highlightListener = google.maps.event.addListener p.marker, "mouseover", @highlightCardsFromPropertyMarker
-            p.unhighlightListener = google.maps.event.addListener p.marker, "mouseout", @unhighlightCardsFromPropertyMarker
-            p.clickListener = google.maps.event.addListener p.marker, "click", @goToPropertyFromPropertyMarker
-
-      @hideAllProperties()
-
-    getUserActivity : ->
-      # Add user activity and comments 
-      if Parse.User.current().activity.length is 0 and Parse.User.current().comments.length is 0
-        Parse.Promise.when(
-          Parse.User.current().activity.query.find(),
-          Parse.User.current().comments.query.find()
-        ).then (objs, comms) =>
-          if objs then Parse.User.current().activity.add objs
-          # Reset the comments, to trigger bulk-add behaviour.
-          if comms then Parse.User.current().comments.reset comms
-
-    resetUserActivity : =>
-
-      @hideAllProperties()
-
-      # Handle User Activity
-      if Parse.User.current()
-        # Check if activity is visible or not.
-        if Parse.User.current().get("property") 
-          p = Parse.User.current().get("property") 
-          if @withinBounds p.get("center") then @showProperty p else @hideProperty p
-        else if Parse.User.current().get("network")
-          Parse.User.current().get("network").properties.each (p) => 
-            if @withinBounds p.get("center") then @showProperty p else @hideProperty p
-        Parse.User.current().activity.each @addOnePropertyActivity
-        @addAllComments Parse.User.current().comments
-
-
-
-    getPersonalizedMapCenter : =>
-      if Parse.User.current()
-        if Parse.User.current().get("property")
-          @center = Parse.User.current().get("property").GPoint()
-          @radius = 50000
-
-        else if Parse.User.current().get("network")
-          Parse.User.current().get("network").properties.getSetting()
-          @center = Parse.User.current().get("network").properties.GPoint()
-          @radius = Parse.User.current().get("network").properties.radius
-
-        else
-          @center = new google.maps.LatLng 43.6481, -79.4042
-          @radius = 50000
-
-      else
-        @center = new google.maps.LatLng 43.6481, -79.4042
-        @radius = 50000
 
     render: ->
       vars = 
@@ -342,9 +172,6 @@ define [
               item.highlightListener = google.maps.event.addListener item.marker, "mouseover", _this.highlightCardFromMarker
               item.unhighlightListener = google.maps.event.addListener item.marker, "mouseout", _this.unhighlightCardFromMarker
 
-            
-
-          
       # @$list.masonry
       #   selector : 'li'
       #   columnWidth: (containerWidth) -> containerWidth / 2
@@ -388,29 +215,39 @@ define [
       $(document.documentElement).scroll @loadTracker
       @
 
-    renderCity : =>
-      if _.contains _.keys(Parse.App.cities), @location
-        desc = Parse.App.cities[@location].desc
-        title = @location.substring 0, @location.indexOf("-")
-        image = "/img/city/#{@location}.jpg"
+    getPersonalizedMapCenter : =>
+      if Parse.User.current()
+        if Parse.User.current().get("property")
+          @center = Parse.User.current().get("property").GPoint()
+          @radius = 50000
 
-        # FB Meta Tags
-        $("head meta[property='og:description']").attr "content", desc
-        $("head meta[property='og:url']").attr "content", window.location.href
-        $("head meta[property='og:image']").attr "content", window.location.origin + image
-        $("head meta[property='og:type']").attr "content", "clevertower:city"
+        else if Parse.User.current().get("network")
+          Parse.User.current().get("network").properties.getSetting()
+          @center = Parse.User.current().get("network").properties.GPoint()
+          @radius = Parse.User.current().get("network").properties.radius
 
-        @$("#city").html """
-          <div class="fade in" style="background-image: url('#{image}');">
-            <button type="button" class="close" data-dismiss="alert">&times;</button>
-            <div class="row">
-              <h1 class="col-md-3">#{title}</h1>
-              <p class="col-md-6">#{desc}</p>
-            </div>
-          </div>
-        """
-      else 
-        @$("#city").empty()
+        else
+          @center = new google.maps.LatLng 43.6481, -79.4042
+          @radius = 50000
+
+      else
+        @center = new google.maps.LatLng 43.6481, -79.4042
+        @radius = 50000
+
+    createQueries : ->
+      # Set up query to match conditions
+      if Parse.User.current()
+        @activityQuery = Parse.Query.or(
+          Parse.App.activity.query,
+          Parse.User.current().activity.query
+        )
+        @commentQuery = Parse.Query.or(
+          Parse.App.comments.query
+          Parse.User.current().comments.query
+        )
+      else
+        @activityQuery = Parse.App.activity.query
+        @commentQuery = Parse.App.comments.query
 
     renderMap : =>
       if @radius
@@ -437,47 +274,55 @@ define [
 
       if Parse.User.current()
         @prepUserActivity()
-                
+
         @newPostView = new NewActivityView(view: @).render()
         @listenTo @newPostView, "view:resize", @bindMapPosition
         @listenTo @newPostView, "model:save", @prependNewPost
 
       # Add listeners
+      @createQueries()
       @bindMapPosition()
       # @dragListener = google.maps.event.addListener @map, 'dragend', => @trigger "dragend"
       # @zoomListener = google.maps.event.addListener @map, 'zoom_changed', @checkIfShouldSearch
 
-      # Search once the map is ready.
-      google.maps.event.addListenerOnce @map, 'idle', @performSearchWithinMap
-      @getUserActivity() if Parse.User.current()
+      # Do a new search unless we've been here before.
+      unless @locationAppend or (Parse.App.activity.length > 0 or (Parse.User.current() and Parse.User.current().activity.length > 0))
+        # Search once the map is ready.
+        google.maps.event.addListenerOnce @map, 'idle', @performSearchWithinMap
+      else
+
+        # Protect ourselves from old models.
+        ninActivity = Parse.App.activity.map((a) -> a.id)
+        ninComments = Parse.App.comments.map((c) -> c.id)
+
+        if Parse.User.current()
+          ninActivity = _.merge ninActivity, Parse.User.current().activity.map((a) -> a.id)
+          ninComments = _.merge ninComments, Parse.User.current().comments.map((c) -> c.id)
+
+        @activityQuery.notContainedIn "objectId", ninActivity
+        @commentQuery.notContainedIn "objectId", ninComments
+
+        # Show the activities
+        @addAllActivity()
+        @addAllPropertyActivity()
+        @addAllComments Parse.App.comments
+        @addAllComments Parse.User.current().comments
 
     initWithCenter : (place, status) =>
       @center = place.geometry.location if status is google.maps.places.PlacesServiceStatus.OK
       @radius = 50000
       @renderMap()
 
+
+    # Search functions
+    # ----------------
+
     googleSearch : (place, status) =>
 
       if status is google.maps.places.PlacesServiceStatus.OK
 
-        # @center = place.geometry.location
-        # @map.setCenter @center
-
         @map.fitBounds place.geometry.viewport
-
-        # bounds = @map.getBounds()
-        sw = place.geometry.viewport.getSouthWest()
-        ne = place.geometry.viewport.getNorthEast()
-        @sw = new Parse.GeoPoint sw.lat(), sw.lng()
-        @ne = new Parse.GeoPoint ne.lat(), ne.lng()
-
-        Parse.App.activity.setBounds @sw, @ne
-        Parse.App.comments.setBounds @sw, @ne
-
-        # Dump the collection if we are going somewhere different.
-        # Parse.App.activity.reset() unless oldBounds.intersects newBounds
-
-        @redoSearch()
+        @setBoundsAndSearch place.geometry.viewport.getSouthWest(), place.geometry.viewport.getNorthEast()
 
     searchMap : =>
       center = @map.getCenter()
@@ -488,10 +333,14 @@ define [
     performSearchWithinMap: =>
 
       bounds = @map.getBounds()
-      @sw = new Parse.GeoPoint(bounds.getSouthWest().lat(), bounds.getSouthWest().lng())
-      @ne = new Parse.GeoPoint(bounds.getNorthEast().lat(), bounds.getNorthEast().lng())
-      Parse.App.activity.setBounds @sw, @ne
-      Parse.App.comments.setBounds @sw, @ne
+      @setBoundsAndSearch bounds.getSouthWest(), bounds.getNorthEast()
+
+    setBoundsAndSearch: (sw, ne) =>
+
+      @sw = new Parse.GeoPoint(sw.lat(), sw.lng())
+      @ne = new Parse.GeoPoint(ne.lat(), ne.lng())
+      @activityQuery.withinGeoBox 'center', @sw, @ne
+      @commentQuery.withinGeoBox 'center', @sw, @ne
 
       @redoSearch()
 
@@ -500,50 +349,270 @@ define [
       @$loading.html "<img src='/img/misc/spinner.gif' class='spinner' alt='#{i18nCommon.verbs.loading}' />"
       @moreToDisplay = true
 
+      @activityQuery.skip(@resultsPerPage * (@page - 1)).limit(@resultsPerPage).include("property").include("profile")
+      @commentQuery.skip(@commentsPerPage * (@page - 1)).limit(@commentsPerPage).include("property").include("profile")
+
       # handleMapActivity
       Parse.Promise.when(
-        Parse.App.activity.query.skip(@resultsPerPage * (@page - 1)).limit(@resultsPerPage).find(),
-        Parse.App.comments.query.skip(@commentsPerPage * (@page - 1)).limit(@commentsPerPage).find()
+        @activityQuery.find(),
+        @commentQuery.find()
       ).then (objs, comms) =>
 
+        if Parse.User.current() and Parse.User.current().get("network")
+          pids = Parse.User.current().get("network").properties.map((p) -> p.id)
+
         if objs
-          Parse.App.activity.add objs
+          for obj in objs
+            if obj.get("property")
+              if Parse.User.current()
+
+                if Parse.User.current().get("network")
+                  if _.contains pids, obj.get("property").id
+                    Parse.User.current().activity.add obj
+                  else Parse.App.activity.add obj
+
+                else if Parse.User.current().get("property")
+                  if obj.get("property").id is Parse.User.current().get("property").id
+                    Parse.User.current().activity.add obj
+                  else Parse.App.activity.add obj
+                else Parse.App.activity.add obj
+              else Parse.App.activity.add obj
+            else Parse.App.activity.add obj
+
           if objs.length < @resultsPerPage then @trigger "view:exhausted"
         else 
-          @trigger if Parse.App.activity.length > 0 then "view:exhausted" else "view:empty"
+          if Parse.App.activity.length > 0 or (Parse.User.current() and Parse.User.current().activity.length > 0)
+            @trigger "view:exhausted" 
+          else @trigger "view:empty"
           
-        if comms then Parse.App.comments.add comms
+        if comms 
+          for comm in comms
+            if comm.get("property")
+              if Parse.User.current()
+
+                if Parse.User.current().get("network")
+                  if _.contains pids, comm.get("property").id
+                    Parse.User.current().comments.add comm
+                  else Parse.App.comments.add comm
+
+                else if Parse.User.current().get("property")
+                  if comm.get("property").id is Parse.User.current().get("property").id
+                    Parse.User.current().comments.add comm
+                  else Parse.App.comments.add comm
+                else Parse.App.comments.add comm
+              else Parse.App.comments.add comm
+            else Parse.App.comments.add comm
         @addAllComments comms
           # if objs.length < @resultsPerPage then @trigger "view:exhausted"
         # @refreshDisplay()
 
-        @checkIfEnd() if @activityCount and @userActivityCount
+        @checkIfEnd() if @activityCount
 
 
       # Save the hassle of updatePaginiation on the first go-round.
       # We can infer whether we need it the second time around.
       if @page is 2 then @updatePaginiation()
-      
 
     checkIfEnd : =>
 
         # Check if we have hit the end.
         collectionLength = Parse.App.activity.length 
+        collectionLength += Parse.User.current().activity.length if Parse.User.current()
 
-        if Parse.User.current()
-          if Parse.User.current().get("property")
-            collectionLength += if Parse.User.current().get("property").shown is true then Parse.User.current().activity.length else 0
-          else if Parse.User.current().get("network")
-            pCount = Parse.User.current().activity.countByProperty()
-            Parse.User.current().get("network").properties.each (p) -> if pCount[p.id] and p.shown is true then collectionLength += pCount[p.id]
+        # if Parse.User.current()
+        #   if Parse.User.current().get("property")
+        #     collectionLength += if Parse.User.current().get("property").shown is true then Parse.User.current().activity.length else 0
+        #   else if Parse.User.current().get("network")
+        #     pCount = Parse.User.current().activity.countByProperty()
+        #     Parse.User.current().get("network").properties.each (p) -> if pCount[p.id] and p.shown is true then collectionLength += pCount[p.id]
 
-        if collectionLength >= @activityCount + @userActivityCount then @trigger "view:exhausted"
+        if collectionLength >= @activityCount then @trigger "view:exhausted"
 
 
 
+
+    # User activity
+    # -------------
+
+    prepUserActivity : =>
+      # Get the property from what we've already loaded.
+      Parse.User.current().activity || Parse.User.current().activity = new ActivityList [], {}
+      Parse.User.current().comments || Parse.User.current().comments = new CommentList [], {}
+      
+      @listenTo Parse.User.current().comments, "reset", @addAllComments
+
+      @listenTo Parse.User.current().activity, 'reset', @addallPropertyActivity
+      @listenTo Parse.User.current().activity, 'add', @addOnePropertyActivity
+
+      if Parse.User.current().get("property")
+        # Activity list for *property*        
+        Parse.User.current().activity.query.equalTo "property", Parse.User.current().get("property")
+        Parse.User.current().comments.query.equalTo "property", Parse.User.current().get("property")
+
+        Parse.App.activity.query.notEqualTo "property", Parse.User.current().get("property")
+        Parse.App.comments.query.notEqualTo "property", Parse.User.current().get("property")
+
+        Parse.User.current().get("property").marker = new google.maps.Marker
+            position:   Parse.User.current().get("property").GPoint()
+            map:        @map
+            items:      []
+            icon: 
+              url: "/img/icon/pins-sprite.png"
+              size: new google.maps.Size(25, 32, "px", "px")
+              origin: new google.maps.Point(50, 0)
+              anchor: null
+              scaledSize: null
+            ZIndex:     100
+            url:        Parse.User.current().get("property").publicUrl()
+            highlightCard: @highlightCard
+            highlightMarker: @highlightMarker
+            unhighlightCard: @unhighlightCard
+            unhighlightMarker: @unhighlightMarker
+
+          Parse.User.current().get("property").highlightListener = google.maps.event.addListener Parse.User.current().get("property").marker, "mouseover", @highlightCardsFromPropertyMarker
+          Parse.User.current().get("property").unhighlightListener = google.maps.event.addListener Parse.User.current().get("property").marker, "mouseout", @unhhighlightCardsFromPropertyMarker
+          Parse.User.current().get("property").clickListener = google.maps.event.addListener Parse.User.current().get("property").marker, "click", @goToPropertyFromPropertyMarker
+
+      else if Parse.User.current().get("network")
+
+        # Activity list for *network*
+        Parse.User.current().activity.query.equalTo "network", Parse.User.current().get("network")
+        Parse.User.current().comments.query.equalTo "network", Parse.User.current().get("network")
+
+        Parse.App.activity.query.notEqualTo "network", Parse.User.current().get("network")
+        Parse.App.comments.query.notEqualTo "network", Parse.User.current().get("network")
+
+        Parse.User.current().get("network").properties.each (p) =>
+            p.marker = new google.maps.Marker
+              position:   p.GPoint()
+              map:        @map
+              ZIndex:     100
+              url:        p.publicUrl()
+              items:      []
+              highlightCard: @highlightCard
+              highlightMarker: @highlightMarker
+              unhighlightCard: @unhighlightCard
+              unhighlightMarker: @unhighlightMarker
+              icon: 
+                url: "/img/icon/pins-sprite.png"
+                size: new google.maps.Size(25, 32, "px", "px")
+                origin: new google.maps.Point(50, p.pos() * 32)
+                anchor: null
+                scaledSize: null
+
+            p.highlightListener = google.maps.event.addListener p.marker, "mouseover", @highlightCardsFromPropertyMarker
+            p.unhighlightListener = google.maps.event.addListener p.marker, "mouseout", @unhighlightCardsFromPropertyMarker
+            p.clickListener = google.maps.event.addListener p.marker, "click", @goToPropertyFromPropertyMarker
+
+      
+      # Hide all properties at the start.
+      # if Parse.User.current().get("property")
+      #   Parse.User.current().get("property").shown = false
+      # else if Parse.User.current().get("network")
+      #   Parse.User.current().get("network").properties.each (p) -> p.shown = false # @hideProperty
+
+    # Add all items in the Properties collection at once.
+    addAllPropertyActivity: (collection, filter) =>
+      Parse.User.current().activity.each @addOnePropertyActivity if Parse.User.current().activity.length > 0
+
+    addOnePropertyActivity: (a) =>
+
+      # We need the original property, for the position
+      # within the collection, as well as for map markers.
+      if Parse.User.current()
+        if Parse.User.current().get("property")
+          a.set "property", Parse.User.current().get("property")
+        else if Parse.User.current().get("network")
+          property = Parse.User.current().get("network").properties.find((p) -> p.id is a.get("property").id)
+          a.set "property", property
+
+      # item = new infinity.ListItem view.render().$el
+      if ((!@filter or @filter is a.get("activity_type")) and (!@specificSearchControls or @specificSearchControls.filter(a)))
+
+        item = new infinity.ListItem @renderTemplate(a, a.liked(), true)
+        item.marker = a.get("property").marker
+
+        a.get("property").marker.items.push item
+        @listViews[@shortestColumnIndex()].append item
+
+      # @$list.append view.render().el
+    
+    # Show activity where we have already loaded the property
+    # showProperty : (property) =>
+    #   property.shown = true
+
+    # hideProperty : (property) =>
+    #   property.shown = false
+    #   _.each property.marker.items, (a) -> a.remove()
+
+    resetUserActivity : =>
+
+    #   # Handle User Activity
+    #   if Parse.User.current()
+    #     # Check if activity is visible or not.
+    #     if Parse.User.current().get("property") 
+    #       p = Parse.User.current().get("property") 
+    #       if @withinBounds p.get("center") then @showProperty p else @hideProperty p
+    #     else if Parse.User.current().get("network")
+    #       Parse.User.current().get("network").properties.each (p) => 
+    #         if @withinBounds p.get("center") then @showProperty p else @hideProperty p
+
+      Parse.User.current().activity.reset()
+      Parse.User.current().comments.reset()
+
+    # App Activity
+    # ------------
+
+    checkIfLiked: (activity) =>
+      data = activity.data()
+
+      model = if data.collection is "user"
+        Parse.User.current().activity.at(data.index)
+      else Parse.App.activity.at(data.index)
+
+      @markAsLiked(activity) if Parse.User.current().get("profile").likes.find (l) => l.id is model.id
+
+    resetListViews: ->
+
+      super
+      @resetAppActivity()
+      @resetUserActivity() if Parse.User.current()
+
+    resetAppActivity: ->
+
+      Parse.App.activity.reset()
+      Parse.App.comments.reset()
+      # @$list.find('> li.empty').remove()
+
+    # Add all items in the Properties collection at once.
+    addAllActivity: (collection, filter) =>
+      Parse.App.activity.each @addOneActivity if Parse.App.activity.length > 0
 
     # BaseIndex Linkers
     # ------------------
+
+    prependNewPost: (a) =>
+      if a.get("property")
+        # view = new ActivityView
+        #   model: a
+        #   # marker: a.get("property").marker
+        #   pos: a.get("property").pos()
+        #   view: @
+        #   linkedToProperty: true
+        #   liked: false
+        # item = new infinity.ListItem view.render().$el
+        item = new infinity.ListItem @renderTemplate(a, false, true) # , a.get("property").pos()
+        item.marker = a.get("property").marker
+        a.get("property").marker.items.push item
+        @listViews[@shortestColumnIndex()].prepend item
+      else
+        # view = new ActivityView
+        #   model: a
+        #   view: @
+        #   liked: false
+        # # @listViews[@shortestColumnIndex()].prepend new infinity.ListItem view.render().$el
+        @listViews[@shortestColumnIndex()].prepend @renderTemplate(a, false, false) # , a.pos()
+
 
     getModelDataToShowInModal: (e) ->
       e.preventDefault()
@@ -575,136 +644,104 @@ define [
       @postComment activity, data, model
 
 
-    # Activity
-    # --------
+    # Filter functions
+    # ----------------
 
-    prependNewPost: (a) =>
-      if a.get("property")
-        # view = new ActivityView
-        #   model: a
-        #   # marker: a.get("property").marker
-        #   pos: a.get("property").pos()
-        #   view: @
-        #   linkedToProperty: true
-        #   liked: false
-        # item = new infinity.ListItem view.render().$el
-        item = new infinity.ListItem @renderTemplate(a, false, true, a.get("property").pos())
-        item.marker = a.get("property").marker
-        a.get("property").marker.items.push item
-        @listViews[@shortestColumnIndex()].prepend item
-      else
-        # view = new ActivityView
-        #   model: a
-        #   view: @
-        #   liked: false
-        # # @listViews[@shortestColumnIndex()].prepend new infinity.ListItem view.render().$el
-        @listViews[@shortestColumnIndex()].prepend @renderTemplate(a, false, false, a.pos())
-
-    # Add all items in the Properties collection at once.
-    addAllActivity: (collection, filter) =>
-      Parse.App.activity.each @addOne if Parse.App.activity.length > 0
-
-    addOnePropertyActivity: (a) =>
-      # view = new ActivityView
-      #   model: a
-      #   # marker: a.get("property").marker
-      #   pos: a.get("property").pos()
-      #   view: @
-      #   linkedToProperty: true
-      #   liked: Parse.User.current() and Parse.User.current().get("profile").likes.find (l) -> l.id is a.id
-
-      # We need the original property, for the position
-      # within the collection, as well as for map markers.
-      if Parse.User.current()
-        if Parse.User.current().get("property")
-          a.set "property", Parse.User.current().get("property")
-        else if Parse.User.current().get("network")
-          property = Parse.User.current().get("network").properties.find((p) -> p.id is a.get("property").id)
-          a.set "property", property
+    changeFilter: (e) ->
+      e.preventDefault()
       
+      filter = e.currentTarget.id
+      if filter is "all" then filter = ""
+      return if filter is @filter
+      @filter = filter
+      @specificSearchControls.clear() if @specificSearchControls
 
-      # item = new infinity.ListItem view.render().$el
-      if ((!@filter or @filter is a.get("activity_type")) and (!@specificSearchControls or @specificSearchControls.filter(a)))
+      if @filter then @filterCollections() else @resetFilters()
 
-        item = new infinity.ListItem @renderTemplate(a, a.liked(), true, a.get("property").pos())
-        item.marker = a.get("property").marker
+      @redoSearch()
 
-        a.get("property").marker.items.push item
-        @listViews[@shortestColumnIndex()].append item
+    filterCollections: ->
+      # "Specific" filter
+      Parse.App.activity.query.containedIn "activity_type", [@filter]
+      Parse.User.current().activity.query.containedIn "activity_type", [@filter] if Parse.User.current()
 
-      # @$list.append view.render().el
-    
-    # Show activity where we have already loaded the property
-    showProperty: (property) =>
-      property.shown = true
+      switch @filter
+        when "new_listing" then @specificSearchControls = new ListingSearchView(view: @).render()
 
-    hideProperty: (property) =>
-      property.shown = false
-      _.each property.marker.items, (a) -> a.remove()
+    resetFilters: ->
+      Parse.App.activity.query.containedIn "activity_type", ["new_listing", "new_post", "new_property"]
+      Parse.User.current().activity.query.containedIn "activity_type", ["new_listing", "new_post", "new_property"] if Parse.User.current()
 
-    hideAllProperties: =>
-      # hide all properties
-      if Parse.User.current().get("property")
-        # Visibility counter
-        Parse.User.current().get("property").shown = false
-
-      else if Parse.User.current().get("network")
-
-        # Visibility counter
-        Parse.User.current().get("network").properties.each (p) -> p.shown = false
-
-    # Update the pagination with appropriate count, pages and page numbers 
+# Update the pagination with appropriate count, pages and page numbers 
     updatePaginiation : =>
-      countQuery = Parse.App.activity.query
-      # Reset old filters
-      countQuery.notContainedIn("objectId", [])
-      # Limit of -1 means do not send a limit.
+
+      countQuery = new Parse.Query("Activity")
+      countQuery._where = _.clone @activityQuery._where
       countQuery.limit(-1).skip(0)
-      counting = countQuery.count()
 
-      if Parse.User.current() and (Parse.User.current().get("property") or Parse.User.current().get("network"))
-        userCountQuery = Parse.User.current().activity.query
-        # Limit of -1 means do not send a limit.
-        userCountQuery.limit(-1).skip(0)
+      # if Parse.User.current() and (Parse.User.current().get("property") or Parse.User.current().get("network"))
+      #   userCountQuery = Parse.User.current().activity.query
+      #   # Limit of -1 means do not send a limit.
+      #   userCountQuery.limit(-1).skip(0)
 
-        if Parse.User.current().get("property")
+      #   if Parse.User.current().get("property")
 
-          # Visibility counter
-          if Parse.User.current().get("property").shown is true
-            userCountQuery.containedIn "property", Parse.User.current().get("property")
-            userCounting = userCountQuery.count()
-          else 
-            userCounting = undefined
+      #     # Visibility counter
+      #     if Parse.User.current().get("property").shown is true
+      #       userCountQuery.containedIn "property", Parse.User.current().get("property")
+      #       userCounting = userCountQuery.count()
+      #     else 
+      #       userCounting = undefined
 
-        else if Parse.User.current().get("network")
+      #   else if Parse.User.current().get("network")
 
-          properties = Parse.User.current().get("network").properties.filter (p) -> p.shown is true
-          userCountQuery.containedIn "property", properties
-          userCounting = userCountQuery.count()
+      #     properties = Parse.User.current().get("network").properties.filter (p) -> p.shown is true
+      #     userCountQuery.containedIn "property", properties
+      #     userCounting = userCountQuery.count()
 
-      else 
-        userCounting = undefined
+      # else 
+      #   userCounting = undefined
       
-      Parse.Promise
-      .when(counting, userCounting)
-      .then (count, userCount) =>
+      # Parse.Promise
+      # .when(counting,)
+
+      countQuery.count().then (count) =>
         # remaining pages
-
-        userCount = 0 unless userCount
-
         @activityCount = count
-        @userActivityCount = userCount
-        @pages = Math.ceil((count + userCount)/ @resultsPerPage)
-        # @$pagination.html ""
-        if count + userCount is 0 then @trigger "view:empty"
+        @pages = Math.ceil((count)/ @resultsPerPage)
 
-        @checkIfEnd()
+        if count is 0 then @trigger "view:empty"
+        else @checkIfEnd()
           
         #   @renderPaginiation()
-          
     
     # MAP
     # ----------
+
+    renderCity : =>
+      if _.contains _.keys(Parse.App.cities), @location
+        desc = Parse.App.cities[@location].desc
+        title = @location.substring 0, @location.indexOf("-")
+        image = "/img/city/#{@location}.jpg"
+
+        # FB Meta Tags
+        $("head meta[property='og:description']").attr "content", desc
+        $("head meta[property='og:url']").attr "content", window.location.href
+        $("head meta[property='og:image']").attr "content", window.location.origin + image
+        $("head meta[property='og:type']").attr "content", "clevertower:city"
+
+        @$("#city").html """
+          <div class="fade in" style="background-image: url('#{image}');">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <div class="row">
+              <h1 class="col-md-3">#{title}</h1>
+              <p class="col-md-6">#{desc}</p>
+            </div>
+          </div>
+        """
+      else 
+        @$("#city").empty()
+
 
     bindMapPosition: => @$block.original_position = @$block.offset()
     

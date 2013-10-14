@@ -75,9 +75,6 @@ define [
         @moreToDisplay = false
         @$loading.html i18nListing.listings.empty.index
 
-      # Create a timer to buffer window re-draws.
-      @time = null
-
       @resultsPerPage = 20
       @commentsPerPage = 40
       # The chunkSize is the number of pages displayed in a group
@@ -100,18 +97,18 @@ define [
             # return false to avoid checking the other column.
             false
 
-    resetListViews: ->
-
-      # Clean up old stuff
-      _.each @listViews, (lv) -> lv.reset()
-
     redoSearch : =>
 
-      @chunk = 1
+      # @chunk = 1
       @page = 1
 
       @resetListViews()
       @search()
+
+    resetListViews: ->
+
+      # Clean up old stuff
+      _.each @listViews, (lv) -> lv.reset()
 
     filterCollections: ->
       # "Specific" filter
@@ -168,7 +165,8 @@ define [
         name: model.name()
         current: Parse.User.current()
         i18nCommon: i18nCommon
-        pos: if @onMap then model.pos() % 20 else false # This will be incremented in the template.
+        pos: if @onMap then (if linked then propertyIndex else model.pos()) % 20 else false # This will be incremented in the template.
+
 
       if Parse.User.current()
         vars.self = Parse.User.current().get("profile").name()
@@ -247,7 +245,7 @@ define [
         setTimeout =>
           if @endOfDocument() then @nextPage()
           @updateScheduled = false
-        , 1000
+        , 2000
         @updateScheduled = true
 
 
@@ -439,7 +437,7 @@ define [
       infinity.updateItemPosition listItem.parent.items, heightChange, listItem.index + 1
       infinity.updatePagePosition listItem.parent.parent.pages, heightChange, listItem.parent.index + 1
       
-    addAllComments: (collection) =>
+    addAllComments : (collection) =>
 
       visible = if collection instanceof CommentList
         collection.groupBy (c) => c.get("activity").id

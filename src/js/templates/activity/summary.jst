@@ -19,7 +19,7 @@
 <footer>
   <div class="clearfix">
     <div class="pull-left">
-      <% if (!isNaN(pos)) { %>
+      <% if (pos !== false) { %>
         <span class="position<% if (linkedToProperty) { %> property-linked<% } %>"><%= pos + 1 %></span>
       <% } %>
       <a href="<%= profileUrl %>" class="photo photo-micro">
