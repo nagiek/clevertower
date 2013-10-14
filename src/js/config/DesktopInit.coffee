@@ -309,7 +309,7 @@ require [
     channelUrl : "//#{window.location.host}/fb-channel"   # Channel File (must be absolute path)
     cookie     : true                                     # enable cookies to allow Parse to access the session
     xfbml      : false                                    # parse XFBML
-    status     : true                                     # check login status
+    # status     : true                                     # check login status
 
 
   # Bring Parse Collection up to speed with Backbone methods.

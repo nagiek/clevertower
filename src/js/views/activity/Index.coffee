@@ -8,6 +8,7 @@ define [
   'collections/CommentList'
   'models/Activity'
   "models/Comment"
+  "views/helper/Alert"
   "views/listing/Search"
   "views/activity/New"
   "views/activity/BaseIndex"
@@ -20,7 +21,7 @@ define [
   # 'masonry'
   # 'jqueryui'
   "gmaps"
-], ($, _, Parse, infinity, moment, ActivityList, CommentList, Activity, Comment, ListingSearchView, NewActivityView, BaseIndexActivityView, i18nListing, i18nCommon) ->
+], ($, _, Parse, infinity, moment, ActivityList, CommentList, Activity, Comment, Alert, ListingSearchView, NewActivityView, BaseIndexActivityView, i18nListing, i18nCommon) ->
 
   class ActivityIndexView extends BaseIndexActivityView
   
@@ -31,6 +32,7 @@ define [
       'click #search-map'                       : 'searchMap'
       # 'click .pagination > ul > li > a'       : 'changePage'
       'click .thumbnails a.content'             : 'getModelDataToShowInModal'
+      'click .thumbnails a.get-comments'        : 'getActivityCommentsAndCollection' # 'showModal'
       "mouseover .thumbnails .activity"         : "highlightMarkerFromCard"
       "mouseout .thumbnails .activity"          : "unhighlightMarkerFromCard"
       # 'hide #view-content-modal'              : 'hideModal'
@@ -642,6 +644,33 @@ define [
       else Parse.App.activity.at(data.index)
 
       @postComment activity, data, model
+
+
+    getActivityCommentsAndCollection : (e) =>
+      e.preventDefault()
+
+      return unless Parse.User.current()
+
+      button = @$(e.currentTarget)
+      activity = button.closest(".activity")
+      data = activity.data()
+      if data.collection is "user"
+        model = Parse.User.current().activity.at(data.index)
+        comments = Parse.User.current().comments
+      else 
+        model = Parse.App.activity.at(data.index)
+        comments = Parse.App.comments
+
+      button.button("loading")
+
+      @getActivityComments(model, comments).then (newComms) =>
+        @addAllComments newComms
+        comments.add newComms
+        button.button("complete")
+      , =>
+        button.button("complete")
+        new Alert event: 'comment-load', fade: false, message: i18nCommon.errors.comment_load, type: 'error'
+
 
 
     # Filter functions

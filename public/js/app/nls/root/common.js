@@ -209,7 +209,8 @@
       beginning: "Beginning",
       loading: "Loading",
       explore: "Explore",
-      manage: "Manage"
+      manage: "Manage",
+      view: "View"
     },
     expressions: {
       delete_forever: "Delete forever",
@@ -234,6 +235,13 @@
       places: "Places",
       sample_email: "keigan@example.com",
       comments: "Comments",
+      more_comment: function(num) {
+        if (num > 1) {
+          return "more comments";
+        } else {
+          return "more comment";
+        }
+      },
       public_activity: "Public Activity",
       likes: "Likes",
       accommodation: "Accommodation",
@@ -307,7 +315,8 @@
       geocode_error: "We were unable to determine your location.",
       no_results: "No results found.",
       not_yet_accepted: "You haven't been accepted into this network yet. <br/> You can only see what is publicly visible. Most things will not work correctly.",
-      pending_approval: "Pending approval."
+      pending_approval: "Pending approval.",
+      comment_load: "Comments failed to load. Please try again."
     }
   });
 

@@ -5,7 +5,7 @@ define [
   'infinity'
   'moment'
   "collections/ActivityList"
-  "views/activity/List"
+  "views/helper/Alert"
   "views/activity/BaseIndex"
   "views/photo/Public"
   "views/listing/PublicSummary"
@@ -18,20 +18,21 @@ define [
   'templates/activity/modal'
   'templates/comment/summary'
   "gmaps"
-], ($, _, Parse, infinity, moment, ActivityList, ActivityView, BaseIndexActivityView, PhotoView, ListingView, i18nProperty, i18nListing, i18nUnit, i18nGroup, i18nCommon) ->
+], ($, _, Parse, infinity, moment, ActivityList, Alert, BaseIndexActivityView, PhotoView, ListingView, i18nProperty, i18nListing, i18nUnit, i18nGroup, i18nCommon) ->
 
   class PublicPropertyView extends BaseIndexActivityView
 
     el: '#main'
 
     events:
-      'click .nav a'                          : 'showTab'
-      'click #activity .thumbnails a.content' : 'getModelDataToShowInModal'
-      'click #new-lease'                      : 'showLeaseModal'
+      'click .nav a'                            : 'showTab'
+      'click #activity .thumbnails a.content'   : 'getModelDataToShowInModal'
+      'click .thumbnails a.get-comments'        : 'getActivityCommentsAndCollection' # 'showModal'
+      'click #new-lease'                        : 'showLeaseModal'
       # Activity events
-      "click .like-button"                    : "likeOrLogin"
-      "click .likers"                         : "showLikers"
-      "submit form.new-comment-form"          : "getCommentDataToPost"
+      "click .like-button"                      : "likeOrLogin"
+      "click .likers"                           : "showLikers"
+      "submit form.new-comment-form"            : "getCommentDataToPost"
 
     initialize: (attrs) ->
 
@@ -189,6 +190,26 @@ define [
 
       @postComment activity, data, model
 
+    getActivityCommentsAndCollection : (e) =>
+      e.preventDefault()
+
+      return unless Parse.User.current()
+
+      button = @$(e.currentTarget)
+      activity = button.closest(".activity")
+      data = activity.data()
+      model = @model.activity.at(data.index)
+      comments = @model.comments
+
+      button.button("loading")
+
+      @getActivityComments(model, comments).then (newComms) =>
+        @addAllComments newComms
+        comments.add newComms
+        button.button("complete")
+      , =>
+        button.button("complete")
+        new Alert event: 'comment-load', fade: false, message: i18nCommon.errors.comment_load, type: 'error'
 
     # Activity
     # ------

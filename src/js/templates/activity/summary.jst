@@ -51,6 +51,11 @@
     </ul>
   </div>
   <div class="comments">
+    <div class="additional-comments">
+      <a href="#" class="get-comments">
+        <%= i18nCommon.verbs.view %> <span class="remaining-comments"><%= commentCount %></span> <%= i18nCommon.nouns.more_comment(commentCount) %>
+      </a>
+    </div>
     <ul class="list-comments list-unstyled"></ul>
     <% if (current) { %>
       <form class="new-comment-form form-condensed">

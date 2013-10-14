@@ -26,6 +26,7 @@ define [
 
     events:
       'click .thumbnails a.content'             : 'getModelDataToShowInModal' # 'showModal'
+      'click .thumbnails a.get-comments'        : 'getActivityCommentsAndCollection' # 'showModal'
       # Activity events
       "click .like-button"                      : "likeOrLogin"
       "click .likers"                           : "getLikers"
@@ -76,7 +77,7 @@ define [
         @$loading.html i18nListing.listings.empty.index
 
       @resultsPerPage = 20
-      @commentsPerPage = 40
+      @commentsPerPage = 20
       # The chunkSize is the number of pages displayed in a group
       @chunkSize = 10
       # The chunk is the start of the group of pages we are displaying
@@ -349,6 +350,10 @@ define [
       activity.data "liked", true
       # activity.attr "data-liked", "true"
 
+
+    # Comments
+    # --------
+
     postComment: (activity, data, model) ->
 
       formData = activity.find("form.new-comment-form").serializeObject()
@@ -440,7 +445,7 @@ define [
     addAllComments : (collection) =>
 
       visible = if collection instanceof CommentList
-        collection.groupBy (c) => c.get("activity").id
+        collection.groupBy (c) => c.get("dextivity").id
       else 
         _.groupBy collection, (c) => c.get("activity").id
 
@@ -449,10 +454,31 @@ define [
         _.each @listViews, (lv) =>
           listItem = lv.find("#activity-#{modelId}")
           if listItem.length > 0
+            # Decrease the "comment remaining" count
+            remaining = listItem[0].$el.find(".remaining-comments").html()
+            remaining = remaining - visible[modelId].length
+            if remaining > 0 then listItem[0].$el.find(".remaining-comments").html(remaining)
+            else listItem[0].$el.find(".additional-comments").addClass("hide")
+
+            # Add comments
             for comment in visible[modelId]
               @addOneComment comment, listItem[0]
               # return false to avoid checking the other column.
             false
+
+    getActivityComments : (model, existingComments) ->
+      excludedComments = existingComments
+        .chain()
+        .select((c) -> c.get("activity").id is model.id)
+        .map((c) -> c.id)
+        .value()
+      new Parse.Query("Comment")
+        .equalTo("activity", model)
+        .notContainedIn("objectId", excludedComments)
+        .include("profile")
+        .find()
+
+
 
     # Modal 
     # @see profile:show and property:public
