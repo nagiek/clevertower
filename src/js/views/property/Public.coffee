@@ -5,20 +5,20 @@ define [
   'infinity'
   'moment'
   "collections/ActivityList"
+  "collections/CommentList"
   "views/helper/Alert"
   "views/activity/BaseIndex"
   "views/photo/Public"
   "views/listing/PublicSummary"
   "i18n!nls/property"
   "i18n!nls/listing"
-  "i18n!nls/unit"
   "i18n!nls/group"
   "i18n!nls/common"
   'templates/property/public'
   'templates/activity/modal'
   'templates/comment/summary'
   "gmaps"
-], ($, _, Parse, infinity, moment, ActivityList, Alert, BaseIndexActivityView, PhotoView, ListingView, i18nProperty, i18nListing, i18nUnit, i18nGroup, i18nCommon) ->
+], ($, _, Parse, infinity, moment, ActivityList, CommentList, Alert, BaseIndexActivityView, PhotoView, ListingView, i18nProperty, i18nListing, i18nGroup, i18nCommon) ->
 
   class PublicPropertyView extends BaseIndexActivityView
 
@@ -169,8 +169,10 @@ define [
       # Keep track of where we are, for subsequent navigation.
       # Convert the index to an array and find the "new" index.
        
-      # This is using the cached results done in addAllActivity
-      # @modalCollection = @model.activity.select (a) => a.get("property") and a.get("property").id is @model.id
+      # Could use the cached results from addAllActivity unless we've loaded new data
+      @modalCollection = @findModelActivity @model.activity if @page > 1
+      @modalCommentCollection = @findModelComments @model.comments
+      
       model = @model.activity.at data.index
 
       ids = _.map(@modalCollection, (a) -> a.id)
@@ -281,17 +283,28 @@ define [
           
         #   @renderPaginiation()
 
-    addAllActivity: (collection, filter) =>
+    addAllActivity: (collection) =>
 
-      visible = @modalCollection = if collection instanceof ActivityList
+      visible = @modalCollection = @findModelActivity collection
+
+      if visible.length > 0 then _.each visible, @addOneActivity
+      else @$loading.html '<div class="empty">' + i18nProperty.tenant_empty.activity + '</div>'
+
+    findModelActivity: (collection) ->
+      if collection instanceof ActivityList
         collection.select (a) =>
           a.get("property") and a.get("property").id is @model.id
       else 
         _.select collection, (a) =>
           a.get("property") and a.get("property").id is @model.id
 
-      if visible.length > 0 then _.each visible, @addOneActivity
-      else @$loading.html '<div class="empty">' + i18nProperty.tenant_empty.activity + '</div>'
+    findModelComments: (collection) ->
+      if collection instanceof CommentList
+        collection.select (c) =>
+          c.get("property") and c.get("property").id is @model.id
+      else 
+        _.select collection, (c) =>
+          c.get("property") and c.get("property").id is @model.id
 
     # Photos
     # ------

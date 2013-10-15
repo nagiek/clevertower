@@ -17,6 +17,7 @@ define [
 
     events:
       'click ul > li > a.content'           : 'getModelDataToShowInModal'
+      'click .thumbnails a.get-comments'    : 'getActivityCommentsAndCollection' # 'showModal'
       # Activity events
       "click .like-button"                  : "likeOrLogin"
       "click .likers"                       : "showLikers"
@@ -85,6 +86,28 @@ define [
       model = @model.likes.at(data.index)
 
       @postComment activity, data, model
+
+    getActivityCommentsAndCollection : (e) =>
+      e.preventDefault()
+
+      return unless Parse.User.current()
+
+      button = @$(e.currentTarget)
+      activity = button.closest(".activity")
+      data = activity.data()
+      model = @model.activity.at(data.index)
+      comments = @model.comments
+
+      button.button("loading")
+
+      @getActivityComments(model, comments).then (newComms) =>
+        @addAllComments newComms
+        comments.add newComms
+        button.button("complete")
+      , =>
+        button.button("complete")
+        new Alert event: 'comment-load', fade: false, message: i18nCommon.errors.comment_load, type: 'error'
+
 
     # Activity
     # ------

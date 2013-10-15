@@ -624,9 +624,12 @@ define [
       # Keep track of where we are, for subsequent navigation.
       @modalIndex = data.index
        
-      @modalCollection = if data.collection is "user"
-        Parse.User.current().activity
-      else Parse.App.activity
+      if data.collection is "user"
+        @modalCollection = Parse.User.current().activity
+        @modalCommentCollection = Parse.User.current().comments
+      else 
+        @modalCollection = Parse.App.activity
+        @modalCommentCollection = Parse.App.comments
 
       @showModal()
 

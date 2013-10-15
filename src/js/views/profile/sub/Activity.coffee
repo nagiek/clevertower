@@ -4,12 +4,13 @@ define [
   "backbone"
   'infinity'
   "collections/ActivityList"
+  "collections/CommentList"
   "views/helper/Alert"
   "views/activity/BaseIndex"
   "i18n!nls/user"
   "i18n!nls/common"
   'templates/profile/show'
-], ($, _, Parse, infinity, ActivityList, Alert, BaseIndexActivityView, i18nUser, i18nCommon) ->
+], ($, _, Parse, infinity, ActivityList, CommentList, Alert, BaseIndexActivityView, i18nUser, i18nCommon) ->
 
   class ProfileActivityView extends BaseIndexActivityView
   

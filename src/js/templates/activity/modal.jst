@@ -22,10 +22,10 @@
       <div class="caption">
         <header class="clearfix">
           <div class="photo photo-thumbnail pull-left">
-            <a href="<%= profileUrl %>"><img src="<%= profilePic %>" alt="Profile" class="img-rounded profile-picture"></a>
+            <a class="profile-link" href="<%= profileUrl %>"><img src="<%= profilePic %>" alt="Profile" class="img-rounded profile-picture"></a>
           </div>
           <div class="photo-float thumbnail-float">
-            <p><a href="<%= profileUrl %>"><strong><%= name %></strong></a></p>
+            <p><a class="profile-link" href="<%= profileUrl %>"><strong><%= name %></strong></a></p>
             <p><small><%= i18nCommon.fields.posted %> <%= postDate %></small></p>
           </div>
           <ul class="activity-actions list-inline center">
@@ -55,6 +55,11 @@
           <% if (isEvent) { %><p><strong><%= start %><% if (endDate) { %> - <%= end %><% } %></strong></p><% } %>
         </div>
         <div class="comments">
+          <div class="additional-comments">
+            <a href="#" class="get-comments">
+              <%= i18nCommon.verbs.view %> <span class="remaining-comments"><%= commentCount %></span> <%= i18nCommon.nouns.more_comment(commentCount) %>
+            </a>
+          </div>
           <ul class="list-comments list-unstyled"></ul>
           <% if (current) { %>
             <form class="new-comment-form form-condensed">
@@ -73,7 +78,7 @@
           <footer class="position-bottom">
             <p>
               <small><%= i18nCommon.fields.posted_at %>
-                <a class="clearfix" href="<%= propertyUrl %>">
+                <a class="profile-link" class="clearfix" href="<%= propertyUrl %>">
                   <img src="<%= propertyCover %>" class="pull-left photo photo-micro img-circle" width="23" height="23">
                   <span class="photo-float micro-float"><%= propertyTitle %></span>
                 </a>

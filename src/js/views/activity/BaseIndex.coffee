@@ -299,7 +299,7 @@ define [
       else
         $("#signup-modal").modal()
 
-    getLikers: (e) ->
+    getLikers: (e) =>
       e.preventDefault()
       button = @$(e.currentTarget)
       activity = button.closest(".activity")
@@ -354,7 +354,7 @@ define [
     # Comments
     # --------
 
-    postComment: (activity, data, model) ->
+    postComment: (activity, data, model) =>
 
       formData = activity.find("form.new-comment-form").serializeObject()
 
@@ -445,7 +445,7 @@ define [
     addAllComments : (collection) =>
 
       visible = if collection instanceof CommentList
-        collection.groupBy (c) => c.get("dextivity").id
+        collection.groupBy (c) => c.get("activity").id
       else 
         _.groupBy collection, (c) => c.get("activity").id
 
@@ -454,6 +454,7 @@ define [
         _.each @listViews, (lv) =>
           listItem = lv.find("#activity-#{modelId}")
           if listItem.length > 0
+
             # Decrease the "comment remaining" count
             remaining = listItem[0].$el.find(".remaining-comments").html()
             remaining = remaining - visible[modelId].length
@@ -495,7 +496,9 @@ define [
 
       # Add events.
       $(document).on "keydown", @controlModalIfOpen
-      $('#view-content-modal').on 'click', '.caption a', @closeModal
+      $('#view-content-modal').on 'click', 'ul.list-comments a', @closeModal
+      $('#view-content-modal').on 'click', 'a.profile-link', @closeModal
+      $('#view-content-modal').on 'click', 'a.get-comments', @getModalComments
       $('#view-content-modal').on 'click', '.left', @prevModal
       $('#view-content-modal').on 'click', '.right', @nextModal
       $('#view-content-modal').on 'hide.bs.modal', @hideModal
@@ -584,20 +587,27 @@ define [
       $("#view-content-modal").html JST["src/js/templates/activity/modal.jst"](vars)
 
       # Comments
-      @$comments = $("#view-content-modal .list-comments")
-      @$comments.html ""
-      model.prep "comments"
-      if model.comments.length > 0
-        visible = model.comments.select (c) => c.get("activity") and c.get("activity").id is model.id
-        if visible.length > 0 then _.each visible, @renderOneModalComment
-      else 
-        model.comments.model = model
-        @listenToOnce model.comments, "reset", @renderAllModalComments, model
-        model.comments.fetch()
+      @$modalComments = $("#view-content-modal .list-comments")
+      @$modalComments.html ""
 
-    renderAllModalComments : (collection) =>
-      visible = collection.select (c) => c.get("activity") and c.get("activity").id is collection.model.id
-      if visible.length > 0 then _.each visible, @renderOneModalComment
+      if model.get("commentCount") > 0
+        visible = if @modalCommentCollection instanceof CommentList
+          @modalCommentCollection.select (c) => c.get("activity") and c.get("activity").id is model.id
+        else 
+          _.select @modalCommentCollection, (c) => c.get("activity") and c.get("activity").id is model.id
+        @renderAllModalComments visible
+
+    renderAllModalComments : (visible) =>
+
+      if visible.length > 0
+
+        # Decrease the "comment remaining" count
+        remaining = $("#view-content-modal .remaining-comments").html()
+        remaining = remaining - visible.length
+        if remaining > 0 then $("#view-content-modal .remaining-comments").html(remaining)
+        else $("#view-content-modal .additional-comments").addClass("hide")
+
+        _.each visible, @renderOneModalComment
 
     renderOneModalComment : (comment) =>
 
@@ -611,4 +621,20 @@ define [
 
       # fn = if isNew then "append" else "prepend"
 
-      @$comments.append JST["src/js/templates/comment/summary.jst"](vars)
+      @$modalComments.append JST["src/js/templates/comment/summary.jst"](vars)
+
+    getModalComments : (e) =>
+      model = if @modalCollection instanceof ActivityList then @modalCollection.at @modalIndex else @modalCollection[@modalIndex]
+      button = $(e.currentTarget)
+      button.button("loading")
+
+      @getActivityComments(model, @modalCommentCollection).then (newComms) =>
+        @addAllComments newComms
+        @modalCommentCollection.add newComms
+        @renderAllModalComments newComms
+        button.button("complete")
+      , =>
+        button.button("complete")
+        new Alert event: 'comment-load', fade: false, message: i18nCommon.errors.comment_load, type: 'error'
+
+    

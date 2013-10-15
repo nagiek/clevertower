@@ -209,8 +209,7 @@
       appId: '387187337995318',
       channelUrl: "//" + window.location.host + "/fb-channel",
       cookie: true,
-      xfbml: false,
-      status: true
+      xfbml: false
     });
     Parse.Collection.prototype.where = function(attrs, first) {
       if (_.isEmpty(attrs)) {
