@@ -329,7 +329,7 @@
           return require(["views/property/Manage"], function(PropertyView) {
             var model;
 
-            if (!view || !(view instanceof PropertyView)) {
+            if (!view || !(view instanceof PropertyView) || id !== view.model.id) {
               if (Parse.User.current().get("network")) {
                 model = Parse.User.current().get("network").properties.get(id);
               } else if (Parse.User.current().get("property")) {
@@ -504,7 +504,7 @@
           var vars;
 
           vars = _this.deparamAction(splat);
-          if (!view || !(view instanceof ShowProfileView)) {
+          if (!view || !(view instanceof ShowProfileView) || id !== view.model.id) {
             if (!id && Parse.User.current()) {
               id = Parse.User.current().get("profile").id;
             }

@@ -234,7 +234,7 @@ define [
       # Check if we are managing the property or the lease.
       if Parse.User.current().get("network") or Parse.User.current().get("property")
         require ["views/property/Manage"], (PropertyView) => 
-          if !view or view !instanceof PropertyView
+          if !view or view !instanceof PropertyView or id isnt view.model.id
 
             if Parse.User.current().get("network")
               model = Parse.User.current().get("network").properties.get id
@@ -327,7 +327,7 @@ define [
       view = @view
       require ["models/Profile", "views/profile/Show"], (Profile, ShowProfileView) =>
         vars = @deparamAction splat
-        if !view or view !instanceof ShowProfileView
+        if !view or view !instanceof ShowProfileView or id isnt view.model.id
           # Default id is current user
           if not id and Parse.User.current() then id = Parse.User.current().get("profile").id
 

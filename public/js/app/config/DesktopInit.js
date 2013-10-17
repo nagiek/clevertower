@@ -84,7 +84,7 @@
   });
 
   require(["jquery", "underscore", "backbone", "facebook", "models/Property", "models/Unit", "models/Lease", "models/Profile", "collections/ListingFeaturedList", "collections/ActivityList", "collections/NotificationList", "routers/Desktop", "underscore.string", "json2", "bootstrap", "serializeObject", "typeahead", "masonry", "transit"], function($, _, Parse, FB, Property, Unit, Lease, Profile, FeaturedListingList, ActivityList, NotificationList, AppRouter, _String) {
-    var eventSplitter, eventsApi, listenEvents, listenMethods;
+    var addOptions, eventSplitter, eventsApi, listenEvents, listenMethods, setOptions;
 
     eventSplitter = /\s+/;
     eventsApi = function(obj, action, name, rest) {
@@ -177,8 +177,188 @@
       this.stopListening();
       return this;
     };
+    setOptions = {
+      add: true,
+      remove: true,
+      merge: true
+    };
+    addOptions = {
+      add: true,
+      remove: false
+    };
     Parse.Collection.prototype.countBy = function() {
       return _.countBy.apply(_, [this.models].concat(_.toArray(arguments)));
+    };
+    Parse.Collection.prototype.add = function(models, options) {
+      return this.set(models, _.extend({
+        merge: false
+      }, options, addOptions));
+    };
+    Parse.Collection.prototype.remove = function(models, options) {
+      var i, index, l, model, singular;
+
+      singular = !_.isArray(models);
+      models = (singular ? [models] : _.clone(models));
+      options || (options = {});
+      i = void 0;
+      l = void 0;
+      index = void 0;
+      model = void 0;
+      i = 0;
+      l = models.length;
+      while (i < l) {
+        model = models[i] = this.get(models[i]);
+        if (!model) {
+          continue;
+        }
+        delete this._byId[model.id];
+        delete this._byId[model.cid];
+        index = this.indexOf(model);
+        this.models.splice(index, 1);
+        this.length--;
+        if (!options.silent) {
+          options.index = index;
+          model.trigger("remove", model, this, options);
+        }
+        this._removeReference(model);
+        i++;
+      }
+      if (singular) {
+        return models[0];
+      } else {
+        return models;
+      }
+    };
+    Parse.Collection.prototype.set = function(models, options) {
+      var add, at, attrs, existing, i, id, l, merge, model, modelMap, order, orderedModels, remove, singular, sort, sortAttr, sortable, targetModel, toAdd, toRemove;
+
+      options = _.defaults({}, options, setOptions);
+      if (options.parse) {
+        models = this.parse(models, options);
+      }
+      singular = !_.isArray(models);
+      models = (singular ? (models ? [models] : []) : _.clone(models));
+      i = void 0;
+      l = void 0;
+      id = void 0;
+      model = void 0;
+      attrs = void 0;
+      existing = void 0;
+      sort = void 0;
+      at = options.at;
+      targetModel = this.model;
+      sortable = this.comparator && (!(at != null)) && options.sort !== false;
+      sortAttr = (_.isString(this.comparator) ? this.comparator : null);
+      toAdd = [];
+      toRemove = [];
+      modelMap = {};
+      add = options.add;
+      merge = options.merge;
+      remove = options.remove;
+      order = (!sortable && add && remove ? [] : false);
+      i = 0;
+      l = models.length;
+      while (i < l) {
+        attrs = models[i];
+        if (attrs instanceof Parse.Object) {
+          id = model = attrs;
+        } else {
+          id = attrs[targetModel.prototype.idAttribute];
+        }
+        console.log(model);
+        console.log(add);
+        if (existing = this.get(id)) {
+          if (remove) {
+            modelMap[existing.cid] = true;
+          }
+          if (merge) {
+            attrs = (attrs === model ? model.attributes : attrs);
+            if (options.parse) {
+              attrs = existing.parse(attrs, options);
+            }
+            existing.set(attrs, options);
+            if (sortable && !sort && existing.hasChanged(sortAttr)) {
+              sort = true;
+            }
+          }
+          models[i] = existing;
+        } else if (add) {
+          model = models[i] = this._prepareModel(attrs, options);
+          console.log(model);
+          if (!model) {
+            continue;
+          }
+          toAdd.push(model);
+          model.on("all", this._onModelEvent, this);
+          this._byId[model.cid] = model;
+          if (model.id != null) {
+            this._byId[model.id] = model;
+          }
+        }
+        if (order) {
+          order.push(existing || model);
+        }
+        i++;
+      }
+      if (remove) {
+        i = 0;
+        l = this.length;
+        while (i < l) {
+          if (!modelMap[(model = this.models[i]).cid]) {
+            toRemove.push(model);
+          }
+          ++i;
+        }
+        if (toRemove.length) {
+          this.remove(toRemove, options);
+        }
+      }
+      if (toAdd.length || (order && order.length)) {
+        if (sortable) {
+          sort = true;
+        }
+        this.length += toAdd.length;
+        if (at != null) {
+          i = 0;
+          l = toAdd.length;
+          while (i < l) {
+            this.models.splice(at + i, 0, toAdd[i]);
+            i++;
+          }
+        } else {
+          if (order) {
+            this.models.length = 0;
+          }
+          orderedModels = order || toAdd;
+          i = 0;
+          l = orderedModels.length;
+          while (i < l) {
+            this.models.push(orderedModels[i]);
+            i++;
+          }
+        }
+      }
+      if (sort) {
+        this.sort({
+          silent: true
+        });
+      }
+      if (!options.silent) {
+        i = 0;
+        l = toAdd.length;
+        while (i < l) {
+          (model = toAdd[i]).trigger("add", model, this, options);
+          i++;
+        }
+        if (sort || (order && order.length)) {
+          this.trigger("sort", this, options);
+        }
+      }
+      if (singular) {
+        return models[0];
+      } else {
+        return models;
+      }
     };
     Parse.initialize(window.APPID, window.JSKEY);
     Parse.App = {};

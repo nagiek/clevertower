@@ -96,18 +96,18 @@ define [
 
       # Load the model if it exists.
       @$("##{@activeTab}-link").tab('show')
-      @renderSubView name, vars
 
-    renderSubView: (name, vars) ->
-      @subView.trigger "view:change" if @subView
-      require [name], (ProfileSubView) =>
-        @subView = (new ProfileSubView(vars)).render()
+      unless @subviews[name] 
+        require [name], (ProfileSubView) => 
+          @subviews[name] = (new ProfileSubView(vars)).render()
+      
 
     # Re-render the contents of the property item.
     refresh: ->
       @$('#profile-picture img').prop('src', @model.cover('profile'))
     
     clear: =>
+      _.each @subviews, (subview) -> subview.clear()
       @undelegateEvents()
       @stopListening()
       delete this

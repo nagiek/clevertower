@@ -190,7 +190,7 @@ define [
       data = activity.data()
       model = @model.activity.at(data.index)
 
-      @postComment activity, data, model
+      @postComment activity, model
 
     getActivityCommentsAndCollection : (e) =>
       e.preventDefault()

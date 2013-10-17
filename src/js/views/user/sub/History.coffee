@@ -22,7 +22,7 @@ define [
     clear: =>
       @stopListening()
       @undelegateEvents()
-      @subView.trigger "view:change" if @subView
+      _.each @subviews, (subview) -> subview.clear()
       delete this
 
     render: ->      
@@ -45,10 +45,9 @@ define [
       if action.length > 1 then vars.path = action.slice(1).join("/")
       
       @$("##{action[0]}-link").tab('show')
-      @renderSubView name, vars
+      unless @subviews[name] 
+        require [name], (ProfileSubView) => 
+          @subviews[name] = (new ProfileSubView(vars)).render()
 
 
-    renderSubView: (name, vars) ->
-      @subView.trigger "view:change" if @subView
-      require [name], (ProfileSubView) =>
-        @subView = (new ProfileSubView(vars)).render()
+    

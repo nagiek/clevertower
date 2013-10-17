@@ -18,8 +18,6 @@ define [
     
     initialize : (attrs) ->
       
-      _.bindAll this, 'save'
-      
       @current = attrs.current
                   
       @model.on 'invalid', (error) =>
@@ -41,7 +39,7 @@ define [
       
     # Save is broken into two saves: User and profile.
     # Profile is always available, but user may be hidden.
-    save : (e) ->
+    save : (e) =>
       e.preventDefault()
       data = @$('form').serializeObject()
       

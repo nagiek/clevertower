@@ -332,12 +332,12 @@ define [
       Parse.history.navigate "/outside" + (if @location then "/#{@location}" else "") + @locationAppend
       @performSearchWithinMap()
 
-    performSearchWithinMap: =>
+    performSearchWithinMap : =>
 
       bounds = @map.getBounds()
       @setBoundsAndSearch bounds.getSouthWest(), bounds.getNorthEast()
 
-    setBoundsAndSearch: (sw, ne) =>
+    setBoundsAndSearch : (sw, ne) =>
 
       @sw = new Parse.GeoPoint(sw.lat(), sw.lng())
       @ne = new Parse.GeoPoint(ne.lat(), ne.lng())
@@ -646,7 +646,7 @@ define [
         Parse.User.current().activity.at(data.index)
       else Parse.App.activity.at(data.index)
 
-      @postComment activity, data, model
+      @postComment activity, model
 
 
     getActivityCommentsAndCollection : (e) =>
@@ -674,7 +674,7 @@ define [
         button.button("complete")
         new Alert event: 'comment-load', fade: false, message: i18nCommon.errors.comment_load, type: 'error'
 
-
+        
 
     # Filter functions
     # ----------------

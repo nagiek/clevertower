@@ -16,7 +16,7 @@ define [
         
     initialize: (attrs) ->
 
-      @listenTo Parse.Dispatcher, "user:logout", @clear
+      @listenTo Parse.Dispatcher, "user:logout", @run
 
       # Render immediately, as we will display a subview
       @render()
@@ -25,9 +25,12 @@ define [
     clear: =>
       @undelegateEvents()
       @stopListening()
-      @subView.trigger "view:change" if @subView
-      Parse.history.navigate "", true
+      _.each @subviews, (subview) -> subview.clear()
       delete this
+
+    run: =>
+      @clear()
+      Parse.history.navigate "", true
 
     render: ->      
       vars = 
@@ -54,10 +57,6 @@ define [
       else
         # Load the model if it exists.
         @$("##{action[0]}-link").tab('show')
-        @renderSubView name, vars
-
-
-    renderSubView: (name, vars) ->
-      @subView.trigger "view:change" if @subView
-      require [name], (ProfileSubView) =>
-        @subView = (new ProfileSubView(vars)).render()
+        unless @subviews[name] 
+          require [name], (ProfileSubView) => 
+            @subviews[name] = (new ProfileSubView(vars)).render()

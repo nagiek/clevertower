@@ -303,7 +303,6 @@ define [
       e.preventDefault()
       button = @$(e.currentTarget)
       activity = button.closest(".activity")
-      likes = Number activity.find(".like-count").html()
       data = activity.data()
       model = if data.collection is "user"
         Parse.User.current().activity.at(data.index)
@@ -354,7 +353,7 @@ define [
     # Comments
     # --------
 
-    postComment: (activity, data, model) =>
+    postComment: (activity, model) =>
 
       formData = activity.find("form.new-comment-form").serializeObject()
 
@@ -503,8 +502,8 @@ define [
       $('#view-content-modal').on 'click', '.right', @nextModal
       $('#view-content-modal').on 'hide.bs.modal', @hideModal
       $('#view-content-modal').on 'click', '.like-button', @likeOrLogin
-      $('#view-content-modal').on 'click', '.likers', @getLikers
-      $('#view-content-modal').on 'submit', 'form', @postComment
+      $('#view-content-modal').on 'click', '.likers', @getModalLikers
+      $('#view-content-modal').on 'submit', 'form', @postModalComment
 
     controlModalIfOpen : (e) =>
       return unless @modal
@@ -637,4 +636,23 @@ define [
         button.button("complete")
         new Alert event: 'comment-load', fade: false, message: i18nCommon.errors.comment_load, type: 'error'
 
-    
+    getModalLikers : (e) =>
+      e.preventDefault()
+
+      model = if @modalCollection instanceof ActivityList then @modalCollection.at @modalIndex else @modalCollection[@modalIndex]
+      
+      model.prep("likers")
+      @listenToOnce model.likers, "reset", @showLikers
+      model.likers.fetch()
+
+    postModalComment : (e) =>
+
+      e.preventDefault()
+
+      return unless Parse.User.current()
+
+      button = @$(e.currentTarget)
+      activity = button.closest(".activity")
+      model = if @modalCollection instanceof ActivityList then @modalCollection.at @modalIndex else @modalCollection[@modalIndex]
+
+      @postComment activity, model

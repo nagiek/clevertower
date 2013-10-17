@@ -31,6 +31,11 @@ define [
 
       @modal = false
 
+    clear: =>
+      @undelegateEvents()
+      @remove()
+      delete this
+
     render: ->
 
       @listViews[0] = new infinity.ListView @$('.list-view'), 
@@ -85,7 +90,7 @@ define [
       data = activity.data()
       model = @model.likes.at(data.index)
 
-      @postComment activity, data, model
+      @postComment activity, model
 
     getActivityCommentsAndCollection : (e) =>
       e.preventDefault()
