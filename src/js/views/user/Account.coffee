@@ -57,6 +57,7 @@ define [
       else
         # Load the model if it exists.
         @$("##{action[0]}-link").tab('show')
+        
         unless @subviews[name] 
           require [name], (ProfileSubView) => 
             @subviews[name] = (new ProfileSubView(vars)).render()

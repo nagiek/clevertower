@@ -16,18 +16,22 @@ define [
     el: "#likes"
 
     events:
-      'click ul > li > a.content'           : 'getModelDataToShowInModal'
-      'click .thumbnails a.get-comments'    : 'getActivityCommentsAndCollection' # 'showModal'
+      'click .thumbnails a.content'           : 'getModelDataToShowInModal'
+      'click .thumbnails button.get-comments' : 'getActivityCommentsAndCollection' # 'showModal'
       # Activity events
-      "click .like-button"                  : "likeOrLogin"
-      "click .likers"                       : "showLikers"
-      "submit form.new-comment-form"        : "getCommentDataToPost"
+      "click .like-button"                    : "likeOrLogin"
+      "click .likers"                         : "showLikers"
+      "submit form.new-comment-form"          : "getCommentDataToPost"
     
     initialize: (attrs) ->
+
       super
 
       @current = attrs.current
       @$list = @$("ul")
+
+      @listenTo @model.likes, "add", @addOneActivity
+      @listenTo @model.likes, "reset", @addAllActivity
 
       @modal = false
 
@@ -52,9 +56,9 @@ define [
 
       @$loading = @$(".loading")
 
-      # Start activity search.      
-      @addAllActivity @model.likes
-      @addAllComments @model.comments
+      # Start activity search.
+      @addAllActivity @model.likes if @model.likes.length > 0
+      @addAllComments @model.comments if @model.comments.length > 0
       @search() unless @model.likes.length > @resultsPerPage * @page
 
       @
@@ -71,8 +75,10 @@ define [
       # Keep track of where we are, for subsequent navigation.
       # Convert the index to an array and find the "new" index.
        
-      # This is using the cached results done in addAllActivity
-      # @modalCollection = @model.likes.select (a) => a.get("profile") and a.get("profile").id is @model.id
+      # Could use the cached results from addAllActivity unless we've loaded new data
+      @modalCollection = @findModelActivity @model.likes
+      @modalCommentCollection = @findModelComments @model.comments
+
       model = @model.likes.at data.index
 
       ids = _.map(@modalCollection, (a) -> a.id)
@@ -86,7 +92,7 @@ define [
       return unless Parse.User.current()
 
       button = @$(e.currentTarget)
-      activity = button.closest(".likes")
+      activity = button.closest(".activity")
       data = activity.data()
       model = @model.likes.at(data.index)
 
@@ -100,23 +106,25 @@ define [
       button = @$(e.currentTarget)
       activity = button.closest(".activity")
       data = activity.data()
-      model = @model.activity.at(data.index)
+      model = @model.likes.at(data.index)
       comments = @model.comments
 
       button.button("loading")
 
       @getActivityComments(model, comments).then (newComms) =>
-        @addAllComments newComms
-        comments.add newComms
-        button.button("complete")
+        addedComms = comments.add newComms
+        @addAllComments addedComms
+        button.button("reset")
       , =>
-        button.button("complete")
+        button.button("reset")
         new Alert event: 'comment-load', fade: false, message: i18nCommon.errors.comment_load, type: 'error'
 
 
     # Activity
     # ------
     search : =>
+
+      console.log 'search'
 
       @$loading.html "<img src='/img/misc/spinner.gif' class='spinner' alt='#{i18nCommon.verbs.loading}' />"
       @moreToDisplay = true
@@ -133,10 +141,10 @@ define [
           if objs[0] and not objs[0].get "profile"
             _.each objs, (o) => o.set "profile", @model
 
-          @model.likes.add objs
+          addedObjs = @model.likes.add objs
 
           # We may be getting non-related models at this point.
-          @addAllActivity objs
+          # @addAllActivity addedObjs
 
           if objs.length < @resultsPerPage then @trigger "view:exhausted"
         else 
@@ -144,9 +152,9 @@ define [
 
         if comms 
           _.each comms, (c) => c.set "profile", @model
-          @model.comments.add comms
+          addedComms = @model.comments.add comms
 
-          @addAllComments comms
+          @addAllComments addedComms
           # if objs.length < @resultsPerPage then @trigger "view:exhausted"
         # @refreshDisplay()
 
@@ -193,7 +201,9 @@ define [
 
     addAllActivity: (collection, filter) =>
 
-      visible = @modalCollection = if collection instanceof ActivityList
+      visible = @findModelActivity collection
+
+      if collection instanceof ActivityList
         collection.select (a) =>
           a.get("profile") and a.get("profile").id is @model.id
       else 
@@ -202,6 +212,22 @@ define [
 
       if visible.length > 0 then _.each visible, @addOneActivity
       else @$loading.html '<div class="empty">' + if @current then i18nUser.empty.activities.self else i18nUser.empty.activities.other(@model.name()) + '</div>'
+
+    findModelActivity: (collection) =>
+      if collection instanceof ActivityList
+        collection.select (a) =>
+          a.get("property") and a.get("property").id is @model.id
+      else 
+        _.select collection, (a) =>
+          a.get("property") and a.get("property").id is @model.id
+
+    findModelComments: (collection) =>
+      if collection instanceof CommentList
+        collection.select (c) =>
+          c.get("property") and c.get("property").id is @model.id
+      else 
+        _.select collection, (c) =>
+          c.get("property") and c.get("property").id is @model.id
 
       
 

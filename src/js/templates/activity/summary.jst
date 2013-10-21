@@ -52,9 +52,9 @@
   </div>
   <div class="comments">
     <div class="additional-comments">
-      <a href="#" class="get-comments">
+      <button class="btn btn-link get-comments">
         <%= i18nCommon.verbs.view %> <span class="remaining-comments"><%= commentCount %></span> <%= i18nCommon.nouns.more_comment(commentCount) %>
-      </a>
+      </button>
     </div>
     <ul class="list-comments list-unstyled"></ul>
     <% if (current) { %>

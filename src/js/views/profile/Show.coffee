@@ -29,6 +29,7 @@ define [
       super
 
       @current = attrs.current
+      @subviews = {}
 
       @model.prep "comments"
 
@@ -91,14 +92,13 @@ define [
 
       @activeTab = path || "activity"
       name = "views/profile/sub/#{@activeTab}"
-      
-      vars = params: params, model: @model, current: @current
 
       # Load the model if it exists.
       @$("##{@activeTab}-link").tab('show')
 
       unless @subviews[name] 
         require [name], (ProfileSubView) => 
+          vars = params: params, model: @model, current: @current
           @subviews[name] = (new ProfileSubView(vars)).render()
       
 

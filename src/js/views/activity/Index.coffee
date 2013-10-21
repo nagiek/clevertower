@@ -32,7 +32,7 @@ define [
       'click #search-map'                       : 'searchMap'
       # 'click .pagination > ul > li > a'       : 'changePage'
       'click .thumbnails a.content'             : 'getModelDataToShowInModal'
-      'click .thumbnails a.get-comments'        : 'getActivityCommentsAndCollection' # 'showModal'
+      'click .thumbnails button.get-comments'   : 'getActivityCommentsAndCollection' # 'showModal'
       "mouseover .thumbnails .activity"         : "highlightMarkerFromCard"
       "mouseout .thumbnails .activity"          : "unhighlightMarkerFromCard"
       # 'hide #view-content-modal'              : 'hideModal'
@@ -360,6 +360,8 @@ define [
         @commentQuery.find()
       ).then (objs, comms) =>
 
+        addedComms = []
+
         if Parse.User.current() and Parse.User.current().get("network")
           pids = Parse.User.current().get("network").properties.map((p) -> p.id)
 
@@ -394,17 +396,17 @@ define [
 
                 if Parse.User.current().get("network")
                   if _.contains pids, comm.get("property").id
-                    Parse.User.current().comments.add comm
-                  else Parse.App.comments.add comm
+                    addedComms.push Parse.User.current().comments.add(comm)
+                  else addedComms.push Parse.App.comments.add(comm)
 
                 else if Parse.User.current().get("property")
                   if comm.get("property").id is Parse.User.current().get("property").id
-                    Parse.User.current().comments.add comm
-                  else Parse.App.comments.add comm
-                else Parse.App.comments.add comm
-              else Parse.App.comments.add comm
-            else Parse.App.comments.add comm
-        @addAllComments comms
+                    addedComms.push Parse.User.current().comments.add(comm)
+                  else addedComms.push Parse.App.comments.add(comm)
+                else addedComms.push Parse.App.comments.add(comm)
+              else addedComms.push Parse.App.comments.add(comm)
+            else addedComms.push Parse.App.comments.add(comm)
+        @addAllComments addedComms
           # if objs.length < @resultsPerPage then @trigger "view:exhausted"
         # @refreshDisplay()
 
@@ -623,7 +625,7 @@ define [
       data = $(e.currentTarget).parent().data()
       # Keep track of where we are, for subsequent navigation.
       @modalIndex = data.index
-       
+
       if data.collection is "user"
         @modalCollection = Parse.User.current().activity
         @modalCommentCollection = Parse.User.current().comments
@@ -667,11 +669,11 @@ define [
       button.button("loading")
 
       @getActivityComments(model, comments).then (newComms) =>
-        @addAllComments newComms
-        comments.add newComms
-        button.button("complete")
+        addedComms = comments.add newComms
+        @addAllComments addedComms
+        button.button("reset")
       , =>
-        button.button("complete")
+        button.button("reset")
         new Alert event: 'comment-load', fade: false, message: i18nCommon.errors.comment_load, type: 'error'
 
         

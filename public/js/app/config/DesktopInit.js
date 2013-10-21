@@ -265,8 +265,6 @@
         } else {
           id = attrs[targetModel.prototype.idAttribute];
         }
-        console.log(model);
-        console.log(add);
         if (existing = this.get(id)) {
           if (remove) {
             modelMap[existing.cid] = true;
@@ -284,7 +282,6 @@
           models[i] = existing;
         } else if (add) {
           model = models[i] = this._prepareModel(attrs, options);
-          console.log(model);
           if (!model) {
             continue;
           }

@@ -12,6 +12,8 @@ define [
     el: "#history"
     
     initialize: (attrs) ->
+      
+      @subviews = {}
 
       @listenTo Parse.Dispatcher, "user:logout", @clear
 

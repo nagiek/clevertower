@@ -346,9 +346,6 @@ require [
         id = model = attrs
       else
         id = attrs[targetModel::idAttribute]
-
-      console.log model
-      console.log add
       
       # If a duplicate is found, prevent it from being added and
       # optionally merge it into the existing model.
@@ -364,7 +361,6 @@ require [
       # If this is a new, valid model, push it to the `toAdd` list.
       else if add
         model = models[i] = @_prepareModel(attrs, options)
-        console.log model
         continue  unless model
         toAdd.push model
         

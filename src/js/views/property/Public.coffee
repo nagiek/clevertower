@@ -11,6 +11,7 @@ define [
   "views/photo/Public"
   "views/listing/PublicSummary"
   "i18n!nls/property"
+  "i18n!nls/unit"
   "i18n!nls/listing"
   "i18n!nls/group"
   "i18n!nls/common"
@@ -18,7 +19,7 @@ define [
   'templates/activity/modal'
   'templates/comment/summary'
   "gmaps"
-], ($, _, Parse, infinity, moment, ActivityList, CommentList, Alert, BaseIndexActivityView, PhotoView, ListingView, i18nProperty, i18nListing, i18nGroup, i18nCommon) ->
+], ($, _, Parse, infinity, moment, ActivityList, CommentList, Alert, BaseIndexActivityView, PhotoView, ListingView, i18nProperty, i18nUnit, i18nListing, i18nGroup, i18nCommon) ->
 
   class PublicPropertyView extends BaseIndexActivityView
 
@@ -27,7 +28,7 @@ define [
     events:
       'click .nav a'                            : 'showTab'
       'click #activity .thumbnails a.content'   : 'getModelDataToShowInModal'
-      'click .thumbnails a.get-comments'        : 'getActivityCommentsAndCollection' # 'showModal'
+      'click .thumbnails button.get-comments'   : 'getActivityCommentsAndCollection' # 'showModal'
       'click #new-lease'                        : 'showLeaseModal'
       # Activity events
       "click .like-button"                      : "likeOrLogin"
@@ -47,6 +48,7 @@ define [
       @model.prep "photos"
       @model.prep "listings"
 
+      # Do not add activity, as we may get extra items added.
       # @listenTo @model.activity, "add", @addOneActivity
       # @listenTo @model.activity, "reset", @addAllActivity
 
@@ -143,8 +145,8 @@ define [
       @$listings = @$("#listings > table > tbody")
       
       # Start activity search.      
-      @addAllActivity @model.activity
-      @addAllComments @model.comments
+      @addAllActivity @model.activity if @model.activity.length > 0
+      @addAllComments @model.comments if @model.comments.length > 0
       @search() unless @model.activity.length > @resultsPerPage * @page
 
       if @model.photos.length > 0 then @addAllPhotos() else @model.photos.fetch()
@@ -170,7 +172,7 @@ define [
       # Convert the index to an array and find the "new" index.
        
       # Could use the cached results from addAllActivity unless we've loaded new data
-      @modalCollection = @findModelActivity @model.activity if @page > 1
+      @modalCollection = @findModelActivity @model.activity
       @modalCommentCollection = @findModelComments @model.comments
       
       model = @model.activity.at data.index
@@ -206,11 +208,11 @@ define [
       button.button("loading")
 
       @getActivityComments(model, comments).then (newComms) =>
-        @addAllComments newComms
-        comments.add newComms
-        button.button("complete")
+        addedComms = comments.add newComms
+        @addAllComments addedComms
+        button.button("reset")
       , =>
-        button.button("complete")
+        button.button("reset")
         new Alert event: 'comment-load', fade: false, message: i18nCommon.errors.comment_load, type: 'error'
 
     # Activity
@@ -232,10 +234,10 @@ define [
           if objs[0] and not objs[0].get "property"
             _.each objs, (o) => o.set "property", @model
 
-          @model.activity.add objs
+          addedObjs = @model.activity.add objs
 
           # We may be getting non-related models at this point.
-          @addAllActivity objs
+          @addAllActivity addedObjs
           
           if objs.length < @resultsPerPage then @trigger "view:exhausted"
         else 
@@ -243,9 +245,9 @@ define [
 
         if comms 
           _.each comms, (c) => c.set "property", @model
-          @model.comments.add comms
+          addedComms = @model.comments.add comms
 
-          @addAllComments comms
+          @addAllComments addedComms
           # if objs.length < @resultsPerPage then @trigger "view:exhausted"
         # @refreshDisplay()
 
@@ -285,12 +287,13 @@ define [
 
     addAllActivity: (collection) =>
 
-      visible = @modalCollection = @findModelActivity collection
+      visible = @findModelActivity collection
+      console.log visible
 
       if visible.length > 0 then _.each visible, @addOneActivity
       else @$loading.html '<div class="empty">' + i18nProperty.tenant_empty.activity + '</div>'
 
-    findModelActivity: (collection) ->
+    findModelActivity: (collection) =>
       if collection instanceof ActivityList
         collection.select (a) =>
           a.get("property") and a.get("property").id is @model.id
@@ -298,7 +301,7 @@ define [
         _.select collection, (a) =>
           a.get("property") and a.get("property").id is @model.id
 
-    findModelComments: (collection) ->
+    findModelComments: (collection) =>
       if collection instanceof CommentList
         collection.select (c) =>
           c.get("property") and c.get("property").id is @model.id

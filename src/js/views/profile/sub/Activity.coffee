@@ -17,18 +17,21 @@ define [
     el: "#activity"
 
     events:
-      'click ul > li > a.content'           : 'getModelDataToShowInModal'
-      'click .thumbnails a.get-comments'    : 'getActivityCommentsAndCollection' # 'showModal'
+      'click .thumbnails a.content'           : 'getModelDataToShowInModal'
+      'click .thumbnails button.get-comments' : 'getActivityCommentsAndCollection' # 'showModal'
       # Activity events
-      "click .like-button"                  : "likeOrLogin"
-      "click .likers"                       : "showLikers"
-      "submit form.new-comment-form"        : "getCommentDataToPost"
+      "click .like-button"                    : "likeOrLogin"
+      "click .likers"                         : "showLikers"
+      "submit form.new-comment-form"          : "getCommentDataToPost"
     
     initialize: (attrs) ->
       super
 
       @current = attrs.current
       @$list = @$("ul")
+
+      # @listenTo @model.activity, "add", @addOneActivity
+      # @listenTo @model.activity, "reset", @addAllActivity
 
       @modal = false
 
@@ -72,8 +75,10 @@ define [
       # Keep track of where we are, for subsequent navigation.
       # Convert the index to an array and find the "new" index.
        
-      # This is using the cached results done in addAllActivity
-      # @modalCollection = @model.activity.select (a) => a.get("profile") and a.get("profile").id is @model.id
+      # Could use the cached results from addAllActivity unless we've loaded new data
+      @modalCollection = @findModelActivity @model.likes if @page > 1 or !@modalCollection or _.isEmpty @modalCollection
+      @modalCommentCollection = @findModelComments @model.comments
+
       model = @model.activity.at data.index
 
       ids = _.map(@modalCollection, (a) -> a.id)
@@ -107,11 +112,11 @@ define [
       button.button("loading")
 
       @getActivityComments(model, comments).then (newComms) =>
-        @addAllComments newComms
-        comments.add newComms
-        button.button("complete")
+        addedComms = comments.add newComms
+        @addAllComments addedComms
+        button.button("reset")
       , =>
-        button.button("complete")
+        button.button("reset")
         new Alert event: 'comment-load', fade: false, message: i18nCommon.errors.comment_load, type: 'error'
 
 
@@ -134,10 +139,10 @@ define [
           if objs[0] and not objs[0].get "profile"
             _.each objs, (o) => o.set "profile", @model
 
-          @model.activity.add objs
+          addedObjs = @model.activity.add objs
 
           # We may be getting non-related models at this point.
-          @addAllActivity objs
+          @addAllActivity addedObjs
 
           if objs.length < @resultsPerPage then @trigger "view:exhausted"
         else 
@@ -145,9 +150,9 @@ define [
 
         if comms 
           _.each comms, (c) => c.set "profile", @model
-          @model.comments.add comms
+          addedComms = @model.comments.add comms
 
-          @addAllComments comms
+          @addAllComments addedComms
           # if objs.length < @resultsPerPage then @trigger "view:exhausted"
         # @refreshDisplay()
 
@@ -194,7 +199,9 @@ define [
 
     addAllActivity: (collection, filter) =>
 
-      visible = @modalCollection = if collection instanceof ActivityList
+      visible = @findModelActivity collection
+
+      if collection instanceof ActivityList
         collection.select (a) =>
           a.get("profile") and a.get("profile").id is @model.id
       else 
@@ -203,6 +210,22 @@ define [
 
       if visible.length > 0 then _.each visible, @addOneActivity
       else @$loading.html '<div class="empty">' + if @current then i18nUser.empty.activities.self else i18nUser.empty.activities.other(@model.name()) + '</div>'
+
+    findModelActivity: (collection) =>
+      if collection instanceof ActivityList
+        collection.select (a) =>
+          a.get("property") and a.get("property").id is @model.id
+      else 
+        _.select collection, (a) =>
+          a.get("property") and a.get("property").id is @model.id
+
+    findModelComments: (collection) =>
+      if collection instanceof CommentList
+        collection.select (c) =>
+          c.get("property") and c.get("property").id is @model.id
+      else 
+        _.select collection, (c) =>
+          c.get("property") and c.get("property").id is @model.id
 
       
 

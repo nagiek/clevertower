@@ -92,7 +92,7 @@ define [
     checkForLikes: ->
       Parse.User.current().get("profile").likes.each (l) =>
         _.each @listViews, (lv) =>
-          activity = lv.find("#activity-#{l.id}")
+          activity = lv.find("> div > .activity-#{l.id}")
           if activity.length > 0
             @markAsLiked activity[0].$el
             # return false to avoid checking the other column.
@@ -138,9 +138,9 @@ define [
         propertyId = false
         propertyIndex = false
 
+      # Possible for the same activity to be on the page twice (in two different tabs)
       $el = $ """
-      <div class="thumbnail clearfix activity fade in"
-        id="activity-#{model.id}"
+      <div class="thumbnail clearfix activity activity-#{model.id} fade in"
         data-liked="#{liked}"
         data-property-index="#{propertyIndex}" 
         data-property-id="#{propertyId}"
@@ -385,7 +385,7 @@ define [
 
       # Optimistic saving.
       _.each @listViews, (lv) =>
-        listItem = lv.find("#activity-#{model.id}")
+        listItem = lv.find("> div > .activity-#{model.id}")
         if listItem.length > 0 
           @addOneComment comment, listItem[0]
           # return false to avoid checking the other column.
@@ -451,7 +451,7 @@ define [
       for modelId in _.keys visible
 
         _.each @listViews, (lv) =>
-          listItem = lv.find("#activity-#{modelId}")
+          listItem = lv.find("> div > .activity-#{modelId}")
           if listItem.length > 0
 
             # Decrease the "comment remaining" count
