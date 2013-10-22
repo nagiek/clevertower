@@ -43,8 +43,7 @@ define [
         @model.likes = new ActivityList [], profile: @model
         @model.likes.query = @model.relation("likes").query().include("property")
 
-      @listenTo @model.likes, "reset", @updateLikesCount
-      if @model.likes.length > 0 then @updateLikesCount() else @model.likes.fetch()
+      @model.likes.query.count().then @updateLikesCount
 
       @file = false
 
@@ -66,8 +65,7 @@ define [
     #     @activeTab = "activity"
     #     @changeSubView @activeTab
 
-    updateLikesCount: => 
-      @$("#like-count").html @model.likes.length
+    updateLikesCount: (count) => @$("#like-count").html count
 
     render: ->      
       vars = _.merge @model.toJSON(),
