@@ -367,7 +367,7 @@
       # transition events are not triggered,
       # so we have to resolve manually:
       ((loadImage and loadImage(file, (img) ->
-        img.className = 'profile-picture span4 offset1'
+        img.className = 'profile-picture col-md-4'
         node.append img
         options.nameContainer.html file.name if options.nameContainer 
         that._forceReflow node

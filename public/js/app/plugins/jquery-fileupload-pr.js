@@ -371,7 +371,7 @@
         options = this.options;
         dfd = $.Deferred();
         return ((loadImage && loadImage(file, function(img) {
-          img.className = 'profile-picture span4 offset1';
+          img.className = 'profile-picture col-md-4';
           node.append(img);
           if (options.nameContainer) {
             options.nameContainer.html(file.name);

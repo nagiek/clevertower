@@ -124,8 +124,6 @@ define [
     # ------
     search : =>
 
-      console.log 'search'
-
       @$loading.html "<img src='/img/misc/spinner.gif' class='spinner' alt='#{i18nCommon.verbs.loading}' />"
       @moreToDisplay = true
 
@@ -203,31 +201,24 @@ define [
 
       visible = @findModelActivity collection
 
-      if collection instanceof ActivityList
-        collection.select (a) =>
-          a.get("profile") and a.get("profile").id is @model.id
-      else 
-        _.select collection, (a) =>
-          a.get("profile") and a.get("profile").id is @model.id
-
       if visible.length > 0 then _.each visible, @addOneActivity
       else @$loading.html '<div class="empty">' + if @current then i18nUser.empty.activities.self else i18nUser.empty.activities.other(@model.name()) + '</div>'
 
     findModelActivity: (collection) =>
       if collection instanceof ActivityList
         collection.select (a) =>
-          a.get("property") and a.get("property").id is @model.id
+          a.get("profile") and a.get("profile").id is @model.id
       else 
         _.select collection, (a) =>
-          a.get("property") and a.get("property").id is @model.id
+          a.get("profile") and a.get("profile").id is @model.id
 
     findModelComments: (collection) =>
       if collection instanceof CommentList
         collection.select (c) =>
-          c.get("property") and c.get("property").id is @model.id
+          c.get("profile") and c.get("profile").id is @model.id
       else 
         _.select collection, (c) =>
-          c.get("property") and c.get("property").id is @model.id
+          c.get("profile") and c.get("profile").id is @model.id
 
       
 
