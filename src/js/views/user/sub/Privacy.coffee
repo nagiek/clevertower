@@ -23,7 +23,7 @@ define [
       @on "save:success", (model) =>
         @$('.error').removeClass('error')
         @$('button.save').removeProp "disabled"
-        new Alert(event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success')
+        new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
     
     save : (e) =>
       e.preventDefault()

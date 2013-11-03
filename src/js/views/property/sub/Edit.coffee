@@ -24,7 +24,7 @@ define [
     initialize : ->
 
       @on "property:save", ->
-        new Alert(event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success')
+        new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
       
       @on "property:sync", ->
         @$('button.save').removeProp('disabled')
@@ -32,7 +32,7 @@ define [
       @listenTo @model, "invalid", (error) ->
         console.log error
 
-        new Alert(event: 'model-save', fade: false, message: i18nProperty.errors[error.message], type: 'error')
+        new Alert event: 'model-save', fade: false, message: i18nProperty.errors[error.message], type: 'danger'
         switch error.message
           when 'title_missing'
             @$el.find('#property-title-group').addClass('error') # Add class to Control Group

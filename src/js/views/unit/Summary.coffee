@@ -5,13 +5,12 @@ define [
   "moment"
   'models/Unit'
   'models/Lease'
-  'views/helper/Alert'
   "i18n!nls/listing"
   "i18n!nls/lease"
   "i18n!nls/unit"
   "i18n!nls/common"
   'templates/unit/summary'
-], ($, _, Parse, moment, Unit, Lease, Alert, i18nListing, i18nLease, i18nUnit, i18nCommon) ->
+], ($, _, Parse, moment, Unit, Lease, i18nListing, i18nLease, i18nUnit, i18nCommon) ->
 
   class UnitSummaryView extends Parse.View
   

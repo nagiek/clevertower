@@ -451,7 +451,7 @@ define [
               require ["views/helper/Alert", 'i18n!nls/common'], (Alert, i18nCommon) -> 
                 new Alert
                   event:    'access-denied'
-                  type:     'error'
+                  type:     'danger'
                   fade:     true
                   heading:  i18nCommon.oauth.error
                   message:  i18nCommon.oauth.unverified_token
@@ -460,7 +460,7 @@ define [
           require ["views/helper/Alert", 'i18n!nls/common'], (Alert, i18nCommon) -> 
             new Alert
               event:    'access-denied'
-              type:     'error'
+              type:     'danger'
               fade:     true
               heading:  i18nCommon.oauth.error
               message:  i18nCommon.oauth[vars.error]
@@ -476,7 +476,7 @@ define [
       require ["views/helper/Alert", 'i18n!nls/common'], (Alert, i18nCommon) -> 
         new Alert
           event:    'access-denied'
-          type:     'error'
+          type:     'danger'
           fade:     true
           heading:  i18nCommon.errors.fourOhFour
           message:  i18nCommon.errors.not_found
@@ -508,7 +508,7 @@ define [
       require ["views/helper/Alert", 'i18n!nls/common'], (Alert, i18nCommon) -> 
         new Alert
           event:    'access-denied'
-          type:     'error'
+          type:     'danger'
           fade:     true
           heading:  i18nCommon.errors.access_denied
           message:  i18nCommon.errors.no_permission

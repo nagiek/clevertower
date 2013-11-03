@@ -38,7 +38,7 @@ define [
 
       @listenTo @model.units, "invalid", (error) =>
         msg = if error.code? i18nCommon.errors[error.message] else i18nUnit.errors[error.message]
-        new Alert(event: 'unit-invalid', fade: false, message: msg, type: 'error')
+        new Alert event: 'unit-invalid', fade: false, message: msg, type: 'danger'
       
       @editing = false
                 
@@ -127,7 +127,7 @@ define [
       @$('.error').removeClass('error') if @$('.error')
       Parse.Object.saveAll @model.units.models, 
         success: (units) =>
-          new Alert(event: 'units-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success')
+          new Alert event: 'units-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
           @model.units.trigger "save:success"
         error: (error) =>
           console.log error

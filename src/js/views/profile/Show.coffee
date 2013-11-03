@@ -162,7 +162,7 @@ define [
         @$('#edit-profile-picture-modal').modal('hide')
       else 
         @$form.after """
-          <div class="alert alert-block alert-error fade in">
+          <div class="alert alert-danger fade in">
             <p class="message">#{i18nCommon.errors.no_picture}</p>
           </div>
         """

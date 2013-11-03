@@ -56,7 +56,7 @@ define [
       e.preventDefault()
       Parse.User.requestPasswordReset $("#reset-email").val(),
         success: ->
-          new Alert(event: 'reset-password', message: i18nDevise.messages.password_reset)
+          new Alert event: 'reset-password', message: i18nDevise.messages.password_reset
           @$('> #reset-password-modal').find('.has-error').removeClass('has-error')
           @$('> #reset-password-modal').modal('hide')
         error: (error) ->
@@ -67,7 +67,7 @@ define [
             else error.message
             
           $("#reset-email-group").addClass('has-error')
-          new Alert(event: 'reset-password', fade: false, message: msg, type: 'error')
+          new Alert event: 'reset-password', fade: false, message: msg, type: 'danger'
 
     logIn: (e) =>
       e.preventDefault()
@@ -185,7 +185,7 @@ define [
               @$('> #signup-modal #signup-modal-form username-group').addClass('has-error')
               @$('> #signup-modal #signup-modal-form password-group').addClass('has-error')
 
-          @$("> #signup-modal #signup-modal-form .alert-error").html(msg).show()
+          @$("> #signup-modal #signup-modal-form .alert-danger").html(msg).show()
 
     switchToSignup: (e) =>
       e.preventDefault()

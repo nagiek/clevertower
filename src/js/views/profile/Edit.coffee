@@ -26,7 +26,7 @@ define [
         
         msg = i18nUser.errors[error.message]
                   
-        new Alert(event: 'model-save', fade: false, message: msg, type: 'error')
+        new Alert event: 'model-save', fade: false, message: msg, type: 'danger'
 
         switch error.message
           when "invalid_birthday"
@@ -35,7 +35,7 @@ define [
       @on "save:success", (model) =>
         @$('.error').removeClass('error')
         @$('button.save').removeProp "disabled"
-        new Alert(event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success')
+        new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
       
     clear: =>
       @undelegateEvents()

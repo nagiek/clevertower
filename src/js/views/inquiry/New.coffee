@@ -33,7 +33,7 @@ define [
                 i18nListing.errors[error.message]
               else i18nCommon.errors.unknown
             
-        new Alert(event: 'model-save', fade: false, message: msg, type: 'error')
+        new Alert event: 'model-save', fade: false, message: msg, type: 'danger'
         switch error.message
           when 'unit_missing'
             @$('.unit-group').addClass('error')

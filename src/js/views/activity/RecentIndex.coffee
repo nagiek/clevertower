@@ -7,6 +7,7 @@ define [
   'collections/ActivityList'
   'collections/CommentList'
   "models/Comment"
+  "views/helper/Alert"
   "views/listing/Search"
   "views/activity/New"
   "views/activity/BaseIndex"
@@ -19,7 +20,7 @@ define [
   # 'masonry'
   # 'jqueryui'
   "gmaps"
-], ($, _, Parse, infinity, moment, ActivityList, CommentList, Comment, ListingSearchView, NewActivityView, BaseIndexActivityView, i18nListing, i18nCommon) ->
+], ($, _, Parse, infinity, moment, ActivityList, CommentList, Comment, Alert, ListingSearchView, NewActivityView, BaseIndexActivityView, i18nListing, i18nCommon) ->
 
   class ActivityIndexView extends BaseIndexActivityView
   
@@ -1108,7 +1109,7 @@ define [
       comment.save().then (obj) -> , 
       (error) =>
         console.log error
-        new Alert event: 'model-save', fade: false, message: i18nCommon.errors.unknown, type: 'error'
+        new Alert event: 'model-save', fade: false, message: i18nCommon.errors.unknown, type: 'danger'
         model.set "commentCount", newCount - 1
         activity.find(".comments > li:last-child").remove()
         activity.find(".comment-count").html newCount - 1

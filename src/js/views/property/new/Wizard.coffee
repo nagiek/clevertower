@@ -63,7 +63,7 @@ define [
           when 'title_missing' then @$('#property-title-group').addClass('error')
           else @$('#address-search-group').addClass('has-error')
         
-        new Alert event: 'model-save', fade: false, message: msg, type: 'error'
+        new Alert event: 'model-save', fade: false, message: msg, type: 'danger'
 
       @on "property:save", (property) =>
         # Add new property to collection

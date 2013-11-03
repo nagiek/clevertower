@@ -46,11 +46,11 @@ define [
           i18nProperty.errors[fn](args[0])
         else
           i18nProperty.errors[error.message]
-        new Alert(event: 'model-save', fade: false, message: msg, type: 'error')
+        new Alert event: 'model-save', fade: false, message: msg, type: 'danger'
           
                   
       @on "save:success", (model) =>
-        new Alert(event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success')
+        new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
         Parse.User.current().set "network", @model
 
         Parse.User.current().networkSetup().then ->

@@ -381,7 +381,7 @@ define [
       comment.save().then @addCommentToCollection, 
       (error) =>
         console.log error
-        new Alert event: 'model-save', fade: false, message: i18nCommon.errors.unknown, type: 'error'
+        new Alert event: 'model-save', fade: false, message: i18nCommon.errors.unknown, type: 'danger'
         model.set "commentCount", newCount - 1
         activity.find(".comments > li:last-child").remove()
         activity.find(".comment-count").html newCount - 1

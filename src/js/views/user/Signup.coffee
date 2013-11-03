@@ -3,13 +3,12 @@ define [
   "underscore"
   "backbone"
   "collections/NotificationList"
-  'views/helper/Alert'
   "i18n!nls/common"
   "i18n!nls/devise"
   "i18n!nls/user"
   'plugins/toggler'
   'templates/user/signup'
-], ($, _, Parse, NotificationList, Alert, i18nCommon, i18nDevise, i18nUser) ->
+], ($, _, Parse, NotificationList, i18nCommon, i18nDevise, i18nUser) ->
 
   class SignupView extends Parse.View
 
@@ -65,7 +64,7 @@ define [
               @$('> #signup #signup-form username-group').addClass('error')
               @$('> #signup #signup-form password-group').addClass('error')
 
-          @$("> #signup #signup-form .alert-error").html(msg).show()
+          @$("> #signup #signup-form .alert-danger").html(msg).show()
 
     logInWithFacebook : (e) =>  
       e.preventDefault()

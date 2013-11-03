@@ -34,7 +34,7 @@ define [
       @
 
     join: =>
-      alert = new Alert(event: 'model-save', fade: true, message: i18nCommon.actions.request_sent, type: 'success')
+      alert = new Alert event: 'model-save', fade: true, message: i18nCommon.actions.request_sent, type: 'success'
       
       manager = new Manager 
         status: 'pending'

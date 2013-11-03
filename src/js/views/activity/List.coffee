@@ -169,7 +169,7 @@ define [
       comment.save().then (obj) -> , 
       (error) =>
         console.log error
-        new Alert event: 'model-save', fade: false, message: i18nCommon.errors.unknown, type: 'error'
+        new Alert event: 'model-save', fade: false, message: i18nCommon.errors.unknown, type: 'danger'
         @$comments.children().last().remove()
         @model.set "commentCount", newCount - 1
         @$(".comment-count").html newCount - 1

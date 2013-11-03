@@ -42,7 +42,7 @@ define [
             @$('.title-group .control-group').addClass('error')
 
         msg = if error.code? i18nCommon.errors[error.message] else i18nUnit.errors[error.message]
-        new Alert(event: 'unit-invalid', fade: false, message: msg, type: 'error')
+        new Alert event: 'unit-invalid', fade: false, message: msg, type: 'danger'
 
     # Re-render the contents of the Unit item.
     render: ->

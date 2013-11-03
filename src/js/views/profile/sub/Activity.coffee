@@ -119,7 +119,7 @@ define [
         button.button("reset")
       , =>
         button.button("reset")
-        new Alert event: 'comment-load', fade: false, message: i18nCommon.errors.comment_load, type: 'error'
+        new Alert event: 'comment-load', fade: false, message: i18nCommon.errors.comment_load, type: 'danger'
 
     addCommentToCollection : (comment) => @model.comments.add comment 
     

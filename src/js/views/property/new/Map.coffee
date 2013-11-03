@@ -107,7 +107,7 @@ define [
           for p in Parse.User.current().get("network").properties.models
             if results[0].geometry.location.equals p.GPoint()
               msg = i18nProperty.errors.taken_by_network p.id
-              return new Alert event: 'geocode', fade: false, message: msg, type: 'error'
+              return new Alert event: 'geocode', fade: false, message: msg, type: 'danger'
 
 
           # This is preventing us from creating another lease in the same building.

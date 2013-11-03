@@ -26,7 +26,7 @@ define [
       e.preventDefault()
       Parse.User.requestPasswordReset $("#reset-email").val(),
         success: ->
-          new Alert(event: 'reset-password', message: i18nDevise.messages.password_reset)
+          new Alert event: 'reset-password', message: i18nDevise.messages.password_reset
           @$('> #reset-password-modal').find('.error').removeClass('error')
           @$('> #reset-password-modal').modal('hide')
         error: (error) ->
@@ -36,4 +36,4 @@ define [
             else error.message
             
           $("#reset-email-group").addClass('error')
-          new Alert(event: 'reset-password', fade: false, message: msg, type: 'error')
+          new Alert event: 'reset-password', fade: false, message: msg, type: 'danger'

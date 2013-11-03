@@ -472,7 +472,7 @@ define [
 
       msg = i18nCommon.errors[error]
 
-      new Alert event: 'model-save', fade: false, message: msg, type: 'error'
+      new Alert event: 'model-save', fade: false, message: msg, type: 'danger'
       switch error.message
         when 'unit_missing'
           @$('.unit-group').addClass('error')

@@ -21,7 +21,7 @@ define [
       @on "save:success", (model) =>
         @$('.error').removeClass('error')
         @$('button.save').removeProp "disabled"
-        new Alert(event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success')
+        new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
         
     FBlink: (e) =>
       e.preventDefault()
@@ -36,7 +36,7 @@ define [
         error: =>
           @$("#fb-link").button("reset")
           @$("#fb-link").html i18nCommon.actions.link
-          new Alert(event: 'facebook-link', fade: false, message: i18nCommon.errors.unknown, type: 'error')
+          new Alert event: 'facebook-link', fade: false, message: i18nCommon.errors.unknown, type: 'danger'
 
     FBunlink: (e) =>
       e.preventDefault()
@@ -49,7 +49,7 @@ define [
         error: =>
           @$("#fb-unlink").button("reset")
           @$("#fb-unlink").html i18nCommon.actions.unlink
-          new Alert(event: 'facebook-link', fade: false, message: i18nCommon.errors.unknown, type: 'error')
+          new Alert event: 'facebook-link', fade: false, message: i18nCommon.errors.unknown, type: 'danger'
             
     render: =>
       vars =

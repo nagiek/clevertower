@@ -28,7 +28,7 @@ define [
         
         msg = i18nDevise.errors[error.message]
                   
-        new Alert(event: 'model-save', fade: false, message: msg, type: 'error')
+        new Alert event: 'model-save', fade: false, message: msg, type: 'danger'
         
         switch error.message
           when "missing_password"         then @$('.password-group').addClass('error')
@@ -40,13 +40,13 @@ define [
       @on "save:success", (model) =>
         @$('.error').removeClass('error')
         @$('button.save').removeProp "disabled"
-        new Alert(event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success')
+        new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
 
     resetPassword: (e) =>
     
       Parse.User.requestPasswordReset @model.getEmail(),
         success: ->
-          new Alert(event: 'reset-password', message: i18nDevise.messages.password_reset)    
+          new Alert event: 'reset-password', message: i18nDevise.messages.password_reset
     
     # Save is broken into two saves: User and profile.
     # Profile is always available, but user may be hidden.

@@ -28,7 +28,7 @@ define [
 
       @on "submit:fail", (error) ->
         @$('.emails-group').addClass('error')
-        new Alert event: 'model-save', fade: false, message: i18nCommon.errors[error.message], type: 'error'
+        new Alert event: 'model-save', fade: false, message: i18nCommon.errors[error.message], type: 'danger'
       
       @model.prep('managers')
       

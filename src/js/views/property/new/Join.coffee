@@ -54,7 +54,7 @@ define [
           else
             i18nCommon.errors.unknown
             
-        new Alert event: 'model-save', fade: false, message: msg, type: 'error'
+        new Alert event: 'model-save', fade: false, message: msg, type: 'danger'
         switch error.message
           when 'unit_missing', 'no_title'
             @$('.unit-group').addClass('has-error')

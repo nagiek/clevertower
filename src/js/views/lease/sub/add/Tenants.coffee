@@ -34,7 +34,7 @@ define [
       @on 'submit:error', (error) =>
         console.log error
         @$('.emails-group').addClass('error') 
-        new Alert(event: 'model-save', fade: false, message: i18nLease.errors[error.message], type: 'error')
+        new Alert event: 'model-save', fade: false, message: i18nLease.errors[error.message], type: 'danger'
       
       @on "submit:success", (model) =>
         new Parse.Query("Tenant").equalTo("lease", @model).include("profile").find()
