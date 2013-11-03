@@ -1,6 +1,6 @@
 <a class="content" href="<%= url %>">
   <% if (postImage) { %>
-    <div class="photo photo-full">
+    <div class="photo photo-grid4">
       <img class="img-responsive" alt="<%= i18nCommon.nouns.cover_photo %>">
     </div>
     <% if (title || rent || isEvent) { %>
@@ -42,17 +42,19 @@
         </a>
         <small class="like-count"><%= likeCount %></small>
       </li>
+      <!--
       <li>
         <a href="#" class="comment-button">
           <span class="glyphicon glyphicon-comment"></span>
         </a>
         <small class="comment-count"><%= commentCount %></small>
       </li>
+      -->
     </ul>
   </div>
   <div class="comments">
     <div class="additional-comments">
-      <button class="btn btn-link get-comments">
+      <button class="btn btn-link get-comments<% if (commentCount == 0) { %> hide<% } %>">
         <%= i18nCommon.verbs.view %> <span class="remaining-comments"><%= commentCount %></span> <%= i18nCommon.nouns.more_comment(commentCount) %>
       </button>
     </div>

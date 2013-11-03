@@ -27,8 +27,7 @@ define [
       @listenTo @results, "reset", @addAll
       @listenTo @results, "network:join", => 
         Parse.User.current().networkSetup().then ->
-          Parse.history.navigate "/inside", true
-          @clear()
+          Parse.history.navigate "inside", true
 
       # Only do this on 'invalid', as we will reload the page 
       # for the user and we don't want them getting antsy
@@ -53,8 +52,10 @@ define [
       @on "save:success", (model) =>
         new Alert(event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success')
         Parse.User.current().set "network", @model
-        
-        Parse.history.navigate "inside", true
+
+        Parse.User.current().networkSetup().then ->
+          if Parse.User.current().get("property") then Parse.User.current().get("property").set("network", @model).save()
+          Parse.history.navigate "inside", true
 
         # Navigate after a second.
         # domain = "#{location.protocol}//#{model.get("name")}.#{location.host}"

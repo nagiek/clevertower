@@ -33,14 +33,27 @@ Parse.Cloud.define "SetPicture", (req, res) ->
       Buffer = require('buffer').Buffer
       buf = new Buffer(httpres.buffer)      
       file = new Parse.File(req.user.getUsername() + "-picture.jpeg", base64: buf.toString('base64'))
-      file.save().then ->
+      file.save().then( ->
+        console.log '1a'
         (new Parse.Query "Profile").equalTo('objectId', req.user.get("profile").id).first()
-      .then (profile) ->
+      , (error) ->
+        console.log '1b'
+        res.error error
+      ).then( (profile) ->
+        console.log '2a'
         profile.save image_thumb: file.url(), image_profile: file.url(), image_full: file.url()
-      .then ->
+      , (error) ->
+        console.log '2b'
+        res.error error
+      ).then( ->
+        console.log '3a'
         res.success file.url()
         # error: (error) ->
-        #   res.error
+        #   res.error)
+      , (error) ->
+        console.log '3b'
+        res.error error
+      )
     error: (error) ->
       res.error error
       # console.log("Got response: " + res.statusCode);
@@ -1159,23 +1172,23 @@ Parse.Cloud.beforeSave "Listing", (req, res) ->
 
 
 # Listing validation
-Parse.Cloud.afterSave "Listing", (req) ->
+# Parse.Cloud.afterSave "Listing", (req) ->
 
-  if !req.object.existed() and req.object.get "public"
+#   if !req.object.existed() and req.object.get "public"
 
-    # Create activity
-    activity = new Parse.Object("Activity")
-    activity.save
-      activity_type: "new_listing"
-      public: true
-      rent: req.object.get "rent"
-      center: req.object.get "center"
-      listing: req.object
-      unit: req.object.get "unit"
-      property: req.object.get "property"
-      network: req.object.get "network"
-      title: req.object.get "title"
-      profile: req.user.get "profile"
+#     # Create activity
+#     activity = new Parse.Object("Activity")
+#     activity.save
+#       activity_type: "new_listing"
+#       public: true
+#       rent: req.object.get "rent"
+#       center: req.object.get "center"
+#       listing: req.object
+#       unit: req.object.get "unit"
+#       property: req.object.get "property"
+#       network: req.object.get "network"
+#       title: req.object.get "title"
+#       profile: req.user.get "profile"
 
 
 # Tenant validation

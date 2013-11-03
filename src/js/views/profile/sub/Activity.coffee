@@ -20,8 +20,8 @@ define [
       'click .thumbnails a.content'           : 'getModelDataToShowInModal'
       'click .thumbnails button.get-comments' : 'getActivityCommentsAndCollection' # 'showModal'
       # Activity events
-      "click .like-button"                    : "likeOrLogin"
-      "click .likers"                         : "showLikers"
+      "click .like-button"                    : "likeOrLoginFromActivity"
+      "click .likers"                         : "getLikersFromActivity"
       "submit form.new-comment-form"          : "getCommentDataToPost"
     
     initialize: (attrs) ->
@@ -76,8 +76,10 @@ define [
       # Convert the index to an array and find the "new" index.
        
       # Could use the cached results from addAllActivity unless we've loaded new data
-      @modalCollection = @findModelActivity @model.likes if @page > 1 or !@modalCollection or _.isEmpty @modalCollection
+      @modalCollection = @findModelActivity @model.activity if @page > 1 or !@modalCollection or _.isEmpty @modalCollection
       @modalCommentCollection = @findModelComments @model.comments
+
+      console.log 
 
       model = @model.activity.at data.index
 
@@ -119,7 +121,8 @@ define [
         button.button("reset")
         new Alert event: 'comment-load', fade: false, message: i18nCommon.errors.comment_load, type: 'error'
 
-
+    addCommentToCollection : (comment) => @model.comments.add comment 
+    
     # Activity
     # ------
     search : =>
@@ -139,11 +142,8 @@ define [
           if objs[0] and not objs[0].get "profile"
             _.each objs, (o) => o.set "profile", @model
 
-          addedObjs = @model.activity.add objs
-
           # We may be getting non-related models at this point.
-          console.log objs
-          console.log addedObjs
+          addedObjs = @model.activity.add objs
           @addAllActivity addedObjs
 
           if objs.length < @resultsPerPage then @trigger "view:exhausted"
@@ -172,6 +172,29 @@ define [
     # addOneActivity : (activity) =>
     #   view = new ActivityView(model: activity, onProfile: false)
     #   @$activity.append view.render().el
+
+    likeOrLoginFromActivity: (e) =>
+      e.preventDefault()
+      button = @$(e.currentTarget)
+      activity = button.closest(".activity")
+      data = activity.data()
+      model = @model.activity.at(data.index)
+
+      if Parse.User.current()
+        @like model, activity, button, data
+      else
+        $("#signup-modal").modal()
+
+    getLikersFromActivity: (e) =>
+      e.preventDefault()
+      button = @$(e.currentTarget)
+      activity = button.closest(".activity")
+      data = activity.data()
+      model = @model.activity.at(data.index)
+
+      model.prep("likers")
+      @listenToOnce model.likers, "reset", @showLikers
+      model.likers.fetch()
 
     checkIfLiked: (activity) =>
       data = activity.data()

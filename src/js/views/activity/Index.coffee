@@ -40,8 +40,8 @@ define [
       # 'click #view-content-modal .left'       : 'prevModal'
       # 'click #view-content-modal .right'      : 'nextModal'
       # Activity events
-      "click .like-button"                      : "likeOrLogin"
-      "click .likers"                           : "getLikers"
+      "click .like-button"                      : "likeOrLoginFromActivity"
+      "click .likers"                           : "getLikersFromActivity"
       "submit form.new-comment-form"            : "getCommentDataToPost"
     
     initialize : (attrs) =>
@@ -433,6 +433,32 @@ define [
         if collectionLength >= @activityCount then @trigger "view:exhausted"
 
 
+    likeOrLoginFromActivity: (e) =>
+      e.preventDefault()
+      button = @$(e.currentTarget)
+      activity = button.closest(".activity")
+      data = activity.data()
+      model = if data.collection is "user"
+        Parse.User.current().activity.at(data.index)
+      else Parse.App.activity.at(data.index)
+
+      if Parse.User.current()
+        @like model, activity, button, data
+      else
+        $("#signup-modal").modal()
+
+    getLikersFromActivity: (e) =>
+      e.preventDefault()
+      button = @$(e.currentTarget)
+      activity = button.closest(".activity")
+      data = activity.data()
+      model = if data.collection is "user"
+        Parse.User.current().activity.at(data.index)
+      else Parse.App.activity.at(data.index)
+
+      model.prep("likers")
+      @listenToOnce model.likers, "reset", @showLikers
+      model.likers.fetch()
 
 
     # User activity
@@ -677,6 +703,17 @@ define [
         new Alert event: 'comment-load', fade: false, message: i18nCommon.errors.comment_load, type: 'error'
 
         
+    addCommentToCollection : (comment) =>
+      if Parse.User.current().get("property")
+        if comment.get("property") and comment.get("property").id is Parse.User.current().get("property").id
+          Parse.User.current().comments.add comment
+        else Parse.App.comments.add comment
+      else if Parse.User.current().get("network")
+        if comment.get("property") and Parse.User.current().get("network").properties.find((p) -> p.id is comment.get("property").id)
+          Parse.User.current().comments.add comment
+        else Parse.App.comments.add comment
+      else Parse.App.comments.add comment 
+
 
     # Filter functions
     # ----------------

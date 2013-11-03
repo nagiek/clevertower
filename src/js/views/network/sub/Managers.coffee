@@ -34,9 +34,7 @@ define [
       
       @listenTo @model.managers, "add",   @addOne
       @listenTo @model.managers, "reset", @addAll
-      
-      @render()
-      
+            
     # Re-render the contents of the Unit item.
     render: =>
       

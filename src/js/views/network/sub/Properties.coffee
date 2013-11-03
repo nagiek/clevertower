@@ -22,8 +22,6 @@ define [
       @listenTo Parse.User.current().get("network").properties, "add", @addOne
       @listenTo Parse.User.current().get("network").properties, "reset", @addAll
             
-      @render()
-
     render: =>
       network = Parse.User.current().get("network")
       _.defaults network.attributes, Network::defaults

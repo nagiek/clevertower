@@ -50,6 +50,8 @@ define [
       @listenTo @model, "invalid", (error) =>
         @buttonsForward()
 
+        console.log error
+
         msg = if error.message.indexOf(":") > 0  
           args = error.message.split ":"
           fn = args.pop()
@@ -345,8 +347,8 @@ define [
               @state = 'picture'
 
     buttonsForward: =>
-      @$('.next').button('complete') # .removeProp "disabled"
-      @$('.join').button('complete') # .removeProp "disabled"
+      @$('.next').button('reset') # .removeProp "disabled"
+      @$('.join').button('reset') # .removeProp "disabled"
       switch @state
         when "share"
           @$('.next').html i18nCommon.actions.finish

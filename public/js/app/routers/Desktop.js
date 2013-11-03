@@ -151,33 +151,35 @@
           _this = this;
 
         view = this.view;
-        return require(["collections/ActivityList", "views/activity/Show"], function(ActivityList, ActivityShowView) {
+        return require(["collections/ActivityList", "views/activity/Show"], function(ActivityList, ShowActivityView) {
           var model;
 
-          Parse.App.activity = Parse.App.activity || new ActivityList([], {});
-          model = Parse.App.activity.get(id);
-          if (model) {
-            _this.view = new ActivityShowView({
-              model: model
-            }).render();
-            if (view) {
-              return view.clear();
-            }
-          } else {
-            return new Parse.Query("Activity").get(id, {
-              success: function(model) {
-                Parse.App.activity.add(model);
-                _this.view = new ActivityShowView({
-                  model: model
-                }).render();
-                if (view) {
-                  return view.clear();
-                }
-              },
-              error: function(object, error) {
-                return _this.accessDenied();
+          if (!view || !(view instanceof ShowActivityView) || id !== view.model.id) {
+            Parse.App.activity = Parse.App.activity || new ActivityList([], {});
+            model = Parse.App.activity.get(id);
+            if (model) {
+              _this.view = new ShowActivityView({
+                model: model
+              }).render();
+              if (view) {
+                return view.clear();
               }
-            });
+            } else {
+              return new Parse.Query("Activity").get(id, {
+                success: function(model) {
+                  Parse.App.activity.add(model);
+                  _this.view = new ShowActivityView({
+                    model: model
+                  }).render();
+                  if (view) {
+                    return view.clear();
+                  }
+                },
+                error: function(object, error) {
+                  return _this.accessDenied();
+                }
+              });
+            }
           }
         });
       };
@@ -245,6 +247,7 @@
                     }
                   },
                   error: function(error) {
+                    console.log(error);
                     Parse.User.current().get("property").mgr = false;
                     return _this.insideManage(splat);
                   }
@@ -323,45 +326,45 @@
         var vars, view,
           _this = this;
 
-        view = this.view;
-        vars = this.deparamAction(splat);
-        if (Parse.User.current().get("network") || Parse.User.current().get("property")) {
-          return require(["views/property/Manage"], function(PropertyView) {
-            var model;
+        if (Parse.User.current()) {
+          view = this.view;
+          vars = this.deparamAction(splat);
+          if (Parse.User.current().get("network") || Parse.User.current().get("property")) {
+            return require(["views/property/Manage"], function(ManagePropertyView) {
+              var model;
 
-            if (!view || !(view instanceof PropertyView) || id !== view.model.id) {
-              if (Parse.User.current().get("network")) {
-                model = Parse.User.current().get("network").properties.get(id);
-              } else if (Parse.User.current().get("property")) {
-                model = Parse.User.current().get("property");
-              }
-              if (model) {
-                vars.model = model;
-                _this.view = new PropertyView(vars);
-                if (view) {
-                  return view.clear();
+              if (!view || !(view instanceof ManagePropertyView) || id !== view.model.id) {
+                model = Parse.User.current().get("network") ? Parse.User.current().get("network").properties.get(id) : Parse.User.current().get("property");
+                if (model) {
+                  vars.model = model;
+                  _this.view = new ManagePropertyView(vars);
+                  if (view) {
+                    return view.clear();
+                  }
+                } else {
+                  return new Parse.Query("Property").get(id, {
+                    success: function(model) {
+                      Parse.User.current().get("network").properties.add(model);
+                      vars.model = model;
+                      _this.view = new ManagePropertyView(vars);
+                      if (view) {
+                        return view.clear();
+                      }
+                    },
+                    error: function(object, error) {
+                      return _this.accessDenied();
+                    }
+                  });
                 }
               } else {
-                return new Parse.Query("Property").get(id, {
-                  success: function(model) {
-                    model.collection = Parse.User.current().get("network").properties;
-                    vars.model = model;
-                    _this.view = new PropertyView(vars);
-                    if (view) {
-                      return view.clear();
-                    }
-                  },
-                  error: function(object, error) {
-                    return _this.accessDenied();
-                  }
-                });
+                return view.changeSubView(vars.path, vars.params);
               }
-            } else {
-              return view.changeSubView(vars.path, vars.params);
-            }
-          });
+            });
+          } else {
+            return Parse.history.navigate("account/setup", true);
+          }
         } else {
-          return Parse.history.navigate("account/setup", true);
+          return this.signupOrLogin();
         }
       };
 

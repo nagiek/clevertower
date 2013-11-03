@@ -58,7 +58,7 @@ define [
 
       @listenTo @model, 'invalid', (error) =>
         @$('.error').removeClass('error')
-        @$('button.save').removeProp "disabled"
+        @$('button.save').button "reset"
 
         console.log error
 
@@ -84,11 +84,12 @@ define [
       
       @on "save:success", (model, isNew) =>
 
+        if @property then @property.leases.add @model else Parse.User.current().get("network").leases.add @model
+
         new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
         @model.id = model.id
 
         if @forNetwork and Parse.User.current()
-          if @property then @property.leases.add @model else Parse.User.current().get("network").leases.add @model
           new Parse.Query("Tenant").equalTo("lease", @model).include("profile").find()
           .then (objs) -> 
             if @property then @property.tenants.add @model else Parse.User.current().get("network").tenants.add @model
@@ -203,7 +204,7 @@ define [
     # Split into separate functions for other uses, such as joining.
     save : (e) =>
       e.preventDefault()      
-      @$('button.save').prop "disabled", "disabled"
+      @$('button.save').button "loading"
       data = @$('form').serializeObject()
       @$('.error').removeClass('error')
 

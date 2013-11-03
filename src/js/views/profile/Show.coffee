@@ -43,7 +43,8 @@ define [
         @model.likes = new ActivityList [], profile: @model
         @model.likes.query = @model.relation("likes").query().include("property")
 
-      @model.likes.query.count().then @updateLikesCount
+      @listenTo @model.likes, "add",    @incLikesCount
+      @listenTo @model.likes, "remove", @decLikesCount
 
       @file = false
 
@@ -65,12 +66,20 @@ define [
     #     @activeTab = "activity"
     #     @changeSubView @activeTab
 
-    updateLikesCount: (count) => @$("#like-count").html count
+    incLikesCount: (count) => 
+      count = Number(@$("#like-count").html()) + 1
+      console.log count
+      @$("#like-count").html count
+
+    decLikesCount: (count) =>
+      count = Number(@$("#like-count").html()) - 1
+      console.log count
+      @$("#like-count").html count
 
     render: ->      
       vars = _.merge @model.toJSON(),
         cover: @model.cover 'profile'
-        likeCount: @model.likes.length
+        likeCount: @model.get("likeCount") || 0
         name: @model.name()
         i18nUser: i18nUser
         i18nCommon: i18nCommon

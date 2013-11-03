@@ -25,8 +25,6 @@ define [
     
     initialize : (attrs) ->
       
-      _.bindAll this, 'addOne', 'addAll', 'save'
-      
       @property = attrs.property
       @leaseId = attrs.leaseId
       
@@ -48,8 +46,12 @@ define [
           new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
           new ShowLeaseView(model: model, property: @property).render()
           Parse.history.navigate "/properties/#{@property.id}/leases/#{model.id}"
-          @undelegateEvents()
-          delete this
+          @clear()
+
+    clear : =>
+      @stopListening()
+      @undelegateEvents()
+      delete this
 
     addOne : (l) =>
       if l.isActive() then @addActive(l) else @addInactive(l) 
@@ -78,7 +80,7 @@ define [
       _.each @leases.active(), @addActive
       _.each @leases.inactive(), @addInactive
 
-    save : (e) ->
+    save : (e) =>
       e.preventDefault()
       
       @$('button.save').prop "disabled", "disabled"

@@ -123,9 +123,10 @@ define [
 
     cover: (format) ->
       switch format
-        when "micro", "tiny" then format = "thumb"
-        when "large", "profile", "span4", "span6" then format = "full"
-      img = @get "image_#{format}"
+        when "micro", "tiny" then getFormat = "thumb"
+        when "large", "profile", "span4", "span6" then getFormat = "full"
+        else getFormat = format
+      img = @get "image_#{getFormat}"
       img = "/img/fallback/property-#{format}.png" if img is '' or !img?
       img 
 

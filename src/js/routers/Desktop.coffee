@@ -116,19 +116,20 @@ define [
 
     activityShow: (id) =>
       view = @view
-      require ["collections/ActivityList", "views/activity/Show"], (ActivityList, ActivityShowView) =>
-        Parse.App.activity = Parse.App.activity || new ActivityList [], {}
-        model = Parse.App.activity.get id
-        if model 
-          @view = new ActivityShowView(model: model).render()
-          view.clear() if view
-        else
-          new Parse.Query("Activity").get id,
-            success: (model) =>
-              Parse.App.activity.add model
-              @view = new ActivityShowView(model: model).render()
-              view.clear() if view
-            error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
+      require ["collections/ActivityList", "views/activity/Show"], (ActivityList, ShowActivityView) =>
+        if !view or view !instanceof ShowActivityView or id isnt view.model.id
+          Parse.App.activity = Parse.App.activity || new ActivityList [], {}
+          model = Parse.App.activity.get id
+          if model 
+            @view = new ShowActivityView(model: model).render()
+            view.clear() if view
+          else
+            new Parse.Query("Activity").get id,
+              success: (model) =>
+                Parse.App.activity.add model
+                @view = new ShowActivityView(model: model).render()
+                view.clear() if view
+              error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
 
     # Network
     # --------------
@@ -153,8 +154,10 @@ define [
             else
               view.changeSubView(vars.path, vars.params)
         else if Parse.User.current().get("property")
+
+          # If we are here for the first time, check whether or not the user is the manager.
           if Parse.User.current().get("property").mgr is undefined
-            if Parse.User.current().get("property").get("mgrRole") 
+            if Parse.User.current().get("property").get("mgrRole")
               Parse.User.current().get("property").get("mgrRole").getUsers().query().get Parse.User.current().id,
                 success: (user) =>
                   if user
@@ -171,6 +174,7 @@ define [
                       else
                         view.changeSubView(vars.path, vars.params)
                 error: (error) =>
+                  console.log error
                   Parse.User.current().get("property").mgr = false
                   @insideManage(splat)
             else
@@ -229,39 +233,38 @@ define [
     # FOR USER
     propertiesManage: (id, splat) =>
 
-      view = @view
-      vars = @deparamAction splat
-      # Check if we are managing the property or the lease.
-      if Parse.User.current().get("network") or Parse.User.current().get("property")
-        require ["views/property/Manage"], (PropertyView) => 
-          if !view or view !instanceof PropertyView or id isnt view.model.id
+      if Parse.User.current()
+        view = @view
+        vars = @deparamAction splat
+        # Check if we are managing the property or the lease.
+        if Parse.User.current().get("network") or Parse.User.current().get("property")
+          require ["views/property/Manage"], (ManagePropertyView) => 
+            if !view or view !instanceof ManagePropertyView or id isnt view.model.id
 
-            if Parse.User.current().get("network")
-              model = Parse.User.current().get("network").properties.get id
-            else if Parse.User.current().get("property")
-              model = Parse.User.current().get("property")
+              model = if Parse.User.current().get("network")
+                Parse.User.current().get("network").properties.get id
+              else Parse.User.current().get("property")
 
-            if model
-              vars.model = model
-              @view = new PropertyView(vars)
-              view.clear() if view
-            else
-              new Parse.Query("Property").get id,
-              success: (model) =>
-                # Network properties are being fetched. Might return before query finishes. 
-                # Can't add to collection without introducing possibility of duplicate add.
-                # @network.properties.add model
-                model.collection = Parse.User.current().get("network").properties
+              if model
                 vars.model = model
-                @view = new PropertyView(vars)
+                @view = new ManagePropertyView(vars)
                 view.clear() if view
-              error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
-          else
-            view.changeSubView(vars.path, vars.params)
-        
+              else
+                new Parse.Query("Property").get id,
+                success: (model) =>
+                  Parse.User.current().get("network").properties.add model
+                  vars.model = model
+                  @view = new ManagePropertyView(vars)
+                  view.clear() if view
+                error: (object, error) => @accessDenied() # if error.code is Parse.Error.INVALID_ACL
+            else
+              view.changeSubView(vars.path, vars.params)
+          
+        else
+          Parse.history.navigate "account/setup", true
+          # @accountSetup()
       else
-        Parse.history.navigate "account/setup", true
-        # @accountSetup()
+        @signupOrLogin()
 
     propertiesPublic: (country, region, city, id, slug) =>
       view = @view

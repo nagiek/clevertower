@@ -6,6 +6,8 @@ define [
   'models/Unit'
   'models/Lease'
   'models/Inquiry'
+  'models/Listing'
+  'models/Photo'
   "i18n!nls/property"
   "i18n!nls/common"
   "underscore.inflection"
@@ -14,7 +16,7 @@ define [
   "templates/property/menu/reports"
   "templates/property/menu/building"
   "templates/property/menu/actions"
-], ($, _, Parse, Property, Unit, Lease, Inquiry, i18nProperty, i18nCommon, inflection) ->
+], ($, _, Parse, Property, Unit, Lease, Inquiry, Listing, Photo, i18nProperty, i18nCommon, inflection) ->
 
   class ManagePropertyView extends Parse.View
 
@@ -25,7 +27,7 @@ define [
       "submit #property-picture-upload-form" : 'save'
 
     initialize: (attrs) ->
-      
+
       @model.prep('units')
       @model.prep('leases')
       @model.prep('listings')
@@ -95,6 +97,8 @@ define [
             when "inquiries" then Inquiry
             when "leases" then Lease
             when "units" then Unit
+            when "listings" then Listing
+            when "photos" then Photo
           (new Parse.Query(nodeType)).get subid, success: (submodel) =>
             @renderSubView name, property: @model, model: submodel, forNetwork: true, baseUrl: @baseUrl
 

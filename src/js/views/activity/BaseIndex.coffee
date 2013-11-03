@@ -28,8 +28,8 @@ define [
       'click .thumbnails a.content'             : 'getModelDataToShowInModal' # 'showModal'
       'click .thumbnails a.get-comments'        : 'getActivityCommentsAndCollection' # 'showModal'
       # Activity events
-      "click .like-button"                      : "likeOrLogin"
-      "click .likers"                           : "getLikers"
+      "click .like-button"                      : "likeOrLoginFromActivity"
+      "click .likers"                           : "getLikersFromActivity"
       "submit form.new-comment-form"            : 'getCommentDataToPost' # "postComment"
     
     initialize : (attrs) =>
@@ -149,7 +149,7 @@ define [
         data-lng="#{model.GPoint().lng()}"
         data-collection="#{collection}"
         data-profile="#{model.profilePic("tiny")}"
-        data-image="#{model.image("large")}"
+        data-image="#{model.image("full")}"
       />
       """
 
@@ -159,7 +159,7 @@ define [
         start: moment(model.get("startDate")).format("LLL")
         end: moment(model.get("endDate")).format("LLL")
         postDate: moment(model.createdAt).fromNow()
-        postImage: model.image("large") # Keep this in for template logic.
+        postImage: model.image("full") # Keep this in for template logic.
         profileUrl: model.profileUrl()
         liked: liked
         icon: model.icon()
@@ -264,53 +264,33 @@ define [
     # Activity
     # --------------
 
-    likeOrLogin: (e) =>
-      e.preventDefault()
-      button = @$(e.currentTarget)
-      activity = button.closest(".activity")
+    like : (model, activity, button, data) =>
       likes = Number activity.find(".like-count").html()
-      data = activity.data()
-      model = if data.collection is "user"
-        Parse.User.current().activity.at(data.index)
-      else Parse.App.activity.at(data.index)
-
-      if Parse.User.current()
-        if data.liked
-          button.removeClass "active"
-          activity.find(".like-count").html(likes - 1)
-          activity.find(".likers").removeClass "active"
-          activity.find(".like-button").text i18nCommon.verbs.like
-          activity.data "liked", false
-          # activity.attr "data-liked", "false"
-          model.increment likeCount: -1
-          model.relation("likers").remove Parse.User.current().get("profile")
-          Parse.User.current().get("profile").relation("likes").remove model
-          Parse.User.current().get("profile").likes.remove model
-        else
-          button.addClass "active"
-          activity.find(".like-count").html(likes + 1)
-          @markAsLiked(activity)
-          model.increment likeCount: +1
-          model.relation("likers").add Parse.User.current().get("profile")
-          Parse.User.current().get("profile").relation("likes").add model
-          # Adding to a relation will somehow add to collection..?
-          Parse.User.current().get("profile").likes.add model
-        Parse.Object.saveAll [model, Parse.User.current().get("profile")]
+      
+      if data.liked
+        button.removeClass "active"
+        activity.find(".like-count").html(likes - 1)
+        activity.find(".likers").removeClass "active"
+        activity.find(".like-button").text i18nCommon.actions.like
+        activity.data "liked", false
+        # activity.attr "data-liked", "false"
+        model.increment likeCount: -1
+        Parse.User.current().increment likeCount: -1
+        model.relation("likers").remove Parse.User.current().get("profile")
+        Parse.User.current().get("profile").relation("likes").remove model
+        Parse.User.current().get("profile").likes.remove model
       else
-        $("#signup-modal").modal()
+        button.addClass "active"
+        activity.find(".like-count").html(likes + 1)
+        @markAsLiked activity
+        model.increment likeCount: +1
+        Parse.User.current().increment likeCount: -1
+        model.relation("likers").add Parse.User.current().get("profile")
+        Parse.User.current().get("profile").relation("likes").add model
+        # Adding to a relation will somehow add to collection..?
+        Parse.User.current().get("profile").likes.add model
+      Parse.Object.saveAll [model, Parse.User.current().get("profile")]
 
-    getLikers: (e) =>
-      e.preventDefault()
-      button = @$(e.currentTarget)
-      activity = button.closest(".activity")
-      data = activity.data()
-      model = if data.collection is "user"
-        Parse.User.current().activity.at(data.index)
-      else Parse.App.activity.at(data.index)
-
-      model.prep("likers")
-      @listenToOnce model.likers, "reset", @showLikers
-      model.likers.fetch()
 
     showLikers: (collection) ->
       # visible = collection
@@ -394,17 +374,19 @@ define [
       activity.find("input.comment-title").val("")
 
       # Count is incremented in Comment afterSave
-      newCount = model.get("commentCount") + 1
+      newCount = Number(model.get("commentCount")) + 1
       model.set "commentCount", newCount
-      activity.find(".comment-count").html newCount
+      # activity.find(".comment-count").html newCount
 
-      comment.save().then (obj) -> , 
+      comment.save().then @addCommentToCollection, 
       (error) =>
         console.log error
         new Alert event: 'model-save', fade: false, message: i18nCommon.errors.unknown, type: 'error'
         model.set "commentCount", newCount - 1
         activity.find(".comments > li:last-child").remove()
         activity.find(".comment-count").html newCount - 1
+
+      comment
 
     addOneComment : (comment, listItem) =>
 
@@ -497,12 +479,12 @@ define [
       $(document).on "keydown", @controlModalIfOpen
       $('#view-content-modal').on 'click', 'ul.list-comments a', @closeModal
       $('#view-content-modal').on 'click', 'a.profile-link', @closeModal
-      $('#view-content-modal').on 'click', 'a.get-comments', @getModalComments
+      $('#view-content-modal').on 'click', 'btn.get-comments', @getModalComments
       $('#view-content-modal').on 'click', '.left', @prevModal
       $('#view-content-modal').on 'click', '.right', @nextModal
       $('#view-content-modal').on 'hide.bs.modal', @hideModal
-      $('#view-content-modal').on 'click', '.like-button', @likeOrLogin
-      $('#view-content-modal').on 'click', '.likers', @getModalLikers
+      $('#view-content-modal').on 'click', '.like-button', @likeOrLoginFromModal
+      $('#view-content-modal').on 'click', '.likers', @getLikersFromModal
       $('#view-content-modal').on 'submit', 'form', @postModalComment
 
     controlModalIfOpen : (e) =>
@@ -556,7 +538,7 @@ define [
         end: moment(model.get("endDate")).format("LLL")
         postDate: moment(model.createdAt).fromNow()
         liked: model.liked()
-        postImage: model.image("large")
+        postImage: model.image("full")
         icon: model.icon()
         name: model.name()
         profilePic: model.profilePic("thumb")
@@ -631,12 +613,50 @@ define [
         @addAllComments newComms
         @modalCommentCollection.add newComms
         @renderAllModalComments newComms
-        button.button("complete")
+        button.button("reset")
       , =>
-        button.button("complete")
+        button.button("reset")
         new Alert event: 'comment-load', fade: false, message: i18nCommon.errors.comment_load, type: 'error'
 
-    getModalLikers : (e) =>
+    likeOrLoginFromModal: (e) =>
+      e.preventDefault()
+      button = $(e.currentTarget)
+      activity = button.closest(".activity")
+      data = activity.data()
+
+      likes = Number activity.find(".like-count").html()
+
+      model = if @modalCollection instanceof ActivityList then @modalCollection.at @modalIndex else @modalCollection[@modalIndex]
+
+      if Parse.User.current()
+        @like model, activity, button, data
+
+        # Update our non-modal activity as well.
+        _.each @listViews, (lv) =>
+          otherActivity = lv.find("> div > .activity-#{model.id}")
+          if otherActivity.length > 0
+            $otherActivity = otherActivity[0].$el
+
+            # Data is switched at this point, so reverse the if-block conditions order. 
+            if data.liked
+              $otherActivity.find(".like-button").addClass "active"
+              $otherActivity.find(".like-count").html(likes + 1)
+              @markAsLiked $otherActivity
+              
+            else
+              $otherActivity.find(".like-button").removeClass "active"
+              $otherActivity.find(".like-count").html(likes - 1)
+              $otherActivity.find(".likers").removeClass "active"
+              $otherActivity.find(".like-button").text i18nCommon.actions.like
+              $otherActivity.data "liked", false
+
+            # return false to avoid checking the other column.
+            false
+        
+      else
+        $("#signup-modal").modal()
+
+    getLikersFromModal : (e) =>
       e.preventDefault()
 
       model = if @modalCollection instanceof ActivityList then @modalCollection.at @modalIndex else @modalCollection[@modalIndex]
@@ -651,8 +671,10 @@ define [
 
       return unless Parse.User.current()
 
-      button = @$(e.currentTarget)
-      activity = button.closest(".activity")
+      form = $(e.currentTarget)
+      activity = form.closest(".activity")
       model = if @modalCollection instanceof ActivityList then @modalCollection.at @modalIndex else @modalCollection[@modalIndex]
 
-      @postComment activity, model
+      comment = @postComment activity, model
+      # postComment will actually do this for us.
+      # @renderOneModalComment comment

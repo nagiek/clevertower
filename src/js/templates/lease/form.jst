@@ -1,42 +1,38 @@
-<div class="row">
-  <fieldset class="col-md-<% if (isNew) { %>4<% } else { %>6<% } %>">
-    <legend><%= i18nCommon.prepositions.where %></legend>
-    <%= JST["src/js/templates/helper/field/unit.jst"]({required: true, unit: unit, i18nUnit: i18nUnit, i18nCommon: i18nCommon, help: false}) %>
-  </fieldset>
-
-  <fieldset class="col-md-<% if (isNew) { %>4<% } else { %>6<% } %>">
-    <legend><%= i18nCommon.prepositions.when %></legend>
-    <div class="date-group form-group">
-      <label for="lease-dates" class="control-label"><%= i18nLease.form.dates %> <span class="required">*</span></label>
-      <div class="row">
-        <div class="col-xs-6">
-          <input type="text" class="form-control start-date datepicker" name="lease[start_date]" maxlength="12" value="<%= dates.start %>" data-date="<%= dates.start %>" data-date-format="<%= i18nCommon.dates.datepicker_format %>"  />
-        </div>
-        <div class="col-xs-6">
-          <input type="text" class="form-control end-date datepicker"   name="lease[end_date]"   maxlength="12" value="<%= dates.end %>" data-date="<%= dates.end %>"   data-date-format="<%= i18nCommon.dates.datepicker_format %>"  />
-        </div>
-      </div>
-      <div class="help-block align-top">
-        <small class="strong inline-block"><%= i18nCommon.verbs.beginning %>:</small>
-        <ul class="list-inline inline-block">
-          <li><small><a href="#" class="starting-this-month"><%= i18nLease.dates.this_month %></a></small></li>
-          <li><small><a href="#" class="starting-next-month"><%= i18nLease.dates.next_month %></a></small></li>
-          <li><small><a href="#" class="july-to-june"><%= i18nLease.dates.july %></a></small></li>
-        </ul>
-      </div>
-    </div>
-  </fieldset>
-
-  <% if (isNew) { %>
-    <fieldset class="col-md-4">
-      <legend><%= i18nLease.form.tenants %></legend>
-      <%= JST["src/js/templates/helper/field/tenant.jst"]({emails: emails, i18nCommon: i18nCommon, label: false}) %>
+<div id="options" class="row">
+  <div id="basic-options">
+    <fieldset class="col-md-6">
+      <legend><%= i18nCommon.prepositions.where %></legend>
+      <%= JST["src/js/templates/helper/field/unit.jst"]({required: true, unit: unit, i18nUnit: i18nUnit, i18nCommon: i18nCommon, help: false}) %>
     </fieldset>
-  <% } %>
+
+    <fieldset class="col-md-6">
+      <legend><%= i18nCommon.prepositions.when %></legend>
+      <div class="date-group form-group">
+        <label for="lease-dates" class="control-label"><%= i18nLease.form.dates %> <span class="required">*</span></label>
+        <div class="row">
+          <div class="col-xs-6">
+            <input type="text" class="form-control start-date datepicker" name="lease[start_date]" maxlength="12" value="<%= dates.start %>" data-date="<%= dates.start %>" data-date-format="<%= i18nCommon.dates.datepicker_format %>"  />
+          </div>
+          <div class="col-xs-6">
+            <input type="text" class="form-control end-date datepicker"   name="lease[end_date]"   maxlength="12" value="<%= dates.end %>" data-date="<%= dates.end %>"   data-date-format="<%= i18nCommon.dates.datepicker_format %>"  />
+          </div>
+        </div>
+        <div class="help-block align-top">
+          <small class="strong inline-block"><%= i18nCommon.verbs.beginning %>:</small>
+          <ul class="list-inline inline-block">
+            <li><small><a href="#" class="starting-this-month"><%= i18nLease.dates.this_month %></a></small></li>
+            <li><small><a href="#" class="starting-next-month"><%= i18nLease.dates.next_month %></a></small></li>
+            <li><small><a href="#" class="july-to-june"><%= i18nLease.dates.july %></a></small></li>
+          </ul>
+        </div>
+      </div>
+    </fieldset>
+  </div>
 </div>
 
 <div class="row">
-  <fieldset class="col-md-4">
+
+  <fieldset class="col-md-<% if (isNew) { %>6<% } else { %>12<% } %>">
     <legend><%= i18nLease.form.rent %></legend>
     <div class="row">
       <div class="form-group col-xs-6">
@@ -60,41 +56,65 @@
     </div>
   </fieldset>
 
-  <fieldset class="col-md-4">
-    <legend><%= i18nLease.form.deposit %></legend>
-    <div class="row">
-      <div class="form-group col-xs-6">
-        <label for="lease-security_deposit" class="control-label"><%= i18nLease.fields.security_deposit %></label>
-        <div class="input-group">
-          <span class="field-prefix input-group-addon">$</span>
-          <input type="number" class="form-control" name="lease[security_deposit]" id="lease-security_deposit" maxlength="12" value="<%= lease.security_deposit %>" />
-        </div>
-      </div>
-      <div class="form-group col-xs-6">
-        <label for="lease-keys" class="control-label"><%= i18nLease.fields.keys %></label>
-        <input type="number" class="form-control" name="lease[keys]" id="lease-keys" maxlength="12" value="<%= lease.keys %>" />
-      </div>
-    </div>
-  </fieldset>
+  <% if (isNew) { %>
+    <fieldset class="col-md-6">
+      <legend><%= i18nLease.form.tenants %></legend>
+      <%= JST["src/js/templates/helper/field/tenant.jst"]({emails: emails, i18nCommon: i18nCommon, label: false}) %>
+    </fieldset>
+  <% } %>
+</div>
 
-  <fieldset class="col-md-4">
-    <legend><%= i18nLease.form.parking %></legend>
-    <div class="row">
-      <div class="form-group col-xs-6 col-sm-5">
-        <label for="lease-parking_fee" class="control-label"><%= i18nLease.fields.parking_fee %></label>
-        <div class="input-group">
-          <span class="field-prefix input-group-addon">$</span>
-          <input type="number" class="form-control" name="lease[parking_fee]" id="lease-parking_fee" maxlength="12" value="<%= lease.parking_fee %>" />
+<div class="panel-group" id="accordion">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a class="accordion-toggle" data-toggle="collapse" href="#advanced-options">
+          <%= i18nCommon.adjectives.advanced %>
+        </a>
+      </h4>
+    </div>
+    <div id="advanced-options" class="panel-collapse collapse">
+      <div class="panel-body">
+        <div class="row">
+          <fieldset class="col-md-6">
+            <legend><%= i18nLease.form.deposit %></legend>
+            <div class="row">
+              <div class="form-group col-xs-6">
+                <label for="lease-security_deposit" class="control-label"><%= i18nLease.fields.security_deposit %></label>
+                <div class="input-group">
+                  <span class="field-prefix input-group-addon">$</span>
+                  <input type="number" class="form-control" name="lease[security_deposit]" id="lease-security_deposit" maxlength="12" value="<%= lease.security_deposit %>" />
+                </div>
+              </div>
+              <div class="form-group col-xs-6">
+                <label for="lease-keys" class="control-label"><%= i18nLease.fields.keys %></label>
+                <input type="number" class="form-control" name="lease[keys]" id="lease-keys" maxlength="12" value="<%= lease.keys %>" />
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="col-md-6">
+            <legend><%= i18nLease.form.parking %></legend>
+            <div class="row">
+              <div class="form-group col-xs-6 col-sm-5">
+                <label for="lease-parking_fee" class="control-label"><%= i18nLease.fields.parking_fee %></label>
+                <div class="input-group">
+                  <span class="field-prefix input-group-addon">$</span>
+                  <input type="number" class="form-control" name="lease[parking_fee]" id="lease-parking_fee" maxlength="12" value="<%= lease.parking_fee %>" />
+                </div>
+              </div>
+              <div class="form-group col-xs-6 col-sm-3">
+                <label for="lease-parking_space" class="control-label"><%= i18nLease.fields.parking_space %></label>
+                <input type="text" class="form-control" name="lease[parking_space]" id="lease-parking_space" maxlength="12" value="<%= lease.parking_space %>" />
+              </div>
+              <div class="form-group col-xs-6 col-sm-4">
+                <label for="lease-garage_remotes" class="control-label"><%= i18nLease.fields.garage_remotes %></label>
+                <input type="number" class="form-control" name="lease[garage_remotes]" id="lease-garage_remotes" maxlength="12" value="<%= lease.garage_remotes %>"/>
+              </div>
+            </div>
+          </fieldset>
         </div>
       </div>
-      <div class="form-group col-xs-6 col-sm-3">
-        <label for="lease-parking_space" class="control-label"><%= i18nLease.fields.parking_space %></label>
-        <input type="text" class="form-control" name="lease[parking_space]" id="lease-parking_space" maxlength="12" value="<%= lease.parking_space %>" />
-      </div>
-      <div class="form-group col-xs-6 col-sm-4">
-        <label for="lease-garage_remotes" class="control-label"><%= i18nLease.fields.garage_remotes %></label>
-        <input type="number" class="form-control" name="lease[garage_remotes]" id="lease-garage_remotes" maxlength="12" value="<%= lease.garage_remotes %>"/>
-      </div>
     </div>
-  </fieldset>
+  </div>
 </div>

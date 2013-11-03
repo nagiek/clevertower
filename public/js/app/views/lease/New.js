@@ -56,7 +56,7 @@
           var args, fn, msg;
 
           _this.$('.error').removeClass('error');
-          _this.$('button.save').removeProp("disabled");
+          _this.$('button.save').button("reset");
           console.log(error);
           msg = (function() {
             if (error.message.indexOf(":") > 0) {
@@ -90,6 +90,11 @@
         this.on("save:success", function(model, isNew) {
           var vars;
 
+          if (_this.property) {
+            _this.property.leases.add(_this.model);
+          } else {
+            Parse.User.current().get("network").leases.add(_this.model);
+          }
           new Alert({
             event: 'model-save',
             fade: true,
@@ -98,11 +103,6 @@
           });
           _this.model.id = model.id;
           if (_this.forNetwork && Parse.User.current()) {
-            if (_this.property) {
-              _this.property.leases.add(_this.model);
-            } else {
-              Parse.User.current().get("network").leases.add(_this.model);
-            }
             new Parse.Query("Tenant").equalTo("lease", _this.model).include("profile").find().then(function(objs) {
               if (this.property) {
                 this.property.tenants.add(this.model);
@@ -244,7 +244,7 @@
           _this = this;
 
         e.preventDefault();
-        this.$('button.save').prop("disabled", "disabled");
+        this.$('button.save').button("loading");
         data = this.$('form').serializeObject();
         this.$('.error').removeClass('error');
         attrs = this.model.scrub(data.lease);

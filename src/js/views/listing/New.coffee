@@ -4,6 +4,7 @@ define [
   "backbone"
   "moment"
   "collections/TenantList"
+  "models/Activity"
   "models/Property"
   "models/Unit"
   "models/Listing"
@@ -18,7 +19,7 @@ define [
   "templates/helper/field/property"
   "templates/helper/field/tenant"
   "datepicker"
-], ($, _, Parse, moment, TenantList, Property, Unit, Listing, Tenant, Alert, i18nCommon, i18nUnit, i18nListing) ->
+], ($, _, Parse, moment, TenantList, Activity, Property, Unit, Listing, Tenant, Alert, i18nCommon, i18nUnit, i18nListing) ->
 
   class NewListingView extends Parse.View
     
@@ -77,13 +78,34 @@ define [
 
       @on "save:success", (model) =>
 
+        if @property then @property.listings.add @model else Parse.User.current().get("network").listings.add @model
+
         new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
+
+        # Parse.Cloud.afterSave "Listing", (req) ->
+        if model.isNew() and model.get "public"
+
+          # Create activity
+          activity = new Activity
+          modelJSON = model.toJSON()
+          activity.save
+            activity_type: "new_listing"
+            public: true
+            rent: modelJSON.rent
+            center: modelJSON.center
+            listing: model
+            unit: modelJSON.unit
+            property: modelJSON.property
+            network: modelJSON.network
+            title: modelJSON.title
+            profile: modelJSON.profile
+
+          Parse.User.current().activity.add activity
 
         # Add the tenants to the network
         user = Parse.User.current() 
         network = user.get("network") if user
         if user and network
-          if @property then @property.listings.add @model else Parse.User.current().get("network").listings.add @model
           new Parse.Query("Tenant").equalTo("listing", @model).include("profile").find()
           .then (objs) -> network.tenants.add objs
         

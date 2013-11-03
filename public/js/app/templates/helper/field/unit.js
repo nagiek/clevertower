@@ -93,7 +93,7 @@ __p += '</label>\n    <div class="row">\n      <div class="col-xs-6">\n        <
 ((__t = ( i18nUnit.form.unit_number )) == null ? '' : __t) +
 '" class="form-control new-unit" maxlength="16" style="display:none;">\n      </div>\n    </div>\n  </div>\n  <input type="hidden" name="unit[__type]" value="Pointer">\n    <input type="hidden" name="unit[className]" value="Unit">\n  ';
  if (help) { ;
-__p += '\n    <p class="help-block">\n      <span class="label label-large">' +
+__p += '\n    <p class="help-block">\n      <span class="label label-default label-large">' +
 ((__t = ( i18nCommon.adjectives.private )) == null ? '' : __t) +
 '</span>\n      ' +
 ((__t = ( i18nUnit.form.help )) == null ? '' : __t) +

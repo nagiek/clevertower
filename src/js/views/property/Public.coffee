@@ -31,8 +31,8 @@ define [
       'click .thumbnails button.get-comments'   : 'getActivityCommentsAndCollection' # 'showModal'
       'click #new-lease'                        : 'showLeaseModal'
       # Activity events
-      "click .like-button"                      : "likeOrLogin"
-      "click .likers"                           : "showLikers"
+      "click .like-button"                      : "likeOrLoginFromActivity"
+      "click .likers"                           : "getLikersFromActivity"
       "submit form.new-comment-form"            : "getCommentDataToPost"
 
     initialize: (attrs) ->
@@ -71,6 +71,8 @@ define [
         @model.comments.add comments
         @model.comments.query.notContainedIn "objectId", _.map(comments, (c) -> c.id)
 
+      console.log @model.toJSON()
+
     showTab : (e) ->
       e.preventDefault()
       $("#{e.currentTarget.hash}-link").tab('show')
@@ -87,7 +89,7 @@ define [
       vars =
         property: @model.toJSON()
         place: @place
-        cover: @model.cover('span9')
+        cover: @model.cover('full')
         i18nProperty: i18nProperty
         i18nCommon: i18nCommon
         i18nGroup: i18nGroup
@@ -215,6 +217,8 @@ define [
         button.button("reset")
         new Alert event: 'comment-load', fade: false, message: i18nCommon.errors.comment_load, type: 'error'
 
+    addCommentToCollection : (comment) => @model.comments.add comment 
+
     # Activity
     # ------
     search : =>
@@ -266,6 +270,29 @@ define [
     #   view = new ActivityView(model: activity, onProfile: false)
     #   @$activity.append view.render().el
 
+    likeOrLoginFromActivity: (e) =>
+      e.preventDefault()
+      button = @$(e.currentTarget)
+      activity = button.closest(".activity")
+      data = activity.data()
+      model = @model.activity.at(data.index)
+
+      if Parse.User.current()
+        @like model, activity, button, data
+      else
+        $("#signup-modal").modal()
+
+    getLikersFromActivity: (e) =>
+      e.preventDefault()
+      button = @$(e.currentTarget)
+      activity = button.closest(".activity")
+      data = activity.data()
+      model = @model.activity.at(data.index)
+
+      model.prep("likers")
+      @listenToOnce model.likers, "reset", @showLikers
+      model.likers.fetch()
+
     updatePaginiation : =>
       countQuery = @model.activity.query
       # Reset old filters
@@ -288,7 +315,6 @@ define [
     addAllActivity: (collection) =>
 
       visible = @findModelActivity collection
-      console.log visible
 
       if visible.length > 0 then _.each visible, @addOneActivity
       else @$loading.html '<div class="empty">' + i18nProperty.tenant_empty.activity + '</div>'

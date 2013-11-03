@@ -28,8 +28,6 @@ define [
       
       @listenTo @model.tenants, "add",   @addOne
       @listenTo @model.tenants, "reset", @addAll
-
-      @render()
       
     # Re-render the contents of the Unit item.
     render: =>

@@ -154,6 +154,7 @@ require [
   "models/Profile"
   "collections/ListingFeaturedList"
   "collections/ActivityList"
+  "collections/CommentList"
   "collections/NotificationList"
   "routers/Desktop",
   "underscore.string"
@@ -163,7 +164,7 @@ require [
   "typeahead"
   "masonry"
   "transit"
-], ($, _, Parse, FB, Property, Unit, Lease, Profile, FeaturedListingList, ActivityList, NotificationList, AppRouter, _String) ->
+], ($, _, Parse, FB, Property, Unit, Lease, Profile, FeaturedListingList, ActivityList, CommentList, NotificationList, AppRouter, _String) ->
 
   # Events
   # ---------
@@ -427,6 +428,8 @@ require [
   Parse.App = {}
 
   Parse.App.featuredListings = new FeaturedListingList 
+  Parse.App.activity = new ActivityList [], {}
+  Parse.App.comments = new CommentList [], {}
 
   Parse.App.fbPerms = "email, publish_actions, user_location, user_about_me, user_birthday, user_website" #, publish_stream, read_stream"
 
@@ -518,6 +521,9 @@ require [
       profile.likes = new ActivityList([], profile: profile)
       profile.likes.query = profile.relation("likes").query().include("property")
       @set "profile", profile
+
+      @activity = new ActivityList [], {} unless @activity
+      @comments = new CommentList [], {} unless @comments
 
       # Notifications.
       @notifications = new NotificationList

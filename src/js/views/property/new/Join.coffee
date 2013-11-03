@@ -24,7 +24,7 @@ define [
 
     el: undefined
     tagName : "form"
-    className: "join-form col-xs-12"
+    className: "join-form col-xs-12 col-md-offset-1 col-md-10"
 
     initialize: (attrs) ->
       

@@ -83,7 +83,7 @@
     return window.google.maps;
   });
 
-  require(["jquery", "underscore", "backbone", "facebook", "models/Property", "models/Unit", "models/Lease", "models/Profile", "collections/ListingFeaturedList", "collections/ActivityList", "collections/NotificationList", "routers/Desktop", "underscore.string", "json2", "bootstrap", "serializeObject", "typeahead", "masonry", "transit"], function($, _, Parse, FB, Property, Unit, Lease, Profile, FeaturedListingList, ActivityList, NotificationList, AppRouter, _String) {
+  require(["jquery", "underscore", "backbone", "facebook", "models/Property", "models/Unit", "models/Lease", "models/Profile", "collections/ListingFeaturedList", "collections/ActivityList", "collections/CommentList", "collections/NotificationList", "routers/Desktop", "underscore.string", "json2", "bootstrap", "serializeObject", "typeahead", "masonry", "transit"], function($, _, Parse, FB, Property, Unit, Lease, Profile, FeaturedListingList, ActivityList, CommentList, NotificationList, AppRouter, _String) {
     var addOptions, eventSplitter, eventsApi, listenEvents, listenMethods, setOptions;
 
     eventSplitter = /\s+/;
@@ -360,6 +360,8 @@
     Parse.initialize(window.APPID, window.JSKEY);
     Parse.App = {};
     Parse.App.featuredListings = new FeaturedListingList;
+    Parse.App.activity = new ActivityList([], {});
+    Parse.App.comments = new CommentList([], {});
     Parse.App.fbPerms = "email, publish_actions, user_location, user_about_me, user_birthday, user_website";
     Parse.App.countryCodes = {
       CA: "Canada",
@@ -444,6 +446,12 @@
         });
         profile.likes.query = profile.relation("likes").query().include("property");
         _this.set("profile", profile);
+        if (!_this.activity) {
+          _this.activity = new ActivityList([], {});
+        }
+        if (!_this.comments) {
+          _this.comments = new CommentList([], {});
+        }
         _this.notifications = new NotificationList;
         _this.notifications.query.find().then(function(notifs) {
           return _this.notifications.add(notifs);

@@ -36,15 +36,27 @@
           base64: buf.toString('base64')
         });
         return file.save().then(function() {
+          console.log('1a');
           return (new Parse.Query("Profile")).equalTo('objectId', req.user.get("profile").id).first();
+        }, function(error) {
+          console.log('1b');
+          return res.error(error);
         }).then(function(profile) {
+          console.log('2a');
           return profile.save({
             image_thumb: file.url(),
             image_profile: file.url(),
             image_full: file.url()
           });
+        }, function(error) {
+          console.log('2b');
+          return res.error(error);
         }).then(function() {
+          console.log('3a');
           return res.success(file.url());
+        }, function(error) {
+          console.log('3b');
+          return res.error(error);
         });
       },
       error: function(error) {
@@ -1106,26 +1118,6 @@
         }
       }
     });
-  });
-
-  Parse.Cloud.afterSave("Listing", function(req) {
-    var activity;
-
-    if (!req.object.existed() && req.object.get("public")) {
-      activity = new Parse.Object("Activity");
-      return activity.save({
-        activity_type: "new_listing",
-        "public": true,
-        rent: req.object.get("rent"),
-        center: req.object.get("center"),
-        listing: req.object,
-        unit: req.object.get("unit"),
-        property: req.object.get("property"),
-        network: req.object.get("network"),
-        title: req.object.get("title"),
-        profile: req.user.get("profile")
-      });
-    }
   });
 
   Parse.Cloud.beforeSave("Tenant", function(req, res) {

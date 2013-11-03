@@ -10,7 +10,7 @@
         <label for="property-title" class="control-label"><%= i18nProperty.fields.title %></label>
         <input type="text" name="property[title]" id="property-title" class="form-control input-xlarge" value="<%= property.title %>">
       </div>
-      <div class="form-group col-md-6">
+      <div class="form-group col-md-4">
         <label for="property-email" class="control-label"><%= i18nProperty.fields.property_type.label %></label>
         <select name="property[property_type]" id="property-property_type" class="form-control">
           <option value="" ><%= i18nCommon.form.select.select_value %></option>
@@ -22,7 +22,7 @@
   </fieldset>
   <hgroup>
     <h3 class="inline-block"><%= i18nCommon.classes.Lease %></h3>
-    <span class="label label-large"><%= i18nCommon.adjectives.private %></span>
+    <span class="label label-lg label-default"><%= i18nCommon.adjectives.private %></span>
   </hgroup>
 <% } else { %>
   <h2><%= i18nProperty.actions.join_property_at(property.title) %></h2>

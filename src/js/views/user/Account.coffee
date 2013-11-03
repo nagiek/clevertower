@@ -18,6 +18,8 @@ define [
 
       @listenTo Parse.Dispatcher, "user:logout", @run
 
+      @subviews = {}
+
       # Render immediately, as we will display a subview
       @render()
       @changeSubView attrs.path, attrs.params

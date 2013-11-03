@@ -80,6 +80,11 @@ html(lang="en")
         #main.main
           block content
 
+        // Content modal, for viewing content
+        #view-content-modal.modal.fade
+          .modal-dialog
+            .modal-content
+
         // People modal, for viewing lists of people.
         #people-modal.modal.fade
           .modal-dialog
@@ -90,11 +95,6 @@ html(lang="en")
               .modal-body
               .modal-footer
                 button.btn.btn-default(data-dismiss="modal") Close
-
-        // Content modal, for viewing content
-        #view-content-modal.modal.fade
-          .modal-dialog
-            .modal-content
 
         // Full-page modal, for wizards
         // #full-modal.hide.main

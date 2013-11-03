@@ -45,6 +45,7 @@
           var args, fn, msg;
 
           _this.buttonsForward();
+          console.log(error);
           msg = error.message.indexOf(":") > 0 ? (args = error.message.split(":"), fn = args.pop(), i18nProperty.errors[fn](args[0])) : i18nProperty.errors[error.message];
           switch (error.message) {
             case 'title_missing':
@@ -401,8 +402,8 @@
       };
 
       PropertyWizardView.prototype.buttonsForward = function() {
-        this.$('.next').button('complete');
-        this.$('.join').button('complete');
+        this.$('.next').button('reset');
+        this.$('.join').button('reset');
         switch (this.state) {
           case "share":
             this.$('.next').html(i18nCommon.actions.finish);

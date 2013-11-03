@@ -28,13 +28,13 @@ define [
       unless Parse.User.current()._isLinked("facebook")
         Parse.FacebookUtils.link Parse.User.current(), Parse.App.fbPerms, 
         success: =>
-          @$("#fb-link").button("complete")
+          @$("#fb-link").button("reset")
           @$("#fb-link").html i18nCommon.actions.link
           @$(".facebook-group .controls").html "<span class='btn active linked'>#{i18nCommon.adjectives.linked}</span>" +
             "<span></span>" +
             "<button id='fb-unlink' class='btn revoke btn-danger'>#{i18nCommon.actions.revoke_access}</button>"
         error: =>
-          @$("#fb-link").button("complete")
+          @$("#fb-link").button("reset")
           @$("#fb-link").html i18nCommon.actions.link
           new Alert(event: 'facebook-link', fade: false, message: i18nCommon.errors.unknown, type: 'error')
 
@@ -43,11 +43,11 @@ define [
       if Parse.User.current()._isLinked("facebook")
         Parse.FacebookUtils.unlink Parse.User.current(), 
         success: =>
-          @$("#fb-unlink").button("complete")
+          @$("#fb-unlink").button("reset")
           @$("#fb-unlink").html i18nCommon.actions.unlink
           @$(".facebook-group .controls").html "<button id='fb-link' class='btn'>#{i18nCommon.actions.link}</button>"
         error: =>
-          @$("#fb-unlink").button("complete")
+          @$("#fb-unlink").button("reset")
           @$("#fb-unlink").html i18nCommon.actions.unlink
           new Alert(event: 'facebook-link', fade: false, message: i18nCommon.errors.unknown, type: 'error')
             

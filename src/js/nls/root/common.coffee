@@ -196,6 +196,7 @@ define
     big:                                "Big"
     done:                               "Done"
     selected:                           "Selected"
+    advanced:                           "Advanced"
     new:                                "new"
     unsaved:                            "Unsaved"
     linked:                             "Linked"

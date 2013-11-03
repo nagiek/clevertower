@@ -97,20 +97,23 @@
         return +Parse.App.countryCodes[this.get("country")].replace(/\s+/g, '-');
       },
       cover: function(format) {
-        var img;
+        var getFormat, img;
 
         switch (format) {
           case "micro":
           case "tiny":
-            format = "thumb";
+            getFormat = "thumb";
             break;
           case "large":
           case "profile":
           case "span4":
           case "span6":
-            format = "full";
+            getFormat = "full";
+            break;
+          default:
+            getFormat = format;
         }
-        img = this.get("image_" + format);
+        img = this.get("image_" + getFormat);
         if (img === '' || (img == null)) {
           img = "/img/fallback/property-" + format + ".png";
         }

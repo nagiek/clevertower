@@ -465,7 +465,7 @@ define [
     # attachPhoto: ->
     handleError: (error) =>
       @$('.error').removeClass('error')
-      @$('button.save').button("complete")
+      @$('button.save').button("reset")
       @$('button.save').html i18nCommon.actions.save
 
       console.log error

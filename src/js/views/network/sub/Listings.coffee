@@ -15,6 +15,9 @@ define [
   class NetworkListingsView extends Parse.View
         
     initialize: (attrs) ->
+
+      console.log 'hi'
+
       @editing = false
       
       @on "view:change", @clear
@@ -24,8 +27,6 @@ define [
 
       @listenTo @model.listings, "add", @addOne
       @listenTo @model.listings, "reset", @addAll
-
-      @render()
 
     render: =>
       vars = 

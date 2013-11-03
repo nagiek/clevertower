@@ -19,8 +19,8 @@ define [
       'click .thumbnails a.content'           : 'getModelDataToShowInModal'
       'click .thumbnails button.get-comments' : 'getActivityCommentsAndCollection' # 'showModal'
       # Activity events
-      "click .like-button"                    : "likeOrLogin"
-      "click .likers"                         : "showLikers"
+      "click .like-button"                    : "likeOrLoginFromActivity"
+      "click .likers"                         : "getLikersFromActivity"
       "submit form.new-comment-form"          : "getCommentDataToPost"
     
     initialize: (attrs) ->
@@ -118,7 +118,9 @@ define [
       , =>
         button.button("reset")
         new Alert event: 'comment-load', fade: false, message: i18nCommon.errors.comment_load, type: 'error'
-
+    
+    addCommentToCollection : (comment) => @model.comments.add comment 
+    
 
     # Activity
     # ------
@@ -170,6 +172,30 @@ define [
     # addOneActivity : (activity) =>
     #   view = new ActivityView(model: activity, onProfile: false)
     #   @$activity.append view.render().el
+
+
+    likeOrLoginFromActivity: (e) =>
+      e.preventDefault()
+      button = @$(e.currentTarget)
+      activity = button.closest(".activity")
+      data = activity.data()
+      model = @model.likes.at(data.index)
+
+      if Parse.User.current()
+        @like model, activity, button, data
+      else
+        $("#signup-modal").modal()
+
+    getLikersFromActivity: (e) =>
+      e.preventDefault()
+      button = @$(e.currentTarget)
+      activity = button.closest(".activity")
+      data = activity.data()
+      model = @model.likes.at(data.index)
+
+      model.prep("likers")
+      @listenToOnce model.likers, "reset", @showLikers
+      model.likers.fetch()
 
     checkIfLiked: (activity) =>
       data = activity.data()
