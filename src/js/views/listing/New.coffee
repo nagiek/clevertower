@@ -160,7 +160,7 @@ define [
         @addOne @unit
       else
         if @property
-          if @property.units.where(property: @property).length is 0 then @property.units.fetch() else @addAll()
+          if @property.units.select((u) => u.get("property").id is @property.id).length is 0 then @property.units.fetch() else @addAll()
         else
           if Parse.User.current().get("network").units.length is 0 then Parse.User.current().get("network").units.fetch() else @addAll()
       @
@@ -177,7 +177,7 @@ define [
       @$unitSelect.html "<option value=''>#{i18nCommon.form.select.select_value}</option>" # if @$unitSelect.children().length > 2
 
       if @property
-        _.each @property.units.where(property: @property), @addOne
+        _.each @property.units.select((u) => u.get("property").id is @property.id), @addOne
         @$unitSelect.append "<option class='new-unit-option' value='-1'>#{i18nUnit.constants.new_unit}</option>"
       else
         # Group by property.

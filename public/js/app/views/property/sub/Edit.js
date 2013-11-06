@@ -41,7 +41,7 @@
             event: 'model-save',
             fade: false,
             message: i18nProperty.errors[error.message],
-            type: 'error'
+            type: 'danger'
           });
           switch (error.message) {
             case 'title_missing':

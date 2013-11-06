@@ -44,10 +44,12 @@
       };
 
       ShowUnitView.prototype.addAll = function(collection, filter) {
+        var _this = this;
+
         this.$list.html('');
-        return _.each(this.model.leases.where({
-          unit: this.model
-        }), this.addOne);
+        return this.model.leases.chain().select(function(l) {
+          return l.get("unit").id === _this.model.id;
+        }).each(this.addOne);
       };
 
       ShowUnitView.prototype.addOne = function(lease) {

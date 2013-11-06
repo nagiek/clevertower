@@ -48,7 +48,7 @@
             event: 'unit-invalid',
             fade: false,
             message: msg,
-            type: 'error'
+            type: 'danger'
           });
         });
         return this.editing = false;

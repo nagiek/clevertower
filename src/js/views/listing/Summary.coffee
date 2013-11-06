@@ -47,7 +47,12 @@ define [
       lastLogin = Parse.User.current().get("lastLogin") || Parse.User.current().updatedAt
 
       unless @onProperty
-        property = Parse.User.current().get("network").properties.get(@model.get("property").id)
+        if Parse.User.current().get("network")
+          property = Parse.User.current().get("network").properties.get(@model.get("property").id)
+        
+        if Parse.User.current().get("property") and !property
+          property = Parse.User.current().get("property")
+
         unless property then @onProperty = false 
         else 
           propertyTitle = property.get("title")
@@ -55,6 +60,8 @@ define [
       else 
         propertyTitle = false
         propertyUrl = false
+
+      console.log @model
 
       vars = _.merge @model.toJSON(),
         count: inquiries.length
@@ -75,7 +82,7 @@ define [
         i18nUnit: i18nUnit
         i18nListing: i18nListing
 
-      $(@el).html JST["src/js/templates/listing/summary.jst"](vars)
+      @$el.html JST["src/js/templates/listing/summary.jst"](vars)
       @
 
     kill : (e) ->

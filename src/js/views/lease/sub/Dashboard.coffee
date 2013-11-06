@@ -30,8 +30,6 @@ define [
       @listenTo @model.listings, "add", @addOne
       @listenTo @model.listings, "reset", @addAll
       
-      @render()
-
     # Re-render the contents of the property item.
     render: ->
       vars = _.merge @model.toJSON(),
@@ -41,7 +39,7 @@ define [
         i18nListing: i18nListing
         i18nCommon: i18nCommon
         hasNetwork: Parse.User.current().get("network")
-        baseUrl: "/manage"
+        baseUrl: @baseUrl
         isMgr: true
       
       @$el.html JST["src/js/templates/lease/sub/dashboard.jst"](vars)
@@ -63,6 +61,10 @@ define [
       @$list.append (new ListingView(model: l, baseUrl: @baseUrl, onUnit: true)).render().el
 
     addAll : =>
-      @$list.html ""
-      if @model.listings.length is 0 then @$list.html "<tr class='empty'><td colspan='5'>#{i18nListing.listings.empty.self}</td></tr>"
-      else @model.listings.each @addOne
+
+      # Only select listings on our unit.
+      visible = @model.listings.select (l) => l.get("unit") and l.get("unit").id is @model.get("unit").id
+      if visible.length is 0 then @$list.html "<tr class='empty'><td colspan='5'>#{i18nListing.listings.empty.self}</td></tr>"
+      else
+        @$list.html ""
+        _.each visible, @addOne

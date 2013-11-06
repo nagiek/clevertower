@@ -981,8 +981,9 @@ Parse.Cloud.beforeSave "Lease", (req, res) ->
       leaseACL.setRoleReadAccess current, true
       leaseACL.setRoleWriteAccess current, true
 
-      leaseACL.setRoleReadAccess mgrRole, true
-      leaseACL.setRoleWriteAccess mgrRole, true
+      if mgrRole
+        leaseACL.setRoleReadAccess mgrRole, true
+        leaseACL.setRoleWriteAccess mgrRole, true
 
       # Let managers edit the lease.
       if network
@@ -990,6 +991,7 @@ Parse.Cloud.beforeSave "Lease", (req, res) ->
         return res.error "role_missing" unless netRole
         leaseACL.setRoleReadAccess netRole, true
         leaseACL.setRoleWriteAccess netRole, true
+
       req.object.setACL leaseACL
 
       # Send a notification to the property if we are joining.

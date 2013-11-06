@@ -57,7 +57,7 @@ define [
 
       @filter(e)
 
-      @$filters.find(".filter-all .count").html @model.tenants.where(property: @model).length      
+      @$filters.find(".filter-all .count").html @model.tenants.select((t) => t.get("property").id is @model.id).length      
       @$filters.find(".filter-recent .count").html @model.tenants.filterRecent(property: @model).length
 
     filter : (e) =>
@@ -69,7 +69,7 @@ define [
       @$filters.find('li').removeClass('active')
       @$filters.find(".#{@currentFilter}").parent().addClass('active')
       visible = switch @currentFilter
-        when 'filter-all'     then @model.tenants.where(property: @model)
+        when 'filter-all'     then @model.tenants.select((t) => t.get("property").id is @model.id)
         when 'filter-recent'  then @model.tenants.filterRecent(property: @model)
       if visible.length is 0 then @$list.html "<li class='span'>#{i18nGroup.tenant.empty.index}</li>"
       else _.each visible, @addOne

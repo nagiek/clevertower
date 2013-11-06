@@ -936,8 +936,10 @@
           leaseACL.setPublicReadAccess(false);
           leaseACL.setRoleReadAccess(current, true);
           leaseACL.setRoleWriteAccess(current, true);
-          leaseACL.setRoleReadAccess(mgrRole, true);
-          leaseACL.setRoleWriteAccess(mgrRole, true);
+          if (mgrRole) {
+            leaseACL.setRoleReadAccess(mgrRole, true);
+            leaseACL.setRoleWriteAccess(mgrRole, true);
+          }
           if (network) {
             netRole = network.get("role");
             if (!netRole) {

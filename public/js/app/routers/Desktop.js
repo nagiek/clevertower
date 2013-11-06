@@ -246,8 +246,7 @@
                       });
                     }
                   },
-                  error: function(error) {
-                    console.log(error);
+                  error: function() {
                     Parse.User.current().get("property").mgr = false;
                     return _this.insideManage(splat);
                   }
@@ -692,7 +691,7 @@
                   require(["views/helper/Alert", 'i18n!nls/common'], function(Alert, i18nCommon) {
                     return new Alert({
                       event: 'access-denied',
-                      type: 'error',
+                      type: 'danger',
                       fade: true,
                       heading: i18nCommon.oauth.error,
                       message: i18nCommon.oauth.unverified_token
@@ -706,7 +705,7 @@
             require(["views/helper/Alert", 'i18n!nls/common'], function(Alert, i18nCommon) {
               return new Alert({
                 event: 'access-denied',
-                type: 'error',
+                type: 'danger',
                 fade: true,
                 heading: i18nCommon.oauth.error,
                 message: i18nCommon.oauth[vars.error]
@@ -723,7 +722,7 @@
         return require(["views/helper/Alert", 'i18n!nls/common'], function(Alert, i18nCommon) {
           new Alert({
             event: 'access-denied',
-            type: 'error',
+            type: 'danger',
             fade: true,
             heading: i18nCommon.errors.fourOhFour,
             message: i18nCommon.errors.not_found
@@ -770,7 +769,7 @@
         return require(["views/helper/Alert", 'i18n!nls/common'], function(Alert, i18nCommon) {
           return new Alert({
             event: 'access-denied',
-            type: 'error',
+            type: 'danger',
             fade: true,
             heading: i18nCommon.errors.access_denied,
             message: i18nCommon.errors.no_permission

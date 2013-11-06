@@ -58,7 +58,7 @@
             event: 'model-save',
             fade: false,
             message: msg,
-            type: 'error'
+            type: 'danger'
           });
         });
         this.on("property:save", function(property) {

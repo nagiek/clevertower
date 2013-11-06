@@ -45,7 +45,7 @@
             event: 'unit-invalid',
             fade: false,
             message: msg,
-            type: 'error'
+            type: 'danger'
           });
         });
       };

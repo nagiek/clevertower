@@ -136,7 +136,7 @@
                   event: 'geocode',
                   fade: false,
                   message: msg,
-                  type: 'error'
+                  type: 'danger'
                 });
               }
             }

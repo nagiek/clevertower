@@ -49,7 +49,7 @@ define [
     # Add all items in the Units collection at once.
     addAll: (collection, filter) =>
       @$list.html ''
-      _.each @model.leases.where(unit: @model), @addOne
+      @model.leases.chain().select((l) => l.get("unit").id is @model.id).each(@addOne)
 
     # Add a single todo item to the list by creating a view for it, and
     # appending its element to the `<ul>`.

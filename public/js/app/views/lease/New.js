@@ -78,7 +78,7 @@
             event: 'model-save',
             fade: false,
             message: msg,
-            type: 'error'
+            type: 'danger'
           });
           switch (error.message) {
             case 'unit_missing':
@@ -158,7 +158,8 @@
       };
 
       NewLeaseView.prototype.render = function() {
-        var cancel_path, template, tmpl, vars;
+        var cancel_path, template, tmpl, vars,
+          _this = this;
 
         tmpl = (this.model.isNew() ? 'new' : 'sub/edit') + (this.modal ? "-modal" : "");
         template = "src/js/templates/lease/" + tmpl + ".jst";
@@ -183,8 +184,8 @@
           this.addOne(this.unit);
         } else {
           if (this.property) {
-            if (this.property.units.where({
-              property: this.property
+            if (this.property.units.select(function(u) {
+              return u.get("property").id === _this.property.id;
             }).length === 0) {
               this.property.units.fetch();
             } else {
@@ -215,8 +216,8 @@
 
         this.$unitSelect.html("<option value=''>" + i18nCommon.form.select.select_value + "</option>");
         if (this.property) {
-          units = this.property.units.where({
-            property: this.property
+          units = this.property.units.select(function(u) {
+            return u.get("property").id === _this.property.id;
           });
           _.each(units, this.addOne);
           if (this.modal || units.length === 0) {

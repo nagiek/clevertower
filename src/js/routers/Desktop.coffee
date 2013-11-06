@@ -173,8 +173,7 @@ define [
                         view.clear() if view
                       else
                         view.changeSubView(vars.path, vars.params)
-                error: (error) =>
-                  console.log error
+                error: =>
                   Parse.User.current().get("property").mgr = false
                   @insideManage(splat)
             else
