@@ -67,7 +67,7 @@ define [
 
       if @model.get "forMgr"
         url = ""
-        url += "//#{Parse.User.current().get("network").get("name")}.#{location.host}" if location.host.split(".").length is 2
+        # url += "//#{Parse.User.current().get("network").get("name")}.#{location.host}" if location.host.split(".").length is 2
         url += "/properties/#{property.id}" if property
         url += channels[0].replace("-", "/") unless channels[0].indexOf('properties') or channels[0].indexOf('profiles')
       else

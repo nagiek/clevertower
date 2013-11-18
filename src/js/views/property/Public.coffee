@@ -64,14 +64,15 @@ define [
 
       if Parse.App.activity and Parse.App.comments
         activity = Parse.App.activity.select((a) => a.get("property") and a.get("property").id is @model.id)
+        # Move models from the general collection to the property
+        Parse.App.activity.remove activity
         @model.activity.add activity
         @model.activity.query.notContainedIn "objectId", _.map(activity, (a) -> a.id)
 
         comments = Parse.App.comments.select((c) => c.get("property") and c.get("property").id is @model.id)
+        Parse.App.comments.remove comments
         @model.comments.add comments
         @model.comments.query.notContainedIn "objectId", _.map(comments, (c) -> c.id)
-
-      console.log @model.toJSON()
 
     showTab : (e) ->
       e.preventDefault()
@@ -146,7 +147,7 @@ define [
       @$photos = @$("#photos ul")
       @$listings = @$("#listings > table > tbody")
       
-      # Start activity search.      
+      # Start activity search.
       @addAllActivity @model.activity if @model.activity.length > 0
       @addAllComments @model.comments if @model.comments.length > 0
       @search() unless @model.activity.length > @resultsPerPage * @page
@@ -265,10 +266,6 @@ define [
 
       # Check if we have hit the end.
       if @model.activity.length >= @activityCount then @trigger "view:exhausted"
-
-    # addOneActivity : (activity) =>
-    #   view = new ActivityView(model: activity, onProfile: false)
-    #   @$activity.append view.render().el
 
     likeOrLoginFromActivity: (e) =>
       e.preventDefault()

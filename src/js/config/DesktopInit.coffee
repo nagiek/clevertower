@@ -525,10 +525,6 @@ require [
       @activity = new ActivityList [], {} unless @activity
       @comments = new CommentList [], {} unless @comments
 
-      # Notifications.
-      @notifications = new NotificationList
-      @notifications.query.find().then (notifs) => @notifications.add notifs
-
       # Living.
       @set "lease", user.get "lease"
       # Need to get the Unit functions when managing our lease.
@@ -545,7 +541,15 @@ require [
       network = user.get "network"
       if network
         @set "network", network
-        @networkSetup() 
+        @networkSetup()
+
+      # Notifications.
+      # Set up after we have set the property and network.
+      @notifications = new NotificationList
+      console.log @notifications
+      @notifications.query.find().then (notifs) => 
+        console.log notifs
+        @notifications.add notifs
 
   Parse.User::networkSetup = ->
 

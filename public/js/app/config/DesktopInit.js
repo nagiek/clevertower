@@ -452,18 +452,20 @@
         if (!_this.comments) {
           _this.comments = new CommentList([], {});
         }
-        _this.notifications = new NotificationList;
-        _this.notifications.query.find().then(function(notifs) {
-          return _this.notifications.add(notifs);
-        });
         _this.set("lease", user.get("lease"));
         _this.set("unit", user.get("unit"));
         _this.set("property", user.get("property"));
         network = user.get("network");
         if (network) {
           _this.set("network", network);
-          return _this.networkSetup();
+          _this.networkSetup();
         }
+        _this.notifications = new NotificationList;
+        console.log(_this.notifications);
+        return _this.notifications.query.find().then(function(notifs) {
+          console.log(notifs);
+          return _this.notifications.add(notifs);
+        });
       });
     };
     Parse.User.prototype.networkSetup = function() {

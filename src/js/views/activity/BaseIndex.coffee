@@ -141,6 +141,7 @@ define [
       # Possible for the same activity to be on the page twice (in two different tabs)
       $el = $ """
       <div class="thumbnail clearfix activity activity-#{model.id} fade in"
+        data-id="#{model.id}"
         data-liked="#{liked}"
         data-property-index="#{propertyIndex}" 
         data-property-id="#{propertyId}"

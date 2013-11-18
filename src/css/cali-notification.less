@@ -1,15 +1,19 @@
 .notifications-menu {
   ul {
     width: 330px;
+    padding:0;
     > li {
       > a {
+        display: block;
+        padding: 10px 10px;
         &.unclicked,
         &:hover {
-          #gradient > .vertical(@brand-primary-light, @brand-primary);
+          #gradient > .vertical(lighten(@brand-primary-light, 33%), lighten(@brand-primary, 33%));
           color:@text-color;
+          text-decoration: none;
         }
         &.unclicked:hover {
-          #gradient > .vertical(@brand-primary, @brand-primary-dark);
+          #gradient > .vertical(lighten(@brand-primary, 33%), lighten(@brand-primary-dark, 33%));
         }
       }
     }
