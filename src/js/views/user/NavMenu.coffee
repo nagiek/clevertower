@@ -4,6 +4,7 @@ define [
   "backbone"
   'models/Network'
   "i18n!nls/common"
+  "templates/user/nav_menu_network"
 ], ($, _, Parse, Network, i18nCommon) ->
 
   # This handles the panel as well, which is outside its element.
@@ -17,11 +18,10 @@ define [
     initialize: ->
 
       # @listenTo Parse.Dispatcher, "user:logout", -> delete @model
+      # @listenTo Parse.Dispatcher, "user:login", @bindListenEvents
+      @listenTo Parse.Dispatcher, "user:change", @render
 
-    #   @listenTo Parse.Dispatcher, "user:login", @bindListenEvents
-    #   @listenTo Parse.Dispatcher, "user:change", @render
-
-    #   @bindListenEvents() if Parse.User.current()
+      # @bindListenEvents() if Parse.User.current()
     
     # bindListenEvents : ->
     #   @listenTo Parse.User.current(), "change:network", @render
@@ -34,7 +34,11 @@ define [
 
     render: =>  
       @$('#home-nav a').html i18nCommon.nouns.outside # i18nCommon.verbs.explore
-      @$('#network-nav a').html i18nCommon.nouns.inside # #{i18nCommon.verbs.manage}
+
+      if Parse.User.current() and Parse.User.current().get("network")
+        @$('#network-nav').addClass("dropdown").html JST["src/js/templates/user/nav_menu_network.jst"](i18nCommon: i18nCommon)
+      else
+        @$('#network-nav').removeClass("dropdown").html "<a href='/inside'>#{i18nCommon.nouns.inside}</a>"# #{i18nCommon.verbs.manage}
 
       # Panel.
       $('#panel-home-nav a').html i18nCommon.nouns.outside # i18nCommon.verbs.explore
