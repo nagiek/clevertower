@@ -16,8 +16,6 @@ define [
         
     initialize: (attrs) ->
 
-      console.log 'hi'
-
       @editing = false
       
       @on "view:change", @clear

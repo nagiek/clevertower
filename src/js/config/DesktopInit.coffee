@@ -546,10 +546,7 @@ require [
       # Notifications.
       # Set up after we have set the property and network.
       @notifications = new NotificationList
-      console.log @notifications
-      @notifications.query.find().then (notifs) => 
-        console.log notifs
-        @notifications.add notifs
+      @notifications.query.find().then (notifs) => @notifications.add notifs
 
   Parse.User::networkSetup = ->
 

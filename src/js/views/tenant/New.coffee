@@ -36,17 +36,16 @@ define [
       @listenTo @leases, "add", @addOne
       @listenTo @leases, "reset", @addAll
       
-      @on 'submit:return', ->
+      @on 'submit:return', =>
         @$('button.save').removeProp "disabled"
       
-      @on 'submit:error', (error) ->
+      @on 'submit:error', (error) =>
         @$('.emails-group').addClass('error') 
         new Alert event: 'model-save', fade: false, message: i18nLease.errors[error.message], type: 'danger'
           
-      
       @on "submit:success", (model) =>
-        @property.leases.add @model if !@leaseId
-        new Parse.Query("Tenant").equalTo("lease", @model).include("profile").find()
+        lease = @leases.get model.id
+        new Parse.Query("Tenant").equalTo("lease", model).include("profile").find()
         .then (objs) -> 
           @property.tenants.add objs
           # Add tenants to the network collection, if it exists.
@@ -54,7 +53,7 @@ define [
         
         require ["views/lease/Show"], (ShowLeaseView) =>
           # Alert the user and move on
-          new ShowLeaseView(model: @model, property: @property, forNetwork: @forNetwork, baseUrl: @baseUrl).render()
+          new ShowLeaseView(model: lease, property: @property, forNetwork: @forNetwork, baseUrl: @baseUrl).render()
           Parse.history.navigate "#{@baseUrl}/leases/#{model.id}"
           @clear()
 
@@ -95,7 +94,7 @@ define [
       return @trigger "submit:error", {message: 'lease_missing'} unless data.lease
       
       attrs = 
-        objectId: data.lease
+        objectId: data.lease.id
         className: "Lease"
       
       # Validate tenants (assignment done in Cloud)

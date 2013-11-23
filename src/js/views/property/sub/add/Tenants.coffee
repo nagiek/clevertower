@@ -22,7 +22,7 @@ define [
 
       @vars = property: @model, lease: undefined, baseUrl: @baseUrl, forNetwork: @forNetwork
       
-      if attrs.params and attrs.params.lease
+      if attrs.params and attrs.params.leaseId
         @vars.leaseId = attrs.params.leaseId
       
       
@@ -37,4 +37,3 @@ define [
       @stopListening()
       @undelegateEvents()
       delete this
-      Parse.history.navigate @baseUrl

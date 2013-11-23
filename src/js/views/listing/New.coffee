@@ -83,12 +83,12 @@ define [
         new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
 
         # Parse.Cloud.afterSave "Listing", (req) ->
-        if model.isNew() and model.get "public"
+        if model.get "public"
 
           # Create activity
           activity = new Activity
           modelJSON = model.toJSON()
-          activity.save
+          activityVars = 
             activity_type: "new_listing"
             public: true
             rent: modelJSON.rent
@@ -100,13 +100,15 @@ define [
             title: modelJSON.title
             profile: modelJSON.profile
 
-          Parse.User.current().activity.add activity
+          activity.save(activityVars).then (returnedActivity) ->
+            model.save activity: returnedActivity
+            Parse.User.current().activity.add returnedActivity
 
         # Add the tenants to the network
         user = Parse.User.current() 
         network = user.get("network") if user
         if user and network
-          new Parse.Query("Tenant").equalTo("listing", @model).include("profile").find()
+          new Parse.Query("Tenant").equalTo("listing", model).include("profile").find()
           .then (objs) -> network.tenants.add objs
         
         Parse.history.navigate "#{@baseUrl}/listings/#{model.id}", true

@@ -1,11 +1,13 @@
-<h2><%= i18nListing.headers.edit_listing %></h2>
-<form class="listing-form" enctype="multipart/form-data">
-  <%= JST["src/js/templates/listing/form.jst"]({title_placeholder: title_placeholder, isNew: false, unit: unit, listing: listing, dates: dates, moment: moment, i18nCommon: i18nCommon, i18nUnit: i18nUnit, i18nListing: i18nListing}) %>
-  
-  <div class="form-actions">
-    <button class="save btn btn-primary"><%= i18nCommon.actions.save %></button>
-    <a href="<%= cancel_path %>" class="cancel btn btn-default"><%= i18nCommon.actions.cancel %></a>
-  </div>
-  
-  <a class="remove" href="#"><%= i18nCommon.actions.delete %></a>
-</form>
+<div class="container">
+  <h2 class="col-sm-offset-2"><%= i18nListing.headers.edit_listing %></h2>
+  <form class="listing-form form-horizontal" enctype="multipart/form-data">
+    <%= JST["src/js/templates/listing/form.jst"]({title_placeholder: title_placeholder, isNew: false, unit: unit, listing: listing, dates: dates, moment: moment, i18nCommon: i18nCommon, i18nUnit: i18nUnit, i18nListing: i18nListing}) %>
+    
+    <div class="form-actions col-sm-offset-2">
+      <button class="save btn btn-primary"><%= i18nCommon.actions.save %></button>
+      <a href="<%= cancel_path %>" class="cancel btn btn-default"><%= i18nCommon.actions.cancel %></a>
+    </div>
+    
+    <a class="remove" href="#"><%= i18nCommon.actions.delete %></a>
+  </form>
+</div>

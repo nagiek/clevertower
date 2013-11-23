@@ -935,9 +935,9 @@ Parse.Cloud.beforeSave "Lease", (req, res) ->
 
     # Move the emails to it's own process category.
     emails = req.object.get("emails") || []
-    unless (req.object.get("forNetwork") and existed)
-      # Add the user if the lease is not for the network.
-      emails.push req.user.getEmail()
+    
+    # Add the user if the lease is new and not for the network
+    emails.push req.user.getEmail() if !existed and !req.object.get("forNetwork")
 
     req.object.set "emailsToProcess", emails
     req.object.unset "emails"

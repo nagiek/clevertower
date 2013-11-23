@@ -1,7 +1,7 @@
 <td>
   <% if (!onProperty) { %><a href="<%= propertyUrl %>"><%= propertyTitle %></a> |<% } %>
   <% if (!onUnit) { %><%= unitTitle %> |<% } %>
-  <a href="<%= baseUrl %>/listings/<%= objectId %>"><%= title %></a>
+  <a href="<%= propertyUrl %>/listings/<%= objectId %>"><%= title %></a>
 </td>
 <td><%= rent %></td>
 <td><span class="label<% if (public) { %> label-success<% } %>"><%= status %></span></td>
@@ -10,10 +10,10 @@
   <% if (newInquiries) { %><small>(<%= newInquiries %> <%= i18nCommon.adjectives.new %>)</small><% } %>
 </td>
 <td>
-  <a href="<%= baseUrl %>/listings/<%= objectId %>/edit" class="btn btn-small">
+  <a href="<%= propertyUrl %>/listings/<%= objectId %>/edit" class="btn btn-link btn-sm">
     <%= i18nCommon.actions.edit %>
   </a>
-  <button class="btn btn-small delete"
+  <button class="btn btn-default btn-xs delete"
           rel="tooltip"
           data-original-title="<%= i18nCommon.actions.delete %>">
     <span class="glyphicon glyphicon-trash"></span>

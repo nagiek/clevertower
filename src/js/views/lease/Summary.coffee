@@ -61,7 +61,6 @@ define [
         moment: moment
         baseUrl: @baseUrl
         objectId: @model.get "objectId"
-        isNew: @model.isNew()
         i18nCommon: i18nCommon
         i18nUnit: i18nUnit
         i18nLease: i18nLease

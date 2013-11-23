@@ -44,4 +44,3 @@ define [
       @stopListening()
       @undelegateEvents()
       delete this
-      Parse.history.navigate @baseUrl

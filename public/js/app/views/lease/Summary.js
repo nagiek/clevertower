@@ -65,7 +65,6 @@
           moment: moment,
           baseUrl: this.baseUrl,
           objectId: this.model.get("objectId"),
-          isNew: this.model.isNew(),
           i18nCommon: i18nCommon,
           i18nUnit: i18nUnit,
           i18nLease: i18nLease

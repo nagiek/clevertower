@@ -46,22 +46,16 @@ define [
       inquiries = @model.inquiries.select (i) => i.get("listing").id is @model.id
       lastLogin = Parse.User.current().get("lastLogin") || Parse.User.current().updatedAt
 
-      unless @onProperty
-        if Parse.User.current().get("network")
-          property = Parse.User.current().get("network").properties.get(@model.get("property").id)
-        
-        if Parse.User.current().get("property") and !property
-          property = Parse.User.current().get("property")
+      if Parse.User.current().get("network")
+        property = Parse.User.current().get("network").properties.get(@model.get("property").id)
+      
+      if Parse.User.current().get("property") and !property
+        property = Parse.User.current().get("property")
 
-        unless property then @onProperty = false 
-        else 
-          propertyTitle = property.get("title")
-          propertyUrl = property.url()
+      unless property then @onProperty = false 
       else 
-        propertyTitle = false
-        propertyUrl = false
-
-      console.log @model
+        propertyTitle = property.get("title")
+        propertyUrl = property.url()
 
       vars = _.merge @model.toJSON(),
         count: inquiries.length
@@ -77,7 +71,6 @@ define [
         onUnit: @onUnit
         unitId: @model.get("unit").id
         unitTitle: @model.get("unit").get("title")
-        isNew: @model.isNew()
         i18nCommon: i18nCommon
         i18nUnit: i18nUnit
         i18nListing: i18nListing

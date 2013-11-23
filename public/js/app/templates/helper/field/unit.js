@@ -80,26 +80,46 @@ __p += '</label>\n      <select class="form-control" name="unit[attributes][bath
 ((__t = ( i18nUnit.form.bathrooms.threeandahalf )) == null ? '' : __t) +
 '</option>\n      </select>\n    </div>\n  </div>\n';
  } else { ;
-__p += '\n  <div class="unit-group form-group">\n    <label for="unit-select" class="control-label">' +
+__p += '\n  <div class="unit-group form-group">\n    <label for="unit-select" class="control-label';
+ if (horiz) { ;
+__p += ' col-sm-2';
+ } ;
+__p += '">' +
 ((__t = ( i18nCommon.classes.Unit )) == null ? '' : __t);
  if (required) { ;
 __p += ' <span class="required">*</span>';
  } ;
-__p += '</label>\n    <div class="row">\n      <div class="col-xs-6">\n        <select name="unit[id]" class="form-control unit-select" required="' +
-((__t = ( required )) == null ? '' : __t) +
-'">\n          <option value="">' +
-((__t = ( i18nCommon.form.select.select_value )) == null ? '' : __t) +
-'</option>\n        </select>\n      </div>\n      <div class="col-xs-6">\n        <input type="text" name="unit[attributes][title]" placeholder="' +
-((__t = ( i18nUnit.form.unit_number )) == null ? '' : __t) +
-'" class="form-control new-unit" maxlength="16" style="display:none;">\n      </div>\n    </div>\n  </div>\n  <input type="hidden" name="unit[__type]" value="Pointer">\n    <input type="hidden" name="unit[className]" value="Unit">\n  ';
- if (help) { ;
-__p += '\n    <p class="help-block">\n      <span class="label label-default label-large">' +
-((__t = ( i18nCommon.adjectives.private )) == null ? '' : __t) +
-'</span>\n      ' +
-((__t = ( i18nUnit.form.help )) == null ? '' : __t) +
-'\n    </p>\n  ';
+__p += '</label>\n    ';
+ if (!horiz) { ;
+__p += '<div class="row">';
  } ;
-__p += '\n';
+__p += '\n    <div class="col-xs-6';
+ if (horiz) { ;
+__p += ' col-sm-3';
+ } ;
+__p += '">\n      <select name="unit[id]" class="form-control unit-select" required="' +
+((__t = ( required )) == null ? '' : __t) +
+'">\n        <option value="">' +
+((__t = ( i18nCommon.form.select.select_value )) == null ? '' : __t) +
+'</option>\n      </select>\n    </div>\n    <div class="col-xs-4';
+ if (horiz) { ;
+__p += ' col-sm-2';
+ } ;
+__p += '">\n      <input type="text" name="unit[attributes][title]" placeholder="' +
+((__t = ( i18nUnit.form.unit_number )) == null ? '' : __t) +
+'" class="form-control new-unit" maxlength="16" style="display:none;">\n    </div>\n    ';
+ if (!horiz) { ;
+__p += '</div>';
+ } ;
+__p += '\n    ';
+ if (help) { ;
+__p += '\n      <p class="help-block col-sm-offset-2 col-sm-10">\n        <span class="label label-default label-large">' +
+((__t = ( i18nCommon.adjectives.private )) == null ? '' : __t) +
+'</span>\n        ' +
+((__t = ( i18nUnit.form.help )) == null ? '' : __t) +
+'\n      </p>\n    ';
+ } ;
+__p += '\n  </div>\n  <input type="hidden" name="unit[__type]" value="Pointer">\n  <input type="hidden" name="unit[className]" value="Unit">\n';
  } ;
 
 

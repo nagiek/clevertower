@@ -1,0 +1,16 @@
+// Alternate styles
+//
+// Generate contextual modifier classes for colorizing the badge.
+
+.badge-success {
+  .alert-variant(@alert-success-bg; @alert-success-border; @alert-success-text);
+}
+.badge-info {
+  .alert-variant(@alert-info-bg; @alert-info-border; @alert-info-text);
+}
+.badge-warning {
+  .alert-variant(@alert-warning-bg; @alert-warning-border; @alert-warning-text);
+}
+.badge-danger {
+  .alert-variant(@alert-danger-bg; @alert-danger-border; @alert-danger-text);
+}

@@ -58,8 +58,7 @@
         delete this.form;
         this.stopListening();
         this.undelegateEvents();
-        delete this;
-        return Parse.history.navigate(this.baseUrl);
+        return delete this;
       };
 
       return AddLeaseToPropertyView;

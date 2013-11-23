@@ -30,24 +30,24 @@
   </div>
 <% } else { %>
   <div class="unit-group form-group">
-    <label for="unit-select" class="control-label"><%= i18nCommon.classes.Unit %><% if (required) { %> <span class="required">*</span><% } %></label>
-    <div class="row">
-      <div class="col-xs-6">
-        <select name="unit[id]" class="form-control unit-select" required="<%= required %>">
-          <option value=""><%= i18nCommon.form.select.select_value %></option>
-        </select>
-      </div>
-      <div class="col-xs-6">
-        <input type="text" name="unit[attributes][title]" placeholder="<%= i18nUnit.form.unit_number %>" class="form-control new-unit" maxlength="16" style="display:none;">
-      </div>
+    <label for="unit-select" class="control-label<% if (horiz) { %> col-sm-2<% } %>"><%= i18nCommon.classes.Unit %><% if (required) { %> <span class="required">*</span><% } %></label>
+    <% if (!horiz) { %><div class="row"><% } %>
+    <div class="col-xs-6<% if (horiz) { %> col-sm-3<% } %>">
+      <select name="unit[id]" class="form-control unit-select" required="<%= required %>">
+        <option value=""><%= i18nCommon.form.select.select_value %></option>
+      </select>
     </div>
+    <div class="col-xs-4<% if (horiz) { %> col-sm-2<% } %>">
+      <input type="text" name="unit[attributes][title]" placeholder="<%= i18nUnit.form.unit_number %>" class="form-control new-unit" maxlength="16" style="display:none;">
+    </div>
+    <% if (!horiz) { %></div><% } %>
+    <% if (help) { %>
+      <p class="help-block col-sm-offset-2 col-sm-10">
+        <span class="label label-default label-large"><%= i18nCommon.adjectives.private %></span>
+        <%= i18nUnit.form.help %>
+      </p>
+    <% } %>
   </div>
   <input type="hidden" name="unit[__type]" value="Pointer">
-    <input type="hidden" name="unit[className]" value="Unit">
-  <% if (help) { %>
-    <p class="help-block">
-      <span class="label label-default label-large"><%= i18nCommon.adjectives.private %></span>
-      <%= i18nUnit.form.help %>
-    </p>
-  <% } %>
+  <input type="hidden" name="unit[className]" value="Unit">
 <% } %>
