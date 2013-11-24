@@ -35,9 +35,9 @@ define [
 
       vars = _.merge @model.toJSON(),
         posted: moment(@model.createdAt).fromNow()
-        publicUrl: @property.publicUrl()
         baseUrl: @baseUrl
         property: @property.toJSON()
+        activityUrl: if @model.get("activity") then @model.get("activity").url() else false
         unitTitle: @model.get("unit").get("title")
         start_date: moment(@model.get "start_date").format("LL")
         end_date: moment(@model.get "end_date").format("LL")

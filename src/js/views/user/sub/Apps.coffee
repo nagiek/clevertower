@@ -22,7 +22,12 @@ define [
         @$('.error').removeClass('error')
         @$('button.save').removeProp "disabled"
         new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
-        
+    
+    clear: =>
+      @stopListening()
+      @undelegateEvents()
+      delete this
+
     FBlink: (e) =>
       e.preventDefault()
       unless Parse.User.current()._isLinked("facebook")

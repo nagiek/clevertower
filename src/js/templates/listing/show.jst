@@ -8,9 +8,9 @@
             <%= i18nCommon.actions.edit %>
           </a>
         </li>
-        <li>
-          <a href="<%= publicUrl %>"><%= i18nProperty.menu.view_public %></a>
-        </li>
+        <% if (activityUrl) { %>
+          <li><a href="<%= activityUrl %>"><%= i18nProperty.menu.view_public %></a></li>
+        <% } %>
       </ul>
     </header>
     <h3><%= i18nListing.inquiries.label %></h3>

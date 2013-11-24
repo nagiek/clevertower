@@ -11,7 +11,14 @@
 
 <!-- form-large -->
 <fieldset>
-  <%= JST["src/js/templates/helper/field/unit.jst"]({unit: unit, required: true, i18nUnit: i18nUnit, i18nCommon: i18nCommon, help: true, horiz: true}) %>
+  <div class="form-group">
+    <label for="listing-rent" class="control-label col-sm-2"><%= i18nListing.fields.rent %></label>
+    <div class="input-group col-sm-3 col-md-2">
+      <span class="input-group-addon">$</span>
+      <input type="number" class="form-control" name="listing[rent]" id="listing-rent" maxlength="12" required="required" value="<%= listing.rent %>" />
+    </div>
+  </div>
+
   <div class="date-group form-group">
     <label for="listing-unit" class="control-label col-sm-2"><%= i18nListing.form.dates %></label>
     <div class="col-xs-6 col-sm-3 col-md-2">
@@ -29,11 +36,5 @@
     </div>
   </div>
 
-  <div class="form-group">
-    <label for="listing-rent" class="control-label col-sm-2"><%= i18nListing.fields.rent %></label>
-    <div class="input-group col-sm-3 col-md-2">
-      <span class="input-group-addon">$</span>
-      <input type="number" class="form-control" name="listing[rent]" id="listing-rent" maxlength="12" required="required" value="<%= listing.rent %>" />
-    </div>
-  </div>
+  <%= JST["src/js/templates/helper/field/unit.jst"]({unit: unit, required: true, i18nUnit: i18nUnit, i18nCommon: i18nCommon, help: true, horiz: true}) %>
 </fieldset>

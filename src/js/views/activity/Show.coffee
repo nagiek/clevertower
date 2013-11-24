@@ -75,7 +75,7 @@ define [
         end: moment(@model.get("endDate")).format("LLL")
         postDate: moment(@model.createdAt).fromNow()
         liked: @liked
-        postImage: @model.image("span4")
+        postImage: @model.image("full")
         icon: @model.icon()
         name: @model.name()
         profilePic: @model.profilePic("tiny")
