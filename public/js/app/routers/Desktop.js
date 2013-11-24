@@ -165,7 +165,7 @@
                 return view.clear();
               }
             } else {
-              return new Parse.Query("Activity").get(id, {
+              return new Parse.Query("Activity").include("property").include("profile").get(id, {
                 success: function(model) {
                   Parse.App.activity.add(model);
                   _this.view = new ShowActivityView({

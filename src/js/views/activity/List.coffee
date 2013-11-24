@@ -174,9 +174,7 @@ define [
         @model.set "commentCount", newCount - 1
         @$(".comment-count").html newCount - 1
 
-    # Re-render the contents of the Unit item.
     render: ->
-
       vars = _.merge @model.toJSON(), 
         url: @model.url()
         start: moment(@model.get("startDate")).format("LLL")

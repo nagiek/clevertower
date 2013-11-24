@@ -98,7 +98,6 @@ define [
             property: modelJSON.property
             network: modelJSON.network
             title: modelJSON.title
-            profile: Parse.User.current().get "profile"
 
           activity.save(activityVars).then (returnedActivity) ->
             model.save activity: returnedActivity

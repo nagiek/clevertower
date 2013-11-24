@@ -124,7 +124,7 @@ define [
             @view = new ShowActivityView(model: model).render()
             view.clear() if view
           else
-            new Parse.Query("Activity").get id,
+            new Parse.Query("Activity").include("property").include("profile").get id,
               success: (model) =>
                 Parse.App.activity.add model
                 @view = new ShowActivityView(model: model).render()

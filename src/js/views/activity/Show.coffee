@@ -79,9 +79,9 @@ define [
         icon: @model.icon()
         name: @model.name()
         profilePic: @model.profilePic("tiny")
-        profileUrl: @model.get("profile").url()
+        profileUrl: @model.profileUrl()
         linkedToProperty: @model.linkedToProperty()
-        pos: @pos % 20 # This will be incremented in the template.
+        pos: false # This will be incremented in the template.
         current: Parse.User.current()
         i18nCommon: i18nCommon
 
