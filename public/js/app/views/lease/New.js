@@ -93,11 +93,13 @@
           if (_this.property) {
             _this.property.leases.add(_this.model);
             if (newUnit) {
+              _this.model.get("unit").set("activeLease", _this.model);
               _this.property.units.add(_this.model.get("unit"));
             }
           } else {
             Parse.User.current().get("network").leases.add(_this.model);
             if (newUnit) {
+              _this.model.get("unit").set("activeLease", _this.model);
               Parse.User.current().get("network").units.add(_this.model.get("unit"));
             }
           }

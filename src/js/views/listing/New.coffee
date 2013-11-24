@@ -36,7 +36,6 @@ define [
     
     initialize : (attrs) ->
 
-      @property = attrs.property
 
       # unitId = prepopulated choice for managers
       # unit = tenant's one and only unit.
@@ -44,6 +43,7 @@ define [
       @unitId = attrs.unitId
       @baseUrl = attrs.baseUrl
       @forNetwork = attrs.forNetwork
+      @property = attrs.property
       
       @model = new Listing(network: Parse.User.current().get("network")) unless @model
       @template = "src/js/templates/listing/#{if @model.isNew() then 'new' else 'sub/edit'}.jst"

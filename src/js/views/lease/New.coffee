@@ -85,10 +85,14 @@ define [
       @on "save:success", (model, newUnit) =>
         if @property
           @property.leases.add @model
-          @property.units.add @model.get("unit") if newUnit
+          if newUnit
+            @model.get("unit").set "activeLease", @model
+            @property.units.add @model.get("unit")
         else
           Parse.User.current().get("network").leases.add @model
-          Parse.User.current().get("network").units.add @model.get("unit") if newUnit
+          if newUnit
+            @model.get("unit").set "activeLease", @model
+            Parse.User.current().get("network").units.add @model.get("unit")
 
         new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
         @model.id = model.id

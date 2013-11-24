@@ -31,7 +31,9 @@ define [
       @model.prep('units')
       @model.prep('leases')
       @model.prep('listings')
+      @model.prep('tenants')
       @model.prep('inquiries')
+      @model.prep('applicants')
       
       @listenTo @model, 'change:image_profile', @refresh
       @listenTo @model, 'destroy', @run
