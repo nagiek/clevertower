@@ -27,6 +27,11 @@ define [
 
     initialize : (attrs) ->
       @skip = false
+    
+    clear: =>
+      @undelegateEvents()
+      @stopListening()
+      delete this
 
     skipThisStep: (e) =>
       e.preventDefault()

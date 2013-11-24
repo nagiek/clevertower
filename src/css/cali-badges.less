@@ -3,14 +3,18 @@
 // Generate contextual modifier classes for colorizing the badge.
 
 .badge-success {
-  .alert-variant(@alert-success-bg; @alert-success-border; @alert-success-text);
+  color: @label-color;
+  .label-variant(@label-success-bg);
 }
 .badge-info {
-  .alert-variant(@alert-info-bg; @alert-info-border; @alert-info-text);
+  color: @label-color;
+  .label-variant(@label-info-bg);
 }
 .badge-warning {
-  .alert-variant(@alert-warning-bg; @alert-warning-border; @alert-warning-text);
+  color: @label-color;
+  .label-variant(@label-warning-bg);
 }
 .badge-danger {
-  .alert-variant(@alert-danger-bg; @alert-danger-border; @alert-danger-text);
+  color: @label-color;
+  .label-variant(@label-danger-bg);
 }

@@ -78,7 +78,12 @@ define [
 
       @on "save:success", (model) =>
 
-        if @property then @property.listings.add @model else Parse.User.current().get("network").listings.add @model
+        if @property
+          @property.listings.add @model
+          @property.units.add @model.get("unit") if newUnit
+        else
+          Parse.User.current().get("network").listings.add @model
+          Parse.User.current().get("network").units.add @model.get("unit") if newUnit
 
         new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
 
@@ -206,6 +211,7 @@ define [
         data.listing[attr] = new Date if typeof data.listing[attr] is 'string'
       
       attrs = data.listing
+      newUnit = false
 
       # Set unit
       if data.unit and data.unit.id isnt ""
@@ -213,6 +219,7 @@ define [
           if data.unit.id is "-1"
             unit = new Unit data.unit.attributes
             unit.set "property", @property
+            newUnit = true
           else 
             unit = @property.units.get data.unit.id
         else 
@@ -229,7 +236,7 @@ define [
 
       @model.save attrs,
         success: (model) => 
-          @trigger "save:success", model, this
+          @trigger "save:success", model, newUnit
         error: (model, error) => 
           @model.trigger "invalid", error
         

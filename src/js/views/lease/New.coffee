@@ -82,16 +82,20 @@ define [
           when 'dates_missing' or 'dates_incorrect'
             @$('.date-group').addClass('error')
       
-      @on "save:success", (model, isNew) =>
-
-        if @property then @property.leases.add @model else Parse.User.current().get("network").leases.add @model
+      @on "save:success", (model, newUnit) =>
+        if @property
+          @property.leases.add @model
+          @property.units.add @model.get("unit") if newUnit
+        else
+          Parse.User.current().get("network").leases.add @model
+          Parse.User.current().get("network").units.add @model.get("unit") if newUnit
 
         new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
         @model.id = model.id
 
         if @forNetwork and Parse.User.current()
           new Parse.Query("Tenant").equalTo("lease", @model).include("profile").find()
-          .then (objs) -> 
+          .then (objs) =>
             if @property then @property.tenants.add @model else Parse.User.current().get("network").tenants.add @model
             # Add tenants to the network collection, if it exists.
             Parse.User.current().get("network").tenants.add objs if Parse.User.current().get("network")
@@ -210,12 +214,15 @@ define [
 
       attrs = @model.scrub data.lease
 
+      newUnit = false
+
       # Set unit
       if data.unit and data.unit.id isnt ""
         if @property
           if data.unit.id is "-1"
             unit = new Unit data.unit.attributes
             unit.set "property", @property
+            newUnit = true
           else 
             unit = @property.units.get data.unit.id
         else 
@@ -246,7 +253,7 @@ define [
       else
         @model.save attrs,
         success: (model) => 
-          @trigger "save:success", model, this
+          @trigger "save:success", model, newUnit
         error: (model, error) => 
           @model.trigger "invalid", error
         

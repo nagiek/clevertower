@@ -937,7 +937,7 @@ Parse.Cloud.beforeSave "Lease", (req, res) ->
     emails = req.object.get("emails") || []
     
     # Add the user if the lease is new and not for the network
-    emails.push req.user.getEmail() if !existed and !req.object.get("forNetwork")
+    emails.push req.user.getEmail() unless existed or req.object.get("forNetwork")
 
     req.object.set "emailsToProcess", emails
     req.object.unset "emails"

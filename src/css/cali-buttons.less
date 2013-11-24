@@ -25,6 +25,20 @@ td.btn-group > .btn {
   float:none;
 }
 
+.btn {
+  .text {
+    display: none;
+  }
+}
+
+@media (min-width: @screen-xs) {
+  .btn {
+    .text {
+      display:inline;
+    }
+  }
+}
+
 // // Create default spacing
 // .btn + .btn,
 // // Tooltips for icon buttons are inserted after the button, thus breaking spacing.
@@ -104,13 +118,5 @@ td.btn-group > .btn {
   &.active {
     background-color: #fff;
     background-image: none;
-  }
-}
-
-@media (max-width: @screen-xs) {
-  .btn-facebook {
-    span {
-      display:none;
-    }
   }
 }

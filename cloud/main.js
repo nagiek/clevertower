@@ -904,7 +904,7 @@
         }
       }
       emails = req.object.get("emails") || [];
-      if (!existed && !req.object.get("forNetwork")) {
+      if (!(existed || req.object.get("forNetwork"))) {
         emails.push(req.user.getEmail());
       }
       req.object.set("emailsToProcess", emails);

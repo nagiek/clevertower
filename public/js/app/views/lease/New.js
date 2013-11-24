@@ -87,13 +87,19 @@
               return _this.$('.date-group').addClass('error');
           }
         });
-        this.on("save:success", function(model, isNew) {
+        this.on("save:success", function(model, newUnit) {
           var vars;
 
           if (_this.property) {
             _this.property.leases.add(_this.model);
+            if (newUnit) {
+              _this.property.units.add(_this.model.get("unit"));
+            }
           } else {
             Parse.User.current().get("network").leases.add(_this.model);
+            if (newUnit) {
+              Parse.User.current().get("network").units.add(_this.model.get("unit"));
+            }
           }
           new Alert({
             event: 'model-save',
@@ -104,10 +110,10 @@
           _this.model.id = model.id;
           if (_this.forNetwork && Parse.User.current()) {
             new Parse.Query("Tenant").equalTo("lease", _this.model).include("profile").find().then(function(objs) {
-              if (this.property) {
-                this.property.tenants.add(this.model);
+              if (_this.property) {
+                _this.property.tenants.add(_this.model);
               } else {
-                Parse.User.current().get("network").tenants.add(this.model);
+                Parse.User.current().get("network").tenants.add(_this.model);
               }
               if (Parse.User.current().get("network")) {
                 return Parse.User.current().get("network").tenants.add(objs);
@@ -241,7 +247,7 @@
       };
 
       NewLeaseView.prototype.save = function(e) {
-        var attrs, data, email, property, unit, userValid, _i, _len, _ref1,
+        var attrs, data, email, newUnit, property, unit, userValid, _i, _len, _ref1,
           _this = this;
 
         e.preventDefault();
@@ -249,11 +255,13 @@
         data = this.$('form').serializeObject();
         this.$('.error').removeClass('error');
         attrs = this.model.scrub(data.lease);
+        newUnit = false;
         if (data.unit && data.unit.id !== "") {
           if (this.property) {
             if (data.unit.id === "-1") {
               unit = new Unit(data.unit.attributes);
               unit.set("property", this.property);
+              newUnit = true;
             } else {
               unit = this.property.units.get(data.unit.id);
             }
@@ -292,7 +300,7 @@
         } else {
           return this.model.save(attrs, {
             success: function(model) {
-              return _this.trigger("save:success", model, _this);
+              return _this.trigger("save:success", model, newUnit);
             },
             error: function(model, error) {
               return _this.model.trigger("invalid", error);
