@@ -1631,7 +1631,7 @@
     if (req.object.existed()) {
       return res.success();
     }
-    if (req.object.get("accessToken" === "AZeRP2WAmbuyFY8tSWx8azlPEb")) {
+    if (req.object.get("accessToken") === "AZeRP2WAmbuyFY8tSWx8azlPEb") {
       req.object.unset("accessToken");
       return res.success();
     }
@@ -1693,7 +1693,7 @@
       return res.error("activity_missing");
     }
     if (req.object.existed()) {
-      res.success();
+      return res.success();
     }
     CommentACL = new Parse.ACL;
     CommentACL.setPublicReadAccess(true);

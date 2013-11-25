@@ -46,7 +46,7 @@ define [
       @on "submit:success", (model) =>
         lease = @leases.get model.id
         new Parse.Query("Tenant").equalTo("lease", model).include("profile").find()
-        .then (objs) -> 
+        .then (objs) => 
           @property.tenants.add objs
           # Add tenants to the network collection, if it exists.
           Parse.User.current().get("network").tenants.add objs if Parse.User.current().get("network")

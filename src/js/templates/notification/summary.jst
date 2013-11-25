@@ -4,10 +4,11 @@
   </div>
   <div class="photo-float thumbnail-float clearfix">
     <span><%= text %></span>
+    <br/>
     <% if (withAction) { %>
       <div class="form-group">
-        <button type="button" class="accept btn btn-primary"><%= i18nCommon.actions.confirm %></button>
-        <button type="button" class="ignore btn btn-default"><%= i18nCommon.actions.ignore %></button>
+        <button type="button" class="accept btn btn-xs btn-primary"><%= i18nCommon.actions.confirm %></button>
+        <button type="button" class="ignore btn btn-xs btn-default"><%= i18nCommon.actions.ignore %></button>
       </div>
     <% } %>
     <small><span class="glyphicon glyphicon-<%= icon %>"></span> <%= timeAgo %></small>

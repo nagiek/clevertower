@@ -32,7 +32,7 @@ define [
       return unless actionItem
       @model.add hidden: [Parse.User.current().id]
       @markAsClicked()
-      @$el.html "<div>" + @model.accepted() + "</div>"
+      @$(".photo-float").html "<div>" + @model.accepted() + "</div>"
 
       # Until req.object.original lands for Cloud Code, have to pass in new status.
       actionItem.save(newStatus: "current").then ->

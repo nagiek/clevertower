@@ -31,7 +31,7 @@ define [
       return unless actionItem
       @model.add hidden: [Parse.User.current().id]
       @markAsClicked()
-      @$el.html "<div>" + @model.accepted() + "</div>"
+      @$(".photo-float").html "<div>" + @model.accepted() + "</div>"
 
       # Until req.object.original lands for Cloud Code, have to pass in new status.
       actionItem.save(newStatus: "current").then ->
@@ -44,7 +44,7 @@ define [
 
     ignore: (e) =>
       # Don't modify the action item, just hide the request.
-      @$el.html "<div>" + @model.ignored() + "</div><small>(<a href='#' class='undo'>" + i18nCommon.actions.undo + "</a>)</small>"
+      @$(".photo-float").html "<div>" + @model.ignored() + "</div><small>(<a href='#' class='undo'>" + i18nCommon.actions.undo + "</a>)</small>"
       @model.add hidden: [Parse.User.current().id]
       @model.save null, patch: true
 

@@ -1881,7 +1881,7 @@ Parse.Cloud.beforeSave "Activity", (req, res) ->
 
   return res.success() if req.object.existed()
 
-  if req.object.get "accessToken" is "AZeRP2WAmbuyFY8tSWx8azlPEb"
+  if req.object.get("accessToken") is "AZeRP2WAmbuyFY8tSWx8azlPEb"
     # We can use unset here.
     req.object.unset "accessToken"
     return res.success()
@@ -1940,7 +1940,7 @@ Parse.Cloud.beforeSave "Activity", (req, res) ->
 Parse.Cloud.beforeSave "Comment", (req, res) ->
   return res.error "activity_missing" unless req.object.get("activity")
 
-  res.success() if req.object.existed()
+  return res.success() if req.object.existed()
 
   CommentACL = new Parse.ACL
   CommentACL.setPublicReadAccess true
