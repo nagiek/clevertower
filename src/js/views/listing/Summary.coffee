@@ -16,6 +16,7 @@ define [
   
     #... is a table row.
     tagName: "tr"
+    id: => "listing-#{@model.id}"
 
     events:
       'click .delete'     : 'kill'
@@ -26,25 +27,8 @@ define [
       @onProperty = if attrs.onProperty then true else false
       @onUnit = if attrs.onUnit then true else false
 
-      @model.prep('inquiries')
-          
-      @listenTo @model, "save:success", @render
-      @listenTo @model, "destroy", @clear
-      
-      @listenTo @model, "invalid", (unit, error) =>
-        # Mark up form
-        @$el.addClass('error')
-        switch error.message
-          when 'title_missing'
-            @$('.title-group .control-group').addClass('error')
-
-        msg = if error.code then i18nCommon.errors[error.message] else i18nUnit.errors[error.message]
-        new Alert event: 'unit-invalid', fade: false, message: msg, type: 'danger'
-
     # Re-render the contents of the Unit item.
     render: ->
-      inquiries = @model.inquiries.select (i) => i.get("listing").id is @model.id
-      lastLogin = Parse.User.current().get("lastLogin") || Parse.User.current().updatedAt
 
       if Parse.User.current().get("network")
         property = Parse.User.current().get("network").properties.get(@model.get("property").id)
@@ -58,8 +42,6 @@ define [
         propertyUrl = property.url()
 
       vars = _.merge @model.toJSON(),
-        count: inquiries.length
-        newInquiries: _.select(inquiries, (i) -> i.createdAt > lastLogin).length
         start_date: moment(@model.get "start_date").format("LL")
         end_date: moment(@model.get "end_date").format("LL")
         status: i18nListing.fields.public[Number @model.get("public")]

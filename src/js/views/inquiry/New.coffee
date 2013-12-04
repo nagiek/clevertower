@@ -18,16 +18,14 @@ define [
 
     events:
       'submit form': 'apply'
-      'click .close' : 'close'
+      'click .close' : 'clear'
 
     initialize: ->
 
-      _.bindAll @, 'render', 'setThisMonth', 'setNextMonth', 'setJulyJune', 'apply'
-
-      @model.on 'invalid', (error) =>
+      @listenTo @model, 'invalid', (error) =>
         console.log error
         @$('.error').removeClass('error')
-        @$('button.save').removeProp "disabled"
+        @$('button.save').button "reset"
 
         msg = if i18nListing.errors[error.message]
                 i18nListing.errors[error.message]
@@ -42,13 +40,14 @@ define [
       
       @on "save:success", (model) =>
         new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
-        Parse.User.current().get("profile").applicants.create 
+        applicant = new Applicant 
           profile: Parse.User.current().get("profile")
           inquiry: @model
           listing: @model.get "listing"
           property: @model.get "property"
           network: @model.get "network"
-        @$el.modal('hide')
+        Parse.User.current().get("profile").applicants.add applicant
+        @clear()
 
     render: ->
       vars =
@@ -63,25 +62,25 @@ define [
       @$('.datepicker').datepicker()
       @
 
-    setThisMonth : (e) ->
+    setThisMonth : (e) =>
       e.preventDefault()
       @$startDate.val moment(@current).format("L")
       @$endDate.val moment(@current).add(1, 'year').subtract(1, 'day').format("L")
       
-    setNextMonth : (e) ->
+    setNextMonth : (e) =>
       e.preventDefault()
       @$startDate.val moment(@current).add(1, 'month').format("L")
       @$endDate.val moment(@current).add(1, 'month').add(1, 'year').subtract(1, 'day').format("L")
       
-    setJulyJune : (e) ->
+    setJulyJune : (e) =>
       e.preventDefault()
       @$startDate.val moment(@current).month(6).format("L")
       @$endDate.val moment(@current).month(6).add(1, 'year').subtract(1, 'day').format("L")
 
-    apply : (e) ->
+    apply : (e) =>
       e.preventDefault()
-      
-      @$('button.save').prop "disabled", "disabled"
+
+      @$('button.save').button "loading"
       data = @$('form').serializeObject()
       @$('.error').removeClass('error')
       
@@ -113,6 +112,8 @@ define [
         error: (model, error) => 
           @model.trigger "invalid", error
         
-    close : ->
+    clear : ->
+      @$el.modal('hide')
+      @stopListening()
       @undelegateEvents()
       delete this

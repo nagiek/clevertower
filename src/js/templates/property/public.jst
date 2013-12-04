@@ -1,18 +1,52 @@
 <div id="public" class="container">
   <div class="row">
-    <div class="col-md-8">
-      <div id="cover-photo" class="photo photo-full">
-        <img class="img-responsive" src="<%= cover %>" alt="<%= i18nCommon.nouns.cover_photo %>">
-      </div>
-    </div>
 
-    <div class="col-md-4 right-lg">
+    <div class="col-md-4 col-md-push-8">
       <div id="map-container">
         <div id="mapCanvas"></div>
       </div>
+
+
+      <% if (property.property_type) { %>
+        <%= i18nProperty.fields.property_type.label %>
+        <% if (property.property_type == 1) { %><%= i18nProperty.fields.property_type.condo %><% } %>
+        <% if (property.property_type == 2) { %><%= i18nProperty.fields.property_type.apartment %><% } %>
+      <% } %>
+      
+      <% if (property.year) { %>
+        <%= i18nProperty.fields.year %>
+        <%= property.year %>
+      <% } %>
+
+      <% if (property.mls) { %>
+        <%= i18nProperty.fields.mls %>
+        <%= property.mls %>
+      <% } %>
+
+      <hr>
+
+      <% if (property.email) { %>
+        <%= i18nProperty.fields.email %>
+        <%= property.email %>
+      <% } %>
+
+      <% if (property.phone) { %>
+        <%= i18nProperty.fields.phone %>
+        <%= property.phone %>
+      <% } %>
+
+      <% if (property.website) { %>
+        <%= i18nProperty.fields.website %>
+        <%= property.website %>
+      <% } %>
+
     </div>
 
-    <div class="col-md-8">
+    <div class="col-md-8 col-md-pull-4">
+      <div id="cover-photo" class="photo photo-full">
+        <img class="img-responsive" src="<%= cover %>" alt="<%= i18nCommon.nouns.cover_photo %>">
+      </div>
+
       <header class="clearfix">
         <hgroup class="left-sm left-md left-lg">
           <h1 class="inline"><%= property.title %></h1><span class="h2">, </span>
@@ -25,7 +59,6 @@
     </div>
 
     <div class="col-md-8">
-
       <ul class="nav nav-tabs">
         <li class="active col-md-offset-2"><a href="#activity" id="activity-link"><%= i18nCommon.nouns.public_activity %></a></li>
         <li>
@@ -43,6 +76,8 @@
         <% if (property.description) { %>
           <li><a href="#about" id="about-link"><%= i18nCommon.prepositions.About %></a></li>
         <% } %>
+        <li><a href="#amenities" id="amenities-link"><%= i18nProperty.form.amenities %></a></li>
+        <li><a href="#included" id="included-link"><%= i18nProperty.form.included %></a></li>
       </ul>
 
       <div class="tab-content">
@@ -81,75 +116,38 @@
             <p><%= property.description %></p>
           </div>
         <% } %>
+        <div class="tab-pane" id="amenities">
+          <ul class="checkbox-list two-column">
+            <li<% if (property.air_conditioning) { %> class="checked"<% } %> ><%= i18nProperty.fields.air_conditioning %></li>
+            <li<% if (property.back_yard) { %> class="checked"<% } %> ><%= i18nProperty.fields.back_yard %></li>
+            <li<% if (property.balcony) { %> class="checked"<% } %> ><%= i18nProperty.fields.balcony %></li>
+            <li<% if (property.cats_allowed) { %> class="checked"<% } %> ><%= i18nProperty.fields.cats_allowed %></li>
+            <li<% if (property.concierge) { %> class="checked"<% } %> ><%= i18nProperty.fields.concierge %></li>
+            <li<% if (property.dogs_allowed) { %> class="checked"<% } %> ><%= i18nProperty.fields.dogs_allowed %></li>
+            <li<% if (property.doorman) { %> class="checked"<% } %> ><%= i18nProperty.fields.doorman %></li>
+            <li<% if (property.elevator) { %> class="checked"<% } %> ><%= i18nProperty.fields.elevator %></li>
+            <li<% if (property.exposed_brick) { %> class="checked"<% } %> ><%= i18nProperty.fields.exposed_brick %></li>
+            <li<% if (property.fireplace) { %> class="checked"<% } %> ><%= i18nProperty.fields.fireplace %></li>
+            <li<% if (property.front_yard) { %> class="checked"<% } %> ><%= i18nProperty.fields.front_yard %></li>
+            <li<% if (property.gym) { %> class="checked"<% } %> ><%= i18nProperty.fields.gym %></li>
+            <li<% if (property.laundry) { %> class="checked"<% } %> ><%= i18nProperty.fields.laundry %></li>
+            <li<% if (property.indoor_parking) { %> class="checked"<% } %> ><%= i18nProperty.fields.indoor_parking %></li>
+            <li<% if (property.outdoor_parking) { %> class="checked"<% } %> ><%= i18nProperty.fields.outdoor_parking %></li>
+            <li<% if (property.pool) { %> class="checked"<% } %> ><%= i18nProperty.fields.pool %></li>
+            <li<% if (property.sauna) { %> class="checked"<% } %> ><%= i18nProperty.fields.sauna %></li>
+            <li<% if (property.wheelchair) { %> class="checked"<% } %> ><%= i18nProperty.fields.wheelchair %></li>
+          </ul>
+        </div>
+        <div class="tab-pane" id="included">
+          <ul class="checkbox-list two-column">
+            <li<% if (property.electricity) { %> class="checked"<% } %>><%= i18nProperty.fields.electricity %></li>
+            <li<% if (property.furniture) { %> class="checked"<% } %>><%= i18nProperty.fields.furniture %></li>
+            <li<% if (property.gas) { %> class="checked"<% } %>><%= i18nProperty.fields.gas %></li>
+            <li<% if (property.heat) { %> class="checked"<% } %>><%= i18nProperty.fields.heat %></li>
+            <li<% if (property.hot_water) { %> class="checked"<% } %>><%= i18nProperty.fields.hot_water %></li>
+          </ul>
+        </div>
       </div>
-
-    </div>
-    <div class="col-md-4 col-md-push-8">
-
-      <% if (property.property_type) { %>
-        <%= i18nProperty.fields.property_type.label %>
-        <% if (property.property_type == 1) { %><%= i18nProperty.fields.property_type.condo %><% } %>
-        <% if (property.property_type == 2) { %><%= i18nProperty.fields.property_type.apartment %><% } %>
-      <% } %>
-      
-      <% if (property.year) { %>
-        <%= i18nProperty.fields.year %>
-        <%= property.year %>
-      <% } %>
-
-      <% if (property.mls) { %>
-        <%= i18nProperty.fields.mls %>
-        <%= property.mls %>
-      <% } %>
-
-      <hr>
-
-      <% if (property.email) { %>
-        <%= i18nProperty.fields.email %>
-        <%= property.email %>
-      <% } %>
-
-      <% if (property.phone) { %>
-        <%= i18nProperty.fields.phone %>
-        <%= property.phone %>
-      <% } %>
-
-      <% if (property.website) { %>
-        <%= i18nProperty.fields.website %>
-        <%= property.website %>
-      <% } %>
-
-      <h3><%= i18nProperty.form.included %></h3>
-      <ul id="included" class="checkbox-list two-column">
-        <li<% if (property.electricity) { %> class="checked"<% } %>><%= i18nProperty.fields.electricity %></li>
-        <li<% if (property.furniture) { %> class="checked"<% } %>><%= i18nProperty.fields.furniture %></li>
-        <li<% if (property.gas) { %> class="checked"<% } %>><%= i18nProperty.fields.gas %></li>
-        <li<% if (property.heat) { %> class="checked"<% } %>><%= i18nProperty.fields.heat %></li>
-        <li<% if (property.hot_water) { %> class="checked"<% } %>><%= i18nProperty.fields.hot_water %></li>
-      </ul>
-
-      <h3><%= i18nProperty.form.amenities %></h3>
-      <ul id="included" class="checkbox-list two-column">
-        <li<% if (property.air_conditioning) { %> class="checked"<% } %> ><%= i18nProperty.fields.air_conditioning %></li>
-        <li<% if (property.back_yard) { %> class="checked"<% } %> ><%= i18nProperty.fields.back_yard %></li>
-        <li<% if (property.balcony) { %> class="checked"<% } %> ><%= i18nProperty.fields.balcony %></li>
-        <li<% if (property.cats_allowed) { %> class="checked"<% } %> ><%= i18nProperty.fields.cats_allowed %></li>
-        <li<% if (property.concierge) { %> class="checked"<% } %> ><%= i18nProperty.fields.concierge %></li>
-        <li<% if (property.dogs_allowed) { %> class="checked"<% } %> ><%= i18nProperty.fields.dogs_allowed %></li>
-        <li<% if (property.doorman) { %> class="checked"<% } %> ><%= i18nProperty.fields.doorman %></li>
-        <li<% if (property.elevator) { %> class="checked"<% } %> ><%= i18nProperty.fields.elevator %></li>
-        <li<% if (property.exposed_brick) { %> class="checked"<% } %> ><%= i18nProperty.fields.exposed_brick %></li>
-        <li<% if (property.fireplace) { %> class="checked"<% } %> ><%= i18nProperty.fields.fireplace %></li>
-        <li<% if (property.front_yard) { %> class="checked"<% } %> ><%= i18nProperty.fields.front_yard %></li>
-        <li<% if (property.gym) { %> class="checked"<% } %> ><%= i18nProperty.fields.gym %></li>
-        <li<% if (property.laundry) { %> class="checked"<% } %> ><%= i18nProperty.fields.laundry %></li>
-        <li<% if (property.indoor_parking) { %> class="checked"<% } %> ><%= i18nProperty.fields.indoor_parking %></li>
-        <li<% if (property.outdoor_parking) { %> class="checked"<% } %> ><%= i18nProperty.fields.outdoor_parking %></li>
-        <li<% if (property.pool) { %> class="checked"<% } %> ><%= i18nProperty.fields.pool %></li>
-        <li<% if (property.sauna) { %> class="checked"<% } %> ><%= i18nProperty.fields.sauna %></li>
-        <li<% if (property.wheelchair) { %> class="checked"<% } %> ><%= i18nProperty.fields.wheelchair %></li>
-      </ul>
-
     </div>
   </div>
 </div>

@@ -76,7 +76,7 @@ define [
       
       @listenTo @model, 'destroy', @clear
 
-      @on "save:success", (model) =>
+      @on "save:success", (model, newUnit) =>
 
         if @property
           @property.listings.add @model

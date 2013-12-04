@@ -21,12 +21,17 @@ define [
       
     initialize: (attrs) ->
         
-      @model.on "destroy", =>
-        @remove()
-        @undelegateEvents()
-        delete this
+      @listenTo @model, "destroy", @clear
       
       @model.prep('applicants')
+
+      @listenTo @model.applicants, "add", @addOne
+      @listenTo @model.applicants, "reset", @addAll
+
+    clear: ->
+      @remove()
+      @undelegateEvents()
+      delete this
 
     # Re-render the contents of the Unit item.
     render: =>
@@ -44,7 +49,7 @@ define [
       @$el.html JST["src/js/templates/inquiry/summary.jst"](vars)
 
       @$list = @$('ul.applicants')
-      @addAll()
+      if @model.applicants.length is 0 then @model.applicants.fetch() else @addAll()
 
       @
 
@@ -57,7 +62,7 @@ define [
 
     addAll : =>
       @$list.html ""
-      @model.applicants.chain().select((a) => a.get("inquiry").id is @model.id).each(@addOne)
+      @model.applicants.each((a) => @addOne(a) if a.get("inquiry").id is @model.id)
 
     kill : (e) =>
       e.preventDefault()

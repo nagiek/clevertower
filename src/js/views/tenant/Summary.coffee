@@ -12,7 +12,7 @@ define [
   class TenantSummaryView extends Parse.View
   
     tagName: "li"
-    className: "col-sm-6 col-md-4 thumbnail"
+    className: "col-sm-6 col-md-4"
     
     events:
       'click .delete' : 'kill'

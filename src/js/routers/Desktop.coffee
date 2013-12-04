@@ -271,12 +271,10 @@ define [
       require ["models/Property", "views/property/Public"], (Property, PublicPropertyView) => 
         if Parse.User.current()
           if Parse.User.current().get("property") and id is Parse.User.current().get("property").id 
-            console.log Parse.User.current().get("property")
             @view = new PublicPropertyView(params: {}, model: Parse.User.current().get("property"), place: place).render()
             view.clear() if view
           else if Parse.User.current().get("network") and Parse.User.current().get("network").properties.find((p) -> p.id is id)
             model = Parse.User.current().get("network").properties.find((p) -> p.id is id)
-            console.log model
             @view = new PublicPropertyView(params: {}, model: model, place: place).render()
             view.clear() if view
           else

@@ -117,11 +117,12 @@ define [
             property: model.get "property"
 
           Parse.User.current().set(vars)
-          if @model.isNew()
-            Parse.history.navigate "/account/building", true
+
+          if @modal
+            @$el.modal('hide')
+            @clear()
           else
             Parse.history.navigate "/manage", true
-          @clear()
                 
       @listenTo @model, 'destroy', @clear
       
@@ -211,6 +212,8 @@ define [
 
     # Split into separate functions for other uses, such as joining.
     save : (e) =>
+      console.log "save"
+      console.log @$('button.save')
       e.preventDefault()      
       @$('button.save').button "loading"
       data = @$('form').serializeObject()

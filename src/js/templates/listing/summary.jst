@@ -6,8 +6,8 @@
 <td><%= rent %></td>
 <td><span class="label<% if (public) { %> label-success<% } %>"><%= status %></span></td>
 <td>
-  <span class="badge"><%= count %></span>
-  <% if (newInquiries) { %><small>(<%= newInquiries %> <%= i18nCommon.adjectives.new %>)</small><% } %>
+  <span class="badge inquiry-count">0</span>
+  <small class="new-inquiry-count-wrapper" style="display:none;">(<span class="new-inquiry-count"></span> <%= i18nCommon.adjectives.new %>)</small>
 </td>
 <td>
   <a href="<%= propertyUrl %>/listings/<%= objectId %>/edit" class="btn btn-link btn-sm">

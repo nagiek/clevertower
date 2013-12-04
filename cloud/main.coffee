@@ -34,29 +34,29 @@ Parse.Cloud.define "SetPicture", (req, res) ->
       buf = new Buffer(httpres.buffer)      
       file = new Parse.File(req.user.getUsername() + "-picture.jpeg", base64: buf.toString('base64'))
       file.save().then( ->
-        console.log '1a'
+        # console.error '1a'
         (new Parse.Query "Profile").equalTo('objectId', req.user.get("profile").id).first()
       , (error) ->
-        console.log '1b'
+        # console.error '1b'
         res.error error
       ).then( (profile) ->
-        console.log '2a'
+        # console.error '2a'
         profile.save image_thumb: file.url(), image_profile: file.url(), image_full: file.url()
       , (error) ->
-        console.log '2b'
+        # console.error '2b'
         res.error error
       ).then( ->
-        console.log '3a'
+        # console.error '3a'
         res.success file.url()
         # error: (error) ->
         #   res.error)
       , (error) ->
-        console.log '3b'
+        # console.error '3b'
         res.error error
       )
     error: (error) ->
       res.error error
-      # console.log("Got response: " + res.statusCode);
+      # console.error("Got response: " + res.statusCode);
       # res.setEncoding('binary')
       # var imagedata = ''
       # res.on('data', function(chunk){
@@ -86,8 +86,6 @@ Parse.Cloud.define "AddTenants", (req, res) ->
   # In theory this could overwrite an inquiry, but oh well.
   status = 'invited'
 
-  # (new Parse.Query Parse.User).find().then -> console.log "arguments"; console.log arguments
-
   # We have to switch to the Master Key, to send the invite.
   # The profile will be open, but the user (who will receive the notification)
   # will be closed.
@@ -97,7 +95,7 @@ Parse.Cloud.define "AddTenants", (req, res) ->
 
   existingProfiles = []
 
-  # (new Parse.Query Parse.User).find().then -> console.log "arguments1"; console.log arguments
+  # (new Parse.Query Parse.User).find().then -> console.error "arguments1"; console.error arguments
 
   # Lease/Applicant Role
   (new Parse.Query className)
@@ -168,16 +166,17 @@ Parse.Cloud.define "AddTenants", (req, res) ->
       profileEmails = new Array() # _.map(profiles, (profile) -> profile.get("email"))
       emailsWithoutProfile = new Array()
 
-      # Go through and add to roles.
       for profile in profiles
-        user = profile.get "user"
-        if user
-          # Add to the tenant role.
-          if tntRole then tntRoleUsers.add user
-          # Security for propRoleUsers. Should only be allowed if: 
-          #   1) We are a manager.
-          #   2) We are trying to join and the property is set to open.
-          if propRole and (mgrObj or netObj) or !netRole then propRoleUsers.add user 
+        if className is "Lease"
+          # Go through and add to roles for new Leases.
+          user = profile.get "user"
+          if user
+            # Add to the tenant role.
+            if tntRole then tntRoleUsers.add user
+            # Security for propRoleUsers. Should only be allowed if: 
+            #   1) We are a manager.
+            #   2) We are trying to join and the property is set to open.
+            if propRole and (mgrObj or netObj) or !netRole then propRoleUsers.add user 
 
         profileEmails.push profile.get "email"
 
@@ -191,7 +190,7 @@ Parse.Cloud.define "AddTenants", (req, res) ->
 
       Parse.Promise.when(newProfileSaves)
     , (error) -> 
-      console.log "role_query_error"
+      console.error "role_query_error"
       res.error 'role_query_error'
     ).then( ->
       joinClassSaves = new Array()
@@ -210,18 +209,19 @@ Parse.Cloud.define "AddTenants", (req, res) ->
           profile: profile
           accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb"
           ACL: joinClassACL
-        vars[className.toLowerCase()] = leaseOrInquiry
-
+        vars[className.toLowerCase()] = 
+          __type: "Pointer"
+          className: className
+          objectId: leaseOrInquiry.id
         joinClassSaves.push new Parse.Object(joinClassName).save(vars)
 
       Parse.Promise.when(joinClassSaves)
     , -> 
-      console.log "profiles_not_saved"
+      console.error "profiles_not_saved"
       res.error 'profiles_not_saved'
     ).then( ->
 
       notifClassSaves = new Array()
-
       _.each arguments, (joinClass) ->
 
         # Profile exists, but user does not necessarily exist.
@@ -271,26 +271,26 @@ Parse.Cloud.define "AddTenants", (req, res) ->
       Parse.Promise.when(notifClassSaves)
       
     , ->
-      console.log "joinClasses_not_saved"
       res.error 'joinClasses_not_saved'
     ).then( ->
       roleSaves = []
-      roleSaves.push propRole.save() if propRole and className is "Lease"
-      roleSaves.push tntRole.save() if tntRole
+      if className is "Lease"
+        roleSaves.push propRole.save() if propRole
+        roleSaves.push tntRole.save() if tntRole
       
       Parse.Promise.when(roleSaves)
 
     , (error) ->
-      console.log 'signup_error'
+      console.error 'signup_error'
       res.error 'signup_error'
     ).then( ->
       res.success leaseOrInquiry
     , (error) -> 
-      console.log "role_save_error"
+      console.error "role_save_error"
       res.error 'role_save_error'
     )
   , (error) -> 
-    console.log "bad_query"
+    console.error "bad_query"
     res.error "bad_query"
 
 # AddManagers
@@ -844,12 +844,13 @@ Parse.Cloud.beforeSave "Inquiry", (req, res) ->
        
   return res.success() if existed
 
-  (new Parse.Query("Listing")).include('network.role').get listing.id,
+  (new Parse.Query("Listing")).include('property.mgrRole').include('network.role').get listing.id,
   success: (obj) ->
 
     property = obj.get("property")
+    mgrRole = property.get("mgrRole") 
     network = obj.get("network")
-    role = network.get("role")
+    netRole = network.get("role") if network
 
     # Add user to tenants.
     emails = req.object.get("emails") || []
@@ -869,14 +870,21 @@ Parse.Cloud.beforeSave "Inquiry", (req, res) ->
     name = req.user.get "name"
     notification = new Parse.Object("Notification")
     notificationACL = new Parse.ACL()
-    notificationACL.setRoleReadAccess(role, true)
-    notificationACL.setRoleWriteAccess(role, true)
-    notificationACL.setWriteAccess(req.user, true)
+    channels = [ "properties-#{property.id}" ]
+    if network
+      notificationACL.setRoleReadAccess netRole, true
+      notificationACL.setRoleWriteAccess netRole, true
+      channels.push "networks-#{network.id}"
+    if mgrRole
+      notificationACL.setRoleReadAccess mgrRole, true
+      notificationACL.setRoleWriteAccess mgrRole, true
+    notificationACL.setWriteAccess req.user, true
+
     notification.save
       name: "new_inquiry"
       text: "#{name} wants to join your property."
-      channels: [ "networks-#{network.id}", "properties-#{property.id}" ]
-      channel: "networks-#{network.id}"
+      channels: channels
+      channel: "properties-#{property.id}"
       forMgr: true
       withAction: false
       property: property
@@ -886,10 +894,14 @@ Parse.Cloud.beforeSave "Inquiry", (req, res) ->
       
     # Give tenants access to read the lease, and managers to read/write
     leaseACL = new Parse.ACL
-    leaseACL.setReadAccess req.user.id, true
-    leaseACL.setWriteAccess req.user.id, true
-    leaseACL.setRoleWriteAccess role, true
-    leaseACL.setRoleReadAccess role, true
+    leaseACL.setReadAccess req.user, true
+    leaseACL.setWriteAccess req.user, true
+    if network
+      leaseACL.setRoleWriteAccess netRole, true
+      leaseACL.setRoleReadAccess netRole, true
+    if mgrRole
+      leaseACL.setRoleReadAccess mgrRole, true
+      leaseACL.setRoleWriteAccess mgrRole, true
     req.object.setACL leaseACL
     
     res.success()
@@ -1392,6 +1404,9 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
               ACL: activityACL
 
           else
+
+            channels = ["properties-#{propertyId}"]
+            if network then channels.push "networks-#{network.id}"
             newStatus = 'pending'
             # Notify the property.
             notification = new Parse.Object("Notification")
@@ -1406,8 +1421,8 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
             savesToComplete.push notification.save
               name: "tenant_inquiry"
               text: "%NAME wants to join your property."
-              channels: [ "networks-#{network.id}", "properties-#{propertyId}" ]
-              channel: "networks-#{network.id}"
+              channels: channels
+              channel: "properties-#{propertyId}"
               forMgr: true
               withAction: true
               profile: profile

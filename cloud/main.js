@@ -36,26 +36,20 @@
           base64: buf.toString('base64')
         });
         return file.save().then(function() {
-          console.log('1a');
           return (new Parse.Query("Profile")).equalTo('objectId', req.user.get("profile").id).first();
         }, function(error) {
-          console.log('1b');
           return res.error(error);
         }).then(function(profile) {
-          console.log('2a');
           return profile.save({
             image_thumb: file.url(),
             image_profile: file.url(),
             image_full: file.url()
           });
         }, function(error) {
-          console.log('2b');
           return res.error(error);
         }).then(function() {
-          console.log('3a');
           return res.success(file.url());
         }, function(error) {
-          console.log('3b');
           return res.error(error);
         });
       },
@@ -131,13 +125,15 @@
         emailsWithoutProfile = new Array();
         for (_i = 0, _len = profiles.length; _i < _len; _i++) {
           profile = profiles[_i];
-          user = profile.get("user");
-          if (user) {
-            if (tntRole) {
-              tntRoleUsers.add(user);
-            }
-            if (propRole && (mgrObj || netObj) || !netRole) {
-              propRoleUsers.add(user);
+          if (className === "Lease") {
+            user = profile.get("user");
+            if (user) {
+              if (tntRole) {
+                tntRoleUsers.add(user);
+              }
+              if (propRole && (mgrObj || netObj) || !netRole) {
+                propRoleUsers.add(user);
+              }
             }
           }
           profileEmails.push(profile.get("email"));
@@ -152,7 +148,7 @@
         }
         return Parse.Promise.when(newProfileSaves);
       }, function(error) {
-        console.log("role_query_error");
+        console.error("role_query_error");
         return res.error('role_query_error');
       }).then(function() {
         var joinClassSaves;
@@ -172,12 +168,16 @@
             accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb",
             ACL: joinClassACL
           };
-          vars[className.toLowerCase()] = leaseOrInquiry;
+          vars[className.toLowerCase()] = {
+            __type: "Pointer",
+            className: className,
+            objectId: leaseOrInquiry.id
+          };
           return joinClassSaves.push(new Parse.Object(joinClassName).save(vars));
         });
         return Parse.Promise.when(joinClassSaves);
       }, function() {
-        console.log("profiles_not_saved");
+        console.error("profiles_not_saved");
         return res.error('profiles_not_saved');
       }).then(function() {
         var notifClassSaves;
@@ -235,30 +235,31 @@
         });
         return Parse.Promise.when(notifClassSaves);
       }, function() {
-        console.log("joinClasses_not_saved");
         return res.error('joinClasses_not_saved');
       }).then(function() {
         var roleSaves;
 
         roleSaves = [];
-        if (propRole && className === "Lease") {
-          roleSaves.push(propRole.save());
-        }
-        if (tntRole) {
-          roleSaves.push(tntRole.save());
+        if (className === "Lease") {
+          if (propRole) {
+            roleSaves.push(propRole.save());
+          }
+          if (tntRole) {
+            roleSaves.push(tntRole.save());
+          }
         }
         return Parse.Promise.when(roleSaves);
       }, function(error) {
-        console.log('signup_error');
+        console.error('signup_error');
         return res.error('signup_error');
       }).then(function() {
         return res.success(leaseOrInquiry);
       }, function(error) {
-        console.log("role_save_error");
+        console.error("role_save_error");
         return res.error('role_save_error');
       });
     }, function(error) {
-      console.log("bad_query");
+      console.error("bad_query");
       return res.error("bad_query");
     });
   });
@@ -805,13 +806,16 @@
     if (existed) {
       return res.success();
     }
-    return (new Parse.Query("Listing")).include('network.role').get(listing.id, {
+    return (new Parse.Query("Listing")).include('property.mgrRole').include('network.role').get(listing.id, {
       success: function(obj) {
-        var emails, leaseACL, name, network, notification, notificationACL, property, role;
+        var channels, emails, leaseACL, mgrRole, name, netRole, network, notification, notificationACL, property;
 
         property = obj.get("property");
+        mgrRole = property.get("mgrRole");
         network = obj.get("network");
-        role = network.get("role");
+        if (network) {
+          netRole = network.get("role");
+        }
         emails = req.object.get("emails") || [];
         emails.push(req.user.get("email"));
         req.object.set({
@@ -825,14 +829,22 @@
         name = req.user.get("name");
         notification = new Parse.Object("Notification");
         notificationACL = new Parse.ACL();
-        notificationACL.setRoleReadAccess(role, true);
-        notificationACL.setRoleWriteAccess(role, true);
+        channels = ["properties-" + property.id];
+        if (network) {
+          notificationACL.setRoleReadAccess(netRole, true);
+          notificationACL.setRoleWriteAccess(netRole, true);
+          channels.push("networks-" + network.id);
+        }
+        if (mgrRole) {
+          notificationACL.setRoleReadAccess(mgrRole, true);
+          notificationACL.setRoleWriteAccess(mgrRole, true);
+        }
         notificationACL.setWriteAccess(req.user, true);
         notification.save({
           name: "new_inquiry",
           text: "" + name + " wants to join your property.",
-          channels: ["networks-" + network.id, "properties-" + property.id],
-          channel: "networks-" + network.id,
+          channels: channels,
+          channel: "properties-" + property.id,
           forMgr: true,
           withAction: false,
           property: property,
@@ -841,10 +853,16 @@
           ACL: notificationACL
         });
         leaseACL = new Parse.ACL;
-        leaseACL.setReadAccess(req.user.id, true);
-        leaseACL.setWriteAccess(req.user.id, true);
-        leaseACL.setRoleWriteAccess(role, true);
-        leaseACL.setRoleReadAccess(role, true);
+        leaseACL.setReadAccess(req.user, true);
+        leaseACL.setWriteAccess(req.user, true);
+        if (network) {
+          leaseACL.setRoleWriteAccess(netRole, true);
+          leaseACL.setRoleReadAccess(netRole, true);
+        }
+        if (mgrRole) {
+          leaseACL.setRoleReadAccess(mgrRole, true);
+          leaseACL.setRoleWriteAccess(mgrRole, true);
+        }
         req.object.setACL(leaseACL);
         return res.success();
       },
@@ -1153,7 +1171,7 @@
           }
           profileQuery = (new Parse.Query("Profile")).include("user").equalTo("objectId", req.object.get("profile").id).first();
           return Parse.Promise.when(mgrQuery, netQuery, profileQuery).then(function(mgrObj, netObj, profile) {
-            var activity, activityACL, notification, notificationACL, profileACL, savesToComplete, tenantACL, title, user;
+            var activity, activityACL, channels, notification, notificationACL, profileACL, savesToComplete, tenantACL, title, user;
 
             savesToComplete = [];
             user = profile.get("user");
@@ -1289,6 +1307,10 @@
                   ACL: activityACL
                 }));
               } else {
+                channels = ["properties-" + propertyId];
+                if (network) {
+                  channels.push("networks-" + network.id);
+                }
                 newStatus = 'pending';
                 notification = new Parse.Object("Notification");
                 notificationACL = new Parse.ACL;
@@ -1303,8 +1325,8 @@
                 savesToComplete.push(notification.save({
                   name: "tenant_inquiry",
                   text: "%NAME wants to join your property.",
-                  channels: ["networks-" + network.id, "properties-" + propertyId],
-                  channel: "networks-" + network.id,
+                  channels: channels,
+                  channel: "properties-" + propertyId,
                   forMgr: true,
                   withAction: true,
                   profile: profile,

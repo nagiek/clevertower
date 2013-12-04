@@ -5,26 +5,28 @@
       <h3 id="edit-profile-picture-modal-label"><%= i18nListing.actions.apply_to %> <em><%= propertyTitle %></em></h3>
     </div>
     <div class="modal-body">
-      <div class="row">
-        <div class="date-group form-group">
-          <label for="inquiry-dates" class="control-label"><%= i18nListing.form.dates %> <span class="required">*</span></label>
-          <div class="controls">
-            <input type="text" class="col-md-2 start-date datepicker" name="inquiry[start_date]" maxlength="12" date="<%= start_date %>" value="<%= start_date %>" data-date-format="<%= i18nCommon.dates.datepicker_format %>"  />
-            <input type="text" class="col-md-2 end-date datepicker"   name="inquiry[end_date]"   maxlength="12" date="<%= end_date %>" value="<%= end_date %>" data-date-format="<%= i18nCommon.dates.datepicker_format %>"  />
+      <div class="date-group form-group">
+        <label for="inquiry-dates" class="control-label"><%= i18nListing.form.dates %> <span class="required">*</span></label>
+        <div class="row">
+          <div class="col-xs-6">
+            <input type="text" class="form-control start-date datepicker" name="inquiry[start_date]" maxlength="12" date="<%= start_date %>" value="<%= start_date %>" data-date-format="<%= i18nCommon.dates.datepicker_format %>"  />
+          </div>
+          <div class="col-xs-6">
+            <input type="text" class="form-control end-date datepicker"   name="inquiry[end_date]"   maxlength="12" date="<%= end_date %>" value="<%= end_date %>" data-date-format="<%= i18nCommon.dates.datepicker_format %>"  />
           </div>
         </div>
-        
-        <%= JST["src/js/templates/helper/field/tenant.jst"]({emails: false, i18nCommon: i18nCommon, label: i18nListing.form.inquiry_tenants}) %>
-        <div class="form-group comments-group">
-          <label for="inquiry-comments" class="control-label"><%= i18nListing.form.comments %></label>
-          <div class="controls">
-            <textarea name="inquiry[comments]" rows="2" class="col-md-12"></textarea>
-          </div>
+      </div>
+      
+      <%= JST["src/js/templates/helper/field/tenant.jst"]({emails: false, i18nCommon: i18nCommon, label: i18nListing.form.inquiry_tenants}) %>
+      <div class="form-group comments-group">
+        <label for="inquiry-comments" class="control-label"><%= i18nListing.form.comments %></label>
+        <div class="controls">
+          <textarea name="inquiry[comments]" rows="2" class="col-md-12 form-control"></textarea>
         </div>
       </div>
     </div>
     <div class="modal-footer">
-      <button id="apply" class="btn btn-primary"><%= i18nCommon.actions.apply %></button>
+      <button id="apply" class="save btn btn-primary"><%= i18nCommon.actions.apply %></button>
       <button class="btn btn-default" data-dismiss="modal"><%= i18nCommon.actions.close %></button>
     </div>
   </div>

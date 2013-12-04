@@ -25,9 +25,13 @@ define [
 
       @[collectionName] = switch collectionName
         when "inquiries"
-          if basedOnNetwork then network.inquiries else new InquiryList [], property: @
+          if basedOnNetwork then network.inquiries 
+          else if @get("property") and @get("property").inquiries then @get("property").inquiries
+          else new InquiryList [], inquiry: @
         when "applicants"
-          if basedOnNetwork then network.applicants else new ApplicantList [], property: @
+          if basedOnNetwork then network.applicants 
+          else if @get("property") and @get("property").applicants then @get("property").applicants
+          else new ApplicantList [], inquiry: @
 
       @[collectionName]
 

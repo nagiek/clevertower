@@ -138,12 +138,12 @@
               property: model.get("property")
             };
             Parse.User.current().set(vars);
-            if (_this.model.isNew()) {
-              Parse.history.navigate("/account/building", true);
+            if (_this.modal) {
+              _this.$el.modal('hide');
+              return _this.clear();
             } else {
-              Parse.history.navigate("/manage", true);
+              return Parse.history.navigate("/manage", true);
             }
-            return _this.clear();
           }
         });
         this.listenTo(this.model, 'destroy', this.clear);
@@ -252,6 +252,8 @@
         var attrs, data, email, newUnit, property, unit, userValid, _i, _len, _ref1,
           _this = this;
 
+        console.log("save");
+        console.log(this.$('button.save'));
         e.preventDefault();
         this.$('button.save').button("loading");
         data = this.$('form').serializeObject();
