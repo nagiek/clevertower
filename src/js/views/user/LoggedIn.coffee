@@ -41,7 +41,7 @@ define [
     # Logs out the user and shows the login view
     logOut: (e) ->
       # Record the user login time for next session.
-      Parse.User.current().save {lastLogin: Parse.User.current().updatedAt}, {patch: true}
+      # Parse.User.current().save {lastLogin: Parse.User.current().updatedAt}, {patch: true}
 
       Parse.User.logOut()
       Parse.Dispatcher.trigger "user:change"

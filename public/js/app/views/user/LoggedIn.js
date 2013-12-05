@@ -35,11 +35,6 @@
       };
 
       LoggedInView.prototype.logOut = function(e) {
-        Parse.User.current().save({
-          lastLogin: Parse.User.current().updatedAt
-        }, {
-          patch: true
-        });
         Parse.User.logOut();
         Parse.Dispatcher.trigger("user:change");
         Parse.Dispatcher.trigger("user:logout");

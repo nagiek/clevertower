@@ -1186,23 +1186,20 @@ Parse.Cloud.beforeSave "Listing", (req, res) ->
 
 
 # Listing validation
-# Parse.Cloud.afterSave "Listing", (req) ->
+Parse.Cloud.afterSave "Listing", (req) ->
 
-#   if !req.object.existed() and req.object.get "public"
+  if req.object.existed() and req.object.get "activity"
 
-#     # Create activity
-#     activity = new Parse.Object("Activity")
-#     activity.save
-#       activity_type: "new_listing"
-#       public: true
-#       rent: req.object.get "rent"
-#       center: req.object.get "center"
-#       listing: req.object
-#       unit: req.object.get "unit"
-#       property: req.object.get "property"
-#       network: req.object.get "network"
-#       title: req.object.get "title"
-#       profile: req.user.get "profile"
+    (new Parse.Query "Activity").get req.object.get("activity").id,
+
+    success: (activity) ->
+
+      if req.object.get "public"
+        activity.save
+          rent: req.object.get "rent"
+          title: req.object.get "title"
+      else 
+        activity.destroy()
 
 
 # Tenant validation

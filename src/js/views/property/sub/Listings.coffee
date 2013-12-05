@@ -89,7 +89,7 @@ define [
       visible = @model.inquiries.select (i) => i.get("property").id is @model.id
       if visible.length > 0
 
-        lastLogin = Parse.User.current().get("lastLogin") || Parse.User.current().updatedAt
+        lastLogin = Parse.User.current().updatedAt
         countBy = _.countBy visible, (i) -> i.get("listing").id
         recent = _.select(visible, (i) -> i.createdAt > lastLogin)
         newCountBy = _.countBy(recent, (i) -> i.get("listing").id)
