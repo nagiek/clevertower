@@ -1,10 +1,24 @@
 <header class="clearfix">
-  <h2 class="left-lg left-md"><%= i18nCommon.classes.Tenants %></h2>
-  <ul class="list-inline right-lg right-md">
+  <h2 class="left-sm"><%= i18nCommon.classes.Tenants %></h2>
+  <ul class="list-inline right-sm">
     <li><a href="/leases/new" id="new-lease-link" class="btn btn-success">
       <span class="glyphicon glyphicon-plus"></span>
       <%= i18nLease.actions.add_new_lease %>
     </a></li>
+  </ul>
+  <ul class="nav nav-pills left-sm left-shift-sm">
+    <li class="active">
+      <a class="filter-all" href="#">
+        <span class="badge pull-right count"></span>
+        <%= i18nCommon.adjectives.all %>
+      </a>
+    </li>
+    <li>
+      <a class="filter-recent" href="#">
+        <span class="badge pull-right count"></span>
+        <%= i18nCommon.adjectives.recently_added %>
+      </a>
+    </li>
   </ul>
 </header>
 

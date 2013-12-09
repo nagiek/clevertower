@@ -1140,6 +1140,23 @@
     });
   });
 
+  Parse.Cloud.afterSave("Listing", function(req) {
+    if (req.object.existed() && req.object.get("activity")) {
+      return (new Parse.Query("Activity")).get(req.object.get("activity").id, {
+        success: function(activity) {
+          if (req.object.get("public")) {
+            return activity.save({
+              rent: req.object.get("rent"),
+              title: req.object.get("title")
+            });
+          } else {
+            return activity.destroy();
+          }
+        }
+      });
+    }
+  });
+
   Parse.Cloud.beforeSave("Tenant", function(req, res) {
     if (req.object.get("accessToken") === "AZeRP2WAmbuyFY8tSWx8azlPEb") {
       req.object.unset("accessToken");

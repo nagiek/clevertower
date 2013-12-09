@@ -3,8 +3,8 @@
 <td><%= comments %></td>
 <td>
   <% if (open) { %>
-  <a href="/properties/<%= propertyId %>/inquiries/<%= objectId %>/makelease" class="btn btn-small btn-primary"><%= i18nGroup.actions.accept %></a>
-  <button class="btn btn-small delete"><%= i18nGroup.actions.ignore %></button>
+  <a href="/properties/<%= propertyId %>/inquiries/<%= objectId %>/makelease" class="btn btn-sm btn-primary"><%= i18nGroup.actions.accept %></a>
+  <button class="btn btn-sm delete"><%= i18nGroup.actions.ignore %></button>
   <% } else { %>
     <% if (chosen) { %><span class="label label-success"><%= i18nListing.inquiries.chosen %></span><% } else { %>-<% } %>
   <% } %>

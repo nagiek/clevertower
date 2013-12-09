@@ -18,6 +18,9 @@ define [
       'click .delete' : 'kill'
     
     initialize : (attrs) ->
+
+      @showProperty = attrs.showProperty
+      @showUnit = attrs.showUnit
       
       @listenTo @model, "destroy", @clear
   

@@ -23,6 +23,8 @@
       };
 
       TenantSummaryView.prototype.initialize = function(attrs) {
+        this.showProperty = attrs.showProperty;
+        this.showUnit = attrs.showUnit;
         return this.listenTo(this.model, "destroy", this.clear);
       };
 

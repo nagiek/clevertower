@@ -1,9 +1,11 @@
 <td>
-  <img src="<%= photo_src %>" alt="<%= i18nCommon.notifications.img %>" width="64" height="64">
-</td>
-<td class="align-middle">
-  <p><%= text %></p>
-  <small><span class="glyphicon glyphicon-<%= icon %>"></span> <%= timeAgo %></small>
+  <div class="photo photo-thumbnail pull-left">
+    <img src="<%= photo_src %>" alt="<%= i18nCommon.notifications.img %>" width="64" height="64">
+  </div>
+  <div class="photo-float thumbnail-float">
+    <p><%= text %></p>
+    <small><span class="glyphicon glyphicon-<%= icon %>"></span> <%= timeAgo %></small>
+  </div>
 </td>
 <td class="align-middle">
   <div class="btn-toolbar pull-right">

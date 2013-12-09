@@ -6,8 +6,10 @@
   </div>
   <div class="photo-float profile-float position-relative">
     <a href="/users/<%= objectId %>"><strong><%= name %></strong></a>
-    <div class="position-bottom dropdown">
-      <a href="#" class="dropdown-toggle label label-<%= status == 'current' ? 'success' : 'warning' %>"><%= status %><span class="caret"></span></a>
+    <div class="position-bottom btn-group">
+      <button type="button" class="btn btn-xs btn-<%= status == 'current' ? 'success' : 'warning' %> dropdown-toggle" data-toggle="dropdown">
+        <%= status %> <span class="caret"></span>
+      </button>
       <ul class="dropdown-menu">
         <li><a href="#" class="delete"><%= i18nCommon.actions.delete %></a></li>
       </ul>
