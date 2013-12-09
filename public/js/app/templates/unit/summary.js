@@ -199,7 +199,7 @@ __p += '\n    <span class="view-specific view-edit';
  if (!editing) { ;
 __p += ' hide';
  } ;
-__p += '">\n      <button class="btn btn-small btn-danger delete view-specific view-edit';
+__p += '">\n      <button class="btn btn-sm btn-danger delete view-specific view-edit';
  if (!editing) { ;
 __p += ' hide';
  } ;
@@ -211,7 +211,7 @@ __p += '\n    <span class="view-specific view-edit';
  if (!editing) { ;
 __p += ' hide';
  } ;
-__p += '">\n      <button class="btn btn-small btn-danger remove">' +
+__p += '">\n      <button class="btn btn-sm btn-danger remove">' +
 ((__t = ( i18nCommon.actions.remove )) == null ? '' : __t) +
 '</button>\n    </span>\n  ';
  } ;

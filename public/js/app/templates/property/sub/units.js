@@ -5,13 +5,13 @@ obj || (obj = {});
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
 with (obj) {
-__p += '<form id="units">\n  <header class="clearfix">\n    <h2 class="left-lg left-md">' +
+__p += '<form id="units">\n  <header class="clearfix">\n    <h2 class="left-md">' +
 ((__t = ( i18nProperty.menu.building )) == null ? '' : __t) +
 '</h2>\n    <!-- <div class="well form-inline form-condensed left-lg">\n      <div class="form-group">\n        <div class="control-label">' +
 ((__t = ( i18nCommon.dates.date )) == null ? '' : __t) +
 '</div>\n        <div class="controls">\n          <input id="date" type="text" class="input-sm" value="' +
 ((__t = ( today )) == null ? '' : __t) +
-'">\n        </div>\n      </div>\n    </div> -->\n    <div id="units-controls" class="well well-sm form-inline right-lg right-md">\n      <button type="button" id="units-edit" class="btn btn-default">' +
+'">\n        </div>\n      </div>\n    </div> -->\n    <div id="units-controls" class="well well-sm form-inline right-sm">\n      <button type="button" id="units-edit" class="btn btn-default">' +
 ((__t = ( i18nUnit.actions.edit_units )) == null ? '' : __t) +
 '</button>\n      <div id="add-units-group" class="form-group inline-block form-condensed">\n        <div class="control-label text-center">' +
 ((__t = ( i18nUnit.actions.add_x_units )) == null ? '' : __t) +
@@ -21,7 +21,7 @@ __p += '<form id="units">\n  <header class="clearfix">\n    <h2 class="left-lg l
 ((__t = ( i18nCommon.actions.undo )) == null ? '' : __t) +
 '</button>\n      <button type="button" class="save btn btn-primary">' +
 ((__t = ( i18nCommon.actions.save )) == null ? '' : __t) +
-'</button>\n    </div>\n    <ul class="list-inline right-lg right-md">\n      <li>\n        <a class="btn btn-success" href="' +
+'</button>\n    </div>\n    <ul class="list-inline right-sm">\n      <li>\n        <a class="btn btn-success" href="' +
 ((__t = ( baseUrl )) == null ? '' : __t) +
 '/add/lease">\n          <span class="glyphicon glyphicon-plus"></span> ' +
 ((__t = ( i18nProperty.menu.add_lease )) == null ? '' : __t) +

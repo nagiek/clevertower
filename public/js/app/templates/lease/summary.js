@@ -29,17 +29,17 @@ __p += '\n    <a href="' +
 ((__t = ( baseUrl )) == null ? '' : __t) +
 '/leases/' +
 ((__t = ( objectId )) == null ? '' : __t) +
-'/edit" class="btn btn-small">\n      ' +
+'/edit" class="btn btn-sm">\n      ' +
 ((__t = ( i18nCommon.actions.edit )) == null ? '' : __t) +
-'\n    </a>\n    <button class="btn btn-small add-tenants"\n            rel="tooltip"\n            data-original-title="' +
+'\n    </a>\n    <button class="btn btn-sm add-tenants"\n            rel="tooltip"\n            data-original-title="' +
 ((__t = ( i18nLease.actions.add_tenants )) == null ? '' : __t) +
-'">\n      <span class="glyphicon glyphicon-user"></span>\n    </button>\n    <button class="btn btn-small extend"\n            rel="tooltip"\n            data-original-title="' +
+'">\n      <span class="glyphicon glyphicon-user"></span>\n    </button>\n    <button class="btn btn-sm extend"\n            rel="tooltip"\n            data-original-title="' +
 ((__t = ( i18nLease.actions.extend )) == null ? '' : __t) +
-'">\n      <span class="glyphicon glyphicon-repeat"></span>\n    </button>\n    <button class="btn btn-small btn-danger delete"\n            rel="tooltip"\n            data-original-title="' +
+'">\n      <span class="glyphicon glyphicon-repeat"></span>\n    </button>\n    <button class="btn btn-sm btn-danger delete"\n            rel="tooltip"\n            data-original-title="' +
 ((__t = ( i18nCommon.actions.delete )) == null ? '' : __t) +
 '">\n      <span class="glyphicon glyphicon-trash icon-white"></span>\n    </button>\n  ';
  } else { ;
-__p += '\n    <button class="btn btn-small btn-danger remove">' +
+__p += '\n    <button class="btn btn-sm btn-danger remove">' +
 ((__t = ( i18nCommon.actions.remove )) == null ? '' : __t) +
 '</button>\n  ';
  } ;
