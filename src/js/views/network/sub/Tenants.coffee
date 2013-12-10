@@ -25,6 +25,8 @@ define [
       @currentFilter = 'filter-all'
 
       @model.prep('tenants')
+      @model.prep('units')
+      @model.prep('properties')
       
       @listenTo @model.tenants, "add",   @addOne
       @listenTo @model.tenants, "reset", @addAll
@@ -43,10 +45,12 @@ define [
       @$list = @$('#tenants')
 
       if @model.tenants.length is 0 then @model.tenants.fetch() else @addAll()
+      if @model.units.length is 0 then @model.units.fetch()
+      if @model.properties.length is 0 then @model.properties.fetch()
       @
       
     addOne : (tenant) =>
-      @$list.append (new TenantView(model: tenant)).render().el
+      @$list.append (new TenantView(model: tenant, showUnit: true, showProperty: true)).render().el
 
     addAll : (e) =>
 

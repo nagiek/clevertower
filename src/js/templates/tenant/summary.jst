@@ -1,4 +1,4 @@
-<div class="thumbnail clearfix">
+<div class="thumbnail tenant clearfix">
   <div class="photo photo-profile pull-left">
     <a href="/users/<%= objectId %>">
       <img src="<%= url %>" class="img-rounded photo-profile" width="100">
@@ -6,6 +6,8 @@
   </div>
   <div class="photo-float profile-float position-relative">
     <a href="/users/<%= objectId %>"><strong><%= name %></strong></a>
+    <% if (property) { %><div class="property"><%= property %></div><% } %>
+    <div class="unit"><% if (unit) { %><%= unit %><% } %></div>
     <div class="position-bottom btn-group">
       <button type="button" class="btn btn-xs btn-<%= status == 'current' ? 'success' : 'warning' %> dropdown-toggle" data-toggle="dropdown">
         <%= status %> <span class="caret"></span>
