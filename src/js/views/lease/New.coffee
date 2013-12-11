@@ -74,6 +74,8 @@ define [
             i18nLease.errors[error.message]
           else
             i18nCommon.errors.unknown
+
+        console.log msg
             
         new Alert event: 'model-save', fade: false, message: msg, type: 'danger'
         switch error.message

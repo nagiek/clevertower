@@ -34,7 +34,7 @@ define [
       @$(".photo-float").html "<div>" + @model.accepted() + "</div>"
 
       # Until req.object.original lands for Cloud Code, have to pass in new status.
-      actionItem.save(newStatus: "current").then ->
+      actionItem.save(newStatus: "current").then =>
         if @model.className is "Tenant" 
           Parse.User.current().set
             property: @model.get("property")

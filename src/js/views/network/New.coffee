@@ -53,8 +53,8 @@ define [
         new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
         Parse.User.current().set "network", @model
 
-        Parse.User.current().networkSetup().then ->
-          if Parse.User.current().get("property") then Parse.User.current().get("property").set("network", @model).save()
+        Parse.User.current().networkSetup().then =>
+          if Parse.User.current().get("property") then Parse.User.current().get("property").save(network: @model)
           Parse.history.navigate "inside", true
 
         # Navigate after a second.
