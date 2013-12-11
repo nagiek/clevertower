@@ -39,7 +39,6 @@ define [
       @model = new Lease(forNetwork: false)
             
       @listenTo @model, 'invalid', (error) =>
-        @$('.has-error').removeClass('has-error')
 
         msg = if error.message.indexOf(":") > 0
             args = error.message.split ":"

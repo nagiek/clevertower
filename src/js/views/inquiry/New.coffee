@@ -24,7 +24,6 @@ define [
 
       @listenTo @model, 'invalid', (error) =>
         console.log error
-        @$('.error').removeClass('error')
         @$('button.save').button "reset"
 
         msg = if i18nListing.errors[error.message]
@@ -34,9 +33,9 @@ define [
         new Alert event: 'model-save', fade: false, message: msg, type: 'danger'
         switch error.message
           when 'unit_missing'
-            @$('.unit-group').addClass('error')
+            @$('.unit-group').addClass('has-error')
           when 'dates_missing' or 'dates_incorrect'
-            @$('.date-group').addClass('error')
+            @$('.date-group').addClass('has-error')
       
       @on "save:success", (model) =>
         new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
@@ -82,7 +81,7 @@ define [
 
       @$('button.save').button "loading"
       data = @$('form').serializeObject()
-      @$('.error').removeClass('error')
+      @$('.has-error').removeClass('has-error')
       
       # Massage the Only-String data from serializeObject()      
       _.each ['start_date', 'end_date'], (attr) ->
@@ -103,7 +102,7 @@ define [
           attrs.emails.push email if userValid
       
       unless userValid
-        @$('.emails-group').addClass('error')
+        @$('.emails-group').addClass('has-error')
         @model.trigger "invalid", {message: 'tenants_incorrect'}
       else
         @model.save attrs,

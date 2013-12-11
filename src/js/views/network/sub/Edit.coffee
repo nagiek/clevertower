@@ -20,12 +20,11 @@ define [
       @first = unless @model then true else false
       @model = new Network if @first
 
-      @model.on "sync", (model) =>
-        @$('.error').removeClass('error')
-        @$('button.save').removeProp "disabled"
+      @listenTo @model, "sync", (model) =>
+        @$('button.save').button "reset"
 
-      @model.on "invalid", (error) =>
-        @$('.name-group').addClass('error')
+      @listenTo @model, "invalid", (error) =>
+        @$('.name-group').addClass('has-error')
         msg = if error.message.indexOf(':') > 0
           args = error.message.split ":"
           fn = args.pop()
@@ -50,7 +49,8 @@ define [
     save : (e) =>
       e.preventDefault()
       data = @$('form').serializeObject()
-      @$('button.save').prop "disabled", "disabled"
+      @$('button.save').button "loading"
+      @$('.has-error').removeClass('has-error')
 
       attrs = @model.scrub data.network
 

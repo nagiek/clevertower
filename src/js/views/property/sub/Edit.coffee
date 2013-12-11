@@ -26,8 +26,8 @@ define [
       @on "property:save", ->
         new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
       
-      @on "property:sync", ->
-        @$('button.save').removeProp('disabled')
+      @on "property:sync", =>
+        @$('button.save').button "reset"
       
       @listenTo @model, "invalid", (error) ->
         console.log error
@@ -35,7 +35,7 @@ define [
         new Alert event: 'model-save', fade: false, message: i18nProperty.errors[error.message], type: 'danger'
         switch error.message
           when 'title_missing'
-            @$el.find('#property-title-group').addClass('error') # Add class to Control Group
+            @$('#property-title-group').addClass('has-error') # Add class to Control Group
 
     clear: (e) =>
       @undelegateEvents()
@@ -53,8 +53,8 @@ define [
         
     save : (e) =>
       e.preventDefault()
-      @$('.error').removeClass('error')
-      @$('button.save').prop('disabled', 'disabled')
+      @$('.has-error').removeClass('has-error')
+      @$('button.save').button("loading")
       
       attrs = @model.scrub @$('form').serializeObject().property
 

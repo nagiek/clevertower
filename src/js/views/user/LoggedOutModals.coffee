@@ -89,7 +89,7 @@ define [
             when -1   then i18nDevise.errors.fields_missing
             else i18nDevise.errors.invalid_login
           
-          @$("> #login-modal #login-modal-form .alert-error").html(msg).show()
+          @$("> #login-modal #login-modal-form .alert-danger").html(msg).show()
 
     logInWithFacebook : (e) =>  
       e.preventDefault()

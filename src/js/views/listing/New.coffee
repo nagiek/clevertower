@@ -51,8 +51,7 @@ define [
             
       @listenTo @model, 'invalid', (error) =>
         console.log error
-        @$('.error').removeClass('error')
-        @$('button.save').removeProp "disabled"
+        @$('button.save').button "reset"
 
         msg = if error.message.indexOf(":") > 0
             args = error.message.split ":"
@@ -70,9 +69,9 @@ define [
         new Alert event: 'model-save', fade: false, message: msg, type: 'danger'
         switch error.message
           when 'unit_missing'
-            @$('.unit-group').addClass('error')
+            @$('.unit-group').addClass('has-error')
           when 'dates_missing' or 'dates_incorrect'
-            @$('.date-group').addClass('error')
+            @$('.date-group').addClass('has-error')
       
       @listenTo @model, 'destroy', @clear
 
@@ -198,9 +197,9 @@ define [
     save : (e) =>
       e.preventDefault() if e
       
-      @$('button.save').prop "disabled", "disabled"
+      @$('button.save').button "loading"
       data = @$('form').serializeObject()
-      @$('.error').removeClass('error')
+      @$('.has-error').removeClass('has-error')
 
       # Massage the Only-String data from serializeObject()
       data.listing.rent = 0 if data.listing.rent is '' or data.listing.rent is '0'

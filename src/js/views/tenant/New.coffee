@@ -37,10 +37,10 @@ define [
       @listenTo @leases, "reset", @addAll
       
       @on 'submit:return', =>
-        @$('button.save').removeProp "disabled"
+        @$('button.save').button "reset"
       
       @on 'submit:error', (error) =>
-        @$('.emails-group').addClass('error') 
+        @$('.emails-group').addClass('has-error') 
         new Alert event: 'model-save', fade: false, message: i18nLease.errors[error.message], type: 'danger'
           
       @on "submit:success", (model) =>
@@ -87,7 +87,7 @@ define [
     save : (e) =>
       e.preventDefault()
       
-      @$('button.save').prop "disabled", "disabled"
+      @$('button.save').button "loading"
       data = @$('form').serializeObject()
       @$('.error').removeClass('error')
       

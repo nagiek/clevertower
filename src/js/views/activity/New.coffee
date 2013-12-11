@@ -375,7 +375,7 @@ define [
     save : (e) ->
       e.preventDefault() if e
       @$('button.save').button("loading")
-      @$('.error').removeClass('error')
+      @$('.has-error').removeClass('has-error')
 
       data = @$('form').serializeObject()
 
@@ -464,9 +464,8 @@ define [
 
     # attachPhoto: ->
     handleError: (error) =>
-      @$('.error').removeClass('error')
+      @$('.has-error').removeClass('has-error')
       @$('button.save').button("reset")
-      @$('button.save').html i18nCommon.actions.save
 
       console.log error
 
@@ -475,9 +474,9 @@ define [
       new Alert event: 'model-save', fade: false, message: msg, type: 'danger'
       switch error.message
         when 'unit_missing'
-          @$('.unit-group').addClass('error')
+          @$('.unit-group').addClass('has-error')
         when 'dates_missing' or 'dates_incorrect'
-          @$('.date-group').addClass('error')
+          @$('.date-group').addClass('has-error')
 
     clear: (e) =>
       @$el.html ""

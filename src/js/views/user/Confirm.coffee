@@ -23,8 +23,7 @@ define [
       @model = Parse.User.current()
                   
       @listenTo @model, 'invalid', (error) =>
-        @$('.error').removeClass('error')
-        @$('button.save').removeProp "disabled"
+        @$('button.save').button "reset"
         
         msg = i18nDevise.errors[error.message]
                   
@@ -38,8 +37,7 @@ define [
           when 'unmatching_passwords'     then @$('.new-password-group').addClass('error')
       
       @on "save:success", (model) =>
-        @$('.error').removeClass('error')
-        @$('button.save').removeProp "disabled"
+        @$('button.save').button "reset"
         new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
 
     resetPassword: (e) =>
@@ -52,7 +50,8 @@ define [
     # Profile is always available, but user may be hidden.
     save : (e) =>
       e.preventDefault()
-      @$('button.save').prop "disabled", "disabled"
+      @$('button.save').button "loading"
+      @$('.has-error').removeClass('has-error')
       data = @$('form').serializeObject()
       
       # Extra security for username/password

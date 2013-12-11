@@ -16,13 +16,6 @@ define [
       'click #fb-link'        : 'FBlink'
       'click #fb-unlink'      : 'FBunlink'
     
-    initialize : (attrs) ->
-                  
-      @on "save:success", (model) =>
-        @$('.error').removeClass('error')
-        @$('button.save').removeProp "disabled"
-        new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
-    
     clear: =>
       @stopListening()
       @undelegateEvents()

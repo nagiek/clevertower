@@ -20,9 +20,8 @@ define [
       
       @current = attrs.current
                   
-      @model.on 'invalid', (error) =>
-        @$('.error').removeClass('error')
-        @$('button.save').removeProp "disabled"
+      @listenTo @model, 'invalid', (error) =>
+        @$('button.save').button "reset"
         
         msg = i18nUser.errors[error.message]
                   
@@ -33,8 +32,7 @@ define [
             @$('.birthday-group').addClass('error')
       
       @on "save:success", (model) =>
-        @$('.error').removeClass('error')
-        @$('button.save').removeProp "disabled"
+        @$('button.save').button "reset"
         new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
       
     clear: =>
@@ -47,6 +45,8 @@ define [
     save : (e) =>
       e.preventDefault()
       data = @$('form').serializeObject()
+      @$('button.save').button("loading")
+      @$('.has-error').removeClass('has-error')
       
       # Set name on every request.
       first_name = data.profile.first_name

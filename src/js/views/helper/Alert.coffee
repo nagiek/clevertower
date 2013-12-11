@@ -54,5 +54,5 @@ define [
 
     setError: (msg) ->
       @vars.message = msg
-      @vars.type = 'error'
+      @vars.type = 'danger'
       @render()

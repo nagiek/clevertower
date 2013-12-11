@@ -79,9 +79,9 @@ define [
 
       @model.set("image", @property.photos.get(@index).get("image"))
 
-      @$('button.save').prop "disabled", true
+      @$('button.save').button "loading"
       data = @$('form').serializeObject()
-      @$('.error').removeClass('error')
+      @$('.has-error').removeClass('has-error')
 
       return @model.trigger "invalid", error: message: i18nCommon.errors.no_data unless data.activity.title or @model.get("image")
 

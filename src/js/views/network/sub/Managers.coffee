@@ -27,7 +27,7 @@ define [
       @on "submit:return", -> @$('button.save').removeProp "disabled"
 
       @on "submit:fail", (error) ->
-        @$('.emails-group').addClass('error')
+        @$('.emails-group').addClass('has-error')
         new Alert event: 'model-save', fade: false, message: i18nCommon.errors[error.message], type: 'danger'
       
       @model.prep('managers')
@@ -56,8 +56,8 @@ define [
     save : (e) ->
       e.preventDefault()
 
-      @$('button.save').prop "disabled", "disabled"
-      @$('.error').removeClass('error')
+      @$('button.save').button "loading"
+      @$('.has-error').removeClass('has-error')
       
       data = @$('form').serializeObject()
 
@@ -65,7 +65,7 @@ define [
       userValid = unless Parse.User::validate(email: data.manager.email) then true else false
 
       unless userValid
-        @$('.emails-group').addClass('error')
+        @$('.emails-group').addClass('has-error')
         @trigger "submit:return"
         @trigger "submit:fail", {message: 'email_incorrect'}
       else

@@ -60,7 +60,7 @@ define [
           i18nProperty.errors[error.message]
 
         switch error.message
-          when 'title_missing' then @$('#property-title-group').addClass('error')
+          when 'title_missing' then @$('#property-title-group').addClass('has-error')
           else @$('#address-search-group').addClass('has-error')
         
         new Alert event: 'model-save', fade: false, message: msg, type: 'danger'
@@ -116,7 +116,7 @@ define [
         profile: Parse.User.current().get("profile")
         state: 'pending'
 
-      alert = new Alert event: 'model-save', fade: false, message: i18nCommon.actions.request_sent, type: 'error'
+      alert = new Alert event: 'model-save', fade: false, message: i18nCommon.actions.request_sent
       concierge.save().then -> @trigger "wizard:finish", 
         (error) -> alert.setError i18nCommon.errors.unknown_error
 
@@ -294,7 +294,7 @@ define [
           attrs.emails.push email
       
       unless userValid
-        @$('.emails-group').addClass('error')
+        @$('.emails-group').addClass('has-error')
         @model.trigger "invalid", {message: 'tenants_incorrect'}
         false
       else

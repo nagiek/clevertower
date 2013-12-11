@@ -28,12 +28,11 @@ define [
 
       @model.prep "tenants"
       
-      @on 'submit:return', =>
-        @$('button.save').removeProp "disabled"
+      @on 'submit:return', => @$('button.save').button "reset"
       
       @on 'submit:error', (error) =>
         console.log error
-        @$('.emails-group').addClass('error') 
+        @$('.emails-group').addClass('has-error') 
         new Alert event: 'model-save', fade: false, message: i18nLease.errors[error.message], type: 'danger'
       
       @on "submit:success", (model) =>
@@ -47,8 +46,8 @@ define [
     save : (e) =>
       e.preventDefault()
       
-      @$('button.save').prop "disabled", "disabled"
-      @$('.error').removeClass('error')
+      @$('button.save').button "loading"
+      @$('.has-error').removeClass('has-error')
       data = @$('form').serializeObject()
       
       attrs = 

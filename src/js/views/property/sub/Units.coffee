@@ -37,9 +37,15 @@ define [
       @listenTo @model.units, "reset", @addAll
 
       @listenTo @model.units, "invalid", (error) =>
+        console.log error
+        @$('button.save').button "reset"
         msg = if error.code? i18nCommon.errors[error.message] else i18nUnit.errors[error.message]
         new Alert event: 'unit-invalid', fade: false, message: msg, type: 'danger'
-      
+
+      @listenTo @model.units, "save:success", =>
+        @$('button.save').button "reset"
+        new Alert event: 'units-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
+
       @editing = false
                 
     # Re-render the contents of the property item.
@@ -124,11 +130,8 @@ define [
     
     save: (e) =>
       e.preventDefault()
-      @$('.error').removeClass('error') if @$('.error')
+      @$('.has-error').removeClass('has-error')
+      @$('button.save').button "loading"
       Parse.Object.saveAll @model.units.models, 
-        success: (units) =>
-          new Alert event: 'units-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
-          @model.units.trigger "save:success"
-        error: (error) =>
-          console.log error
-          @model.units.trigger "invalid", error
+        success: (units) => @model.units.trigger "save:success"
+        error: (error) => @model.units.trigger "invalid", error

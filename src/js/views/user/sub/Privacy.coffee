@@ -19,14 +19,20 @@ define [
     initialize : (attrs) ->
       
       @model = Parse.User.current().get("profile")
-                  
+
+      @listenTo @model, 'invalid', (error) =>
+        @$('button.save').button "reset"        
+        msg = i18nUser.errors[error.message]
+        new Alert event: 'model-save', fade: false, message: msg, type: 'danger'
+
       @on "save:success", (model) =>
-        @$('.error').removeClass('error')
-        @$('button.save').removeProp "disabled"
+        @$('button.save').button "reset"
         new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
     
     save : (e) =>
       e.preventDefault()
+      @$('.has-error').removeClass('has-error')
+      @$('button.save').button "loading"
 
       attrs = @model.scrub @$('form').serializeObject().profile 
 
@@ -34,6 +40,8 @@ define [
       success: (model) =>
         @model.trigger "sync", model # This is triggered automatically in Backbone, but not Parse.
         @trigger "save:success", model, this
+      error: (model, error) => 
+        @model.trigger "invalid", error
                 
     render: ->
       vars = _.merge @model.toJSON(),

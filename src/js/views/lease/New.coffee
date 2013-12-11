@@ -57,7 +57,6 @@ define [
       @setElement '#apply-modal' if @modal
 
       @listenTo @model, 'invalid', (error) =>
-        @$('.error').removeClass('error')
         @$('button.save').button "reset"
 
         console.log error
@@ -80,9 +79,9 @@ define [
         new Alert event: 'model-save', fade: false, message: msg, type: 'danger'
         switch error.message
           when 'unit_missing'
-            @$('.unit-group').addClass('error')
+            @$('.unit-group').addClass('has-error')
           when 'dates_missing' or 'dates_incorrect'
-            @$('.date-group').addClass('error')
+            @$('.date-group').addClass('has-error')
       
       @on "save:success", (model, newUnit) =>
         if @property
@@ -214,12 +213,10 @@ define [
 
     # Split into separate functions for other uses, such as joining.
     save : (e) =>
-      console.log "save"
-      console.log @$('button.save')
       e.preventDefault()      
       @$('button.save').button "loading"
       data = @$('form').serializeObject()
-      @$('.error').removeClass('error')
+      @$('.has-error').removeClass('has-error')
 
       attrs = @model.scrub data.lease
 
@@ -257,7 +254,7 @@ define [
           attrs.emails.push email
       
       unless userValid
-        @$('.emails-group').addClass('error')
+        @$('.emails-group').addClass('has-error')
         @model.trigger "invalid", {message: 'tenants_incorrect'}
       else
         @model.save attrs,

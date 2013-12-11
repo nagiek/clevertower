@@ -23,23 +23,20 @@ define [
       @model = Parse.User.current()
                   
       @listenTo @model, 'invalid', (error) =>
-        @$('.error').removeClass('error')
-        @$('button.save').removeProp "disabled"
-        
+        @$('button.save').button "reset"
         msg = i18nDevise.errors[error.message]
                   
         new Alert event: 'model-save', fade: false, message: msg, type: 'danger'
         
         switch error.message
-          when "missing_password"         then @$('.password-group').addClass('error')
-          when "invalid login parameters" then @$('.password-group').addClass('error')
-          when "invalid_email"            then @$('.email-group').addClass('error')
-          when "missing_passwords"        then @$('.new-password-group').addClass('error')
-          when 'unmatching_passwords'     then @$('.new-password-group').addClass('error')
+          when "missing_password"         then @$('.password-group').addClass('has-error')
+          when "invalid login parameters" then @$('.password-group').addClass('has-error')
+          when "invalid_email"            then @$('.email-group').addClass('has-error')
+          when "missing_passwords"        then @$('.new-password-group').addClass('has-error')
+          when 'unmatching_passwords'     then @$('.new-password-group').addClass('has-error')
       
       @on "save:success", (model) =>
-        @$('.error').removeClass('error')
-        @$('button.save').removeProp "disabled"
+        @$('button.save').button "reset"
         new Alert event: 'model-save', fade: true, message: i18nCommon.actions.changes_saved, type: 'success'
 
     resetPassword: (e) =>
@@ -52,7 +49,8 @@ define [
     # Profile is always available, but user may be hidden.
     save : (e) =>
       e.preventDefault()
-      @$('button.save').prop "disabled", "disabled"
+      @$('button.save').button "loading"
+      @$('.has-error').removeClass('has-error')
       data = @$('form').serializeObject()
       
       # Extra security for username/password

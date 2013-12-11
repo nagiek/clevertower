@@ -27,13 +27,13 @@ define [
 
     signUp: (e) =>
       e.preventDefault()
-      @$("#signup-form button").prop "disabled", "disabled"
+      @$("#signup-form button").button "loading"
       email = @$("#signup-username").val()
       password = @$("#signup-password").val()
       user_type = if @$(".type-group :checked").prop('id') is 'signup-tenant' then 'tenant' else 'manager'
       Parse.User.signUp email, password, { user_type: user_type, email: email, ACL: new Parse.ACL() },
         success: (user) =>
-          @$("#signup-form button").removeProp "disabled"
+          @$("#signup-form button").button "reset"
 
           # Skip the user-setup phase, as we will not have anything to add.
           # Only extra things we need are the profile and notifications.
@@ -49,8 +49,8 @@ define [
           Parse.history.navigate "/account/setup", trigger: true
 
         error: (user, error) =>
-          @$("#signup-form .error").removeClass 'error'
-          @$("#signup-form button").removeProp "disabled"
+          @$("#signup-form .has-error").removeClass 'has-error'
+          @$("#signup-form button").button "reset"
           msg = switch error.code
             when 125  then i18nDevise.errors.invalid_email_format
             when 202  then i18nDevise.errors.username_taken
@@ -59,10 +59,10 @@ define [
 
           switch error.code
             when 125 or 202 
-              @$('.username-group').addClass('error')
+              @$('.username-group').addClass('has-error')
             when -1   
-              @$('> #signup #signup-form username-group').addClass('error')
-              @$('> #signup #signup-form password-group').addClass('error')
+              @$('> #signup #signup-form username-group').addClass('has-error')
+              @$('> #signup #signup-form password-group').addClass('has-error')
 
           @$("> #signup #signup-form .alert-danger").html(msg).show()
 

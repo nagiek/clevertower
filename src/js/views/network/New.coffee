@@ -32,14 +32,13 @@ define [
       # Only do this on 'invalid', as we will reload the page 
       # for the user and we don't want them getting antsy
       # @model.on "sync", (model) =>
-      #   @$('.error').removeClass('error')
-      #   @$('button.save').removeProp "disabled"
+      #   @$('.error').removeClass('has-error')
+      #   @$('button.save').button "reset"
 
       @listenTo @model, "invalid", (error) =>
         console.log error
-        @$('.error').removeClass('error')
-        @$('button.save').removeProp "disabled"
-        @$('.name-group').addClass('error')
+        @$('button.save').button "reset"
+        @$('.name-group').addClass('has-error')
         msg = if error.message.indexOf(':') > 0
           args = error.message.split ":"
           fn = args.pop()
@@ -101,7 +100,8 @@ define [
     save : (e) =>
       e.preventDefault()
       data = @$('form').serializeObject()
-      @$('button.save').prop "disabled", "disabled"
+      @$('button.save').button("loading")
+      @$('.has-error').removeClass('has-error')
 
       attrs = @model.scrub data.network
 
