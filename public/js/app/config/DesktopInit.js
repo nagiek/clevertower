@@ -195,18 +195,14 @@
       }, options, addOptions));
     };
     Parse.Collection.prototype.remove = function(models, options) {
-      var i, index, l, model, singular;
+      var i, index, model, singular, _i, _len, _ref;
 
       singular = !_.isArray(models);
       models = (singular ? [models] : _.clone(models));
       options || (options = {});
-      i = void 0;
-      l = void 0;
-      index = void 0;
-      model = void 0;
-      i = 0;
-      l = models.length;
-      while (i < l) {
+      _ref = models.length;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        i = _ref[_i];
         model = models[i] = this.get(models[i]);
         if (!model) {
           continue;
@@ -221,7 +217,6 @@
           model.trigger("remove", model, this, options);
         }
         this._removeReference(model);
-        i++;
       }
       if (singular) {
         return models[0];

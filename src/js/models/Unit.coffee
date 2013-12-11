@@ -42,7 +42,7 @@ define [
     
     scrub: (unit) ->
       # Massage the Only-String data from serializeObject()
-      for attr in ['bedrooms', 'bathrooms']
+      for attr in ['bedrooms', 'bathrooms', 'square_feet']
         unit[attr] = 0 if unit[attr] is '' or unit[attr] is '0'
         unit[attr] = Number unit[attr] if unit[attr]
 

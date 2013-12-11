@@ -49,7 +49,7 @@
           msg = error.message.indexOf(":") > 0 ? (args = error.message.split(":"), fn = args.pop(), i18nProperty.errors[fn](args[0])) : i18nProperty.errors[error.message];
           switch (error.message) {
             case 'title_missing':
-              _this.$('#property-title-group').addClass('error');
+              _this.$('#property-title-group').addClass('has-error');
               break;
             default:
               _this.$('#address-search-group').addClass('has-error');
@@ -131,8 +131,7 @@
         alert = new Alert({
           event: 'model-save',
           fade: false,
-          message: i18nCommon.actions.request_sent,
-          type: 'error'
+          message: i18nCommon.actions.request_sent
         });
         return concierge.save().then(function() {
           return this.trigger("wizard:finish", function(error) {
@@ -321,7 +320,7 @@
           }
         }
         if (!userValid) {
-          this.$('.emails-group').addClass('error');
+          this.$('.emails-group').addClass('has-error');
           this.model.trigger("invalid", {
             message: 'tenants_incorrect'
           });

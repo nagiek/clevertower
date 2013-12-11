@@ -283,18 +283,12 @@ require [
     singular = not _.isArray(models)
     models = (if singular then [models] else _.clone(models))
     options or (options = {})
-    i = undefined
-    l = undefined
-    index = undefined
-    model = undefined
-    i = 0
-    l = models.length
 
-    while i < l
+    for i in models.length
       model = models[i] = @get(models[i])
       continue  unless model
+      
       delete @_byId[model.id]
-
       delete @_byId[model.cid]
 
       index = @indexOf(model)
@@ -304,7 +298,7 @@ require [
         options.index = index
         model.trigger "remove", model, this, options
       @_removeReference model
-      i++
+
     (if singular then models[0] else models)
 
   

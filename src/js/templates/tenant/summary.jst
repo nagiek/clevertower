@@ -6,8 +6,8 @@
   </div>
   <div class="photo-float profile-float position-relative">
     <a href="/users/<%= objectId %>"><strong><%= name %></strong></a>
-    <% if (property) { %><div class="property"><%= property %></div><% } %>
-    <div class="unit"><% if (unit) { %><%= unit %><% } %></div>
+    <% if (property) { %><div class="property"><small><%= property %></small></div><% } %>
+    <div class="unit"><small><% if (unit) { %><%= unit %><% } %></small></div>
     <div class="position-bottom btn-group">
       <button type="button" class="btn btn-xs btn-<%= status == 'current' ? 'success' : 'warning' %> dropdown-toggle" data-toggle="dropdown">
         <%= status %> <span class="caret"></span>

@@ -28,6 +28,8 @@ define [
     
     events:
       'submit form'                 : 'save'
+      'click .remove'               : 'kill'
+
       # Adjust the modal (don't need this)
       # 'click .close'                : 'close'
       "click .google-oauth"         : "googleOAuth"
@@ -299,3 +301,9 @@ define [
       @stopListening()
       @undelegateEvents()
       delete this
+
+    kill : (e) =>
+      e.preventDefault()
+      if confirm(i18nCommon.actions.confirm + " " + i18nCommon.warnings.no_undo)
+        @model.destroy()
+        Parse.history.navigate @baseUrl, true

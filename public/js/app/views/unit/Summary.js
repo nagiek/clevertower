@@ -10,7 +10,8 @@
       __extends(UnitSummaryView, _super);
 
       function UnitSummaryView() {
-        this.newOnEnter = __bind(this.newOnEnter, this);        _ref = UnitSummaryView.__super__.constructor.apply(this, arguments);
+        this.newOnEnter = __bind(this.newOnEnter, this);
+        this.clear = __bind(this.clear, this);        _ref = UnitSummaryView.__super__.constructor.apply(this, arguments);
         return _ref;
       }
 
@@ -36,17 +37,19 @@
         });
         this.listenTo(this.model.collection, "save:success", this.render);
         this.listenTo(this.model, "invalid", function(error) {
-          _this.$el.addClass('error');
+          _this.$el.addClass('danger');
           switch (error.message) {
             case 'title_missing':
-              return _this.$('.title-group .control-group').addClass('error');
+              return _this.$('.title-group .control-group').addClass('has-error');
           }
         });
-        return this.listenTo(this.model, "destroy", function() {
-          _this.remove();
-          _this.undelegateEvents();
-          return delete _this;
-        });
+        return this.listenTo(this.model, "destroy", this.clear);
+      };
+
+      UnitSummaryView.prototype.clear = function() {
+        this.remove();
+        this.undelegateEvents();
+        return delete this;
       };
 
       UnitSummaryView.prototype.render = function() {

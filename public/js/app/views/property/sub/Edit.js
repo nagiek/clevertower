@@ -24,6 +24,8 @@
       };
 
       PropertyEditView.prototype.initialize = function() {
+        var _this = this;
+
         this.on("property:save", function() {
           return new Alert({
             event: 'model-save',
@@ -33,7 +35,7 @@
           });
         });
         this.on("property:sync", function() {
-          return this.$('button.save').removeProp('disabled');
+          return _this.$('button.save').button("reset");
         });
         return this.listenTo(this.model, "invalid", function(error) {
           console.log(error);
@@ -45,7 +47,7 @@
           });
           switch (error.message) {
             case 'title_missing':
-              return this.$el.find('#property-title-group').addClass('error');
+              return this.$('#property-title-group').addClass('has-error');
           }
         });
       };
@@ -74,8 +76,8 @@
           _this = this;
 
         e.preventDefault();
-        this.$('.error').removeClass('error');
-        this.$('button.save').prop('disabled', 'disabled');
+        this.$('.has-error').removeClass('has-error');
+        this.$('button.save').button("loading");
         attrs = this.model.scrub(this.$('form').serializeObject().property);
         return this.model.save(attrs, {
           success: function(property) {

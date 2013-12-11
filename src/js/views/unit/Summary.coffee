@@ -38,15 +38,17 @@ define [
       
       @listenTo @model, "invalid", (error) =>
         # Mark up form
-        @$el.addClass('error')
+        @$el.addClass('danger')
         switch error.message
           when 'title_missing'
-            @$('.title-group .control-group').addClass('error')
+            @$('.title-group .control-group').addClass('has-error')
 
-      @listenTo @model, "destroy", =>
-        @remove()
-        @undelegateEvents()
-        delete this
+      @listenTo @model, "destroy", @clear
+
+    clear: =>
+      @remove()
+      @undelegateEvents()
+      delete this
 
     # Re-render the contents of the Unit item.
     render: ->

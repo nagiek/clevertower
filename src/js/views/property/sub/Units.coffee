@@ -105,28 +105,28 @@ define [
 
     addX: (e) =>
       e.preventDefault()
-      x = Number $('#x').val()
+      x = Number @$('#x').val()
       x = 1 unless x?
 
       until x <= 0
         @model.units.prepopulate(@model)
         x--
 
+      @$undo.removeClass 'disabled'
       @$undo.removeProp 'disabled'
       @$list.last().find('.title').focus()
       
     undo: (e) =>
       e.preventDefault()
-      x = Number $('#x').val()
-      x = 1 unless x?
+      x = Number @$('#x').val()
+      x = 1 unless x
 
-      until x <= 0
-        unless @model.units.length is 0
-          # @model.units.pop() doesn't exist.
-          @model.units.last().destroy() if @model.units.last().isNew()
+      while x > 0 and @model.units.last().isNew() and @model.units.length > 0 
+        @model.units.last().destroy()
         x--
 
-      @$undo.prop 'disabled', 'disabled'
+      # @$undo.button 'reset'
+      # @$undo.prop 'disabled', 'disabled'
     
     save: (e) =>
       e.preventDefault()

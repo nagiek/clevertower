@@ -10,6 +10,7 @@
       __extends(NewLeaseView, _super);
 
       function NewLeaseView() {
+        this.kill = __bind(this.kill, this);
         this.googleOAuth = __bind(this.googleOAuth, this);
         this.setJulyJune = __bind(this.setJulyJune, this);
         this.setNextMonth = __bind(this.setNextMonth, this);
@@ -26,6 +27,7 @@
 
       NewLeaseView.prototype.events = {
         'submit form': 'save',
+        'click .remove': 'kill',
         "click .google-oauth": "googleOAuth",
         'click .starting-this-month': 'setThisMonth',
         'click .starting-next-month': 'setNextMonth',
@@ -55,7 +57,6 @@
         this.listenTo(this.model, 'invalid', function(error) {
           var args, fn, msg;
 
-          _this.$('.error').removeClass('error');
           _this.$('button.save').button("reset");
           console.log(error);
           msg = (function() {
@@ -83,9 +84,9 @@
           });
           switch (error.message) {
             case 'unit_missing':
-              return _this.$('.unit-group').addClass('error');
+              return _this.$('.unit-group').addClass('has-error');
             case 'dates_missing' || 'dates_incorrect':
-              return _this.$('.date-group').addClass('error');
+              return _this.$('.date-group').addClass('has-error');
           }
         });
         this.on("save:success", function(model, newUnit) {
@@ -253,12 +254,10 @@
         var attrs, data, email, newUnit, property, unit, userValid, _i, _len, _ref1,
           _this = this;
 
-        console.log("save");
-        console.log(this.$('button.save'));
         e.preventDefault();
         this.$('button.save').button("loading");
         data = this.$('form').serializeObject();
-        this.$('.error').removeClass('error');
+        this.$('.has-error').removeClass('has-error');
         attrs = this.model.scrub(data.lease);
         newUnit = false;
         if (data.unit && data.unit.id !== "") {
@@ -298,7 +297,7 @@
           }
         }
         if (!userValid) {
-          this.$('.emails-group').addClass('error');
+          this.$('.emails-group').addClass('has-error');
           return this.model.trigger("invalid", {
             message: 'tenants_incorrect'
           });
@@ -354,6 +353,14 @@
         this.stopListening();
         this.undelegateEvents();
         return delete this;
+      };
+
+      NewLeaseView.prototype.kill = function(e) {
+        e.preventDefault();
+        if (confirm(i18nCommon.actions.confirm + " " + i18nCommon.warnings.no_undo)) {
+          this.model.destroy();
+          return Parse.history.navigate(this.baseUrl, true);
+        }
       };
 
       return NewLeaseView;

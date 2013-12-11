@@ -76,7 +76,7 @@
 
       AlertView.prototype.setError = function(msg) {
         this.vars.message = msg;
-        this.vars.type = 'error';
+        this.vars.type = 'danger';
         return this.render();
       };
 

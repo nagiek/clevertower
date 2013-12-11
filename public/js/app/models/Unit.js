@@ -65,7 +65,7 @@
       Unit.prototype.scrub = function(unit) {
         var attr, _i, _len, _ref1;
 
-        _ref1 = ['bedrooms', 'bathrooms'];
+        _ref1 = ['bedrooms', 'bathrooms', 'square_feet'];
         for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
           attr = _ref1[_i];
           if (unit[attr] === '' || unit[attr] === '0') {

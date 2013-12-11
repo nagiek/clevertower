@@ -43,12 +43,23 @@
         this.listenTo(this.model.units, "invalid", function(error) {
           var msg;
 
+          console.log(error);
+          _this.$('button.save').button("reset");
           msg = (typeof error.code === "function" ? error.code(i18nCommon.errors[error.message]) : void 0) ? void 0 : i18nUnit.errors[error.message];
           return new Alert({
             event: 'unit-invalid',
             fade: false,
             message: msg,
             type: 'danger'
+          });
+        });
+        this.listenTo(this.model.units, "save:success", function() {
+          _this.$('button.save').button("reset");
+          return new Alert({
+            event: 'units-save',
+            fade: true,
+            message: i18nCommon.actions.changes_saved,
+            type: 'success'
           });
         });
         return this.editing = false;
@@ -138,7 +149,7 @@
         var x;
 
         e.preventDefault();
-        x = Number($('#x').val());
+        x = Number(this.$('#x').val());
         if (x == null) {
           x = 1;
         }
@@ -146,48 +157,38 @@
           this.model.units.prepopulate(this.model);
           x--;
         }
+        this.$undo.removeClass('disabled');
         this.$undo.removeProp('disabled');
         return this.$list.last().find('.title').focus();
       };
 
       PropertyUnitsView.prototype.undo = function(e) {
-        var x;
+        var x, _results;
 
         e.preventDefault();
-        x = Number($('#x').val());
-        if (x == null) {
+        x = Number(this.$('#x').val());
+        if (!x) {
           x = 1;
         }
-        while (!(x <= 0)) {
-          if (this.model.units.length !== 0) {
-            if (this.model.units.last().isNew()) {
-              this.model.units.last().destroy();
-            }
-          }
-          x--;
+        _results = [];
+        while (x > 0 && this.model.units.last().isNew() && this.model.units.length > 0) {
+          this.model.units.last().destroy();
+          _results.push(x--);
         }
-        return this.$undo.prop('disabled', 'disabled');
+        return _results;
       };
 
       PropertyUnitsView.prototype.save = function(e) {
         var _this = this;
 
         e.preventDefault();
-        if (this.$('.error')) {
-          this.$('.error').removeClass('error');
-        }
+        this.$('.has-error').removeClass('has-error');
+        this.$('button.save').button("loading");
         return Parse.Object.saveAll(this.model.units.models, {
           success: function(units) {
-            new Alert({
-              event: 'units-save',
-              fade: true,
-              message: i18nCommon.actions.changes_saved,
-              type: 'success'
-            });
             return _this.model.units.trigger("save:success");
           },
           error: function(error) {
-            console.log(error);
             return _this.model.units.trigger("invalid", error);
           }
         });
