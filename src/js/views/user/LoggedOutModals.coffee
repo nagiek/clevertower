@@ -31,6 +31,11 @@ define [
       @listenTo Parse.Dispatcher, "user:loginStart", @startLogin
       @listenTo Parse.Dispatcher, "user:loginEnd", @finalizeLogin
 
+    clear: =>
+      @stopListening()
+      @undelegateEvents()
+      delete this
+
 
     startLogin: => Parse.User.current().setup().then -> Parse.Dispatcher.trigger "user:loginEnd"
 
@@ -41,9 +46,9 @@ define [
       @$('#signup-modal').remove()
       @$('#login-modal').remove()
 
-      @stopListening()
-      @undelegateEvents()
-      delete this
+      unless Parse.User.current().get("property") or Parse.User.current().get("network") 
+        Parse.history.navigate "/account/setup", trigger: true
+      @clear()
 
     render: =>
       @$el.append JST["src/js/templates/user/logged_out_modals.jst"](i18nCommon: i18nCommon, i18nDevise: i18nDevise)
@@ -54,10 +59,10 @@ define [
 
     resetPassword: (e) =>
       e.preventDefault()
+      @$('> #reset-password-modal').find('.has-error').removeClass('has-error')
       Parse.User.requestPasswordReset $("#reset-email").val(),
-        success: ->
+        success: =>
           new Alert event: 'reset-password', message: i18nDevise.messages.password_reset
-          @$('> #reset-password-modal').find('.has-error').removeClass('has-error')
           @$('> #reset-password-modal').modal('hide')
         error: (error) ->
           console.log error
@@ -71,7 +76,8 @@ define [
 
     logIn: (e) =>
       e.preventDefault()
-      @$("> #login-modal #login-modal-form button").prop "disabled", "disabled"
+      @$("> #login-modal #login-modal-form button").button "loading"
+      @$("> #login-modal #login-modal-form .has-error").removeClass 'has-error'
       email = @$("#login-modal-username").val()
       password = @$("#login-modal-password").val()
       Parse.User.logIn email, password,
@@ -79,9 +85,9 @@ define [
           @$('> #login-modal').modal('hide')
           Parse.Dispatcher.trigger "user:loginStart", user
 
-        error: (error) =>
+        error: (user, error) =>
           console.log error
-          @$("> #login-modal #login-modal-form button").removeProp "disabled"
+          @$("> #login-modal #login-modal-form button").button "reset"
           @$('> #login-modal #login-modal-form .username-group').addClass('has-error')
           @$('> #login-modal #login-modal-form .password-group').addClass('has-error')
 
@@ -142,36 +148,36 @@ define [
                 else 
                   Parse.Dispatcher.trigger "user:loginEnd"
 
-        error: (error) => console.log error
+        error: (user, error) => console.log error
             
     signUp: (e) =>
       e.preventDefault()
-      @$("> #signup-modal #signup-modal-form button").prop "disabled", "disabled"
+      @$("> #signup-modal #signup-modal-form button").button "loading"
+      @$("> #signup-modal #signup-modal-form .has-error").removeClass 'has-error'
       email = @$("#signup-modal-username").val()
       password = @$("#signup-modal-password").val()
       user_type = if @$(".type-group :checked").prop('id') is 'signup-modal-tenant' then 'tenant' else 'manager'
       Parse.User.signUp email, password, { user_type: user_type, email: email, ACL: new Parse.ACL() },
         success: (user) =>
           @$('> #signup-modal').modal('hide')
-          @$("> #signup-modal #signup-modal-form button").removeProp "disabled"
+          @$("> #signup-modal #signup-modal-form button").button "reset"
 
-          # Skip the user-setup phase, as we will not have anything to add.
-          # Only extra things we need are the profile and notifications.
+          # I thought we could skip the user-setup phase, as we will not have 
+          # anything to add and the only extra things were profile and notifications.
+          # 
+          # However, we have to query the notifications to see if 
+          # we've been previously been invited to a property.
+          # 
+          # profile = user.get("profile")
+          # profile.set "email", user.get("email")
+          # 
+          # Parse.User.current().set "profile", profile
+          # Parse.User.current().notifications = new NotificationList
 
-          profile = user.get("profile")
-          profile.set "email", user.get("email")
+          Parse.Dispatcher.trigger "user:loginStart"
 
-          Parse.User.current().set "profile", profile
-          Parse.User.current().notifications = new NotificationList
-
-          Parse.Dispatcher.trigger "user:login"
-          Parse.Dispatcher.trigger "user:change"
-          Parse.history.navigate "/account/setup", trigger: true
-
-        error: (error) =>
-          console.log error
-          @$("> #signup-modal #signup-modal-form .has-error").removeClass 'has-error'
-          @$("> #signup-modal #signup-modal-form button").removeProp "disabled"
+        error: (user, error) =>
+          @$("> #signup-modal #signup-modal-form button").button "reset"
           msg = switch error.code
             when 125  then i18nDevise.errors.invalid_email_format
             when 202  then i18nDevise.errors.username_taken

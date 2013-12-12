@@ -15,8 +15,8 @@ define [
     el: "#main"
 
     events:
-      "submit form#signup-form"       : "signUp"
-      "click .btn-facebook"                 : "logInWithFacebook"
+      "submit form#signup-form"  : "signUp"
+      "click .btn-facebook"      : "logInWithFacebook"
 
     render: =>
       @$el.html JST["src/js/templates/user/signup.jst"](i18nCommon: i18nCommon, i18nDevise: i18nDevise)
@@ -28,6 +28,7 @@ define [
     signUp: (e) =>
       e.preventDefault()
       @$("#signup-form button").button "loading"
+      @$("#signup-form .has-error").removeClass 'has-error'
       email = @$("#signup-username").val()
       password = @$("#signup-password").val()
       user_type = if @$(".type-group :checked").prop('id') is 'signup-tenant' then 'tenant' else 'manager'
@@ -35,21 +36,9 @@ define [
         success: (user) =>
           @$("#signup-form button").button "reset"
 
-          # Skip the user-setup phase, as we will not have anything to add.
-          # Only extra things we need are the profile and notifications.
-
-          profile = user.get("profile")
-          profile.set "email", user.get("email")
-
-          Parse.User.current().set "profile", profile
-          Parse.User.current().notifications = new NotificationList
-
-          Parse.Dispatcher.trigger "user:login"
-          Parse.Dispatcher.trigger "user:change"
-          Parse.history.navigate "/account/setup", trigger: true
+          Parse.Dispatcher.trigger "user:loginStart"
 
         error: (user, error) =>
-          @$("#signup-form .has-error").removeClass 'has-error'
           @$("#signup-form button").button "reset"
           msg = switch error.code
             when 125  then i18nDevise.errors.invalid_email_format

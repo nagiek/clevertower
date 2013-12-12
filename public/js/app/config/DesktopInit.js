@@ -456,8 +456,10 @@
           _this.networkSetup();
         }
         _this.notifications = new NotificationList;
-        return _this.notifications.query.find().then(function(notifs) {
-          return _this.notifications.add(notifs);
+        return _this.notifications.query.find({
+          success: function(notifs) {
+            return _this.notifications.add(notifs);
+          }
         });
       });
     };

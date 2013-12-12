@@ -26,6 +26,7 @@ define [
       "click .done" : "done"
 
     initialize : (attrs) ->
+      @listenTo Parse.Dispatcher, "user:logout", -> Parse.history.navigate("/", true)
       @skip = false
     
     clear: =>

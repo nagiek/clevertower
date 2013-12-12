@@ -540,7 +540,7 @@ require [
       # Notifications.
       # Set up after we have set the property and network.
       @notifications = new NotificationList
-      @notifications.query.find().then (notifs) => @notifications.add notifs
+      @notifications.query.find(success: (notifs) => @notifications.add notifs)
 
   Parse.User::networkSetup = ->
 

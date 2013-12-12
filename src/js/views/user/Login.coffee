@@ -24,7 +24,8 @@ define [
 
     logIn: (e) =>
       e.preventDefault()
-      @$("> #login-modal #login-modal-form button").prop "disabled", "disabled"
+      @$("> #login-modal #login-modal-form button").button "loading"
+      @$("> #login-modal #login-modal-form  .has-error").removeClass 'has-error'
       email = @$("#login-modal-username").val()
       password = @$("#login-modal-password").val()
       Parse.User.logIn email, password,
@@ -32,10 +33,10 @@ define [
           @$('> #login-modal').modal('hide')
           Parse.Dispatcher.trigger "user:loginStart"
 
-        error: (error) =>
-          @$("> #login-modal #login-modal-form button").removeProp "disabled"
-          @$('> #login-modal #login-modal-form .username-group').addClass('error')
-          @$('> #login-modal #login-modal-form .password-group').addClass('error')
+        error: (user, error) =>
+          @$("> #login-modal #login-modal-form button").button "reset"
+          @$('> #login-modal #login-modal-form .username-group').addClass('has-error')
+          @$('> #login-modal #login-modal-form .password-group').addClass('has-error')
 
           msg = switch error.code
             when -1   then i18nDevise.errors.fields_missing

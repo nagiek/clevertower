@@ -24,10 +24,10 @@ define [
 
     resetPassword: (e) =>
       e.preventDefault()
+      @$('> #reset-password-modal').find('.has-error').removeClass('has-error')
       Parse.User.requestPasswordReset $("#reset-email").val(),
         success: =>
           new Alert event: 'reset-password', message: i18nDevise.messages.password_reset
-          @$('> #reset-password-modal').find('.has-error').removeClass('has-error')
           @$('> #reset-password-modal').modal('hide')
         error: (error) =>
           msg = switch error.code
