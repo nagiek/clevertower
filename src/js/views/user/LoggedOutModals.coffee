@@ -76,7 +76,7 @@ define [
 
     logIn: (e) =>
       e.preventDefault()
-      @$("> #login-modal #login-modal-form button").button "loading"
+      @$("> #login-modal #login-modal-form button.save").button "loading"
       @$("> #login-modal #login-modal-form .has-error").removeClass 'has-error'
       email = @$("#login-modal-username").val()
       password = @$("#login-modal-password").val()
@@ -87,7 +87,7 @@ define [
 
         error: (user, error) =>
           console.log error
-          @$("> #login-modal #login-modal-form button").button "reset"
+          @$("> #login-modal #login-modal-form button.save").button "reset"
           @$('> #login-modal #login-modal-form .username-group').addClass('has-error')
           @$('> #login-modal #login-modal-form .password-group').addClass('has-error')
 
@@ -99,8 +99,11 @@ define [
 
     logInWithFacebook : (e) =>  
       e.preventDefault()
+      @$("button.btn-facebook").button "loading"
       Parse.FacebookUtils.logIn Parse.App.fbPerms,
         success: (user) =>
+
+          @$("button.btn-facebook").button "reset"
 
           # We don't know if this is a signup or a login. 
           @$('> #login-modal').modal('hide')
@@ -148,11 +151,13 @@ define [
                 else 
                   Parse.Dispatcher.trigger "user:loginEnd"
 
-        error: (user, error) => console.log error
+        error: (user, error) =>
+          console.log error
+          @$("button.btn-facebook").button "reset"
             
     signUp: (e) =>
       e.preventDefault()
-      @$("> #signup-modal #signup-modal-form button").button "loading"
+      @$("> #signup-modal #signup-modal-form button.save").button "loading"
       @$("> #signup-modal #signup-modal-form .has-error").removeClass 'has-error'
       email = @$("#signup-modal-username").val()
       password = @$("#signup-modal-password").val()
@@ -160,7 +165,7 @@ define [
       Parse.User.signUp email, password, { user_type: user_type, email: email, ACL: new Parse.ACL() },
         success: (user) =>
           @$('> #signup-modal').modal('hide')
-          @$("> #signup-modal #signup-modal-form button").button "reset"
+          @$("> #signup-modal #signup-modal-form button.save").button "reset"
 
           # I thought we could skip the user-setup phase, as we will not have 
           # anything to add and the only extra things were profile and notifications.
@@ -177,7 +182,7 @@ define [
           Parse.Dispatcher.trigger "user:loginStart"
 
         error: (user, error) =>
-          @$("> #signup-modal #signup-modal-form button").button "reset"
+          @$("> #signup-modal #signup-modal-form button.save").button "reset"
           msg = switch error.code
             when 125  then i18nDevise.errors.invalid_email_format
             when 202  then i18nDevise.errors.username_taken

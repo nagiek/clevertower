@@ -8,11 +8,9 @@
     
     <header class="header page-header photo-float thumbnail-float elastic-float">
       <hgroup class="inline-block align-top">
-        <a href="<%= baseUrl %>">
-          <h1 class="property-title"><%= title %></h1>
-          <h2 class="inline-block"><%= i18nLease.attributes.lease_on_unit %> <span class="unit-title"><%= unitTitle %></span></h2>
-          <h4 class="inline-block"><span class="start-date"><%= startDate %></span> - <span class="end-date"><%= endDate %></span></h4>
-        </a>
+        <h1 class="property-title"><a href="<%= baseUrl %>"><%= title %></a></h1>
+        <h2 class="inline-block"><%= i18nLease.attributes.lease_on_unit %> <span class="unit-title"><%= unitTitle %></span></h2>
+        <h4 class="inline-block"><span class="start-date"><%= startDate %></span> - <span class="end-date"><%= endDate %></span></h4>
       </hgroup>
       <ul class="inline-block align-top list-inline right-sm col-md-offset-1">
         <li>

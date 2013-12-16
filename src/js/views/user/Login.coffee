@@ -24,7 +24,7 @@ define [
 
     logIn: (e) =>
       e.preventDefault()
-      @$("> #login-modal #login-modal-form button").button "loading"
+      @$("> #login-modal #login-modal-form button.save").button "loading"
       @$("> #login-modal #login-modal-form  .has-error").removeClass 'has-error'
       email = @$("#login-modal-username").val()
       password = @$("#login-modal-password").val()
@@ -34,7 +34,7 @@ define [
           Parse.Dispatcher.trigger "user:loginStart"
 
         error: (user, error) =>
-          @$("> #login-modal #login-modal-form button").button "reset"
+          @$("> #login-modal #login-modal-form button.save").button "reset"
           @$('> #login-modal #login-modal-form .username-group').addClass('has-error')
           @$('> #login-modal #login-modal-form .password-group').addClass('has-error')
 

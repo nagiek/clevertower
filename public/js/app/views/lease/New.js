@@ -115,24 +115,12 @@
           if (_this.forNetwork && Parse.User.current()) {
             new Parse.Query("Tenant").equalTo("lease", _this.model).include("profile").find().then(function(objs) {
               if (_this.property) {
-                _this.property.tenants.add(_this.model);
+                return _this.property.tenants.add(objs);
               } else {
-                Parse.User.current().get("network").tenants.add(_this.model);
-              }
-              if (Parse.User.current().get("network")) {
                 return Parse.User.current().get("network").tenants.add(objs);
               }
             });
-            return require(["views/lease/Show"], function(ShowLeaseView) {
-              new ShowLeaseView({
-                model: _this.model,
-                property: _this.model.get("property"),
-                forNetwork: _this.forNetwork,
-                baseUrl: _this.baseUrl
-              }).render();
-              Parse.history.navigate("" + _this.baseUrl + "/leases/" + model.id);
-              return _this.clear();
-            });
+            return Parse.history.navigate("" + _this.baseUrl + "/leases/" + model.id, true);
           } else {
             vars = {
               lease: model,
@@ -260,7 +248,10 @@
         this.$('.has-error').removeClass('has-error');
         attrs = this.model.scrub(data.lease);
         newUnit = false;
-        if (data.unit && data.unit.id !== "") {
+        if (this.unit) {
+          attrs.unit = this.unit;
+          attrs.unit.set(unit.scrub(data.unit.attributes));
+        } else if (data.unit && data.unit.id) {
           if (this.property) {
             if (data.unit.id === "-1") {
               unit = new Unit(data.unit.attributes);

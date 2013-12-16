@@ -27,19 +27,19 @@ define [
 
     signUp: (e) =>
       e.preventDefault()
-      @$("#signup-form button").button "loading"
+      @$("#signup-form button.save").button "loading"
       @$("#signup-form .has-error").removeClass 'has-error'
       email = @$("#signup-username").val()
       password = @$("#signup-password").val()
       user_type = if @$(".type-group :checked").prop('id') is 'signup-tenant' then 'tenant' else 'manager'
       Parse.User.signUp email, password, { user_type: user_type, email: email, ACL: new Parse.ACL() },
         success: (user) =>
-          @$("#signup-form button").button "reset"
+          @$("#signup-form button.save").button "reset"
 
           Parse.Dispatcher.trigger "user:loginStart"
 
         error: (user, error) =>
-          @$("#signup-form button").button "reset"
+          @$("#signup-form button.save").button "reset"
           msg = switch error.code
             when 125  then i18nDevise.errors.invalid_email_format
             when 202  then i18nDevise.errors.username_taken
@@ -57,8 +57,10 @@ define [
 
     logInWithFacebook : (e) =>  
       e.preventDefault()
+      @$("button.btn-facebook").button "loading"
       Parse.FacebookUtils.logIn Parse.App.fbPerms,
         success: (user) =>
+          @$("button.btn-facebook").button "reset"
 
           # We don't know if this is a signup or a login. 
           @$('> #login-modal').modal('hide')
@@ -105,3 +107,5 @@ define [
                   Parse.Dispatcher.trigger "user:loginEnd"
 
         error: (error) =>
+          console.log error
+          @$("button.btn-facebook").button "reset"

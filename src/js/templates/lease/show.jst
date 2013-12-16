@@ -1,9 +1,9 @@
 <header class="clearfix">
-  <hgroup class="left-md">
+  <hgroup class="left-sm">
     <h2><%= i18nLease.attributes.lease_on_unit %> <span id="unit-title"><%= title %></span></h2>
     <h4><%= start_date %> - <%= end_date %></h4>
   </hgroup>
-  <ul class="left-sm col-md-offset-1 list-inline">
+  <ul class="left-md right-sm col-md-offset-1 list-inline">
     <li>
       <a href="<%= baseUrl %>/leases/<%= objectId %>/edit" class="btn btn-default">
       <%= i18nCommon.actions.edit %>
@@ -27,7 +27,7 @@
   </ul>
 </header>
 <div class="row">
-  <div class="col-md-9">
+  <div class="col-md-<% if (isMgr) { %>9<% } else { %>12<% } %>">
     <div>
       <h3><%= i18nLease.form.tenants %></h3> 
       <p class="empty"><%= i18nLease.empty.tenants %></p>

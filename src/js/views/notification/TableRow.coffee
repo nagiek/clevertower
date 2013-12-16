@@ -16,7 +16,8 @@ define [
     events:
       'click a.unclicked' : 'handleClick'
       'click .accept' : 'accept'
-      'click .ignore' : 'reject'
+      'click .ignore' : 'ignore'
+      'click .reject' : 'reject'
       'click .undo' : 'undo'
         
     initialize: ->
@@ -32,7 +33,7 @@ define [
       return unless actionItem
       @model.add hidden: [Parse.User.current().id]
       @markAsClicked()
-      @$(".photo-float").html "<div>" + @model.accepted() + "</div>"
+      @render()
 
       # Until req.object.original lands for Cloud Code, have to pass in new status.
       actionItem.save(newStatus: "current").then ->
@@ -43,24 +44,32 @@ define [
             lease: @model.get("lease")
         else if @model.className is "Manager" then Parse.User.current().set("network", @model.get("network"))
 
-    reject: (e) =>
+    ignore: (e) =>
       # Don't modify the action item, just hide the request.
+      @model.add hidden: [Parse.User.current().id]
+      @model.save null, patch: true
+      @render()
+
+    reject: (e) =>
       actionItem = if @model.get("tenant") then @model.get("tenant") else @model.get("manager")
       actionItem.destroy() if actionItem
       @model.destroy()
-
+  
     undo: (e) =>
       # Don't modify the action item, just hide the request.
-      @model.remove clicked: [Parse.User.current().id]
+      @model.remove hidden: [Parse.User.current().id]
       @model.save null, patch: true
       @render()
-  
+
     markAsClicked: (e) =>
       @model.add clicked: [Parse.User.current().id]
       @model.save null, patch: true
 
     # Re-render the contents of the property item.
     render: =>
+      clicked = _.contains @model.get("clicked"), Parse.User.current().id
+      hidden = _.contains @model.get("hidden"), Parse.User.current().id
+
       channels = @model.get "channels"
       network = @model.get "network"
       property = @model.get "property"
@@ -85,11 +94,18 @@ define [
           icon = 'calendar'
           photo_src = profile.cover("thumb")
 
+      if clicked
+        text = @model.accepted()
+      else if hidden
+        text = @model.ignored() + "<small>(<a href='#' class='undo'>" + i18nCommon.actions.undo + "</a>)</small>"
+      else
+        text = @model.text()
+
       vars = 
         timeAgo: moment(@model.createdAt).fromNow()
-        text: @model.text()
+        text: text
         url: url
-        clicked: _.contains @model.get("clicked"), Parse.User.current()
+        clicked: clicked
         icon: icon
         photo_src: photo_src
         i18nCommon: i18nCommon

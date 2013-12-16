@@ -13,9 +13,11 @@
 <fieldset>
   <div class="form-group">
     <label for="listing-rent" class="control-label col-sm-2"><%= i18nListing.fields.rent %></label>
-    <div class="input-group col-sm-3 col-md-2">
-      <span class="input-group-addon">$</span>
-      <input type="number" class="form-control" name="listing[rent]" id="listing-rent" maxlength="12" required="required" value="<%= listing.rent %>" />
+    <div class="col-sm-3 col-md-2">
+      <div class="input-group">
+        <span class="input-group-addon">$</span>
+        <input type="number" class="form-control" name="listing[rent]" id="listing-rent" maxlength="12" required="required" value="<%= listing.rent %>" />
+      </div>
     </div>
   </div>
 

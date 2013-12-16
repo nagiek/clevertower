@@ -103,15 +103,15 @@ define [
         if @forNetwork and Parse.User.current()
           new Parse.Query("Tenant").equalTo("lease", @model).include("profile").find()
           .then (objs) =>
-            if @property then @property.tenants.add @model else Parse.User.current().get("network").tenants.add @model
             # Add tenants to the network collection, if it exists.
-            Parse.User.current().get("network").tenants.add objs if Parse.User.current().get("network")
+            if @property then @property.tenants.add objs else Parse.User.current().get("network").tenants.add objs
           
-          require ["views/lease/Show"], (ShowLeaseView) =>
-            # Alert the user and move on
-            new ShowLeaseView(model: @model, property: @model.get("property"), forNetwork: @forNetwork, baseUrl: @baseUrl).render()
-            Parse.history.navigate "#{@baseUrl}/leases/#{model.id}"
-            @clear()
+          Parse.history.navigate "#{@baseUrl}/leases/#{model.id}", true
+          # require ["views/lease/Show"], (ShowLeaseView) =>
+          #   # Alert the user and move on
+          #   new ShowLeaseView(model: @model, property: @model.get("property"), forNetwork: @forNetwork, baseUrl: @baseUrl).render()
+            
+          #   @clear()
 
         else 
           vars = 
@@ -225,7 +225,10 @@ define [
       newUnit = false
 
       # Set unit
-      if data.unit and data.unit.id isnt ""
+      if @unit
+        attrs.unit = @unit
+        attrs.unit.set unit.scrub(data.unit.attributes)
+      else if data.unit and data.unit.id
         if @property
           if data.unit.id is "-1"
             unit = new Unit data.unit.attributes

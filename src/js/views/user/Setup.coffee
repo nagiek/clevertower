@@ -23,7 +23,6 @@ define [
       "click #user-type-group input" : "changeSubView"
       "click .accept" : "readyToMoveOn"
       "click .skip-this-step" : "skipThisStep"
-      "click .done" : "done"
 
     initialize : (attrs) ->
       @listenTo Parse.Dispatcher, "user:logout", -> Parse.history.navigate("/", true)
@@ -39,14 +38,7 @@ define [
       @skip = true
       @render()
 
-    readyToMoveOn: =>
-      console.log "readyToMoveOn"
-      @$(".done").removeProp "disabled"
-
-    done: =>
-      e.preventDefault()
-      @skip = true
-      @render()
+    readyToMoveOn: => @$(".done").removeProp "disabled"
 
     render: =>
 

@@ -5,7 +5,7 @@ obj || (obj = {});
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
 with (obj) {
-__p += '<form id="units">\n  <header class="clearfix">\n    <h2 class="left-md">' +
+__p += '<form id="units">\n  <header class="clearfix">\n    <h2 class="left-sm">' +
 ((__t = ( i18nProperty.menu.building )) == null ? '' : __t) +
 '</h2>\n    <!-- <div class="well form-inline form-condensed left-lg">\n      <div class="form-group">\n        <div class="control-label">' +
 ((__t = ( i18nCommon.dates.date )) == null ? '' : __t) +

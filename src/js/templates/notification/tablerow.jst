@@ -3,19 +3,25 @@
     <img src="<%= photo_src %>" alt="<%= i18nCommon.notifications.img %>" width="64" height="64">
   </div>
   <div class="photo-float thumbnail-float">
-    <p><%= text %></p>
+    <p class="text"><%= text %></p>
     <small><span class="glyphicon glyphicon-<%= icon %>"></span> <%= timeAgo %></small>
   </div>
 </td>
 <td class="align-middle">
   <div class="btn-toolbar pull-right">
-    <div class="btn-group">
-      <button type="button" class="accept btn btn-primary"><%= i18nCommon.actions.confirm %></button>
-    </div>
-    <div class="btn-group">
-      <button type="button" class="ignore btn btn-default">
-        <% if (permanent) { %><%= i18nCommon.expressions.delete_forever %><% } else { %><%= i18nCommon.actions.ignore %><% } %>
-      </button>
-    </div>
+    <% if (withAction) { %>
+      <% if (clicked) { %>
+        <div class="btn-group">
+          <button type="button" class="reject btn btn-default"><%= i18nCommon.expressions.delete_forever %></button>
+        </div>
+      <% } else { %>
+        <div class="btn-group">
+          <button type="button" class="accept btn btn-primary"><%= i18nCommon.actions.confirm %></button>
+        </div>
+        <div class="btn-group">
+          <button type="button" class="ignore btn btn-default"><%= i18nCommon.actions.ignore %></button>
+        </div>
+      <% } %>
+    <% } %>
   </div>
 </td>

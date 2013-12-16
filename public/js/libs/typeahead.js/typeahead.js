@@ -1002,6 +1002,7 @@
                 position: "absolute",
                 top: "0",
                 left: "0",
+                width: "100%",
                 borderColor: "transparent",
                 boxShadow: "none"
             },
@@ -1014,6 +1015,7 @@
                 position: "absolute",
                 top: "100%",
                 left: "0",
+                width: "100%",
                 zIndex: "1000",
                 display: "none"
             }

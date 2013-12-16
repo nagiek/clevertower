@@ -31,7 +31,7 @@ define [
       return unless actionItem
       @model.add hidden: [Parse.User.current().id]
       @markAsClicked()
-      @$(".photo-float").html "<div>" + @model.accepted() + "</div>"
+      @render()
 
       # Until req.object.original lands for Cloud Code, have to pass in new status.
       actionItem.save(newStatus: "current").then ->
@@ -44,9 +44,9 @@ define [
 
     ignore: (e) =>
       # Don't modify the action item, just hide the request.
-      @$(".photo-float").html "<div>" + @model.ignored() + "</div><small>(<a href='#' class='undo'>" + i18nCommon.actions.undo + "</a>)</small>"
       @model.add hidden: [Parse.User.current().id]
       @model.save null, patch: true
+      @render()
 
     undo: (e) =>
       # Don't modify the action item, just hide the request.
@@ -60,6 +60,9 @@ define [
   
     # Re-render the contents of the property item.
     render: =>
+      clicked = _.contains @model.get("clicked"), Parse.User.current().id
+      hidden = _.contains @model.get("hidden"), Parse.User.current().id
+
       channels = @model.get "channels"
       network = @model.get "network"
       property = @model.get "property"
@@ -84,11 +87,18 @@ define [
           icon = 'calendar'
           photo_src = profile.cover("thumb")
 
+      if clicked
+        text = @model.accepted()
+      else if hidden
+        text = @model.ignored() + "<small>(<a href='#' class='undo'>" + i18nCommon.actions.undo + "</a>)</small>"
+      else
+        text = @model.text()
+
       vars = 
         timeAgo: moment(@model.createdAt).fromNow()
-        text: @model.text()
+        text: text
         url: url
-        clicked: _.contains @model.get("clicked"), Parse.User.current()
+        clicked: clicked
         icon: icon
         photo_src: photo_src
         i18nCommon: i18nCommon

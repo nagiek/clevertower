@@ -5,7 +5,7 @@ obj || (obj = {});
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
 with (obj) {
-__p += '<header class="clearfix">\n  <hgroup class="left-md">\n    <h2>' +
+__p += '<header class="clearfix">\n  <hgroup class="left-sm">\n    <h2>' +
 ((__t = ( i18nLease.attributes.lease_on_unit )) == null ? '' : __t) +
 ' <span id="unit-title">' +
 ((__t = ( title )) == null ? '' : __t) +
@@ -13,7 +13,7 @@ __p += '<header class="clearfix">\n  <hgroup class="left-md">\n    <h2>' +
 ((__t = ( start_date )) == null ? '' : __t) +
 ' - ' +
 ((__t = ( end_date )) == null ? '' : __t) +
-'</h4>\n  </hgroup>\n  <ul class="left-sm col-md-offset-1 list-inline">\n    <li>\n      <a href="' +
+'</h4>\n  </hgroup>\n  <ul class="left-md right-sm col-md-offset-1 list-inline">\n    <li>\n      <a href="' +
 ((__t = ( baseUrl )) == null ? '' : __t) +
 '/leases/' +
 ((__t = ( objectId )) == null ? '' : __t) +
@@ -31,7 +31,13 @@ __p += '<header class="clearfix">\n  <hgroup class="left-md">\n    <h2>' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '/extend"\n          class="btn btn-default extend"\n          rel="tooltip"\n          data-original-title="' +
 ((__t = ( i18nLease.actions.extend )) == null ? '' : __t) +
-'">\n        <span class="glyphicon glyphicon-repeat"></span>\n      </a>\n    </li>\n  </ul>\n</header>\n<div class="row">\n  <div class="col-md-9">\n    <div>\n      <h3>' +
+'">\n        <span class="glyphicon glyphicon-repeat"></span>\n      </a>\n    </li>\n  </ul>\n</header>\n<div class="row">\n  <div class="col-md-';
+ if (isMgr) { ;
+__p += '9';
+ } else { ;
+__p += '12';
+ } ;
+__p += '">\n    <div>\n      <h3>' +
 ((__t = ( i18nLease.form.tenants )) == null ? '' : __t) +
 '</h3> \n      <p class="empty">' +
 ((__t = ( i18nLease.empty.tenants )) == null ? '' : __t) +

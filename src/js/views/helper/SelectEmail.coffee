@@ -35,7 +35,7 @@ define [
             https://www.googleapis.com/auth/userinfo.profile%20
             https://www.google.com/m8/feeds&
           state=#{window.location.pathname}&
-          redirect_uri=http://localhost:3000/oauth2callback
+          redirect_uri=http://clevertower.dev:3000/oauth2callback
           """
 
       # Log in to Google to before getting the contacts
@@ -85,12 +85,12 @@ define [
 
     prev: => 
       @index -= 100
-      if @index is 1 then @$('.prev').prop "disabled", true
+      if @index is 1 then @$('.prev').addClass("disabled").prop("disabled", true)
       @query()
     next: ->
       @index += 100
       @query()
-      @$('.prev').prop "disabled", false
+      @$('.prev').removeClass("disabled").removeProp("disabled")
 
     addOne: (c) =>
       @$list.append new ContactView(modal: @, view: @view, model: c).render().el

@@ -95,8 +95,19 @@
   }
 }
 
+#primary-nav {
+  margin-right:15px;
+}
+
 .navbar-form {
   float:none;
+  border: none;
+  margin:0;
+  padding: 10px 0;
+  @media (min-width:@screen-sm-min) {
+    margin-top:4px;
+    padding: 0;
+  }
 }
 .navbar-brand {
   padding-top:4px;
@@ -113,19 +124,20 @@
 }
 
 #sidebar-toggle {
-  margin-right: 20px;
+}
+
+.navbar-toggle {
+  position:static;
+  top: auto;
+  right: auto;
+  margin-top: 4px;
   float:left;
   .icon-bar {
     width:14px;
   }
-}
-
-.navbar-toggle {
-  margin-top: 4px;
-  position:static;
-  top: auto;
-  right: auto;
-  width: 40px;
+  @media (max-width:@screen-xs-max) {
+    margin-right: 20px;
+  }
 }
 
 #user-menu {
@@ -143,23 +155,13 @@
   }
 }
 
-// Override default styles for 767px to 979px
-// @media (min-width:@screen-md) and (max-width:@screen-lg) {
-//   .nav-collapse,
-//   .nav-collapse.collapse {
-//     clear: none;
-//     height: auto;
-//     overflow: visible;
-//   }
-//   .nav-collapse .navbar-form {
-//     padding: 0;
-//     border: none;
-//   }
-// }
+.navbar-collapse.in {
+  overflow-y: visible;
+}
 
 @media (min-width:@screen-md) {
-  .nav-collapse,
-  .nav-collapse.collapse {
+  .navbar-collapse,
+  .navbar-collapse.collapse {
     display:block;
   }
 }
@@ -167,9 +169,9 @@
 
 @media (min-width:@screen-md) {
   #search-menu {
-    width:270px; // input-xlarge width
+    width:400px;
   }
-  .nav-collapse, .nav-collapse.collapse {
+  .navbar-collapse, .navbar-collapse.collapse {
     width: 100%;
   }
 }

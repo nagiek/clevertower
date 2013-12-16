@@ -6,10 +6,12 @@
           <a href="<%= baseUrl %>">
             <img src="<%= cover %>" alt="Profile" class="img-rounded profile-picture">
           </a>
-          <div class="photo-actions">
-            <button type="button" role="button" class="edit-property-picture btn btn-default btn-sm">
-              <span class="glyphicon glyphicon-picture"></span>
-            </button>
+          <div class="hidden-xs hidden-sm">
+            <div class="photo-actions">
+              <button type="button" role="button" class="edit-property-picture btn btn-default btn-sm">
+                <span class="glyphicon glyphicon-picture"></span>
+              </button>
+            </div>
           </div>
         </div>
         
@@ -21,17 +23,17 @@
               </a>
             </li>
             <li class="right-sm">
-              <a class="btn btn-link"  href="<%= publicUrl %>" rel="tooltip" data-placement="bottom" title="<%= i18nProperty.menu.view_public %>">
-                <span class="glyphicon glyphicon-signout"></span>
+              <a class="btn btn-link" href="<%= publicUrl %>" rel="tooltip" data-placement="bottom" title="<%= i18nProperty.menu.view_public %>">
+                <span class="glyphicon glyphicon-log-out"></span>
               </a>
             </li>
-            <li class="visible-sm">
-              <button type="button" role="button" class="edit-property-picture btn btn-link">
+            <li class="visible-xs visible-sm">
+              <button type="button" role="button" class="edit-property-picture btn btn-link" rel="tooltip" data-placement="bottom" title="<%= i18nCommon.actions.edit_picture %>">
                 <span class="glyphicon glyphicon-picture"></span>
               </button>
             </li>
             <% if (!hasNetwork) { %>
-              <li class="pull-right hidden-sm">
+              <li class="pull-right hidden-xs hidden-sm">
                 <a href="/network/new" class="btn btn-default">
                   <span class="glyphicon glyphicon-arrow-up"></span> <%= i18nCommon.actions.upgrade %>
                 </a>

@@ -160,6 +160,13 @@
 // @dropdownLinkColorHover:        @white;
 // @dropdownLinkBackgroundHover:   @linkColor;
 
+// Navbar collapse
+
+// Point at which the navbar becomes uncollapsed
+@grid-float-breakpoint:     @screen-md-min;
+// Point at which the navbar begins collapsing
+@grid-float-breakpoint-max: (@grid-float-breakpoint - 1);
+
 // Navbar
 // -------------------------
 @navbar-height:                 40px;
@@ -173,13 +180,14 @@
 
 // Sprite icons path
 // -------------------------
-@images-folder:               "../../img";
-@icon-sprite-path:            "@{images-folder}/icon/glyphicons-halflings.png";
-@icon-white-sprite-path:      "@{images-folder}/icon/glyphicons-halflings-white.png";
-@icon-gray-sprite-path:       "@{images-folder}/icon/glyphicons-gray.png";
-@icon-big-sprite-path:        "@{images-folder}/icon/glyphicons-big.png";
-@icon-big-white-sprite-path:  "@{images-folder}/icon/glyphicons-big-white.png";
-@icon-activity-sprite-path:   "@{images-folder}/icon/icons-post.png";
+@images-folder:               "../../img/";
+@icon-font-path:          	  "../../fonts/";
+@icon-sprite-path:            "@{images-folder}icon/glyphicons-halflings.png";
+@icon-white-sprite-path:      "@{images-folder}icon/glyphicons-halflings-white.png";
+@icon-gray-sprite-path:       "@{images-folder}icon/glyphicons-gray.png";
+@icon-big-sprite-path:        "@{images-folder}icon/glyphicons-big.png";
+@icon-big-white-sprite-path:  "@{images-folder}icon/glyphicons-big-white.png";
+@icon-activity-sprite-path:   "@{images-folder}icon/icons-post.png";
 
 
 // Images

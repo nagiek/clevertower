@@ -1,9 +1,9 @@
 <div class="thumbnail">
   <a href="/users/<%= objectId %>">
-    <div class="photo photo-thumbnail inline-block">
+    <div class="photo photo-thumbnail inline-block align-middle">
       <img src="<%= url %>" width="50" height="50">
     </div>
-    <div class="inline-block">
+    <div class="inline-block align-middle">
       <%= name %>
       <% if (current_user) { %><strong><small>(<%= i18nCommon.nouns.you %>)</small></strong><% } %>
     </div>
