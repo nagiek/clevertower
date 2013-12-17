@@ -30,16 +30,16 @@
 }
 
 .box-fill {
-  width:100% !important;;
-  height:100% !important;;
+  width:100% !important;
+  height:100% !important;
 }
 
 .width-fill {
-  width:100% !important;;
+  width:100% !important;
 }
 
 .height-fill {
-  height:100% !important;;
+  height:100% !important;
 }
 
 .mask {
@@ -120,7 +120,7 @@ ul.list-inline, ol.list-inline {
   }
 }
 
-@media (max-width: @screen-md) { 
+@media (max-width: @screen-sm-max) { 
   .three-column {
     -moz-column-count: 2;
     -moz-column-gap: 10px;
@@ -131,7 +131,7 @@ ul.list-inline, ol.list-inline {
   }
 }
 
-@media (max-width: @screen-sm) { 
+@media (max-width: @screen-xs-max) { 
   .two-column,
   .three-column {
     -moz-column-count: 1;
@@ -257,7 +257,7 @@ ul.list-inline, ol.list-inline {
 //   }
 // }
 
-@media (min-width: 1200px) {
+@media (min-width: @screen-lg-min) {
   .pull-right {
     &[class*="col-offset-"] {
       margin-left: percentage((1 / @grid-columns));;
@@ -276,7 +276,7 @@ ul.list-inline, ol.list-inline {
   }
 }
 
-@media (max-width: @screen-md) {
+@media (max-width: @screen-sm-max) {
   .pull-left,
   .pull-right {
     float: none;
@@ -287,9 +287,13 @@ ul.list-inline, ol.list-inline {
       margin-right:0;
     }
   }
+
+  .clearfix-md {
+    .clearfix()
+  }
 }
 
-@media (min-width:@screen-sm) {
+@media (min-width:@screen-sm-min) {
   .left-sm        { float:left;       }
   .right-sm       { float:right;      }
   .left-shift-sm  { margin-left: 10px; }

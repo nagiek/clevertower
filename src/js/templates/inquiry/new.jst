@@ -20,9 +20,7 @@
       <%= JST["src/js/templates/helper/field/tenant.jst"]({emails: false, i18nCommon: i18nCommon, label: i18nListing.form.inquiry_tenants}) %>
       <div class="form-group comments-group">
         <label for="inquiry-comments" class="control-label"><%= i18nListing.form.comments %></label>
-        <div class="controls">
-          <textarea name="inquiry[comments]" rows="2" class="col-md-12 form-control"></textarea>
-        </div>
+        <textarea name="inquiry[comments]" rows="2" class="form-control"></textarea>
       </div>
     </div>
     <div class="modal-footer">

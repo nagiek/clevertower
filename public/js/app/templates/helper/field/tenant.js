@@ -5,7 +5,7 @@ obj || (obj = {});
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
 with (obj) {
-__p += '<div class="emails-group"> <!-- remove .form-group for formatting.-->\n  ';
+__p += '<div class="emails-group form-group"> <!-- remove .form-group for formatting.-->\n  ';
  if (label) { ;
 __p += '<label for="emails" class="control-label">' +
 ((__t = ( label )) == null ? '' : __t) +

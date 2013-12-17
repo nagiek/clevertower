@@ -305,17 +305,14 @@ textarea,
   }
 }
 
-@media (min-width: @screen-sm) and (max-width: @screen-md) {
-  #search-menu {
-    width:100%;
-    .navbar-form {
-      padding: 0;
-      margin-bottom: 3px;
-    }
+@media (min-width: @screen-sm-min) and (max-width: @screen-md-max) {
+  .navbar-form {
+    padding: 0;
+    margin-bottom: 3px;
   }
 }
 
-@media (min-width: @screen-md) {
+@media (min-width: @screen-md-min) {
   .form-search {
     .form-control {
       padding-left: 36px;
