@@ -14,7 +14,7 @@ define [
     defaults:
       title:          ""
       activity_type:  "new_post"
-      likeCount:      0
+      likersCount:    0
       commentCount:   0
       isEvent:        false
 
@@ -79,14 +79,19 @@ define [
     property: -> if @collection and @collection.property then @collection.property else @get("property")
 
 
+    # User functions
+    # -----------------
+
+    likedByUser: -> Parse.User.current() and Parse.User.current().get("profile").likes.any (l) => l.id is @id
+    followedByUser: -> @profile().followedByUser()
+
+
     # Display functions
     # -----------------
 
-    name: -> if @linkedToProperty() then @property().get("title") else @profile().name()
-    profilePic: (size) -> if @linkedToProperty() then @property().cover(size) else @profile().cover(size)
-    profileUrl: -> if @linkedToProperty() then @property().publicUrl() else @profile().url()
-    linkedToProperty: -> @property() and not @profile()
-    liked: -> Parse.User.current() and Parse.User.current().get("profile").likes.some (l) => l.id is @id
+    name: -> @profile().name()
+    profilePic: (size) -> @profile().cover(size)
+    profileUrl: -> if @property() then @property().publicUrl() else @profile().url()
 
     title: ->
       switch @get "activity_type"
@@ -106,9 +111,8 @@ define [
 
     image: (size) ->
       switch @get("activity_type")
-        when "new_listing", "new_property" then @property().cover(size)
+        when "new_listing", "new_property","new_tenant", "new_manager" then @profile().cover(size)
         when "new_post", "new_photo" then @get("image") || false
-        when "new_tenant", "new_manager" then @profile().cover(size)
         else false
 
 

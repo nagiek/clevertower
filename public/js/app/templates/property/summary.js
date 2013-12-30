@@ -36,7 +36,7 @@ __p += '<div class="property">\n  <div class="photo photo-medium photo-elastic l
 '\n      </div>\n    </div>\n    -->\n    \n    <h2>\n      <a href="/properties/' +
 ((__t = ( objectId )) == null ? '' : __t) +
 '">' +
-((__t = ( title )) == null ? '' : __t) +
+((__t = ( profile.name )) == null ? '' : __t) +
 '</a>\n      ';
  if (init !== false) { ;
 __p += '\n        <a href="#" class="badge badge-info" rel="tooltip" data-original-title="' +

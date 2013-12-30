@@ -90,7 +90,7 @@ define [
         timeAgo: moment(@model.createdAt).fromNow()
         text: @model.text()
         url: url
-        clicked: _.contains @model.get("clicked"), Parse.User.current()
+        clicked: _.contains @model.get("clicked"), Parse.User.current().id
         icon: icon
         photo_src: photo_src
         i18nCommon: i18nCommon

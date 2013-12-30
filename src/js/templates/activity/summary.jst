@@ -32,15 +32,16 @@
       <li>
         <small>
           <a href="#" class="like-button">
-            <% if (liked) { %><%= i18nCommon.adjectives.liked %><% } else { %><%= i18nCommon.actions.like %><% } %>
+            <% if (likedByUser) { %><%= i18nCommon.adjectives.liked %>
+            <% } else { %><%= i18nCommon.actions.like %><% } %>
           </a>
         </small>
       </li>
       <li>
-        <a href="#" class="likers<% if (liked) { %> active<% } %>" >
+        <a href="#" class="likers<% if (likedByUser) { %> active<% } %>" >
           <i class="glyphicon glyphicon-thumbs-up"></i>
         </a>
-        <small class="like-count"><%= likeCount %></small>
+        <small class="likers-count"><%= likersCount %></small>
       </li>
       <!--
       <li>

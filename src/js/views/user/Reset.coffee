@@ -24,10 +24,12 @@ define [
 
     resetPassword: (e) =>
       e.preventDefault()
+      @$("> #reset-password-modal button.btn-primary").button "loading"
       @$('> #reset-password-modal').find('.has-error').removeClass('has-error')
       Parse.User.requestPasswordReset $("#reset-email").val(),
         success: =>
           new Alert event: 'reset-password', message: i18nDevise.messages.password_reset
+          @$("> #reset-password-modal button.btn-primary").button "reset"
           @$('> #reset-password-modal').modal('hide')
         error: (error) =>
           msg = switch error.code
@@ -35,5 +37,6 @@ define [
             when 205 then i18nDevise.errors.username_doesnt_exist
             else error.message
             
+          @$("> #reset-password-modal button.btn-primary").button "reset"
           @$("#reset-email-group").addClass('has-error')
           new Alert event: 'reset-password', fade: false, message: msg, type: 'danger'

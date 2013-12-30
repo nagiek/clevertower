@@ -48,13 +48,51 @@ define [
 
       @view = attrs.view
 
-      @listenTo Parse.Dispatcher, "user:logout", @clear
-
       @model = new Activity
         activity_type: "new_post"
         profile: Parse.User.current().get("profile")
         public: true
         isEvent: false
+
+      @listenTo Parse.Dispatcher, "user:logout", @clear
+
+      # Model may change, so have to re-establish listeners on render.
+      @listenTo @model, 'invalid', @handleError
+
+      @listenTo Parse.User.current(), "change:property change:network", @handlePossiblePropertyAdd
+      if Parse.User.current().get("network")
+        @listenTo Parse.User.current().get("network").properties, "add", @handlePropertyAdd
+
+      @listenTo @model, "change:image", @renderImage
+
+      @listenTo @model, "change:property", =>
+
+        if @model.get "property"
+
+          # We are private by default when posting to the property. Adjust model accordingly.
+          @togglePostPrivate()
+          @$("#activity-profile-pic").prop "src", @model.get("property").cover("tiny") unless @model.get "profile"
+          @marker.setVisible false
+          @$('#property-options').removeClass 'hide'
+          # @model.get("property").marker.setZIndex 100
+          @view.map.setOptions
+            draggable: false
+            center: @model.get("property").GPoint()
+            zoom: 14
+        else
+          @model.set "public", true
+          @marker.setVisible true
+          @$('#property-options').addClass 'hide'
+          @view.map.setOptions
+            draggable: true
+
+      @listenTo @model, "change:profile", =>
+        if @model.get("property") and not @model.get("profile")
+          # Property profile pic
+          @$("#activity-profile-pic").prop "src", @model.get("property").cover("tiny")
+        else
+          # User profile pic
+          @$("#activity-profile-pic").prop "src", Parse.User.current().get("profile").cover("tiny")
 
 
     # Mid level functions
@@ -166,8 +204,8 @@ define [
       #               """
 
     handlePossiblePropertyAdd : =>
-      if Parse.User.current().get("network")
-        if Parse.User.current().get("network").properties.length > 0 then @handlePropertyAdd()
+      if Parse.User.current().get("network") 
+        if Parse.User.current().get("network").properties and Parse.User.current().get("network").properties.length > 0 then @handlePropertyAdd()
         else 
           @handleNoProperty()
           # We have just created a network, therefore add the listeners.
@@ -191,44 +229,6 @@ define [
 
       # Put listener in render, after the "undelegateEvents" call
       @dragListener = google.maps.event.addListener @view.map, 'dragend', @updateCenter
-
-      # Model may change, so have to re-establish listeners on render.
-      @listenTo @model, 'invalid', @handleError
-
-      @listenTo Parse.User.current(), "change:property change:network", @handlePossiblePropertyAdd
-      if Parse.User.current().get("network")
-        @listenTo Parse.User.current().get("network").properties, "add", @handlePropertyAdd
-
-      @listenTo @model, "change:image", @renderImage
-
-      @listenTo @model, "change:property", =>
-
-        if @model.get "property"
-
-          # We are private by default when posting to the property. Adjust model accordingly.
-          @togglePostPrivate()
-          @$("#activity-profile-pic").prop "src", @model.get("property").cover("tiny") unless @model.get "profile"
-          @marker.setVisible false
-          @$('#property-options').removeClass 'hide'
-          # @model.get("property").marker.setZIndex 100
-          @view.map.setOptions
-            draggable: false
-            center: @model.get("property").GPoint()
-            zoom: 14
-        else
-          @model.set "public", true
-          @marker.setVisible true
-          @$('#property-options').addClass 'hide'
-          @view.map.setOptions
-            draggable: true
-
-      @listenTo @model, "change:profile", =>
-        if @model.get("property") and not @model.get("profile")
-          # Property profile pic
-          @$("#activity-profile-pic").prop "src", @model.get("property").cover("tiny")
-        else
-          # User profile pic
-          @$("#activity-profile-pic").prop "src", Parse.User.current().get("profile").cover("tiny")
 
       @updateCenter()
 

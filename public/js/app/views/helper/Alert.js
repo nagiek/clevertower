@@ -67,11 +67,11 @@
         var _this = this;
 
         this.$el.removeClass("in");
-        return setTimeout(150, function() {
+        return setTimeout(function() {
           _this.remove();
           _this.undelegateEvents();
           return delete _this;
-        });
+        }, 150);
       };
 
       AlertView.prototype.setError = function(msg) {

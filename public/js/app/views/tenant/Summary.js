@@ -102,7 +102,7 @@
             });
           }
           if (unit) {
-            return this.$(".unit").html(unit.get("title"));
+            return this.$(".unit > small").html(unit.get("title"));
           }
         }
       };

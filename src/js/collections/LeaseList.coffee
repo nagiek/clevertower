@@ -8,9 +8,9 @@ define [
   class LeaseList extends Parse.Collection
 
     model: Lease
-    query: new Parse.Query("Lease").include("unit")
       
     initialize: (models, attrs) ->
+      @query = new Parse.Query("Lease").include("unit")
       if attrs.property
         @property = attrs.property
         @query.equalTo "property", @property

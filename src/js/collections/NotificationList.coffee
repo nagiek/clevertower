@@ -21,7 +21,7 @@ define [
       @query = new Parse.Query(Notification)
                 .containedIn("channels", channels)
                 .include('network') # For mgr invitations.
-                .include('property')
+                .include('property.profile')
                 .include('profile')
                 .include('tenant')
                 .include('unit')

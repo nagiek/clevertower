@@ -20,7 +20,7 @@ define [
       @baseUrl = attrs.baseUrl
       @forNetwork = attrs.forNetwork
 
-      @vars = property: @model, lease: undefined, baseUrl: @baseUrl, forNetwork: @forNetwork
+      @vars = property: @model, profile: @model.get("profile"), lease: undefined, baseUrl: @baseUrl, forNetwork: @forNetwork
       
       if attrs.params and attrs.params.leaseId
         @vars.leaseId = attrs.params.leaseId

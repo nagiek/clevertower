@@ -29,8 +29,9 @@ define [
     # Re-render the contents of the property item.
     render: ->
       vars = _.merge @model.toJSON(),
+        profile: @model.get("profile").toJSON()
         publicUrl: @model.publicUrl()
-        cover: @model.cover 'full'
+        cover: @model.get("profile").cover 'full'
         i18nProperty: i18nProperty
         i18nCommon: i18nCommon
       
@@ -44,7 +45,7 @@ define [
         type: "POST"
         dataType: "json"
         # fileInput: '#file-input'
-        filesContainer: _this.$('#preview-property-picture')
+        filesContainer: _this.$('#preview-profile-picture')
         multipart: false # Tell Fileupload to keep file as binary, as Parse only takes binary files.
         context: @$el
         add: (e, data) ->
@@ -55,15 +56,15 @@ define [
           delete data.headers['Content-Disposition']; # Parse does not accept this header.
         done: (e, data) =>
           file = data.result
-          @model.save image_thumb: file.url, image_profile: file.url, image_full: file.url
-          @$('#preview-property-picture img').prop('src', file.url)
+          @model.get("profile").set image_thumb: file.url, image_profile: file.url, image_full: file.url
+          @$('#preview-profile-picture img').prop('src', file.url)
           @$(".delete").removeClass("hide")
 
       @
     
     resetImage: =>
-      @model.save image_thumb: null, image_profile: null, image_full: null
-      @$('#preview-property-picture img').prop('src', "/img/fallback/property-large.png")
+      @model.get("profile").set image_thumb: null, image_profile: null, image_full: null
+      @$('#preview-profile-picture img').prop('src', "/img/fallback/property-large.png")
       @$(".delete").addClass("hide")
 
     clear: =>

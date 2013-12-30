@@ -6,7 +6,9 @@ define [
   "moment"
   "collections/ActivityList"
   "collections/CommentList"
+  "collections/ProfileList"
   "models/Profile"
+  "views/profile/Summary"
   "views/profile/sub/Activity"
   "views/activity/BaseIndex"
   "i18n!nls/user"
@@ -14,7 +16,7 @@ define [
   'templates/profile/show'
   'templates/activity/modal'
   'templates/comment/summary'
-], ($, _, Parse, infinity, moment, ActivityList, CommentList, Profile, ActivityView, BaseIndexActivityView, i18nUser, i18nCommon) ->
+], ($, _, Parse, infinity, moment, ActivityList, CommentList, ProfileList, Profile, SummaryProfileView, ActivityView, BaseIndexActivityView, i18nUser, i18nCommon) ->
 
   class ShowProfileView extends Parse.View
   
@@ -22,6 +24,9 @@ define [
 
     events:
       'click .edit-profile-picture'         : 'editProfilePicture'
+      'click #stats-likes-link'             : 'swtichToLikesTab'
+      'click #followers-link'               : 'showFollowers'
+      'click #following-link'               : 'showFollowing'
       "submit #profile-picture-upload-form" : 'save'
 
     initialize: (attrs) ->
@@ -43,8 +48,19 @@ define [
         @model.likes = new ActivityList [], profile: @model
         @model.likes.query = @model.relation("likes").query().include("property")
 
+      unless @model.following
+        @model.following = new ProfileList [], {}
+        @model.following.query = @model.relation("following").query()
+
+      unless @model.followers
+        @model.followers = new ProfileList [], {}
+        @model.followers.query = @model.relation("followers").query()
+
       @listenTo @model.likes, "add",    @incLikesCount
       @listenTo @model.likes, "remove", @decLikesCount
+
+      @on "profile:follow", (p) => _.each(@subviews, (view) -> view.trigger("profile:follow", p))
+      @on "profile:unfollow", (p) => _.each(@subviews, (view) -> view.trigger("profile:unfollow", p))
 
       @file = false
 
@@ -59,6 +75,13 @@ define [
 
       @markAsLiked(activity) if Parse.User.current().get("profile").likes.find (l) => l.id is model.id
 
+    checkIfFollowing: (activity) =>
+      data = activity.data()
+
+      model = @model.activity.at(data.index)
+
+      @markAsFollowing(activity) if Parse.User.current().get("profile").following.find (p) => p.id is model.get("profile").id
+
     # switchToPublic: =>
     #   if @subView !instanceof ActivityView
     #     @current = false
@@ -68,18 +91,18 @@ define [
 
     incLikesCount: (count) => 
       count = Number(@$("#like-count").html()) + 1
-      console.log count
       @$("#like-count").html count
 
     decLikesCount: (count) =>
       count = Number(@$("#like-count").html()) - 1
-      console.log count
       @$("#like-count").html count
 
     render: ->      
       vars = _.merge @model.toJSON(),
         cover: @model.cover 'profile'
-        likeCount: @model.get("likeCount") || 0
+        likesCount: @model.get("likesCount") || 0
+        followersCount: @model.get("followersCount") || 0
+        followingCount: @model.get("followingCount") || 0
         name: @model.name()
         i18nUser: i18nUser
         i18nCommon: i18nCommon
@@ -118,6 +141,16 @@ define [
       @undelegateEvents()
       @stopListening()
       delete this
+
+    swtichToLikesTab: (e) -> 
+      e.preventDefault()
+      @$("#likes-link").click()
+    showFollowers: (e) ->
+      e.preventDefault()
+      if @model.followers.length is 0 then @model.followers.fetch(add: true, success: @showFollowersModal) else @showFollowersModal(@model.followers)
+    showFollowing: (e) ->
+      e.preventDefault()
+      if @model.following.length is 0 then @model.following.fetch(add: true, success: @showFollowingModal) else @showFollowingModal(@model.following)
     
     editProfilePicture: ->
       
@@ -154,6 +187,28 @@ define [
 
             
         @$('#edit-profile-picture-modal').modal()
+
+    showFollowersModal: (collection) =>
+      $("#people-modal h3.modal-title").html i18nCommon.activity.people_following(@model.name())
+      if collection.length > 0
+        $("#people-modal .modal-body").html "<ul class='list-unstyled' />"
+        collection.each @appendPerson
+      else
+        $("#people-modal .modal-body").html "<p>#{i18nCommon.activity.following_no_one(@model.name())}</p>"
+      $("#people-modal").modal()
+
+    showFollowingModal: (collection) =>
+      $("#people-modal h3.modal-title").html i18nCommon.activity.people_followed_by(@model.name())
+      if collection.length > 0
+        $("#people-modal .modal-body").html "<ul class='list-unstyled' />"
+        collection.each @appendPerson
+      else
+        $("#people-modal .modal-body").html "<p>#{i18nCommon.activity.followed_by_no_one(@model.name())}</p>"
+      $("#people-modal").modal()
+
+    appendPerson: (p) =>
+      view = new SummaryProfileView(model: p, view: @).render().$el
+      $("#people-modal .modal-body ul").append view
 
     save: (e) =>
       e.preventDefault()

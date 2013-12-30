@@ -45,7 +45,7 @@
       },
       title: function() {
         if (this.get("property")) {
-          return this.get("property").get("title");
+          return this.get("property").get("profile").name();
         } else {
           return this.get("network").get("title");
         }

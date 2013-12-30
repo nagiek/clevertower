@@ -37,7 +37,8 @@
           });
         }
         vars = {
-          property: this.model.toJSON(),
+          property: this.model.attributes,
+          profile: this.model.get("profile").toJSON(),
           i18nProperty: i18nProperty,
           i18nCommon: i18nCommon
         };

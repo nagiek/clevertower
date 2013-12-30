@@ -9,7 +9,7 @@ define [
   "i18n!nls/property"
   "templates/property/new/map"
   "gmaps"
-], ($, _, Parse, PropertyList, PropertyResult, Alert, i18nCommon, i18nProperty) ->
+], ($, _, Parse, PropertyResultsList, PropertyResult, Alert, i18nCommon, i18nProperty) ->
 
   # GMapView
   # anytime the points change or the center changes
@@ -36,7 +36,7 @@ define [
       @listenTo @wizard, "wizard:finish wizard:cancel", @clear
       
       window.geocoder = window.geocoder || new google.maps.Geocoder
-      @results = new PropertyList [], forNetwork: @forNetwork
+      @results = new PropertyResultsList [], forNetwork: @forNetwork
       @listenTo @results, "reset", @processResults
 
       # Geolocation
@@ -120,7 +120,7 @@ define [
         @model.set @parse(results[0])
         @$searchInput.val @model.get('formatted_address')
         
-        @results.setCenter new Parse.GeoPoint(results[0].geometry.location.lat(), results[0].geometry.location.lng())
+        @results.setCenter(new Parse.GeoPoint(results[0].geometry.location.lat(), results[0].geometry.location.lng()))
         @results.fetch()
 
       else

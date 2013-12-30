@@ -47,10 +47,11 @@ define [
       
     clear: ->
       @$el.removeClass "in"
-      setTimeout 150, =>
+      setTimeout =>
         @remove()
         @undelegateEvents()
         delete this
+      , 150
 
     setError: (msg) ->
       @vars.message = msg

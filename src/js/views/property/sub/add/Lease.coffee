@@ -21,7 +21,7 @@ define [
       @forNetwork = attrs.forNetwork
       @params = attrs.params
       
-      vars = property: @model, network: @model.get("network")
+      vars = property: @model, profile: @model.get("profile"), network: @model.get("network")
       if attrs.params and attrs.params.unit
         # vars.unit = @model.units.get attrs.params.unit # Won't complete in time
         vars.unit = __type: "Pointer", className: "Unit", objectId: attrs.params.unit.id

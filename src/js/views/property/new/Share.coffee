@@ -40,8 +40,8 @@ define [
 
       vars = 
         title: i18nProperty.activity.new_property()
-        cover: @model.cover("full")
-        profilePic: Parse.User.current().get("profile").cover("tiny")
+        cover: @model.get("profile").cover("full")
+        profilePic: @model.get("profile").cover("tiny")
         fbLinked: Parse.User.current()._isLinked("facebook")
         i18nProperty: i18nProperty
         i18nCommon: i18nCommon

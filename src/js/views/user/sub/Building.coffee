@@ -39,6 +39,7 @@ define [
         i18nLease: i18nLease
         i18nUser: i18nUser
         property: if Parse.User.current().get("property") then Parse.User.current().get("property").toJSON() else false
+        profile: if Parse.User.current().get("property") then Parse.User.current().get("property").get("profile").toJSON() else false
         unit: if Parse.User.current().get("unit") then Parse.User.current().get("unit").toJSON() else false
         lease: if Parse.User.current().get("lease") then Parse.User.current().get("lease").toJSON() else false
       

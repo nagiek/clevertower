@@ -34,7 +34,7 @@ define [
     # We may not have a @property, so be specific.
     prepopulate: (property) =>
       units = @select((u) -> u.get("property").id is property.id)
-      if units.length is 0 then unit = new Unit property: property 
+      if units.length is 0 then unit = new Unit property: property, profile: property.get("profile")
       else 
         
         unit = _.last(units).clone()

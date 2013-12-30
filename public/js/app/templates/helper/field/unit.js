@@ -101,7 +101,7 @@ __p += '">\n      <select name="unit[id]" class="form-control unit-select" requi
 ((__t = ( required )) == null ? '' : __t) +
 '">\n        <option value="">' +
 ((__t = ( i18nCommon.form.select.select_value )) == null ? '' : __t) +
-'</option>\n      </select>\n    </div>\n    <div class="col-xs-4';
+'</option>\n      </select>\n    </div>\n    <div class="col-xs-6';
  if (horiz) { ;
 __p += ' col-sm-2';
  } ;

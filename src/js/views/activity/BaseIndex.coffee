@@ -7,6 +7,8 @@ define [
   'collections/ActivityList'
   'collections/CommentList'
   "models/Comment"
+  "views/helper/Alert"
+  "views/profile/Summary"
   "views/listing/Search"
   "views/activity/New"
   "i18n!nls/listing"
@@ -18,7 +20,7 @@ define [
   # 'masonry'
   # 'jqueryui'
   "gmaps"
-], ($, _, Parse, infinity, moment, ActivityList, CommentList, Comment, ListingSearchView, NewActivityView, i18nListing, i18nCommon) ->
+], ($, _, Parse, infinity, moment, ActivityList, CommentList, Comment, Alert, SummaryProfileView, ListingSearchView, NewActivityView, i18nListing, i18nCommon) ->
 
   class BaseActivityIndexView extends Parse.View
   
@@ -30,6 +32,8 @@ define [
       # Activity events
       "click .like-button"                      : "likeOrLoginFromActivity"
       "click .likers"                           : "getLikersFromActivity"
+      # "click .follow-button"                    : "followOrLoginFromActivity"
+      # "click .followers"                        : "getFollowersFromActivity"
       "submit form.new-comment-form"            : 'getCommentDataToPost' # "postComment"
     
     initialize : (attrs) =>
@@ -43,9 +47,11 @@ define [
       @listenTo Parse.Dispatcher, "user:login", => 
         # Check for likes.
         @listenTo Parse.User.current().get("profile").likes, "reset", @checkForLikes
+        @listenTo Parse.User.current().get("profile").following, "reset", @checkForFollowing
 
         # Get the user's personal likes.
         if Parse.User.current().get("profile").likes.length is 0 then Parse.User.current().get("profile").likes.fetch()
+        if Parse.User.current().get("profile").following.length is 0 then Parse.User.current().get("profile").following.fetch()
 
         # Add comment bar
         _.each @listViews, (lv) -> 
@@ -68,6 +74,9 @@ define [
       @on "model:view", @showModal
       @on "view:change", @clear
 
+      @on "profile:follow", @markProfileActivitiesAsFollowing
+      @on "profile:unfollow", @markProfileActivitiesAsNotFollowing
+
       @on "view:exhausted", =>
         @moreToDisplay = false
         @$loading.html i18nCommon.activity.exhausted
@@ -85,9 +94,11 @@ define [
 
       if Parse.User.current()
         @listenTo Parse.User.current().get("profile").likes, "reset", @checkForLikes
+        @listenTo Parse.User.current().get("profile").following, "reset", @checkForFollowing
 
         # Get the user's personal likes.
         if Parse.User.current().get("profile").likes.length is 0 then Parse.User.current().get("profile").likes.fetch()
+        if Parse.User.current().get("profile").following.length is 0 then Parse.User.current().get("profile").following.fetch()
 
     checkForLikes: ->
       Parse.User.current().get("profile").likes.each (l) =>
@@ -97,6 +108,25 @@ define [
             @markAsLiked activity[0].$el
             # return false to avoid checking the other column.
             false
+
+    checkForFollowing: =>
+      Parse.User.current().get("profile").following.each @markProfileActivitiesAsFollowing
+
+    markProfileActivitiesAsNotFollowing: (p) =>
+      _.each @listViews, (lv) =>
+        activity = lv.find("> div > .profile-#{p.id}")
+        if activity.length > 0
+          _.each activity (a) => @markAsNotFollowing a.$el
+          # return false to avoid checking the other column.
+        false
+
+    markProfileActivitiesAsFollowing: (p) =>
+      _.each @listViews, (lv) =>
+        activity = lv.find("> div > .profile-#{p.id}")
+        if activity.length > 0
+          _.each activity (a) => @markAsFollowing a.$el
+          # return false to avoid checking the other column.
+        false
 
     redoSearch : =>
 
@@ -126,7 +156,7 @@ define [
     # Adding from Collections
     # -----------------------
 
-    renderTemplate: (model, liked, linked) =>
+    renderTemplate: (model, likedByUser, followedByUser, linked) =>
 
       # Create new element with extra details for infinity.js
       if linked
@@ -139,20 +169,34 @@ define [
         propertyIndex = false
 
       # Possible for the same activity to be on the page twice (in two different tabs)
-      $el = $ """
-      <div class="thumbnail clearfix activity activity-#{model.id} fade in"
-        data-id="#{model.id}"
-        data-liked="#{liked}"
-        data-property-index="#{propertyIndex}" 
-        data-property-id="#{propertyId}"
-        data-index="#{model.pos()}"
-        data-lat="#{model.GPoint().lat()}"
-        data-lng="#{model.GPoint().lng()}"
-        data-collection="#{collection}"
-        data-profile="#{model.profilePic("tiny")}"
-        data-image="#{model.image("full")}"
-      />
-      """
+      $el = $ "<div class='thumbnail clearfix activity activity-#{model.id} profile-#{model.get('profile').id} fade in' />"
+
+        # data-id="#{model.id}"
+        # data-liked="#{likedByUser}"
+        # data-following="#{followedByUser}"
+        # data-linked="#{linked}"
+        # data-property-index="#{propertyIndex}" 
+        # data-property-id="#{propertyId}"
+        # data-index="#{model.pos()}"
+        # data-lat="#{model.GPoint().lat()}"
+        # data-lng="#{model.GPoint().lng()}"
+        # data-collection="#{collection}"
+        # data-profile="#{model.profilePic("tiny")}"
+        # data-image="#{model.image("full")}"
+
+      $el.data
+        id: model.id
+        liked: likedByUser
+        following: followedByUser
+        linked: linked
+        "property-index": propertyIndex
+        "property-id": propertyId
+        index: model.pos()
+        lat: model.GPoint().lat()
+        lng: model.GPoint().lng()
+        collection: collection
+        profile: model.profilePic("tiny")
+        image: model.image("full")
 
       vars = _.merge model.toJSON(), 
         url: model.url()
@@ -162,10 +206,12 @@ define [
         postDate: moment(model.createdAt).fromNow()
         postImage: model.image("full") # Keep this in for template logic.
         profileUrl: model.profileUrl()
-        liked: liked
         icon: model.icon()
         name: model.name()
+        likedByUser: likedByUser
+        followedByUser: followedByUser
         current: Parse.User.current()
+        isSelf: collection is "user" or (Parse.User.current() and model.get("profile").id is Parse.User.current().get("profile").id)
         i18nCommon: i18nCommon
         pos: if @onMap then (if linked then propertyIndex else model.pos()) % 20 else false # This will be incremented in the template.
 
@@ -180,7 +226,7 @@ define [
         image: false
         isEvent: false
         endDate: false
-        likeCount: 0
+        likersCount: 0
         commentCount: 0
 
       # Override default title.
@@ -188,31 +234,11 @@ define [
 
       $el.html JST["src/js/templates/activity/summary.jst"](vars)
 
-      @checkIfLiked($el) if Parse.User.current() and not liked
+      if Parse.User.current()
+        @checkIfLiked($el) unless likedByUser
+        @checkIfFollowing($el) unless followedByUser
 
       $el
-
-    prependNewPost: (a) =>
-      if a.get("property")
-        # view = new ActivityView
-        #   model: a
-        #   # marker: a.get("property").marker
-        #   pos: a.get("property").pos()
-        #   view: @
-        #   linkedToProperty: true
-        #   liked: false
-        # item = new infinity.ListItem view.render().$el
-        item = new infinity.ListItem @renderTemplate(a, false, true)
-        item.marker = a.get("property").marker
-        a.get("property").marker.items.push item
-        @listViews[@shortestColumnIndex()].prepend item
-      else
-        # view = new ActivityView
-        #   model: a
-        #   view: @
-        #   liked: false
-        # # @listViews[@shortestColumnIndex()].prepend new infinity.ListItem view.render().$el
-        @listViews[@shortestColumnIndex()].prepend @renderTemplate(a, false, false)
 
     addOneActivity: (a) =>
       # view = new ActivityView
@@ -220,7 +246,7 @@ define [
       #   view: @
       #   liked: Parse.User.current() and Parse.User.current().get("profile").likes.find (l) -> l.id is a.id
       # @listViews[@shortestColumnIndex()].append view.render().$el
-      @listViews[@shortestColumnIndex()].append @renderTemplate(a, a.liked(), false)
+      @listViews[@shortestColumnIndex()].append @renderTemplate(a, a.likedByUser(), a.followedByUser(), false)
       # @$list.append view.render().el
 
     # Pagination
@@ -265,71 +291,152 @@ define [
     # Activity
     # --------------
 
-    like : (model, activity, button, data) =>
-      likes = Number activity.find(".like-count").html()
+    like : (model, activity, button, data, undo) =>
+      likes = Number activity.find(".likers-count").html()
       
       if data.liked
         button.removeClass "active"
-        activity.find(".like-count").html(likes - 1)
-        activity.find(".likers").removeClass "active"
-        activity.find(".like-button").text i18nCommon.actions.like
-        activity.data "liked", false
+        activity.find(".likers-count").html(likes - 1)
+        @markAsUnliked activity
         # activity.attr "data-liked", "false"
-        model.increment likeCount: -1
-        Parse.User.current().increment likeCount: -1
-        model.relation("likers").remove Parse.User.current().get("profile")
+
+        Parse.User.current().get("profile").increment likesCount: -1
         Parse.User.current().get("profile").relation("likes").remove model
         Parse.User.current().get("profile").likes.remove model
+
+        unless undo 
+          Parse.Cloud.run "Unlike", {
+            likee: model.id
+            liker: Parse.User.current().get("profile").id
+          },
+          error: (res) => 
+            # Undo what we did.
+            @like(model, activity, button, data, true)
+            console.log res
+        else new Alert event: 'like', fade: false, message: i18nCommon.errors.not_saved, type: 'danger'
+        
       else
         button.addClass "active"
-        activity.find(".like-count").html(likes + 1)
+        activity.find(".likers-count").html(likes + 1)
         @markAsLiked activity
-        model.increment likeCount: +1
-        Parse.User.current().increment likeCount: -1
-        model.relation("likers").add Parse.User.current().get("profile")
+
+        Parse.User.current().get("profile").increment likesCount: -1
         Parse.User.current().get("profile").relation("likes").add model
         # Adding to a relation will somehow add to collection..?
         Parse.User.current().get("profile").likes.add model
-      Parse.Object.saveAll [model, Parse.User.current().get("profile")]
-
-
-    showLikers: (collection) ->
-      # visible = collection
-      # .chain()
-      # .select((c) => c.get("activity") and c.get("activity").id is model.id)
-      # .map((c) => c.get("profile"))
-      # .value()
-
-      if collection.length > 0
-        # profiles = _.uniq(visible, false, (v) -> v.id)
-        $("#people-modal .modal-body").html "<ul class='list-unstyled' />"
-        collection.each (p) ->
-          $("#people-modal .modal-body ul").append """
-            <li class="clearfix">
-              <div class="photo photo-thumbnail pull-left">
-                <a href="#{p.url()}">
-                  <img src="#{p.cover("thumb")}" height="50" width="50">
-                </a>
-              </div>
-              <div class="photo-float thumbnail-float">
-                <h4><a href="#{p.url()}">#{p.name()}</a></h4>
-              </div>
-            </li>
-          """
-        $("#people-modal").modal()
         
+        unless undo 
+          Parse.Cloud.run "Like", {
+            likee: model.id
+            liker: Parse.User.current().get("profile").id
+          },
+          # Optimistic saving.
+          # success: (res) => 
+          error: (res) => 
+            # Undo what we did.
+            @like(model, activity, button, data, true)
+            console.log res
+        else new Alert event: 'like', fade: false, message: i18nCommon.errors.not_saved, type: 'danger'
+
+      Parse.User.current().get("profile").save()
+
+    showLikersModal: (collection) =>
+      $("#people-modal h3.modal-title").html i18nCommon.activity.people_who_like_this
+      if collection.length > 0
+        $("#people-modal .modal-body").html "<ul class='list-unstyled' />"
+        collection.each @appendPerson
       else
-        $("#people-modal .modal-body ul").append """
-          <li>Be the first one to like this</li>
-        """
+        $("#people-modal .modal-body").html "<p>#{i18nCommon.activity.be_the_first_to_like_this}</p>"
+      $("#people-modal").modal()
+
+    appendPerson: (p) =>
+      view = new SummaryProfileView(model: p, view: @).render().$el
+      $("#people-modal .modal-body ul").append view
 
     # Used just for display, not the action.
-    markAsLiked: (activity) =>
+    markAsLiked: (activity) ->
       activity.find(".likers").addClass "active"
       activity.find(".like-button").text i18nCommon.adjectives.liked
       activity.data "liked", true
       # activity.attr "data-liked", "true"
 
+    markAsUnliked: (activity) ->
+      activity.find(".likers").removeClass "active"
+      activity.find(".like-button").text i18nCommon.actions.like
+      activity.data "liked", false
+      # activity.attr "data-liked", "false"
+
+
+    follow : (model, activity, buttonParent, data, undo) =>
+
+      if data.following
+        buttonParent.html """<button type="button" class="btn btn-primary follow">#{i18nCommon.actions.follow}</button>"""
+        @markAsNotFollowing(activity)
+
+        Parse.User.current().get("profile").increment followingCount: -1
+        Parse.User.current().get("profile").relation("following").remove model.get("profile")
+        Parse.User.current().get("profile").following.remove model.get("profile")
+
+        # Unfollow all other items from this profile
+        @markProfileActivitiesAsNotFollowing(model.get("profile"))
+
+        # activity.attr "data-liked", "false"
+        unless undo
+          Parse.Cloud.run "Unfollow", {
+            followee: model.get("profile").id
+            follower: Parse.User.current().get("profile").id
+          },
+          # Optimistic saving.
+          # success: (res) => 
+          error: (res) => 
+            # Undo what we did.
+            @follow(model, activity, buttonParent, data, true)
+            console.log res
+        else new Alert event: 'like', fade: false, message: i18nCommon.errors.not_saved, type: 'danger'
+
+      else
+        # extra span to break up .btn + .btn spacing
+        # Don't put in the unfollow button right away.
+        buttonParent.html("""<span class="btn btn-primary following">#{i18nCommon.verbs.following}</span>""")
+        setTimeout ->
+          buttonParent.append """
+            <span></span> 
+            <button type="button" class="btn btn-default follow unfollow">#{i18nCommon.actions.unfollow}</button>
+          """
+        , 500
+
+        @markAsFollowing(activity)
+
+        Parse.User.current().get("profile").increment followingCount: +1
+        Parse.User.current().get("profile").relation("following").add model.get("profile")
+        # Adding to a relation will somehow add to collection..?
+        Parse.User.current().get("profile").following.add model.get("profile")
+
+        unless undo
+          Parse.Cloud.run "Follow", {
+            followee: model.get("profile").id
+            follower: Parse.User.current().get("profile").id
+          },
+          # Optimistic saving.
+          # success: (res) => 
+          error: (res) => 
+            # Undo what we did.
+            @follow(model, activity, buttonParent, data, true)
+            console.log res
+        else new Alert event: 'like', fade: false, message: i18nCommon.errors.not_saved, type: 'danger'
+        
+        # Follow all other items from this profile
+        @markProfileActivitiesAsFollowing(model.get("profile"))
+
+      Parse.User.current().get("profile").save()
+
+    markAsNotFollowing: (activity) =>
+      # activity.find(".follow-button").text i18nCommon.verbs.following
+      activity.data "following", false
+
+    markAsFollowing: (activity) =>
+      # activity.find(".follow-button").text i18nCommon.verbs.following
+      activity.data "following", true
 
     # Comments
     # --------
@@ -480,12 +587,13 @@ define [
       $(document).on "keydown", @controlModalIfOpen
       $('#view-content-modal').on 'click', 'ul.list-comments a', @closeModal
       $('#view-content-modal').on 'click', 'a.profile-link', @closeModal
-      $('#view-content-modal').on 'click', 'btn.get-comments', @getModalComments
+      $('#view-content-modal').on 'click', 'button.follow', @followOrLoginFromModal
+      $('#view-content-modal').on 'click', 'button.get-comments', @getModalComments
       $('#view-content-modal').on 'click', '.left', @prevModal
       $('#view-content-modal').on 'click', '.right', @nextModal
       $('#view-content-modal').on 'hide.bs.modal', @hideModal
-      $('#view-content-modal').on 'click', '.like-button', @likeOrLoginFromModal
-      $('#view-content-modal').on 'click', '.likers', @getLikersFromModal
+      $('#view-content-modal').on 'click', 'a.like-button', @likeOrLoginFromModal
+      $('#view-content-modal').on 'click', 'a.likers', @getLikersFromModal
       $('#view-content-modal').on 'submit', 'form', @postModalComment
 
     controlModalIfOpen : (e) =>
@@ -505,7 +613,7 @@ define [
 
     detachModalEvents: ->
       $(document).off "keydown"
-      $('#view-content-modal').off "hide click"
+      $('#view-content-modal').off "hide.bs.modal click submit"
       # $('#view-content-modal .caption a').off 'click'
       # $('#view-content-modal .left').off 'click'
       # $('#view-content-modal .right').off 'click'
@@ -530,7 +638,7 @@ define [
 
       # Add a building link if applicable.
       # Cache result
-      property = if model.get("property") and not model.linkedToProperty() then model.get("property") else false
+      property = if model.get("property") then model.get("property") else false
 
       vars = _.merge model.toJSON(), 
         url: model.url()
@@ -538,16 +646,18 @@ define [
         start: moment(model.get("startDate")).format("LLL")
         end: moment(model.get("endDate")).format("LLL")
         postDate: moment(model.createdAt).fromNow()
-        liked: model.liked()
+        likedByUser: model.likedByUser()
+        followedByUser: model.followedByUser()
         postImage: model.image("full")
         icon: model.icon()
         name: model.name()
         profilePic: model.profilePic("thumb")
         propertyLinked: if property then true else false
         propertyTitle: if property then property.get("title") else false
-        propertyCover: if property then property.cover("tiny") else false
+        propertyCover: if property then property.get("profile").cover("tiny") else false
         propertyUrl: if property then property.publicUrl() else false
         current: Parse.User.current()
+        isSelf: Parse.User.current() and model.get("profile").id is Parse.User.current().get("profile").id
         i18nCommon: i18nCommon
 
       if Parse.User.current()
@@ -560,13 +670,17 @@ define [
         image: false
         isEvent: false
         endDate: false
-        likeCount: 0
+        likesCount: 0
         commentCount: 0
 
       # Override default title.
       vars.title = model.title()
 
       $("#view-content-modal").html JST["src/js/templates/activity/modal.jst"](vars)
+
+      $("#view-content-modal").find("> .modal-dialog > .activity").data
+        liked: model.likedByUser()
+        following: model.followedByUser()
 
       # Comments
       @$modalComments = $("#view-content-modal .list-comments")
@@ -625,12 +739,12 @@ define [
       activity = button.closest(".activity")
       data = activity.data()
 
-      likes = Number activity.find(".like-count").html()
+      likes = Number activity.find(".likers-count").html()
 
       model = if @modalCollection instanceof ActivityList then @modalCollection.at @modalIndex else @modalCollection[@modalIndex]
 
       if Parse.User.current()
-        @like model, activity, button, data
+        @like model, activity, button, data, false
 
         # Update our non-modal activity as well.
         _.each @listViews, (lv) =>
@@ -641,15 +755,13 @@ define [
             # Data is switched at this point, so reverse the if-block conditions order. 
             if data.liked
               $otherActivity.find(".like-button").addClass "active"
-              $otherActivity.find(".like-count").html(likes + 1)
+              $otherActivity.find(".likers-count").html(likes + 1)
               @markAsLiked $otherActivity
               
             else
               $otherActivity.find(".like-button").removeClass "active"
-              $otherActivity.find(".like-count").html(likes - 1)
-              $otherActivity.find(".likers").removeClass "active"
-              $otherActivity.find(".like-button").text i18nCommon.actions.like
-              $otherActivity.data "liked", false
+              $otherActivity.find(".likers-count").html(likes - 1)
+              @markAsUniked $otherActivity
 
             # return false to avoid checking the other column.
             false
@@ -663,7 +775,7 @@ define [
       model = if @modalCollection instanceof ActivityList then @modalCollection.at @modalIndex else @modalCollection[@modalIndex]
       
       model.prep("likers")
-      @listenToOnce model.likers, "reset", @showLikers
+      @listenToOnce model.likers, "reset", @showLikersModal
       model.likers.fetch()
 
     postModalComment : (e) =>
@@ -679,3 +791,16 @@ define [
       comment = @postComment activity, model
       # postComment will actually do this for us.
       # @renderOneModalComment comment
+
+
+    followOrLoginFromModal : (e) =>
+      e.preventDefault()
+      if Parse.User.current()
+        buttonParent = $(e.currentTarget).parent()
+        activity = button.closest(".activity")
+        data = activity.data()
+        model = if @modalCollection instanceof ActivityList then @modalCollection.at @modalIndex else @modalCollection[@modalIndex]
+
+        @follow model, activity, buttonParent, data, false
+      else
+        $("#signup-modal").modal()

@@ -70,7 +70,7 @@ define [
         else if Parse.User.current().get("property")
           unit = Parse.User.current().get("property").units.find((u) => u.id is @model.get("unit").id)
           
-        if unit then @$(".unit").html unit.get("title")
+        if unit then @$(".unit > small").html unit.get("title")
     
     kill: ->
       if confirm(i18nCommon.actions.confirm)

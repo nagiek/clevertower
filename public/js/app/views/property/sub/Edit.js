@@ -46,8 +46,8 @@
             type: 'danger'
           });
           switch (error.message) {
-            case 'title_missing':
-              return this.$('#property-title-group').addClass('has-error');
+            case 'name_missing':
+              return this.$('#property-profile-title-group').addClass('has-error');
           }
         });
       };
@@ -62,6 +62,7 @@
 
         vars = {
           property: _.defaults(this.model.attributes, Property.prototype.defaults),
+          profile: this.model.get("profile").toJSON(),
           i18nProperty: i18nProperty,
           i18nCommon: i18nCommon
         };
@@ -72,13 +73,16 @@
       };
 
       PropertyEditView.prototype.save = function(e) {
-        var attrs,
+        var attrs, data,
           _this = this;
 
         e.preventDefault();
         this.$('.has-error').removeClass('has-error');
         this.$('button.save').button("loading");
-        attrs = this.model.scrub(this.$('form').serializeObject().property);
+        data = this.$('form').serializeObject();
+        console.log(data);
+        this.model.get("profile").set(data.profile);
+        attrs = this.model.scrub(data.property);
         return this.model.save(attrs, {
           success: function(property) {
             _this.trigger("property:sync", property, _this);

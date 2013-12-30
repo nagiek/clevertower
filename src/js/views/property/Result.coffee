@@ -25,7 +25,7 @@ define [
     render: =>
       vars = 
         formatted_address: @model.get "formatted_address"
-        cover:             @model.cover('profile')
+        cover:             @model.get('profile').cover('profile')
         pos:               @model.pos() + 1
         publicUrl:         @model.publicUrl()
         i18nCommon:        i18nCommon

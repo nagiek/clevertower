@@ -83,7 +83,7 @@
     return window.google.maps;
   });
 
-  require(["jquery", "underscore", "backbone", "facebook", "models/Property", "models/Unit", "models/Lease", "models/Profile", "collections/ListingFeaturedList", "collections/ActivityList", "collections/CommentList", "collections/NotificationList", "routers/Desktop", "underscore.string", "json2", "bootstrap", "serializeObject", "typeahead", "masonry", "transit"], function($, _, Parse, FB, Property, Unit, Lease, Profile, FeaturedListingList, ActivityList, CommentList, NotificationList, AppRouter, _String) {
+  require(["jquery", "underscore", "backbone", "facebook", "models/Property", "models/Unit", "models/Lease", "models/Profile", "collections/ListingFeaturedList", "collections/ActivityList", "collections/CommentList", "collections/NotificationList", "collections/ProfileList", "routers/Desktop", "underscore.string", "json2", "bootstrap", "serializeObject", "typeahead", "masonry", "transit"], function($, _, Parse, FB, Property, Unit, Lease, Profile, FeaturedListingList, ActivityList, CommentList, NotificationList, ProfileList, AppRouter, _String) {
     var addOptions, eventSplitter, eventsApi, listenEvents, listenMethods, setOptions;
 
     eventSplitter = /\s+/;
@@ -193,36 +193,6 @@
       return this.set(models, _.extend({
         merge: false
       }, options, addOptions));
-    };
-    Parse.Collection.prototype.remove = function(models, options) {
-      var i, index, model, singular, _i, _len, _ref;
-
-      singular = !_.isArray(models);
-      models = (singular ? [models] : _.clone(models));
-      options || (options = {});
-      _ref = models.length;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        i = _ref[_i];
-        model = models[i] = this.get(models[i]);
-        if (!model) {
-          continue;
-        }
-        delete this._byId[model.id];
-        delete this._byId[model.cid];
-        index = this.indexOf(model);
-        this.models.splice(index, 1);
-        this.length--;
-        if (!options.silent) {
-          options.index = index;
-          model.trigger("remove", model, this, options);
-        }
-        this._removeReference(model);
-      }
-      if (singular) {
-        return models[0];
-      } else {
-        return models;
-      }
     };
     Parse.Collection.prototype.set = function(models, options) {
       var add, at, attrs, existing, i, id, l, merge, model, modelMap, order, orderedModels, remove, singular, sort, sortAttr, sortable, targetModel, toAdd, toRemove;
@@ -429,8 +399,8 @@
     Parse.User.prototype.setup = function() {
       var _this = this;
 
-      return new Parse.Query("_User").include('lease').include('unit').include('profile').include('property.role').include('property.mgrRole').include('network.role').equalTo("objectId", this.id).first().then(function(user) {
-        var network, profile;
+      return new Parse.Query("_User").include('lease').include('unit').include('profile').include('property.profile').include('property.role').include('property.mgrRole').include('network.role').equalTo("objectId", this.id).first().then(function(user) {
+        var network, profile, property;
 
         if (!user) {
           return;
@@ -440,6 +410,15 @@
           profile: profile
         });
         profile.likes.query = profile.relation("likes").query().include("property");
+        profile.following = new ProfileList([], {});
+        profile.following.query = profile.relation("following").query().include("property");
+        profile.followers = new ProfileList([], {});
+        profile.followers.query = profile.relation("followers").query().include("property");
+        profile.followingActivity = new ActivityList([], {});
+        profile.followingActivity.query.matchesQuery("profile", profile.relation("following").query());
+        profile.followingActivity.query.include("property");
+        profile.followingComments = new CommentList([], {});
+        profile.followingComments.query.matchesQuery("profile", profile.relation("following").query());
         _this.set("profile", profile);
         if (!_this.activity) {
           _this.activity = new ActivityList([], {});
@@ -449,7 +428,11 @@
         }
         _this.set("lease", user.get("lease"));
         _this.set("unit", user.get("unit"));
-        _this.set("property", user.get("property"));
+        property = user.get("property");
+        if (property) {
+          _this.set("property", property);
+          _this.propertySetup();
+        }
         network = user.get("network");
         if (network) {
           _this.set("network", network);
@@ -462,6 +445,19 @@
           }
         });
       });
+    };
+    Parse.User.prototype.propertySetup = function() {
+      var property;
+
+      property = this.get("property");
+      property.prep("units").fetch();
+      property.prep("activity");
+      property.prep("comments");
+      property.prep("managers");
+      property.prep("tenants");
+      property.prep("listings");
+      property.prep("applicants");
+      return property.prep("inquiries");
     };
     Parse.User.prototype.networkSetup = function() {
       var network, role,

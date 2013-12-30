@@ -25,19 +25,19 @@
 
       <hr>
 
-      <% if (property.email) { %>
-        <%= i18nProperty.fields.email %>
-        <%= property.email %>
+      <% if (profile.email) { %>
+        <%= i18nCommon.fields.email %>
+        <%= profile.email %>
       <% } %>
 
-      <% if (property.phone) { %>
-        <%= i18nProperty.fields.phone %>
-        <%= property.phone %>
+      <% if (profile.phone) { %>
+        <%= i18nCommon.fields.phone %>
+        <%= profile.phone %>
       <% } %>
 
-      <% if (property.website) { %>
-        <%= i18nProperty.fields.website %>
-        <%= property.website %>
+      <% if (profile.website) { %>
+        <%= i18nCommon.fields.website %>
+        <%= profile.website %>
       <% } %>
 
     </div>
@@ -49,7 +49,7 @@
 
       <header class="clearfix">
         <hgroup class="left-sm">
-          <h1 class="inline"><%= property.title %></h1><span class="h2">, </span>
+          <h1 class="inline"><%= profile.name %></h1><span class="h2">, </span>
           <h4 class="inline"><a href="/outside/<%= place %>"><%= property.locality %></a></h4>
         </hgroup>
         <ul class="right-sm actions list-unstyled">
@@ -73,7 +73,7 @@
             <%= i18nCommon.classes.Photos %>
           </a>
         </li>
-        <% if (property.description) { %>
+        <% if (profile.bio) { %>
           <li><a href="#about" id="about-link"><%= i18nCommon.prepositions.About %></a></li>
         <% } %>
         <li><a href="#amenities" id="amenities-link"><%= i18nProperty.form.amenities %></a></li>
@@ -111,9 +111,9 @@
             </li>
           </ul>
         </div>
-        <% if (property.description) { %>
+        <% if (profile.bio) { %>
           <div class="tab-pane" id="about">
-            <p><%= property.description %></p>
+            <p><%= profile.bio %></p>
           </div>
         <% } %>
         <div class="tab-pane" id="amenities">

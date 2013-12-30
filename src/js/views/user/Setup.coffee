@@ -45,8 +45,6 @@ define [
       # Check if the user has any outstanding requests and present them. 
       if @skip or Parse.User.current().notifications.visibleWithAction().length is 0
 
-        console.log "skip"
-
         type = Parse.User.current().get("user_type") || "tenant"
         vars =
           type: type
@@ -82,10 +80,7 @@ define [
 
     changeSubView: (e) ->
 
-
       type = if e.currentTarget.defaultValue is "manager" then "tenant" else "manager"
-      console.log type
-      debugger
       if type is "manager"
         view = new NewNetworkView(model: Parse.User.current().get("network"))
         @$(".content").removeClass("in").html(view.render().el).delay(150).addClass("in")

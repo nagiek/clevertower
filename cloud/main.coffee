@@ -1,5 +1,73 @@
-# Parse.Cloud functions are asynchronous!!
-# Always use promises with expensive functions, like queries.
+# Social functions
+# ----------
+# Used to set protected properties on Activity and Profile objects.
+Parse.Cloud.define "Follow", (req, res) ->
+  Parse.Cloud.useMasterKey()
+  (new Parse.Query "Profile").equalTo('objectId', req.params.followee).first()
+    .then (model) ->
+      if model
+        model.increment followersCount: +1
+        profile = new Parse.Object("Profile")
+        profile.id = req.params.follower
+        model.relation("likers").add profile
+        model.save().then ->
+          res.success()
+        , -> res.error "model_not_saved"
+      else 
+        res.error "bad_query"
+    , -> res.error "bad_query"
+
+Parse.Cloud.define "Unfollow", (req, res) ->
+  Parse.Cloud.useMasterKey()
+  (new Parse.Query "Profile").equalTo('objectId', req.params.followee).first()
+    .then (model) ->
+      if model
+        model.increment followersCount: -1
+        profile = new Parse.Object("Profile")
+        profile.id = req.params.follower
+        model.relation("likers").remove profile
+        model.save().then ->
+          res.success()
+        , -> res.error "model_not_saved"
+      else 
+        res.error "bad_query"
+    , -> res.error "bad_query"
+
+
+Parse.Cloud.define "Like", (req, res) ->
+  Parse.Cloud.useMasterKey()
+  (new Parse.Query "Activity").equalTo('objectId', req.params.likee).first()
+    .then (model) ->
+      if model
+        model.increment likersCount: +1
+        profile = new Parse.Object("Profile")
+        profile.id = req.params.liker
+        model.relation("likers").add profile
+        model.save().then ->
+          res.success()
+        , -> res.error "model_not_saved"
+      else 
+        res.error "bad_query"
+    , -> res.error "bad_query"
+
+Parse.Cloud.define "Unlike", (req, res) ->
+  Parse.Cloud.useMasterKey()
+  (new Parse.Query "Activity").equalTo('objectId', req.params.likee).first()
+    .then (model) ->
+      if model
+        model.increment likersCount: -1
+        profile = new Parse.Object("Profile")
+        profile.id = req.params.liker
+        model.relation("likers").remove profile
+        model.save().then ->
+          res.success()
+        , -> res.error "model_not_saved"
+      else 
+        res.error "bad_query"
+    , -> res.error "bad_query"
+
+
+
 
 # PromoteToFeatured
 # ----------
@@ -100,6 +168,7 @@ Parse.Cloud.define "AddTenants", (req, res) ->
   # Lease/Applicant Role
   (new Parse.Query className)
   .include('role')
+  .include("property.profile")
   .include("property.role")
   .include("property.mgrRole")
   .include("property.network.role")
@@ -110,7 +179,7 @@ Parse.Cloud.define "AddTenants", (req, res) ->
     property = leaseOrInquiry.get "property"
     propRole = property.get "role"
     mgrRole = property.get "mgrRole"
-    title = property.get "thoroughfare"
+    title = property.get("profile").get("name")
     network = property.get "network"
     # Possible that the property is not part of a network.
     netRole = if network then network.get "role" else false
@@ -458,7 +527,6 @@ Parse.Cloud.beforeSave "Profile", (req, res) ->
   # return res.error 'invalid_email_format' unless /^([a-zA-Z0-9_.-])+@([a-zA-Z0-9_.-])+\.([a-zA-Z])+([a-zA-Z])+/.test email
   
   req.object.set "createdBy", req.user unless req.object.existed()
-  
   res.success()
 
 
@@ -483,6 +551,8 @@ Parse.Cloud.beforeSave Parse.User, (req, res) ->
       profile.save(email: email).then ->
         req.object.set "profile", profile
         res.success()
+      , -> res.error "profile_not_saved"
+
 
   , ->
     res.error "no_profile"
@@ -634,6 +704,7 @@ Parse.Cloud.afterSave "Network", (req) ->
       
     # Save a convenient reference to the network.
     req.user.save network: req.object
+    if req.user.get("property") then req.user.get("property").save network: req.object
 
 
 # Property validation
@@ -652,8 +723,6 @@ Parse.Cloud.beforeSave "Property", (req, res) ->
   )
     # Insufficient data
     return res.error 'insufficient_data'
-  else unless req.object.get "title"
-    return res.error 'title_missing'
 
   # Set a proxy center for fake addresses.
   if req.object.get "approx"
@@ -669,7 +738,6 @@ Parse.Cloud.beforeSave "Property", (req, res) ->
   unless req.object.existed()
 
     # TODO: Special transfer code if it was previously NOT part of a network and has now been transferred.
-
     if req.object.get("network")
       (new Parse.Query "Network").include("role").get req.object.get("network").id,
       success : (network) ->
@@ -698,7 +766,11 @@ Parse.Cloud.beforeSave "Property", (req, res) ->
         role = new Parse.Role(current, roleACL)
         mgrRole = new Parse.Role(mgr, roleACL)
 
-        Parse.Promise.when(role.save(), mgrRole.save()).then -> 
+        objsToSave = [role.save(), mgrRole.save()]
+        unless req.object.get("profile") then objsToSave.unshift new Parse.Object("Profile").save(name: req.object.get("thoroughfare"))
+
+        # Create profile
+        Parse.Promise.when(objsToSave).then (profile) -> 
 
           # Set the property to public.
           propertyACL = roleACL
@@ -715,6 +787,8 @@ Parse.Cloud.beforeSave "Property", (req, res) ->
             mgrRole: mgrRole
             network: network
             ACL: propertyACL
+
+          unless req.object.get("profile") then req.object.set "profile", profile
 
           res.success()
         , -> res.error "role_error"
@@ -743,7 +817,12 @@ Parse.Cloud.beforeSave "Property", (req, res) ->
       role.getUsers().add req.user
       mgrRole.getUsers().add req.user
 
-      Parse.Promise.when(role.save(), mgrRole.save()).then -> 
+      objsToSave = [role.save(), mgrRole.save()]
+
+      unless req.object.get("profile") then objsToSave.unshift new Parse.Object("Profile").save(name: req.object.get("thoroughfare"), ACL: propertyACL)
+
+      # Create profile
+      Parse.Promise.when(objsToSave).then (profile) -> 
 
         # Set the property to public.
         propertyACL = roleACL
@@ -756,6 +835,8 @@ Parse.Cloud.beforeSave "Property", (req, res) ->
           mgrRole: mgrRole
           ACL: propertyACL
 
+        unless req.object.get("profile") then req.object.set "profile", profile
+
         res.success()
       , -> res.error "role_error"
       
@@ -763,28 +844,41 @@ Parse.Cloud.beforeSave "Property", (req, res) ->
     isPublic = req.object.get "public"
     propertyACL = req.object.getACL()
     if propertyACL.getPublicReadAccess() isnt isPublic
+
       propertyACL.setPublicReadAccess(isPublic)
       req.object.setACL propertyACL
+
+      objsToSave = []
+      objsToSave.push req.object.get("profile").save(ACL: propertyACL)
 
       # Listings can only be public if the property is public
       (new Parse.Query "Listing").equalTo('property', req.object).find()
       .then (objs) ->
         if objs
-          listingsToSave = new Array
+          objsToSave = new Array
           for l in objs
             if l.get "public" isnt isPublic
               listingACL = l.getACL()
               listingACL.setPublicReadAccess isPublic
-              l.set
+              l.save
                 public: isPublic
                 ACL: listingACL 
-              listingsToSave.push l
+              objsToSave.push l
 
-          Parse.Object.saveAll listingsToSave if listingsToSave.length > 0
-          res.success()
-        else res.success()
+        Parse.Promise.when(objsToSave).then -> res.success()
       , -> res.error "bad_query"
     else res.success()
+
+
+# Property After Save
+Parse.Cloud.afterSave "Property", (req) ->
+
+  return if req.object.existed()
+
+  # Map the user to the profile, if any.
+  (new Parse.Query "Profile").get req.object.get("profile").id, 
+  success: (profile) -> profile.save(property: req.object, ACL: req.object.getACL())
+
 
 # Unit validation
 Parse.Cloud.beforeSave "Unit", (req, res) ->
@@ -909,7 +1003,7 @@ Parse.Cloud.beforeSave "Inquiry", (req, res) ->
   error: -> res.error "bad_query"
 
 
-# Lease After Save
+# Inquiry After Save
 Parse.Cloud.afterSave "Inquiry", (req) ->
   Parse.Cloud.run "AddTenants", {
     objectId: req.object.id
@@ -960,6 +1054,7 @@ Parse.Cloud.beforeSave "Lease", (req, res) ->
     Parse.Cloud.useMasterKey()
     
     (new Parse.Query "Property")
+    .include('profile')
     .include('role')
     .include('mgrRole')
     .include('network.role')
@@ -1026,7 +1121,7 @@ Parse.Cloud.beforeSave "Lease", (req, res) ->
           channels.push "networks-#{network.id}"
         savesToComplete.push new Parse.Object("Notification").save
           name: "lease_join"
-          text: "New tenants have joined #{property.get("title")}"
+          text: "New tenants have joined #{property.get("profile").get("name")}"
           channels: channels
           channel: "property-#{property.id}"
           forMgr: true
@@ -1234,6 +1329,7 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
 
   (new Parse.Query "Lease")
   .include('role')
+  .include("property.profile")
   .include("property.mgrRole")
   .include("property.role")
   .include("property.network.role")
@@ -1343,7 +1439,7 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
             newStatus = 'invited'
 
             # Notify the user.
-            title = property.get "thoroughfare"
+            title = property.get("profile").get "name"
             notificationACL = new Parse.ACL
             notificationACL.setReadAccess user, true
             notificationACL.setWriteAccess user, true
@@ -1464,7 +1560,7 @@ Parse.Cloud.beforeSave "Concerige", (req, res) ->
 
   (new Parse.Query "Property")
   .include('role')
-  .get req.object.get("property").include("network.role").id,
+  .get req.object.get("property").include("profile").include("network.role").id,
   success: (property) ->
 
     # INSECURE.
@@ -1524,7 +1620,7 @@ Parse.Cloud.beforeSave "Concerige", (req, res) ->
           newStatus = 'invited'
 
           # Notify the user.
-          title = property.get "title"
+          title = property.get("profile").get "name"
           notificationACL = new Parse.ACL
           notificationACL.setRoleReadAccess netRole, true
           notificationACL.setRoleWriteAccess netRole, true

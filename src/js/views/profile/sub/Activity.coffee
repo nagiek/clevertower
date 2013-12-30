@@ -181,7 +181,7 @@ define [
       model = @model.activity.at(data.index)
 
       if Parse.User.current()
-        @like model, activity, button, data
+        @like model, activity, button, data, false
       else
         $("#signup-modal").modal()
 
@@ -202,6 +202,13 @@ define [
       model = @model.activity.at(data.index)
 
       @markAsLiked(activity) if Parse.User.current().get("profile").likes.find (l) => l.id is model.id
+
+    checkIfFollowing: (activity) =>
+      data = activity.data()
+
+      model = @model.activity.at(data.index)
+
+      @markAsFollowing(activity) if Parse.User.current().get("profile").following.find (p) => p.id is model.get("profile").id
 
     updatePaginiation : =>
       countQuery = @model.activity.query

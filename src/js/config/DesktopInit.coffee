@@ -156,6 +156,7 @@ require [
   "collections/ActivityList"
   "collections/CommentList"
   "collections/NotificationList"
+  "collections/ProfileList"
   "routers/Desktop",
   "underscore.string"
   "json2"
@@ -164,7 +165,7 @@ require [
   "typeahead"
   "masonry"
   "transit"
-], ($, _, Parse, FB, Property, Unit, Lease, Profile, FeaturedListingList, ActivityList, CommentList, NotificationList, AppRouter, _String) ->
+], ($, _, Parse, FB, Property, Unit, Lease, Profile, FeaturedListingList, ActivityList, CommentList, NotificationList, ProfileList, AppRouter, _String) ->
 
   # Events
   # ---------
@@ -276,31 +277,6 @@ require [
     @set models, _.extend(
       merge: false
     , options, addOptions)
-
-  
-  # Remove a model, or a list of models from the set.
-  Parse.Collection::remove = (models, options) ->
-    singular = not _.isArray(models)
-    models = (if singular then [models] else _.clone(models))
-    options or (options = {})
-
-    for i in models.length
-      model = models[i] = @get(models[i])
-      continue  unless model
-      
-      delete @_byId[model.id]
-      delete @_byId[model.cid]
-
-      index = @indexOf(model)
-      @models.splice index, 1
-      @length--
-      unless options.silent
-        options.index = index
-        model.trigger "remove", model, this, options
-      @_removeReference model
-
-    (if singular then models[0] else models)
-
   
   # Update a collection by `set`-ing a new list of models, adding new ones,
   # removing models that are no longer present, and merging models that
@@ -502,6 +478,7 @@ require [
     .include('lease')
     .include('unit')
     .include('profile')
+    .include('property.profile')
     .include('property.role')
     .include('property.mgrRole')
     .include('network.role')
@@ -512,8 +489,23 @@ require [
 
       # Profile.
       profile = user.get "profile"
-      profile.likes = new ActivityList([], profile: profile)
+      
+      profile.likes = new ActivityList [], profile: profile
       profile.likes.query = profile.relation("likes").query().include("property")
+
+      profile.following = new ProfileList [], {}
+      profile.following.query = profile.relation("following").query().include("property")
+
+      profile.followers = new ProfileList [], {}
+      profile.followers.query = profile.relation("followers").query().include("property")
+
+      profile.followingActivity = new ActivityList [], {}
+      profile.followingActivity.query.matchesQuery "profile", profile.relation("following").query()
+      profile.followingActivity.query.include("property")
+
+      profile.followingComments = new CommentList [], {}
+      profile.followingComments.query.matchesQuery "profile", profile.relation("following").query()
+
       @set "profile", profile
 
       @activity = new ActivityList [], {} unless @activity
@@ -526,7 +518,10 @@ require [
       # if user.get("unit") then @set "unit", new Unit(user.get("unit").attributes)
 
       # Need Property methods for posting
-      @set "property", user.get "property"
+      property = user.get "property"
+      if property
+        @set "property", property
+        @propertySetup()
       # if user.get("property") then @set "property", new Property(user.get("property").attributes)
 
       # Load the network regardless if we are on a subdomain or not, as we need the link.
@@ -541,6 +536,19 @@ require [
       # Set up after we have set the property and network.
       @notifications = new NotificationList
       @notifications.query.find(success: (notifs) => @notifications.add notifs)
+
+  Parse.User::propertySetup = ->
+
+    property = @get "property"
+    
+    property.prep("units").fetch()
+    property.prep("activity") # .fetch()
+    property.prep("comments") # .fetch()
+    property.prep("managers") # .fetch()
+    property.prep("tenants") # .fetch()
+    property.prep("listings") # .fetch()
+    property.prep("applicants") # .fetch()
+    property.prep("inquiries") # .fetch()
 
   Parse.User::networkSetup = ->
 

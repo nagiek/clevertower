@@ -4,6 +4,8 @@
       title: "Title",
       body: "Body",
       email: "Email",
+      phone: "Phone",
+      website: "Website",
       status: "Status",
       name: "Name",
       posted: "Posted",
@@ -63,6 +65,8 @@
       create: "Create",
       back: "Back",
       edit: "Edit",
+      follow: "Follow",
+      unfollow: "Unfollow",
       undo: "Undo",
       link: "Link",
       like: "Like",
@@ -178,6 +182,21 @@
     },
     activity: {
       building: "Post to your building",
+      people_who_like_this: "People who like this",
+      people_following: function(name) {
+        return "People following <em>" + name + "</em>";
+      },
+      people_followed_by: function(name) {
+        return "People followed by <em>" + name + "</em>";
+      },
+      be_the_first_to_like_this: "Be the first one to like this",
+      following_no_one: function(name) {
+        return "<em>" + name + "</em> isn't following anyone";
+      },
+      followed_by_no_one: function(name) {
+        return "<em>" + name + "</em> isn't followed by anyone";
+      },
+      be_the_first_to_like_this: "Be the first one to like this",
       exhausted: "There are no more items to display."
     },
     status: {
@@ -208,6 +227,7 @@
     verbs: {
       beginning: "Beginning",
       loading: "Loading",
+      following: "Following",
       explore: "Explore",
       manage: "Manage",
       view: "View"
@@ -227,6 +247,8 @@
       building: "Building",
       inside: "Inside",
       outside: "Outside",
+      following: "Following",
+      followers: "Followers",
       history: "History",
       tenants: "Tenants",
       roommates: "Roommates",
@@ -262,6 +284,7 @@
       unsaved: "Unsaved",
       linked: "Linked",
       liked: "Liked",
+      followed: "Followed",
       joined: "Joined",
       open: "Open",
       closed: "Closed",

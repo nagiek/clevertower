@@ -34,8 +34,8 @@ define [
 
         new Alert event: 'model-save', fade: false, message: i18nProperty.errors[error.message], type: 'danger'
         switch error.message
-          when 'title_missing'
-            @$('#property-title-group').addClass('has-error') # Add class to Control Group
+          when 'name_missing'
+            @$('#property-profile-title-group').addClass('has-error') # Add class to Control Group
 
     clear: (e) =>
       @undelegateEvents()
@@ -44,6 +44,7 @@ define [
     render : =>
       vars = 
         property: _.defaults(@model.attributes, Property::defaults)
+        profile: @model.get("profile").toJSON()
         i18nProperty: i18nProperty
         i18nCommon: i18nCommon
       vars.property.id = @model.id
@@ -56,7 +57,12 @@ define [
       @$('.has-error').removeClass('has-error')
       @$('button.save').button("loading")
       
-      attrs = @model.scrub @$('form').serializeObject().property
+      data = @$('form').serializeObject()
+
+      console.log data
+
+      @model.get("profile").set data.profile
+      attrs = @model.scrub data.property
 
       @model.save attrs,
         success: (property) =>

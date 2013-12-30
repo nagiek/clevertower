@@ -1,5 +1,5 @@
 <div class="modal-dialog modal-wide modal-picture">
-  <div class="modal-content activity clearfix<% if (propertyTitle) { %> has-property<% } %>" data-liked="<% if (liked) { %>true<% } else {%>false<% } %>">
+  <div class="modal-content activity clearfix<% if (propertyTitle) { %> has-property<% } %>">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
     <% if (postImage) { %>
       <div class="photo-container col-md-8">
@@ -25,22 +25,33 @@
         </div>
         <div class="photo-float thumbnail-float">
           <p><a class="profile-link" href="<%= profileUrl %>"><strong><%= name %></strong></a></p>
+          <% if (!isSelf) { %>
+            <div class="follow-controls">
+              <% if (!followedByUser) { %>
+                <button type="button" class="btn btn-primary follow"><%= i18nCommon.actions.follow %></button>
+              <% } else { %>
+                <span class="btn btn-primary following"><%= i18nCommon.verbs.following %></span>
+                <span></span> <!-- to break up .btn btn-default + .btn btn-default spacing -->
+                <button type="button" class="btn btn-default follow unfollow"><%= i18nCommon.actions.unfollow %></button>
+              <% } %>
+            </div>
+          <% } %>
           <p><small><%= i18nCommon.fields.posted %> <%= postDate %></small></p>
         </div>
         <ul class="activity-actions list-inline center">
           <li>
             <small>
               <a href="#" class="like-button">
-                <% if (liked) { %><%= i18nCommon.adjectives.liked %>
+                <% if (likedByUser) { %><%= i18nCommon.adjectives.liked %>
                 <% } else { %><%= i18nCommon.actions.like %><% } %>
               </a>
             </small>
           </li>
           <li>
-            <a href="#" class="likers<% if (liked) { %> active<% } %>" >
+            <a href="#" class="likers<% if (likedByUser) { %> active<% } %>" >
               <i class="glyphicon glyphicon-thumbs-up"></i>
             </a>
-            <small class="like-count"><%= likeCount %></small>
+            <small class="likers-count"><%= likersCount %></small>
           </li>
           <!--
           <li>

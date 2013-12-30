@@ -27,19 +27,19 @@ define [
 
     signUp: (e) =>
       e.preventDefault()
-      @$("#signup-form button.save").button "loading"
+      @$("#signup-form button.btn-primary").button "loading"
       @$("#signup-form .has-error").removeClass 'has-error'
       email = @$("#signup-username").val()
       password = @$("#signup-password").val()
       user_type = if @$(".type-group :checked").prop('id') is 'signup-tenant' then 'tenant' else 'manager'
       Parse.User.signUp email, password, { user_type: user_type, email: email, ACL: new Parse.ACL() },
         success: (user) =>
-          @$("#signup-form button.save").button "reset"
+          @$("#signup-form button.btn-primary").button "reset"
 
           Parse.Dispatcher.trigger "user:loginStart"
 
         error: (user, error) =>
-          @$("#signup-form button.save").button "reset"
+          @$("#signup-form button.btn-primary").button "reset"
           msg = switch error.code
             when 125  then i18nDevise.errors.invalid_email_format
             when 202  then i18nDevise.errors.username_taken

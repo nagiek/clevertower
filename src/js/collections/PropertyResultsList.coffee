@@ -10,7 +10,7 @@ define [
     # Reference to this collection's model.
     model: Property
 
-    query: new Parse.Query("Property")
+    query: new Parse.Query(Property).include("profile")
 
     initialize: (models, attrs) ->
 

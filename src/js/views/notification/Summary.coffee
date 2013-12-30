@@ -79,7 +79,7 @@ define [
       switch channels[0].split("-")[0]
         when 'properties'
           icon = 'person'
-          photo_src = property.cover("thumb")
+          photo_src = property.get("profile").cover("thumb")
         when 'leases' or 'tenant'
           icon = 'plus'
           photo_src = profile.cover("thumb")

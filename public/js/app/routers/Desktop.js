@@ -30,6 +30,8 @@
         "posts/:id": "activityShow",
         "outside/*splat": "outside",
         "outside*splat": "outside",
+        "following/*splat": "following",
+        "following*splat": "following",
         "network/new": "networkNew",
         "listings/new": "listingsNew",
         "leases/new": "leasesNew",
@@ -136,6 +138,27 @@
           if (!view || !(view instanceof ActivityIndexView)) {
             vars = _this.deparamAction(splat);
             _this.view = new ActivityIndexView({
+              location: vars.path,
+              params: vars.params
+            }).render();
+            if (view) {
+              return view.clear();
+            }
+          }
+        });
+      };
+
+      DesktopRouter.prototype.following = function(splat) {
+        var view,
+          _this = this;
+
+        view = this.view;
+        return require(["views/activity/following"], function(FollowingActivityView) {
+          var vars;
+
+          if (!view || !(view instanceof FollowingActivityView)) {
+            vars = _this.deparamAction(splat);
+            _this.view = new FollowingActivityView({
               location: vars.path,
               params: vars.params
             }).render();

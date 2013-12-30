@@ -30,15 +30,17 @@ define [
       
       delete @events["submit form"]
 
+      @property = attrs.property
       @wizard = attrs.wizard
       @listenTo @wizard, "wizard:cancel wizard:finish", @clear
-
-      @property = attrs.property
 
       # Don't set the property on the lease, as we may not have access to it.
       @model = new Lease(forNetwork: false)
             
       @listenTo @model, 'invalid', (error) =>
+
+        console.log error
+        @wizard.trigger("invalid")
 
         msg = if error.message.indexOf(":") > 0
             args = error.message.split ":"
@@ -70,7 +72,8 @@ define [
       
       vars = 
         lease: _.defaults @model.attributes, Lease::defaults
-        property: @property.toJSON()
+        property: @property.attributes
+        profile: @property.get("profile").toJSON()
         isNew: true
         propertyIsNew: @property.isNew()
         unit: false

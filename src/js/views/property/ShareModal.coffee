@@ -39,7 +39,7 @@ define [
       @index = 0
       @property = attrs.property
       @property.prep "photos"
-      if @property.photos.length is 0 then @model.photos.add new Photo(image: @property.cover("large"))
+      if @property.photos.length is 0 then @model.photos.add new Photo(image: @property.get("profile").cover("large"))
 
     render : ->
 

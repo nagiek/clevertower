@@ -13,6 +13,8 @@ define [
       "posts/:id"                   : "activityShow"
       "outside/*splat"              : "outside"
       "outside*splat"               : "outside"
+      "following/*splat"            : "following"
+      "following*splat"             : "following"
       # "inside"                      : "propertiesManage"
       # "inside/*splat"               : "propertiesManage"
       "network/new"                 : "networkNew"
@@ -111,6 +113,13 @@ define [
           @view = new ActivityIndexView(location: vars.path, params: vars.params).render()
           view.clear() if view
 
+    following: (splat) ->
+      view = @view
+      require ["views/activity/following"], (FollowingActivityView) =>
+        if !view or view !instanceof FollowingActivityView
+          vars = @deparamAction splat
+          @view = new FollowingActivityView(location: vars.path, params: vars.params).render()
+          view.clear() if view
     # 
     # 
 

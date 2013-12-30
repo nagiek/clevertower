@@ -3,7 +3,7 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", "collections/PropertyResultsList", "views/property/Result", "views/helper/Alert", "i18n!nls/common", "i18n!nls/property", "templates/property/new/map", "gmaps"], function($, _, Parse, PropertyList, PropertyResult, Alert, i18nCommon, i18nProperty) {
+  define(["jquery", "underscore", "backbone", "collections/PropertyResultsList", "views/property/Result", "views/helper/Alert", "i18n!nls/common", "i18n!nls/property", "templates/property/new/map", "gmaps"], function($, _, Parse, PropertyResultsList, PropertyResult, Alert, i18nCommon, i18nProperty) {
     var GMapView, _ref;
 
     return GMapView = (function(_super) {
@@ -40,7 +40,7 @@
         this.wizard = attrs.wizard;
         this.listenTo(this.wizard, "wizard:finish wizard:cancel", this.clear);
         window.geocoder = window.geocoder || new google.maps.Geocoder;
-        this.results = new PropertyList([], {
+        this.results = new PropertyResultsList([], {
           forNetwork: this.forNetwork
         });
         this.listenTo(this.results, "reset", this.processResults);

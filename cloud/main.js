@@ -1,4 +1,104 @@
 (function() {
+  Parse.Cloud.define("Follow", function(req, res) {
+    Parse.Cloud.useMasterKey();
+    return (new Parse.Query("Profile")).equalTo('objectId', req.params.followee).first().then(function(model) {
+      var profile;
+
+      if (model) {
+        model.increment({
+          followersCount: +1
+        });
+        profile = new Parse.Object("Profile");
+        profile.id = req.params.follower;
+        model.relation("likers").add(profile);
+        return model.save().then(function() {
+          return res.success();
+        }, function() {
+          return res.error("model_not_saved");
+        });
+      } else {
+        return res.error("bad_query");
+      }
+    }, function() {
+      return res.error("bad_query");
+    });
+  });
+
+  Parse.Cloud.define("Unfollow", function(req, res) {
+    Parse.Cloud.useMasterKey();
+    return (new Parse.Query("Profile")).equalTo('objectId', req.params.followee).first().then(function(model) {
+      var profile;
+
+      if (model) {
+        model.increment({
+          followersCount: -1
+        });
+        profile = new Parse.Object("Profile");
+        profile.id = req.params.follower;
+        model.relation("likers").remove(profile);
+        return model.save().then(function() {
+          return res.success();
+        }, function() {
+          return res.error("model_not_saved");
+        });
+      } else {
+        return res.error("bad_query");
+      }
+    }, function() {
+      return res.error("bad_query");
+    });
+  });
+
+  Parse.Cloud.define("Like", function(req, res) {
+    Parse.Cloud.useMasterKey();
+    return (new Parse.Query("Activity")).equalTo('objectId', req.params.likee).first().then(function(model) {
+      var profile;
+
+      if (model) {
+        model.increment({
+          likersCount: +1
+        });
+        profile = new Parse.Object("Profile");
+        profile.id = req.params.liker;
+        model.relation("likers").add(profile);
+        return model.save().then(function() {
+          return res.success();
+        }, function() {
+          return res.error("model_not_saved");
+        });
+      } else {
+        return res.error("bad_query");
+      }
+    }, function() {
+      return res.error("bad_query");
+    });
+  });
+
+  Parse.Cloud.define("Unlike", function(req, res) {
+    Parse.Cloud.useMasterKey();
+    return (new Parse.Query("Activity")).equalTo('objectId', req.params.likee).first().then(function(model) {
+      var profile;
+
+      if (model) {
+        model.increment({
+          likersCount: -1
+        });
+        profile = new Parse.Object("Profile");
+        profile.id = req.params.liker;
+        model.relation("likers").remove(profile);
+        return model.save().then(function() {
+          return res.success();
+        }, function() {
+          return res.error("model_not_saved");
+        });
+      } else {
+        return res.error("bad_query");
+      }
+    }, function() {
+      return res.error("bad_query");
+    });
+  });
+
   Parse.Cloud.define("PromoteToFeatured", function(req, res) {
     Parse.Cloud.useMasterKey();
     return (new Parse.Query("Listing")).equalTo('objectId', req.params.objectId).first().then(function(obj) {
@@ -73,14 +173,14 @@
     status = 'invited';
     Parse.Cloud.useMasterKey();
     existingProfiles = [];
-    return (new Parse.Query(className)).include('role').include("property.role").include("property.mgrRole").include("property.network.role").equalTo("objectId", req.params.objectId).first().then(function(leaseOrInquiry) {
+    return (new Parse.Query(className)).include('role').include("property.profile").include("property.role").include("property.mgrRole").include("property.network.role").equalTo("objectId", req.params.objectId).first().then(function(leaseOrInquiry) {
       var joinClassACL, joinClassName, mgrQuery, mgrRole, mgrUsers, netQuery, netRole, netUsers, network, profileQuery, propRole, property, title, tntRole;
 
       tntRole = leaseOrInquiry.get("role");
       property = leaseOrInquiry.get("property");
       propRole = property.get("role");
       mgrRole = property.get("mgrRole");
-      title = property.get("thoroughfare");
+      title = property.get("profile").get("name");
       network = property.get("network");
       netRole = network ? network.get("role") : false;
       joinClassName = className === "Lease" ? "Tenant" : "Applicant";
@@ -441,6 +541,8 @@
         }).then(function() {
           req.object.set("profile", profile);
           return res.success();
+        }, function() {
+          return res.error("profile_not_saved");
         });
       }
     }, function() {
@@ -603,21 +705,24 @@
         accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb",
         ACL: managerACL
       });
-      return req.user.save({
+      req.user.save({
         network: req.object
       });
+      if (req.user.get("property")) {
+        return req.user.get("property").save({
+          network: req.object
+        });
+      }
     }
   });
 
   Parse.Cloud.beforeSave("Property", function(req, res) {
-    var current, isPublic, mgr, mgrRole, possible, propertyACL, randomId, role, roleACL, _i;
+    var current, isPublic, mgr, mgrRole, objsToSave, possible, propertyACL, randomId, role, roleACL, _i;
 
     if (!req.object.get("center")) {
       return res.error('invalid_address');
     } else if (!(req.object.get("thoroughfare") && req.object.get("locality") && (req.object.get("administrative_area_level_1") || req.object.get("administrative_area_level_2")) && req.object.get("country") && req.object.get("postal_code"))) {
       return res.error('insufficient_data');
-    } else if (!req.object.get("title")) {
-      return res.error('title_missing');
     }
     if (req.object.get("approx")) {
       req.object.set("offset", {
@@ -634,7 +739,7 @@
       if (req.object.get("network")) {
         return (new Parse.Query("Network")).include("role").get(req.object.get("network").id, {
           success: function(network) {
-            var current, mgr, mgrRole, netRole, possible, randomId, role, roleACL, _i;
+            var current, mgr, mgrRole, netRole, objsToSave, possible, randomId, role, roleACL, _i;
 
             netRole = network.get("role");
             randomId = "";
@@ -655,7 +760,13 @@
             }
             role = new Parse.Role(current, roleACL);
             mgrRole = new Parse.Role(mgr, roleACL);
-            return Parse.Promise.when(role.save(), mgrRole.save()).then(function() {
+            objsToSave = [role.save(), mgrRole.save()];
+            if (!req.object.get("profile")) {
+              objsToSave.unshift(new Parse.Object("Profile").save({
+                name: req.object.get("thoroughfare")
+              }));
+            }
+            return Parse.Promise.when(objsToSave).then(function(profile) {
               var propertyACL;
 
               propertyACL = roleACL;
@@ -668,6 +779,9 @@
                 network: network,
                 ACL: propertyACL
               });
+              if (!req.object.get("profile")) {
+                req.object.set("profile", profile);
+              }
               return res.success();
             }, function() {
               return res.error("role_error");
@@ -693,7 +807,14 @@
         mgrRole = new Parse.Role(mgr, roleACL);
         role.getUsers().add(req.user);
         mgrRole.getUsers().add(req.user);
-        return Parse.Promise.when(role.save(), mgrRole.save()).then(function() {
+        objsToSave = [role.save(), mgrRole.save()];
+        if (!req.object.get("profile")) {
+          objsToSave.unshift(new Parse.Object("Profile").save({
+            name: req.object.get("thoroughfare"),
+            ACL: propertyACL
+          }));
+        }
+        return Parse.Promise.when(objsToSave).then(function(profile) {
           var propertyACL;
 
           propertyACL = roleACL;
@@ -705,6 +826,9 @@
             mgrRole: mgrRole,
             ACL: propertyACL
           });
+          if (!req.object.get("profile")) {
+            req.object.set("profile", profile);
+          }
           return res.success();
         }, function() {
           return res.error("role_error");
@@ -716,30 +840,31 @@
       if (propertyACL.getPublicReadAccess() !== isPublic) {
         propertyACL.setPublicReadAccess(isPublic);
         req.object.setACL(propertyACL);
+        objsToSave = [];
+        objsToSave.push(req.object.get("profile").save({
+          ACL: propertyACL
+        }));
         return (new Parse.Query("Listing")).equalTo('property', req.object).find().then(function(objs) {
-          var l, listingACL, listingsToSave, _j, _len;
+          var l, listingACL, _j, _len;
 
           if (objs) {
-            listingsToSave = new Array;
+            objsToSave = new Array;
             for (_j = 0, _len = objs.length; _j < _len; _j++) {
               l = objs[_j];
               if (l.get("public" !== isPublic)) {
                 listingACL = l.getACL();
                 listingACL.setPublicReadAccess(isPublic);
-                l.set({
+                l.save({
                   "public": isPublic,
                   ACL: listingACL
                 });
-                listingsToSave.push(l);
+                objsToSave.push(l);
               }
             }
-            if (listingsToSave.length > 0) {
-              Parse.Object.saveAll(listingsToSave);
-            }
-            return res.success();
-          } else {
-            return res.success();
           }
+          return Parse.Promise.when(objsToSave).then(function() {
+            return res.success();
+          });
         }, function() {
           return res.error("bad_query");
         });
@@ -747,6 +872,20 @@
         return res.success();
       }
     }
+  });
+
+  Parse.Cloud.afterSave("Property", function(req) {
+    if (req.object.existed()) {
+      return;
+    }
+    return (new Parse.Query("Profile")).get(req.object.get("profile").id, {
+      success: function(profile) {
+        return profile.save({
+          property: req.object,
+          ACL: req.object.getACL()
+        });
+      }
+    });
   });
 
   Parse.Cloud.beforeSave("Unit", function(req, res) {
@@ -931,7 +1070,7 @@
         return res.success();
       }
       Parse.Cloud.useMasterKey();
-      return (new Parse.Query("Property")).include('role').include('mgrRole').include('network.role').get(req.object.get("property").id, {
+      return (new Parse.Query("Property")).include('profile').include('role').include('mgrRole').include('network.role').get(req.object.get("property").id, {
         success: function(property) {
           var channels, current, leaseACL, mgrRole, netRole, network, notificationACL, possible, propRole, randomId, role, savesToComplete, _j;
 
@@ -980,7 +1119,7 @@
             }
             savesToComplete.push(new Parse.Object("Notification").save({
               name: "lease_join",
-              text: "New tenants have joined " + (property.get("title")),
+              text: "New tenants have joined " + (property.get("profile").get("name")),
               channels: channels,
               channel: "property-" + property.id,
               forMgr: true,
@@ -1163,7 +1302,7 @@
       return res.success();
     }
     Parse.Cloud.useMasterKey();
-    return (new Parse.Query("Lease")).include('role').include("property.mgrRole").include("property.role").include("property.network.role").get(req.object.get("lease").id, {
+    return (new Parse.Query("Lease")).include('role').include("property.profile").include("property.mgrRole").include("property.role").include("property.network.role").get(req.object.get("lease").id, {
       success: function(lease) {
         var mgrQuery, mgrRole, mgrUsers, netQuery, netRole, netUsers, network, newStatus, profileQuery, propRole, property, status, tntRole;
 
@@ -1260,7 +1399,7 @@
                 }));
               } else {
                 newStatus = 'invited';
-                title = property.get("thoroughfare");
+                title = property.get("profile").get("name");
                 notificationACL = new Parse.ACL;
                 notificationACL.setReadAccess(user, true);
                 notificationACL.setWriteAccess(user, true);
@@ -1374,7 +1513,7 @@
 
   Parse.Cloud.beforeSave("Concerige", function(req, res) {
     Parse.Cloud.useMasterKey();
-    return (new Parse.Query("Property")).include('role').get(req.object.get("property").include("network.role").id, {
+    return (new Parse.Query("Property")).include('role').get(req.object.get("property").include("profile").include("network.role").id, {
       success: function(property) {
         var mgrQuery, mgrRole, mgrUsers, netQuery, netRole, netUsers, network, newStatus, profileQuery, status;
 
@@ -1412,7 +1551,7 @@
               }));
             } else {
               newStatus = 'invited';
-              title = property.get("title");
+              title = property.get("profile").get("name");
               notificationACL = new Parse.ACL;
               notificationACL.setRoleReadAccess(netRole, true);
               notificationACL.setRoleWriteAccess(netRole, true);

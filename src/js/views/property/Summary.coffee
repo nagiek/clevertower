@@ -43,7 +43,8 @@ define [
       units = @model.units.select((u) => u.get("property").id is @model.id)
 
       vars = _.merge @model.toJSON(),
-        cover:          @model.cover('profile')
+        profile:        @model.get('profile').toJSON()
+        cover:          @model.get('profile').cover('profile')
         publicUrl:      @model.publicUrl()
         listings:       @model.listings.select((l) => l.get("property").id is @model.id).length
         tenants:        @model.tenants.select((t) => t.get("property").id is @model.id).length

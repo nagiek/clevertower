@@ -55,4 +55,4 @@ define [
       attrs
 
     publicUrl: -> "/networks/#{@id}"
-    privateUrl: -> "#{location.protocol}//#{@get("name")}.#{location.host}"
+    # privateUrl: -> "#{location.protocol}//#{@get("name")}.#{location.host}"

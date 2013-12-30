@@ -14,6 +14,7 @@ define [
 
     events:
       "click #network-nav a" : "checkForLogin"
+      "click #following-nav a" : "checkForLogin"
     
     initialize: ->
 
@@ -34,6 +35,7 @@ define [
 
     render: =>  
       @$('#home-nav a').html i18nCommon.nouns.outside # i18nCommon.verbs.explore
+      @$('#following-nav a').html i18nCommon.nouns.following # i18nCommon.verbs.explore
 
       if Parse.User.current() and Parse.User.current().get("network")
         @$('#network-nav').addClass("dropdown").html JST["src/js/templates/user/nav_menu_network.jst"](i18nCommon: i18nCommon)
@@ -43,6 +45,7 @@ define [
       # Panel.
       $('#panel-home-nav a').html i18nCommon.nouns.outside # i18nCommon.verbs.explore
       $('#panel-network-nav a').html i18nCommon.nouns.inside # #{i18nCommon.verbs.manage}
+      $('#panel-following-nav a').html i18nCommon.nouns.following # #{i18nCommon.verbs.manage}
 
       # hostArray = location.host.split(".")
       # hostArray.shift()

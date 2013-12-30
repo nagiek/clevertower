@@ -12,15 +12,27 @@
         <% } %>
       </div>
     
-      <h1 class="soften"><%= name %></h1>
+
+      <% if (current) { %>
+        <a href="/account/edit" class="btn btn-default pull-right visible-xs"><%= i18nCommon.actions.edit %></a>
+      <% } %>
+      <h1 class="soften left-xs"><%= name %></h1>
 
       <hr class="divider">
       <strong><%= i18nCommon.adjectives.joined %></strong> <%= joinDate %>
       <hr class="divider">
       <ul id="profile-stats" class="list-inline">
         <li>
-          <div id="like-count" class="count"><%= likeCount %></div>
-          <h6><%= i18nCommon.nouns.likes %></h6>
+          <div id="likes-count" class="count"><%= likesCount %></div>
+          <h6><a id="stats-likes-link" href="#likes"><%= i18nCommon.nouns.likes %></a></h6>
+        </li>
+        <li>
+          <div id="followers-count" class="count"><%= followersCount %></div>
+          <h6><a id="followers-link" href="#followers"><%= i18nCommon.nouns.followers %></a></h6>
+        </li>
+        <li>
+          <div id="following-count" class="count"><%= followingCount %></div>
+          <h6><a id="following-link" href="#following"><%= i18nCommon.nouns.following %></a></h6>
         </li>
       </ul>
 
@@ -36,7 +48,7 @@
     <div class="col-sm-9">
 
       <% if (current) { %>
-        <a href="/account/edit" class="btn btn-default pull-right"><%= i18nUser.menu.edit_my_profile %></a>
+        <a href="/account/edit" class="btn btn-default pull-right hidden-xs"><%= i18nUser.menu.edit_my_profile %></a>
       <% } %>
       <ul class="nav nav-tabs">
         <li class="active"><a id="activity-link" href="/users/<%= objectId %>" data-target="#activity"><%= i18nCommon.nouns.public_activity %></a></li>
@@ -80,9 +92,11 @@
       <div class="modal-body">
         <div class="row form-group">
           <div id="preview-profile-picture" class="preview template-upload">
-            <img src="<%= cover %>" alt="Profile" class="profile-picture col-md-4 col-md-offset-1">
+            <div class="col-sm-6 col-md-4 col-md-offset-1">
+              <img src="<%= cover %>" alt="Profile" class="img-responsive">
+            </div>
           </div>
-          <div id="profile-picture-controls" class="col-md-6 col-md-offset-1">
+          <div id="profile-picture-controls" class="col-sm-6 col-md-offset-1">
             <div id="preview-profile-picture-name"></div>
             <div class="fileupload-buttonbar">
               <button type="button" id="file-input" class="btn btn-default fileinput-button">

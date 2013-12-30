@@ -35,7 +35,8 @@ define [
       @model.prep('inquiries')
       @model.prep('applicants')
       
-      @listenTo @model, 'change:image_profile', @refresh
+      @listenTo @model.get("profile"), 'change:image_profile', @refreshPic
+      @listenTo @model.get("profile"), 'change:name', @refreshName
       @listenTo @model, 'destroy', @run
 
       @listenTo Parse.Dispatcher, 'user:logout', @run
@@ -52,7 +53,8 @@ define [
     render: ->
       vars = _.merge @model.toJSON(),
         publicUrl: @model.publicUrl()
-        cover: @model.cover 'profile'
+        profile: @model.get('profile').toJSON()
+        cover: @model.get('profile').cover 'profile'
         i18nProperty: i18nProperty
         i18nCommon: i18nCommon
         hasNetwork: @model.get("network")
@@ -113,8 +115,8 @@ define [
         @$('.content').addClass 'in'
   
     # Re-render the contents of the property item.
-    refresh: ->
-      @$('#property-picture img').prop('src', @model.cover('profile'))
+    refreshPic: -> @$('#property-picture > a > img').prop('src', @model.cover('profile'))
+    refreshName: -> @$('#property-name > a').html(@model.get('name'))
     
     clear: =>
       @undelegateEvents()
@@ -163,7 +165,7 @@ define [
     save: (e) =>
       e.preventDefault()
       if @file
-        @model.save image_thumb: @file.url, image_profile: @file.url, image_full: @file.url
+        @model.get("profile").save image_thumb: @file.url, image_profile: @file.url, image_full: @file.url
         @$('#edit-property-picture-modal').modal('hide')
       else 
         @$form.after """

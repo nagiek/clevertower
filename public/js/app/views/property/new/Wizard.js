@@ -3,7 +3,7 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "backbone", "collections/ActivityList", "models/Activity", "models/Property", "models/Unit", "models/Lease", "models/Concierge", "views/helper/Alert", "views/property/new/Map", "views/property/new/New", "views/property/new/Join", "views/property/new/Picture", "views/property/new/Share", "i18n!nls/property", "i18n!nls/common", "templates/property/new/map", "templates/property/new/wizard"], function($, _, Parse, ActivityList, Activity, Property, Unit, Lease, Concierge, Alert, GMapView, NewPropertyView, JoinPropertyView, PicturePropertyView, SharePropertyView, i18nProperty, i18nCommon) {
+  define(["jquery", "underscore", "backbone", "collections/ActivityList", "models/Activity", "models/Property", "models/Profile", "models/Unit", "models/Lease", "models/Concierge", "views/helper/Alert", "views/property/new/Map", "views/property/new/New", "views/property/new/Join", "views/property/new/Picture", "views/property/new/Share", "i18n!nls/property", "i18n!nls/common", "templates/property/new/map", "templates/property/new/wizard"], function($, _, Parse, ActivityList, Activity, Property, Profile, Unit, Lease, Concierge, Alert, GMapView, NewPropertyView, JoinPropertyView, PicturePropertyView, SharePropertyView, i18nProperty, i18nCommon) {
     var PropertyWizardView, _ref;
 
     return PropertyWizardView = (function(_super) {
@@ -38,18 +38,22 @@
         if (this.forNetwork) {
           this.model.set("network", Parse.User.current().get("network"));
         }
+        this.model.set("profile", new Profile);
         this.listenTo(Parse.Dispatcher, 'user:logout', function() {
           return Parse.history.navigate("", true);
+        });
+        this.on("invalid", function(error) {
+          _this.buttonsForward();
+          return console.log(error);
         });
         this.listenTo(this.model, "invalid", function(error) {
           var args, fn, msg;
 
-          _this.buttonsForward();
-          console.log(error);
+          _this.trigger("invalid", error);
           msg = error.message.indexOf(":") > 0 ? (args = error.message.split(":"), fn = args.pop(), i18nProperty.errors[fn](args[0])) : i18nProperty.errors[error.message];
           switch (error.message) {
-            case 'title_missing':
-              _this.$('#property-title-group').addClass('has-error');
+            case 'name_missing':
+              _this.$('#property-profile-title-group').addClass('has-error');
               break;
             default:
               _this.$('#address-search-group').addClass('has-error');
@@ -160,7 +164,7 @@
               });
             } else {
               this.state = 'property';
-              this.model.set('title', this.model.get('thoroughfare'));
+              this.model.get("profile").set('name', this.model.get('thoroughfare'));
               if (this.forNetwork) {
                 this.form = new NewPropertyView({
                   wizard: this,
@@ -180,6 +184,9 @@
             break;
           case 'property':
             data = this.form.$el.serializeObject();
+            if (data.profile) {
+              this.model.get("profile").set(data.profile);
+            }
             if (data.lease) {
               attrs = this.form.model.scrub(data.lease);
               attrs = this.assignAdditionalToLease(data, attrs);
@@ -212,7 +219,7 @@
             }
             break;
           case 'picture':
-            return this.model.save().then(function(property) {
+            return this.model.get("profile").save().then(function(property) {
               _this.state = 'share';
               _this.share = new SharePropertyView({
                 wizard: _this,
@@ -238,9 +245,9 @@
                   "public": true,
                   center: _this.model.get("center"),
                   property: _this.model,
-                  network: Parse.User.current().get("network"),
+                  network: _this.model.get("network"),
                   title: data.activity.title,
-                  profile: Parse.User.current().get("profile"),
+                  profile: _this.model.get("profile"),
                   ACL: activityACL
                 }).then(function() {
                   Parse.User.current().activity = Parse.User.current().activity || new ActivityList([], {});

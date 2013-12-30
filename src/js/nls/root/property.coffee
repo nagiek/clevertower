@@ -105,10 +105,6 @@ define
     building:                         "You haven't joined a property yet. Join your current building, or explore and find a new one."
   fields:                             
     description:                      "Description"
-    phone:                            "Phone"
-    email:                            "Email"
-    website:                          "Website"
-    title:                            "Title"
     photos:                           "Photos"
     property_type:                                           
       label:                          "Property Type"
@@ -162,4 +158,4 @@ define
     "success/error was not called":   "<strong>D'oh!</strong> Something went wrong. Please try again."
     access_denied:                    "You do not have access to the property."
     missing:                          "You must select a property."
-    title_missing:                    "A title is required."
+    name_missing:                     "A title is required."

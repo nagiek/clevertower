@@ -6,7 +6,7 @@ data-title="Missing something?"
 data-content="
 <% if (Parse.User.current().get("network")) { %> 
   <p>CleverTower is more fun when you're connected, but you haven't added any properties yet.</p>
-  <a class='btn btn-primary btn-block' href='<%= Parse.User.current().get("network").privateUrl() %>'>
+  <a class='btn btn-primary btn-block' href='/properties/new'>
     <%= i18nProperty.actions.add_a_property %>
   </a>
 <% } else { %>

@@ -96,29 +96,6 @@
         +this.get("administrative_area_level_1").replace(/\s+/g, '-') + "--";
         return +Parse.App.countryCodes[this.get("country")].replace(/\s+/g, '-');
       },
-      cover: function(format) {
-        var getFormat, img;
-
-        switch (format) {
-          case "micro":
-          case "tiny":
-            getFormat = "thumb";
-            break;
-          case "large":
-          case "profile":
-          case "span4":
-          case "span6":
-            getFormat = "full";
-            break;
-          default:
-            getFormat = format;
-        }
-        img = this.get("image_" + getFormat);
-        if (img === '' || (img == null)) {
-          img = "/img/fallback/property-" + format + ".png";
-        }
-        return img;
-      },
       scrub: function(attrs) {
         var attr, bools, _i, _len;
 

@@ -111,24 +111,13 @@ define [
     
     # URL friendly title
     publicUrl: -> "/places/#{@country()}/#{@get("administrative_area_level_1")}/#{@get("locality")}/#{@id}/#{@slug()}"
-
     slug: -> @get("title").replace(/\s+/g, '-').toLowerCase()
-
     country: -> Parse.App.countryCodes[@get("country")]
 
     city: -> 
       @get("locality").replace(/\s+/g, '-') + "--"
       + @get("administrative_area_level_1").replace(/\s+/g, '-') + "--"
       + Parse.App.countryCodes[@get("country")].replace(/\s+/g, '-')
-
-    cover: (format) ->
-      switch format
-        when "micro", "tiny" then getFormat = "thumb"
-        when "large", "profile", "span4", "span6" then getFormat = "full"
-        else getFormat = format
-      img = @get "image_#{getFormat}"
-      img = "/img/fallback/property-#{format}.png" if img is '' or !img?
-      img 
 
     scrub: (attrs) ->
       bools = ['electricity'

@@ -6,12 +6,12 @@
   <fieldset>
     <!-- <legend><%= i18nProperty.form.building %></legend> -->
     <div class="row">
-      <div id="property-title-group" class="form-group col-md-6">
-        <label for="property-title" class="control-label"><%= i18nProperty.fields.title %></label>
-        <input type="text" name="property[title]" id="property-title" class="form-control input-xlarge" value="<%= property.title %>">
+      <div id="profile-name-group" class="form-group col-md-6">
+        <label for="profile-name" class="control-label"><%= i18nCommon.fields.title %></label>
+        <input type="text" name="profile[name]" id="profile-name" class="form-control input-xlarge" value="<%= profile.name %>">
       </div>
       <div class="form-group col-md-4">
-        <label for="property-email" class="control-label"><%= i18nProperty.fields.property_type.label %></label>
+        <label for="property-property_type" class="control-label"><%= i18nProperty.fields.property_type.label %></label>
         <select name="property[property_type]" id="property-property_type" class="form-control">
           <option value="" ><%= i18nCommon.form.select.select_value %></option>
           <option value="1" <%= property.property_type == 1 ? 'selected="selected"' : ''  %>><%= i18nProperty.fields.property_type.condo %></option>
@@ -25,10 +25,11 @@
     <span class="label label-lg label-default"><%= i18nCommon.adjectives.private %></span>
   </hgroup>
 <% } else { %>
-  <h2><%= i18nProperty.actions.join_property_at(property.title) %></h2>
+  <h2><%= i18nProperty.actions.join_property_at(profile.name) %></h2>
 <% } %>
 <%= 
   JST["src/js/templates/lease/form.jst"]({
+    profile: profile,
     lease: lease,
     isNew: true,
     unit: false,

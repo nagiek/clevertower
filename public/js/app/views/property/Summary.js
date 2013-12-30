@@ -65,7 +65,8 @@
           return u.get("property").id === _this.model.id;
         });
         vars = _.merge(this.model.toJSON(), {
-          cover: this.model.cover('profile'),
+          profile: this.model.get('profile').toJSON(),
+          cover: this.model.get('profile').cover('profile'),
           publicUrl: this.model.publicUrl(),
           listings: this.model.listings.select(function(l) {
             return l.get("property").id === _this.model.id;

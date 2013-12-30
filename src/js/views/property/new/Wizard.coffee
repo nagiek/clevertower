@@ -5,6 +5,7 @@ define [
   "collections/ActivityList"
   "models/Activity"
   "models/Property"
+  "models/Profile"
   "models/Unit"
   "models/Lease"
   "models/Concierge"
@@ -18,7 +19,7 @@ define [
   "i18n!nls/common"
   "templates/property/new/map"
   "templates/property/new/wizard"
-], ($, _, Parse, ActivityList, Activity, Property, Unit, Lease, Concierge, Alert, GMapView, NewPropertyView, JoinPropertyView, PicturePropertyView, SharePropertyView, i18nProperty, i18nCommon) ->
+], ($, _, Parse, ActivityList, Activity, Property, Profile, Unit, Lease, Concierge, Alert, GMapView, NewPropertyView, JoinPropertyView, PicturePropertyView, SharePropertyView, i18nProperty, i18nCommon) ->
 
   class PropertyWizardView extends Parse.View
   
@@ -44,13 +45,16 @@ define [
 
       @model = new Property
       @model.set "network", Parse.User.current().get("network") if @forNetwork 
+      @model.set "profile", new Profile
 
       @listenTo Parse.Dispatcher, 'user:logout', -> Parse.history.navigate "", true
 
-      @listenTo @model, "invalid", (error) =>
+      @on "invalid", (error) =>
         @buttonsForward()
-
         console.log error
+
+      @listenTo @model, "invalid", (error) =>
+        @trigger "invalid", error
 
         msg = if error.message.indexOf(":") > 0  
           args = error.message.split ":"
@@ -60,7 +64,7 @@ define [
           i18nProperty.errors[error.message]
 
         switch error.message
-          when 'title_missing' then @$('#property-title-group').addClass('has-error')
+          when 'name_missing' then @$('#property-profile-title-group').addClass('has-error')
           else @$('#address-search-group').addClass('has-error')
         
         new Alert event: 'model-save', fade: false, message: msg, type: 'danger'
@@ -139,9 +143,9 @@ define [
             @model.trigger "invalid", {message: 'insufficient_data'}
           else
             @state = 'property'
-            @model.set 'title', @model.get('thoroughfare')
+            @model.get("profile").set 'name', @model.get('thoroughfare')
 
-            if @forNetwork  
+            if @forNetwork
               @form = new NewPropertyView wizard: @, model: @model
               @map.$el.after @form.render().el
               @animate 'forward'
@@ -156,6 +160,7 @@ define [
 
         when 'property'
           data = @form.$el.serializeObject()
+          if data.profile then @model.get("profile").set data.profile
           if data.lease
             attrs = @form.model.scrub data.lease
             attrs = @assignAdditionalToLease data, attrs
@@ -180,7 +185,7 @@ define [
             , (error) => @model.trigger "invalid", error
 
         when 'picture'
-          @model.save().then (property) => 
+          @model.get("profile").save().then (property) => 
             @state = 'share'
             @share = new SharePropertyView wizard: @, model: @model
             @picture.$el.after @share.render().el
@@ -202,9 +207,9 @@ define [
                 public: true
                 center: @model.get "center"
                 property: @model
-                network: Parse.User.current().get("network")
+                network: @model.get "network"
                 title: data.activity.title
-                profile: Parse.User.current().get("profile")
+                profile: @model.get "profile"
                 ACL: activityACL
               .then ->
                 Parse.User.current().activity = Parse.User.current().activity || new ActivityList [], {}

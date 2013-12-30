@@ -144,7 +144,7 @@
   margin-right: 0;
 }
 
-@media (max-width:@screen-md) {
+@media (max-width:@screen-md-max) {
   .navbar {
     .btn-name {
       max-width:220px;
@@ -159,25 +159,23 @@
   overflow-y: visible;
 }
 
-@media (min-width:@screen-md) {
-  .navbar-collapse,
-  .navbar-collapse.collapse {
-    display:block;
-  }
-}
-
-
-@media (min-width:@screen-md) {
+@media (min-width:@screen-md-min) {
   #search-menu {
-    width:400px;
+    width:300px;
   }
   .navbar-collapse, .navbar-collapse.collapse {
+    display:block;
     width: 100%;
   }
 }
 
+@media (min-width:@screen-lg-min) {
+  #search-menu {
+    width:400px;
+  }
+}
 
-@media (max-width:@screen-sm) {
+@media (max-width:@screen-sm-max) {
   .navbar {
     .btn-name {
       max-width:120px;

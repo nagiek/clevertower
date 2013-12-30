@@ -24,6 +24,7 @@
         this.params = attrs.params;
         vars = {
           property: this.model,
+          profile: this.model.get("profile"),
           network: this.model.get("network")
         };
         if (attrs.params && attrs.params.unit) {

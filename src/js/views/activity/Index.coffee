@@ -288,7 +288,7 @@ define [
       # @zoomListener = google.maps.event.addListener @map, 'zoom_changed', @checkIfShouldSearch
 
       # Do a new search unless we've been here before.
-      unless @locationAppend or (Parse.App.activity.length > 0 or (Parse.User.current() and Parse.User.current().activity.length > 0))
+      unless Parse.App.activity.length > 0 or (Parse.User.current() and Parse.User.current().activity.length > 0)
         # Search once the map is ready.
         google.maps.event.addListenerOnce @map, 'idle', @performSearchWithinMap
       else
@@ -297,18 +297,18 @@ define [
         ninActivity = Parse.App.activity.map((a) -> a.id)
         ninComments = Parse.App.comments.map((c) -> c.id)
 
-        if Parse.User.current()
-          ninActivity = _.merge ninActivity, Parse.User.current().activity.map((a) -> a.id)
-          ninComments = _.merge ninComments, Parse.User.current().comments.map((c) -> c.id)
-
         @activityQuery.notContainedIn "objectId", ninActivity
         @commentQuery.notContainedIn "objectId", ninComments
 
         # Show the activities
         @addAllActivity()
-        @addAllPropertyActivity()
         @addAllComments Parse.App.comments
-        @addAllComments Parse.User.current().comments
+
+        if Parse.User.current()
+          ninActivity = _.merge ninActivity, Parse.User.current().activity.map((a) -> a.id)
+          ninComments = _.merge ninComments, Parse.User.current().comments.map((c) -> c.id)
+          @addAllPropertyActivity()
+          @addAllComments Parse.User.current().comments
 
     initWithCenter : (place, status) =>
       @center = place.geometry.location if status is google.maps.places.PlacesServiceStatus.OK
@@ -443,7 +443,7 @@ define [
       else Parse.App.activity.at(data.index)
 
       if Parse.User.current()
-        @like model, activity, button, data
+        @like model, activity, button, data, false
       else
         $("#signup-modal").modal()
 
@@ -559,7 +559,7 @@ define [
       # item = new infinity.ListItem view.render().$el
       if ((!@filter or @filter is a.get("activity_type")) and (!@specificSearchControls or @specificSearchControls.filter(a)))
 
-        item = new infinity.ListItem @renderTemplate(a, a.liked(), true)
+        item = new infinity.ListItem @renderTemplate(a, a.likedByUser(), true, true)
         item.marker = a.get("property").marker
 
         a.get("property").marker.items.push item
@@ -600,7 +600,17 @@ define [
         Parse.User.current().activity.at(data.index)
       else Parse.App.activity.at(data.index)
 
-      @markAsLiked(activity) if Parse.User.current().get("profile").likes.find (l) => l.id is model.id
+      @markAsLiked(activity) if model.likedByUser()
+
+    checkIfFollowing: (activity) =>
+
+      data = activity.data()
+
+      model = if data.collection is "user"
+        Parse.User.current().activity.at(data.index)
+      else Parse.App.activity.at(data.index)
+
+      @markAsFollowing(activity) if model.followedByUser()
 
     resetListViews: ->
 
@@ -631,7 +641,7 @@ define [
         #   linkedToProperty: true
         #   liked: false
         # item = new infinity.ListItem view.render().$el
-        item = new infinity.ListItem @renderTemplate(a, false, true) # , a.get("property").pos()
+        item = new infinity.ListItem @renderTemplate(a, false, true, true)
         item.marker = a.get("property").marker
         a.get("property").marker.items.push item
         @listViews[@shortestColumnIndex()].prepend item
@@ -641,8 +651,7 @@ define [
         #   view: @
         #   liked: false
         # # @listViews[@shortestColumnIndex()].prepend new infinity.ListItem view.render().$el
-        @listViews[@shortestColumnIndex()].prepend @renderTemplate(a, false, false) # , a.pos()
-
+        @listViews[@shortestColumnIndex()].prepend @renderTemplate(a, false, true, false)
 
     getModelDataToShowInModal: (e) ->
       e.preventDefault()

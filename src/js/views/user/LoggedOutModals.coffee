@@ -59,10 +59,12 @@ define [
 
     resetPassword: (e) =>
       e.preventDefault()
+      @$("> #reset-password-modal button.btn-primary").button "loading"
       @$('> #reset-password-modal').find('.has-error').removeClass('has-error')
       Parse.User.requestPasswordReset $("#reset-email").val(),
         success: =>
           new Alert event: 'reset-password', message: i18nDevise.messages.password_reset
+          @$("> #reset-password-modal button.btn-primary").button "reset"
           @$('> #reset-password-modal').modal('hide')
         error: (error) ->
           console.log error
@@ -71,12 +73,13 @@ define [
             when 205 then i18nDevise.errors.username_doesnt_exist
             else error.message
             
+          @$("> #reset-password-modal button.btn-primary").button "reset"
           $("#reset-email-group").addClass('has-error')
           new Alert event: 'reset-password', fade: false, message: msg, type: 'danger'
 
     logIn: (e) =>
       e.preventDefault()
-      @$("> #login-modal #login-modal-form button.save").button "loading"
+      @$("> #login-modal #login-modal-form button.btn-primary").button "loading"
       @$("> #login-modal #login-modal-form .has-error").removeClass 'has-error'
       email = @$("#login-modal-username").val()
       password = @$("#login-modal-password").val()
@@ -87,7 +90,7 @@ define [
 
         error: (user, error) =>
           console.log error
-          @$("> #login-modal #login-modal-form button.save").button "reset"
+          @$("> #login-modal #login-modal-form button.btn-primary").button "reset"
           @$('> #login-modal #login-modal-form .username-group').addClass('has-error')
           @$('> #login-modal #login-modal-form .password-group').addClass('has-error')
 
@@ -157,7 +160,7 @@ define [
             
     signUp: (e) =>
       e.preventDefault()
-      @$("> #signup-modal #signup-modal-form button.save").button "loading"
+      @$("> #signup-modal #signup-modal-form button.btn-primary").button "loading"
       @$("> #signup-modal #signup-modal-form .has-error").removeClass 'has-error'
       email = @$("#signup-modal-username").val()
       password = @$("#signup-modal-password").val()
@@ -165,7 +168,7 @@ define [
       Parse.User.signUp email, password, { user_type: user_type, email: email, ACL: new Parse.ACL() },
         success: (user) =>
           @$('> #signup-modal').modal('hide')
-          @$("> #signup-modal #signup-modal-form button.save").button "reset"
+          @$("> #signup-modal #signup-modal-form button.btn-primary").button "reset"
 
           # I thought we could skip the user-setup phase, as we will not have 
           # anything to add and the only extra things were profile and notifications.
@@ -182,7 +185,7 @@ define [
           Parse.Dispatcher.trigger "user:loginStart"
 
         error: (user, error) =>
-          @$("> #signup-modal #signup-modal-form button.save").button "reset"
+          @$("> #signup-modal #signup-modal-form button.btn-primary").button "reset"
           msg = switch error.code
             when 125  then i18nDevise.errors.invalid_email_format
             when 202  then i18nDevise.errors.username_taken

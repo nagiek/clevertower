@@ -11,7 +11,7 @@ define [
     # Reference to this collection's model.
     model: Property
 
-    query: new Parse.Query("Property")
+    query: new Parse.Query(Property).include("profile")
 
     GPoint : -> new google.maps.LatLng @center._latitude ,@center._longitude
     center: new Parse.GeoPoint 43.6481, -79.4042

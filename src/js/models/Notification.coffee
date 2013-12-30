@@ -20,7 +20,7 @@ define [
     isMemo : -> if @get("withAction") then false else true
     withAction : -> if @get("withAction") then true else false
 
-    title : -> if @get("property") then @get("property").get("title") else @get("network").get("title")
+    title : -> if @get("property") then @get("property").get("profile").name() else @get("network").get("title")
     text : -> if @isMemo() then i18nCommon.notifications[@get("name")](@name(), @title()) else i18nCommon.notifications[@get("name")].invited(@name(), @title())
     name : -> if @get("profile") then @get("profile").name() else false
 
