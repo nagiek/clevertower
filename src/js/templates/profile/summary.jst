@@ -1,0 +1,21 @@
+<div class="photo photo-thumbnail pull-left">
+  <a href="<%= url %>">
+    <img src="<%= cover %>" height="50" width="50">
+  </a>
+</div>
+<div class="photo-float thumbnail-float">
+  <div class="pull-left">
+    <h4><a href="<%= url %>"><%= name %></a></h4>
+    <div class="property"><small><% if (property) { %><%= property %><% } %></small></div>
+    <div class="unit"><small><% if (unit) { %><%= unit %><% } %></small></div>
+  </div>
+  <div class="pull-right follow-controls">
+    <% if (!followedByUser) { %>
+      <button type="button" class="btn btn-primary follow"><%= i18nCommon.actions.follow %></button>
+    <% } else { %>
+      <span class="btn btn-primary following"><%= i18nCommon.verbs.following %></span>
+      <span></span> <!-- to break up .btn btn-default + .btn btn-default spacing -->
+      <button type="button" class="btn btn-default follow unfollow"><%= i18nCommon.actions.unfollow %></button>
+    <% } %>
+  </div>
+</div>

@@ -1,0 +1,45 @@
+<div class="container">
+  <div class="row">
+    <div id="city" class="col-sm-8"></div>
+    <div class="right-sm col-sm-4">
+      <div id="user-container">
+        <div id="property-prompt"></div>
+        <div id="new-activity"></div>
+      </div>
+      <form id="activity-filter-form">
+        <div id="general-controls" class="form-group center clearfix">
+          <div id="filters" class="btn-group btn-group-justified" data-toggle="buttons">
+            <label class="btn btn-default active">
+              <input type="radio" name="filters" id="all" checked="checked"> <%= i18nCommon.adjectives.all %>
+            </label>
+            <label class="btn btn-default" rel="tooltip" data-container="body" title="<%= i18nCommon.classes.Listing %>">
+              <input type="radio" name="filters" id="new_listing"> <span class="glyphicon glyphicon-certificate glyphicon-listing"></span>
+            </label>
+            <label class="btn btn-default" rel="tooltip" data-container="body" title="<%= i18nCommon.nouns.building %>">
+              <input type="radio" name="filters" id="new_property"> <span class="glyphicon glyphicon-home glyphicon-building"></span>
+            </label>
+            <label class="btn btn-default" rel="tooltip" data-container="body" title="<%= i18nCommon.classes.Posts %>">
+              <input type="radio" name="filters" id="new_post"> <span class="glyphicon glyphicon-comment"></span>
+            </label>
+          </div>
+        </div>
+        <div id="specific-controls" class="form-horizontal"></div>
+      </form>
+      <div id="map-container" class="map-container-fixed">
+        <div class="position-relative">
+          <button type="button" id="search-map" class="btn btn-google-maps" rel="tooltip" data-container="body" title="<%= i18nListing.map.redo_search %>"><span class="glyphicon glyphicon-repeat"></span></button>
+          <div id="mapCanvas"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-8 content">
+      <div id="activities" class="thumbnails row"></div>
+      <div class="loading center col-xs-12">
+        <img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" />
+      </div>
+      <div class="pagination col-xs-12">
+        <ul></ul>
+      </div>
+    </div>
+  </div>
+</div>
