@@ -167,7 +167,7 @@
           unit: this.unit ? this.unit.toJSON() : false,
           dates: this.dates,
           cancel_path: cancel_path,
-          title: this.property ? this.property.get("title") : false,
+          title: this.property ? this.property.get("profile").name() : false,
           i18nCommon: i18nCommon,
           i18nUnit: i18nUnit,
           i18nLease: i18nLease,

@@ -56,11 +56,30 @@ define [
         @model.followers = new ProfileList [], {}
         @model.followers.query = @model.relation("followers").query()
 
-      @listenTo @model.likes, "add",    @incLikesCount
-      @listenTo @model.likes, "remove", @decLikesCount
+      @listenTo @model.likes,     "add",    @incLikesCount
+      @listenTo @model.likes,     "remove", @decLikesCount
+      @listenTo @model, "change:likesCount",@setLikesCount
+      @listenTo @model.following, "add",    @incFollowingCount
+      @listenTo @model.following, "remove", @decFollowingCount
+      @listenTo @model, "change:followingCount",@setFollowingCount
+      @listenTo @model.followers, "add",    @incFollowersCount
+      @listenTo @model.followers, "remove", @decFollowersCount
+      @listenTo @model, "change:followersCount",@setFollowersCount
 
       @on "profile:follow", (p) => _.each(@subviews, (view) -> view.trigger("profile:follow", p))
       @on "profile:unfollow", (p) => _.each(@subviews, (view) -> view.trigger("profile:unfollow", p))
+
+
+      # Set counts
+      # Save counts if they don't match.
+      if @current
+        Parse.Promise.when(@model.likes.query.count(), @model.following.query.count(), @model.followers.query.count())
+        .then (likesCount, followingCount, followersCount) => 
+          if 0 < likesCount < 500 or 0 < followingCount < 500 or 0 < followersCount < 500
+            if 0 < likesCount < 500 then @model.set(likesCount: likesCount)
+            if 0 < followingCount < 500 then @model.set(followingCount: followingCount)
+            if 0 < followersCount < 500 then @model.set(followersCount: followersCount)
+            @model.save()
 
       @file = false
 
@@ -89,20 +108,24 @@ define [
     #     @activeTab = "activity"
     #     @changeSubView @activeTab
 
-    incLikesCount: (count) => 
-      count = Number(@$("#like-count").html()) + 1
-      @$("#like-count").html count
+    incLikesCount: (count) => @$("#likes-count").html Number(@$("#likes-count").html()) + 1
+    decLikesCount: (count) => @$("#likes-count").html Number(@$("#likes-count").html()) - 1
+    setLikesCount: (count) => @$("#likes-count").html count
 
-    decLikesCount: (count) =>
-      count = Number(@$("#like-count").html()) - 1
-      @$("#like-count").html count
+    incFollowingCount: (count) => @$("#following-count").html Number(@$("#following-count").html()) + 1
+    decFollowingCount: (count) => @$("#following-count").html Number(@$("#following-count").html()) - 1
+    setFollowingCount: (count) => @$("#following-count").html count
+
+    incFollowersCount: (count) => @$("#followers-count").html Number(@$("#followers-count").html()) + 1
+    decFollowersCount: (count) => @$("#followers-count").html Number(@$("#followers-count").html()) - 1
+    setFollowersCount: (count) => @$("#followers-count").html count
 
     render: ->      
       vars = _.merge @model.toJSON(),
         cover: @model.cover 'profile'
-        likesCount: @model.get("likesCount") || 0
-        followersCount: @model.get("followersCount") || 0
-        followingCount: @model.get("followingCount") || 0
+        likesCount: @model.likesCount()
+        followersCount: @model.followersCount()
+        followingCount: @model.followingCount()
         name: @model.name()
         i18nUser: i18nUser
         i18nCommon: i18nCommon
@@ -138,6 +161,7 @@ define [
     
     clear: =>
       _.each @subviews, (subview) -> subview.clear()
+      @off "profile:follow profile:unfollow"
       @undelegateEvents()
       @stopListening()
       delete this
@@ -194,7 +218,7 @@ define [
         $("#people-modal .modal-body").html "<ul class='list-unstyled' />"
         collection.each @appendPerson
       else
-        $("#people-modal .modal-body").html "<p>#{i18nCommon.activity.following_no_one(@model.name())}</p>"
+        $("#people-modal .modal-body").html "<p>#{i18nCommon.activity.followed_by_no_one(@model.name())}</p>"
       $("#people-modal").modal()
 
     showFollowingModal: (collection) =>
@@ -203,7 +227,7 @@ define [
         $("#people-modal .modal-body").html "<ul class='list-unstyled' />"
         collection.each @appendPerson
       else
-        $("#people-modal .modal-body").html "<p>#{i18nCommon.activity.followed_by_no_one(@model.name())}</p>"
+        $("#people-modal .modal-body").html "<p>#{i18nCommon.activity.following_no_one(@model.name())}</p>"
       $("#people-modal").modal()
 
     appendPerson: (p) =>

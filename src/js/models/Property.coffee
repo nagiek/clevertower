@@ -111,7 +111,7 @@ define [
     
     # URL friendly title
     publicUrl: -> "/places/#{@country()}/#{@get("administrative_area_level_1")}/#{@get("locality")}/#{@id}/#{@slug()}"
-    slug: -> @get("title").replace(/\s+/g, '-').toLowerCase()
+    slug: -> @get("profile").name().replace(/\s+/g, '-').toLowerCase()
     country: -> Parse.App.countryCodes[@get("country")]
 
     city: -> 

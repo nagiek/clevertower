@@ -9,6 +9,7 @@ define [
   class DesktopRouter extends Parse.Router
     routes:
       ""                            : "index"
+      "places/:country/:region/:city/:id" : "propertiesPublic"
       "places/:country/:region/:city/:id/:slug" : "propertiesPublic"
       "posts/:id"                   : "activityShow"
       "outside/*splat"              : "outside"

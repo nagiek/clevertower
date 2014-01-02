@@ -96,6 +96,7 @@ define [
 
       vars =
         property: @model.toJSON()
+        profile: @model.get("profile").toJSON()
         place: @place
         cover: @model.get("profile").cover('full')
         i18nProperty: i18nProperty

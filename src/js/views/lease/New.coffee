@@ -157,7 +157,7 @@ define [
         unit: if @unit then @unit.toJSON() else false
         dates: @dates
         cancel_path: cancel_path
-        title: if @property then @property.get "title" else false
+        title: if @property then @property.get("profile").name() else false
         # units: @property.units
         i18nCommon: i18nCommon
         i18nUnit: i18nUnit

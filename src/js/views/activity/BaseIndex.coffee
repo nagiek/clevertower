@@ -116,7 +116,7 @@ define [
       _.each @listViews, (lv) =>
         activity = lv.find("> div > .profile-#{p.id}")
         if activity.length > 0
-          _.each activity (a) => @markAsNotFollowing a.$el
+          _.each activity, (a) => @markAsNotFollowing a.$el
           # return false to avoid checking the other column.
         false
 
@@ -124,7 +124,7 @@ define [
       _.each @listViews, (lv) =>
         activity = lv.find("> div > .profile-#{p.id}")
         if activity.length > 0
-          _.each activity (a) => @markAsFollowing a.$el
+          _.each activity, (a) => @markAsFollowing a.$el
           # return false to avoid checking the other column.
         false
 
@@ -797,7 +797,7 @@ define [
       e.preventDefault()
       if Parse.User.current()
         buttonParent = $(e.currentTarget).parent()
-        activity = button.closest(".activity")
+        activity = buttonParent.closest(".activity")
         data = activity.data()
         model = if @modalCollection instanceof ActivityList then @modalCollection.at @modalIndex else @modalCollection[@modalIndex]
 

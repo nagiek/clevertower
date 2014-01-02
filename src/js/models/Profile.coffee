@@ -43,6 +43,12 @@ define [
     slug: -> @get("name").replace(/\s+/g, '-').toLowerCase()
     country: -> Parse.App.countryCodes[@get("property").get("country")]
 
+    # Counts
+    # If we have a relatively small number, count manually. Otherwise, use our count tracker.
+    likesCount: -> if @likes and 0 < @likes.length < 500 then @likes.length else @get("likesCount") || 0
+    followersCount: -> if @followers and 0 < @followers.length < 500 then @followers.length else @get("followersCount") || 0
+    followingCount: -> if @following and 0 < @following.length < 500 then @following.length else @get("followingCount") || 0
+
     cover: (format) ->
       switch format
         when "micro", "tiny" then getFormat = "thumb"
