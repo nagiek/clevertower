@@ -9,38 +9,39 @@ block fbTags
 block content
   .container
     .row
-      #city.span8
+      #city.col-md-8
         if city
           .fade.in(style='background-image: url(\'/img/city#{location}.jpg\');')
-            button.close(type='button', data-dismiss='alert') ×
+            button.close(type='button') ×
             .row
-              h1.span3= name
-              p.span4= desc
-      .pull-right.span4
-        .row
-          .span4
-            form#activity-filter-form.well.well-sm
-              #general-controls
-                .control-group.center
-                  .controls
-                    #filters.btn-group(data-toggle='buttons-radio')
-                      button.btn.active(type='button') All
-                      button.btn(data-filter='new_listing', type='button', rel='tooltip', data-original-title='Listing')
-                        i.icon.icon-listing
-                      button.btn(data-filter='new_property', type='button', rel='tooltip', data-original-title='Building')
-                        i.icon.icon-building
-                      button.btn(data-filter='new_post', type='button', rel='tooltip', data-original-title='Posts')
-                        i.icon.icon-status
-              #specific-controls.form-horizontal
-          #map-container.pull-right.span4
-            .position-relative
-              button#search-map.btn.btn-google-maps(type='button', rel='tooltip', title='', data-original-title='Redo search')
-                i.icon.icon-repeat
-              #mapCanvas
-      .span8.content
+              .col-md-3
+                h1= name
+                .follow-controls
+                  button.btn.btn-primary.follow(type="button") Follow
+              p.col-md-6= desc
+      .pull-right.col-md-4
+        form#activity-filter-form.well.well-sm
+          #general-controls
+            .control-group.center
+              .controls
+                #filters.btn.btn-default-group(data-toggle='buttons-radio')
+                  button.btn.btn-default.active(type='button') All
+                  button.btn.btn-default(data-filter='new_listing', type='button', rel='tooltip', data-original-title='Listing')
+                    i.glyphicon.glyphicon-listing
+                  button.btn.btn-default(data-filter='new_property', type='button', rel='tooltip', data-original-title='Building')
+                    i.glyphicon.glyphicon-building
+                  button.btn.btn-default(data-filter='new_post', type='button', rel='tooltip', data-original-title='Posts')
+                    i.glyphicon.glyphicon-status
+          #specific-controls.form-horizontal
+        #map-container
+          .position-relative
+            button#search-map.btn.btn-google-maps(type='button', rel='tooltip', title='', data-original-title='Redo search')
+              i.glyphicon.glyphicon-repeat
+            #mapCanvas
+      .col-md-8.content
         #activities.thumbnails
-          .list-view.span4
-          .list-view.span4
+          .list-view.col-md-6
+          .list-view.col-md-6
         .loading.center No one has posted any thing here yet.
         .pagination
           ul

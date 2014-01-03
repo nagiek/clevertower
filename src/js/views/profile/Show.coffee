@@ -108,17 +108,17 @@ define [
     #     @activeTab = "activity"
     #     @changeSubView @activeTab
 
-    incLikesCount: (count) => @$("#likes-count").html Number(@$("#likes-count").html()) + 1
-    decLikesCount: (count) => @$("#likes-count").html Number(@$("#likes-count").html()) - 1
-    setLikesCount: (count) => @$("#likes-count").html count
+    incLikesCount: => @$("#likes-count").html Number(@$("#likes-count").html()) + 1
+    decLikesCount: => @$("#likes-count").html Number(@$("#likes-count").html()) - 1
+    setLikesCount: => @$("#likes-count").html @model.likesCount()
 
-    incFollowingCount: (count) => @$("#following-count").html Number(@$("#following-count").html()) + 1
-    decFollowingCount: (count) => @$("#following-count").html Number(@$("#following-count").html()) - 1
-    setFollowingCount: (count) => @$("#following-count").html count
+    incFollowingCount: => @$("#following-count").html Number(@$("#following-count").html()) + 1
+    decFollowingCount: => @$("#following-count").html Number(@$("#following-count").html()) - 1
+    setFollowingCount: => @$("#following-count").html @model.followingCount()
 
-    incFollowersCount: (count) => @$("#followers-count").html Number(@$("#followers-count").html()) + 1
-    decFollowersCount: (count) => @$("#followers-count").html Number(@$("#followers-count").html()) - 1
-    setFollowersCount: (count) => @$("#followers-count").html count
+    incFollowersCount: => @$("#followers-count").html Number(@$("#followers-count").html()) + 1
+    decFollowersCount: => @$("#followers-count").html Number(@$("#followers-count").html()) - 1
+    setFollowersCount: => @$("#followers-count").html @model.followersCount()
 
     render: ->      
       vars = _.merge @model.toJSON(),
@@ -161,7 +161,6 @@ define [
     
     clear: =>
       _.each @subviews, (subview) -> subview.clear()
-      @off "profile:follow profile:unfollow"
       @undelegateEvents()
       @stopListening()
       delete this
@@ -213,7 +212,7 @@ define [
         @$('#edit-profile-picture-modal').modal()
 
     showFollowersModal: (collection) =>
-      $("#people-modal h3.modal-title").html i18nCommon.activity.people_following(@model.name())
+      $("#people-modal h3.modal-title").html "#{i18nCommon.verbs.following} #{@model.name()}"
       if collection.length > 0
         $("#people-modal .modal-body").html "<ul class='list-unstyled' />"
         collection.each @appendPerson
@@ -222,7 +221,7 @@ define [
       $("#people-modal").modal()
 
     showFollowingModal: (collection) =>
-      $("#people-modal h3.modal-title").html i18nCommon.activity.people_followed_by(@model.name())
+      $("#people-modal h3.modal-title").html "#{i18nCommon.verbs.followed_by} #{@model.name()}"
       if collection.length > 0
         $("#people-modal .modal-body").html "<ul class='list-unstyled' />"
         collection.each @appendPerson

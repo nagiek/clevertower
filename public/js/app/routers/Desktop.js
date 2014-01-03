@@ -53,7 +53,8 @@
         "account/login": "login",
         "account/logout": "logout",
         "account/*splat": "accountSettings",
-        "oauth2callback": "oauth2callback"
+        "oauth2callback": "oauth2callback",
+        "createLocations": "createLocations"
       };
 
       DesktopRouter.prototype.initialize = function(options) {
@@ -803,6 +804,17 @@
 
       DesktopRouter.prototype.signupOrLogin = function() {
         return $("#login-modal").modal();
+      };
+
+      DesktopRouter.prototype.createLocations = function() {
+        return Parse.Cloud.run("CreateLocations", {}, {
+          success: function() {
+            return console.log("success");
+          },
+          error: function(error) {
+            return console.log(error);
+          }
+        });
       };
 
       return DesktopRouter;

@@ -93,6 +93,9 @@ define
     # Not really actions.               
     changes_saved:                      "Changes Saved."
     request_sent:                       "Request sent."
+  countries:
+    CA:                                 "Canada"
+    US:                                 "United States"
   dates:                
     moment_format:                      "MM/DD/YYYY" # Convenience reference to moment().format("L")
     datepicker_format:                  "mm/dd/yyyy" # Same as above, but for datepicker widget
@@ -137,8 +140,6 @@ define
   activity:
     building:                           "Post to your building"
     people_who_like_this:               "People who like this"
-    people_following: (name) ->         "People following <em>#{name}</em>"
-    people_followed_by: (name) ->       "People followed by <em>#{name}</em>"
     be_the_first_to_like_this:          "Be the first one to like this"
     following_no_one: (name) ->         "<em>#{name}</em> isn't following anyone"
     followed_by_no_one: (name) ->       "<em>#{name}</em> isn't followed by anyone"
@@ -158,6 +159,7 @@ define
     on:                                 "on"
     off:                                "off"
     at:                                 "at"
+    in:                                 "in"
     eg:                                 "E.g., "
   affirmations:             
     yes:                                "Yes"
@@ -169,6 +171,7 @@ define
     beginning:                          "Beginning"
     loading:                            "Loading"
     following:                          "Following"
+    followed_by:                        "Followed by"
     explore:                            "Explore"
     manage:                             "Manage"
     view:                               "View"

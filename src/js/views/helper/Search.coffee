@@ -26,8 +26,9 @@ define [
 
         # Send our user to the right page. 
         # If we are already on a Search page, view will not be re-init'ed.
-        Parse.history.navigate "/outside/#{data.location}", trigger: true 
-        new Search(reference: data.reference, location: data.location).save()
+        Parse.history.navigate "/outside/#{data.googleName}", trigger: true 
+        location = Parse.App.locations.find((l) -> l.get("googleName") is data.googleName)
+        new Search(reference: data.reference, googleName: data.googleName, location: location).save()
 
       @listenTo Parse.Dispatcher, "user:change", @reset
 
@@ -96,8 +97,8 @@ define [
           filter: (parsedResponse) ->
             return [] if parsedResponse.results.length is 0
             _.map parsedResponse.results, (p) ->
-              value: p.name()
-              img_src: p.cover("tiny")
+              value: p.get("profile").name()
+              img_src: p.get("profile").cover("tiny")
               url: p.url()
         limit: 5
         template: _.template  """
@@ -158,10 +159,10 @@ define [
       if Parse.User.current() and Parse.User.current().get("network")
 
         @vars[0].local = Parse.User.current().get("network").properties.map (p) ->
-            value: p.get("title")
-            img_src: p.cover("tiny")
+            value: p.get("profile").name()
+            img_src: p.get("profile").cover("tiny")
             url: p.url()
-            tokens: _.union(p.get("title").split(" "), p.get("thoroughfare").split(" "), [p.get("locality")])
+            tokens: _.union(p.get("profile").name().split(" "), p.get("thoroughfare").split(" "), [p.get("locality")])
         @vars[0].prefetch = 
             url: "https://api.parse.com/1/classes/Property?where=" + 
                   encodeURIComponent(JSON.stringify({network: Parse.User.current().get("network").id}))
@@ -209,8 +210,8 @@ define [
         @listenTo Parse.User.current().get("network").properties, "add reset", =>
           @$('.search-query').typeahead 'destroy'
           @vars[0].local = Parse.User.current().get("network").properties.map (p) ->
-            value: p.get("title")
-            img_src: p.cover("tiny")
+            value: p.get("profile").get("title")
+            img_src: p.get("profile").cover("tiny")
             url: p.url()
             tokens: _.union(p.get("title").split(" "), p.get("thoroughfare").split(" "), [p.get("locality")])          
 
@@ -234,7 +235,7 @@ define [
 
     googleSearch : (e, data) => 
       if data.reference
-        data.location = _.map(data.terms, (t) -> t.value).join("--").replace(" ", "-")
+        data.googleName = _.map(data.terms, (t) -> t.value).join("--").replace(" ", "-")
         @trigger "google:search", data
 
     render : =>

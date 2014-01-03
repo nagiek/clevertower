@@ -31,7 +31,9 @@ define [
       vars = _.merge @model.toJSON(),
         profile: @model.get("profile").toJSON()
         publicUrl: @model.publicUrl()
-        cover: @model.get("profile").cover 'full'
+        # Get the property img directly, as the profile does not have a reference 
+        # to the property yet, and thus will not give the correct image.
+        cover: "/img/fallback/property-full.png"
         i18nProperty: i18nProperty
         i18nCommon: i18nCommon
       

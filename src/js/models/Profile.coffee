@@ -6,7 +6,8 @@ define [
   # 'collections/ActivityList'
   'collections/ApplicantList'
   'collections/TenantList'
-], (_, Parse, CommentList, ApplicantList, TenantList) ->
+  "i18n!nls/common"
+], (_, Parse, CommentList, ApplicantList, TenantList, i18nCommon) ->
 
   Profile = Parse.Object.extend "Profile",
     
@@ -35,13 +36,12 @@ define [
       followingCount      : 0
 
     # Backbone default, as Parse function does not exist.
-    url: -> if @get "user" then "/users/#{@id}" else @propertyUrl()
+    url: ->
+      if @get "property" then @get("property").publicUrl()
+      else if @get "location" then @get("location").url()
+      else "/users/#{@id}" 
+      
     followedByUser: -> Parse.User.current() and Parse.User.current().get("profile").following.any (p) => p.id is @id
-
-    # URL friendly title for properties
-    propertyUrl: -> "/places/#{@country()}/#{@get("property").get("administrative_area_level_1")}/#{@get("property").get("locality")}/#{@id}/#{@slug()}"
-    slug: -> @get("name").replace(/\s+/g, '-').toLowerCase()
-    country: -> Parse.App.countryCodes[@get("property").get("country")]
 
     # Counts
     # If we have a relatively small number, count manually. Otherwise, use our count tracker.

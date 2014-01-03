@@ -43,6 +43,7 @@ define [
       # "account/history/:category"   : "accountHistory"
       "account/*splat"              : "accountSettings"
       "oauth2callback"              : "oauth2callback"
+      "createLocations"             : "createLocations"
       # "*actions"                    : "fourOhFour" # 404
 
     initialize: (options) ->
@@ -532,3 +533,13 @@ define [
       #     heading:  i18nCommon.errors.not_logged_in
       #   Parse.history.navigate "", true
       $("#login-modal").modal()
+
+    # Admin
+    # Not for production!! Seriously if you see this and you don't work here, please tweet us.
+    # -----------
+
+    createLocations: ->
+
+      Parse.Cloud.run "CreateLocations", {}, 
+        success: -> console.log "success"
+        error: (error) -> console.log error

@@ -11,7 +11,7 @@ define [
     model: Profile
 
     initialize: (models, attrs) ->
-      @query = new Parse.Query(Profile).include("property").descending("createdAt").limit(500)
+      @query = new Parse.Query(Profile).include("property").include("location").descending("createdAt").limit(500)
 
       # Activity List is very personal to the user.
       if attrs.activity

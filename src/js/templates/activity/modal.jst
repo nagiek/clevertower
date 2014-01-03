@@ -87,17 +87,31 @@
           </form>
         <% } %>
       </div>
-      <% if (propertyTitle) { %>
+      <% if (propertyTitle || locationTitle) { %>
         <footer class="position-bottom">
+          <%= i18nCommon.fields.posted %>
+          <% if (propertyTitle) { %>
+            <p>
+              <small>
+              <%= i18nCommon.prepositions.at %>
+                <a class="profile-link left-shift" href="<%= propertyUrl %>">
+                  <img src="<%= propertyCover %>" class="display-inline photo photo-micro img-circle" width="23" height="23">
+                  <span class=""><%= propertyTitle %></span>
+                </a>
+              </small>
+            </p>
+          <% } %>
+          <% if (locationTitle) { %>
           <p>
             <small>
-              <%= i18nCommon.fields.posted_at %>
-              <a class="profile-link left-shift" href="<%= propertyUrl %>">
-                <img src="<%= propertyCover %>" class="display-inline photo photo-micro img-circle" width="23" height="23">
-                <span class=""><%= propertyTitle %></span>
+              <%= i18nCommon.prepositions.in %>
+              <a class="location-link profile-link left-shift" href="<%= locationUrl %>">
+                <img src="<%= locationCover %>" class="display-inline photo photo-micro img-circle" width="23" height="23">
+                <span class=""><%= locationTitle %></span>
               </a>
             </small>
           </p>
+          <% } %>
         </footer>
       <% } %>
     </div>

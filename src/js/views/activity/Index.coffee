@@ -12,6 +12,7 @@ define [
   "views/listing/Search"
   "views/activity/New"
   "views/activity/BaseIndex"
+  "views/location/Summary"
   "i18n!nls/listing"
   "i18n!nls/common"
   'templates/activity/index'
@@ -21,7 +22,7 @@ define [
   # 'masonry'
   # 'jqueryui'
   "gmaps"
-], ($, _, Parse, infinity, moment, ActivityList, CommentList, Activity, Comment, Alert, ListingSearchView, NewActivityView, BaseIndexActivityView, i18nListing, i18nCommon) ->
+], ($, _, Parse, infinity, moment, ActivityList, CommentList, Activity, Comment, Alert, ListingSearchView, NewActivityView, BaseIndexActivityView, LocationSummaryView, i18nListing, i18nCommon) ->
 
   class ActivityIndexView extends BaseIndexActivityView
   
@@ -92,9 +93,7 @@ define [
 
 
       @listenTo Parse.App.search, "google:search", (data) =>
-        unless @location is data.location
-          @location = data.location
-          @renderCity()
+        @location = data.googleName unless @location is data.googleName
         @placesService.getDetails reference: data.reference, @googleSearch
 
 
@@ -185,14 +184,13 @@ define [
       @$block = @$('#map-container')
 
       @placesService = new google.maps.places.PlacesService(document.getElementById(@mapId))
+
       if @center then @renderMap()
       else 
         if Parse.App.search.lastReference
           @placesService.getDetails reference: Parse.App.search.lastReference, @initWithCenter
-        else if Parse.User.current() and Parse.User.current().lastReference
-          @placesService.getDetails reference: Parse.User.current().lastReference, @initWithCenter
         else if @location
-          new Parse.Query("Search").descending("createdAt").equalTo("location", @location).first()
+          new Parse.Query("Search").descending("createdAt").equalTo("googleName", @location).first()
           .then (obj) => 
             if obj
               @placesService.getDetails reference: obj.get("reference"), @initWithCenter
@@ -322,7 +320,7 @@ define [
     googleSearch : (place, status) =>
 
       if status is google.maps.places.PlacesServiceStatus.OK
-
+        @renderCity()
         @map.fitBounds place.geometry.viewport
         @setBoundsAndSearch place.geometry.viewport.getSouthWest(), place.geometry.viewport.getNorthEast()
 
@@ -724,6 +722,28 @@ define [
       else Parse.App.comments.add comment 
 
 
+    # Modal functions
+    # ----------------
+
+    showModal : =>
+
+      super
+
+      # Trigger a search if we click on a location.
+      $('#view-content-modal').on 'click', 'a.location-link', @gotoLocation
+
+    gotoLocation: (e) =>
+      model = if @modalCollection instanceof ActivityList then @modalCollection.at @modalIndex else @modalCollection[@modalIndex]
+      location = model.get("location").slug()
+      unless @location is location
+        @location = location
+        new Parse.Query("Search").descending("createdAt").equalTo("googleName", location).first()
+          .then (obj) => 
+            console.log obj
+            if obj then @placesService.getDetails reference: obj.get("reference"), @googleSearch
+          (error) => console.log error
+
+
     # Filter functions
     # ----------------
 
@@ -799,28 +819,11 @@ define [
     # ----------
 
     renderCity : =>
-      if _.contains _.keys(Parse.App.cities), @location
-        desc = Parse.App.cities[@location].desc
-        title = @location.substring 0, @location.indexOf("-")
-        image = "/img/city/#{@location}.jpg"
-
-        # FB Meta Tags
-        $("head meta[property='og:description']").attr "content", desc
-        $("head meta[property='og:url']").attr "content", window.location.href
-        $("head meta[property='og:image']").attr "content", window.location.origin + image
-        $("head meta[property='og:type']").attr "content", "clevertower:city"
-
-        @$("#city").html """
-          <div class="fade in" style="background-image: url('#{image}');">
-            <button type="button" class="close" data-dismiss="alert">&times;</button>
-            <div class="row">
-              <h1 class="col-md-3">#{title}</h1>
-              <p class="col-md-6">#{desc}</p>
-            </div>
-          </div>
-        """
+      location = Parse.App.locations.find((l) => l.get("googleName") is @location)
+      if location
+        @city = new LocationSummaryView(model: location, view: @).render()
       else 
-        @$("#city").empty()
+        @city.clear() if @city
 
 
     bindMapPosition: => @$block.original_position = @$block.offset()
@@ -836,6 +839,8 @@ define [
 
         # Take the top padding into account.
         vOffset += 60 # 40 navBar + 20 padding
+
+        @bindMapPosition() unless @$block.original_position
         
         if vOffset > @$block.original_position.top
           @$block.addClass "float-block-fixed"

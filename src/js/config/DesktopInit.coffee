@@ -151,7 +151,9 @@ require [
   "models/Property"
   "models/Unit"
   "models/Lease"
+  "models/Location"
   "models/Profile"
+  "collections/LocationList"
   "collections/ListingFeaturedList"
   "collections/ActivityList"
   "collections/CommentList"
@@ -165,7 +167,7 @@ require [
   "typeahead"
   "masonry"
   "transit"
-], ($, _, Parse, FB, Property, Unit, Lease, Profile, FeaturedListingList, ActivityList, CommentList, NotificationList, ProfileList, AppRouter, _String) ->
+], ($, _, Parse, FB, Property, Unit, Lease, Location, Profile, LocationList, FeaturedListingList, ActivityList, CommentList, NotificationList, ProfileList, AppRouter, _String) ->
 
   # Events
   # ---------
@@ -403,17 +405,71 @@ require [
 
   Parse.App.fbPerms = "email, publish_actions, user_location, user_about_me, user_birthday, user_website" #, publish_stream, read_stream"
 
-  Parse.App.countryCodes = 
-    CA: "Canada"
-    US: "United States"
-
-  Parse.App.cities = 
-    "Montreal--QC--Canada": 
+  # Hard coded.
+  # Do not overwrite: these have objectIds which you will have to lookup...
+  locationAttributes =
+    [
+      objectId: "WqL44FLrni"
+      googleName: "Montreal--QC--Canada"
+      isCity: true
+      center: new Parse.GeoPoint(45.5,-73.566667)
+    ,
+      objectId: "mzHk9SyFCh"
+      googleName: "Le-Plateau-Mont-Royal--Montreal--QC--Canada"
+      isCity: false
+      center: new Parse.GeoPoint(45.521646, -73.57545)
+    ,
+      objectId: "peW8RrUqxj"
+      googleName: "Toronto--ON--Canada" 
+      isCity: true
+      center: new Parse.GeoPoint(43.6537228,-79.373571)
+    ,
+      objectId: "7Huyd0XF8M"
+      googleName: "The-Beaches--Toronto--ON--Canada" 
+      isCity: false
+      center: new Parse.GeoPoint(43.667266,-79.297128)
+    ]
+  profileAttributes =
+    [
+      objectId: "dGlN9B9eOs"
       fbID: 102184499823699
-      desc: 'Originally called Ville-Marie, or "City of Mary", it is named after Mount Royal, the triple-peaked hill located in the heart of the city.'
-    "Toronto--ON--Canada": 
+      name: "Montreal"
+      bio: 'Originally called Ville-Marie, or "City of Mary", it is named after Mount Royal, the triple-peaked hill located in the heart of the city.'
+      image_thumb: "/img/city/Montreal--QC--Canada.jpg"
+      image_profile: "/img/city/Montreal--QC--Canada.jpg"
+      image_full: "/img/city/Montreal--QC--Canada.jpg"
+    ,
+      objectId: "d0lLcU5FJL"
+      fbID: 106014166105010
+      name: "The Plateau-Mont-Royal"
+      bio: 'The Plateau-Mont-Royal is the most densely populated borough in Canada, with 101,054 people living in an 8.1 square kilometre area.'
+      image_thumb: "/img/city/Montreal--QC--Canada.jpg"
+      image_profile: "/img/city/Montreal--QC--Canada.jpg"
+      image_full: "/img/city/Montreal--QC--Canada.jpg"
+    ,
+      objectId: "QZcUnUwJOE"
       fbID: 110941395597405
-      desc: 'Canada’s most cosmopolitan city is situated on beautiful Lake Ontario, and is the cultural heart of south central Ontario and of English-speaking Canada.'
+      name: "Toronto" 
+      bio: 'Canada’s most cosmopolitan city is situated on beautiful Lake Ontario, and is the cultural heart of south central Ontario and of English-speaking Canada.'
+      image_thumb: "/img/city/Toronto--ON--Canada.jpg"
+      image_profile: "/img/city/Toronto--ON--Canada.jpg"
+      image_full: "/img/city/Toronto--ON--Canada.jpg"
+    ,
+      objectId: "ZN3GHkpw7j"
+      fbID: 111084918946366
+      name: "The Beaches"
+      bio: 'The Beaches (also known as "The Beach") is a neighbourhood and popular tourist destination. It is located on the east side of the "Old" City of Toronto.'
+      image_thumb: "/img/city/Toronto--ON--Canada.jpg"
+      image_profile: "/img/city/Toronto--ON--Canada.jpg"
+      image_full: "/img/city/Toronto--ON--Canada.jpg"
+    ]
+  locations = []
+
+  for attrs, i in locationAttributes
+    attrs.profile = new Profile(profileAttributes[i])
+    locations.push new Location(attrs)
+
+  Parse.App.locations = new LocationList locations, {}
 
 
   # Bootstrap
@@ -500,8 +556,11 @@ require [
       profile.followers.query = profile.relation("followers").query().include("property")
 
       profile.followingActivity = new ActivityList [], {}
-      profile.followingActivity.query.matchesQuery "profile", profile.relation("following").query()
-      profile.followingActivity.query.include("property")
+      # profile.followingActivity.query = Parse.Query.or(
+      #   new Parse.Query("Activity").matchesQuery("profile", profile.relation("following").query())
+      #   , new Parse.Query("Activity").matchesKeyInQuery("location", "location", profile.relation("following").query())
+      # ).include("property").include("profile").include("location")
+      profile.followingActivity.query = new Parse.Query("Activity").matchesKeyInQuery("location", "location", profile.relation("following").query())
 
       profile.followingComments = new CommentList [], {}
       profile.followingComments.query.matchesQuery "profile", profile.relation("following").query()

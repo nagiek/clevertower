@@ -191,6 +191,7 @@ define [
         linked: linked
         "property-index": propertyIndex
         "property-id": propertyId
+        "location-id": if model.get("location") then model.get("location").id else false
         index: model.pos()
         lat: model.GPoint().lat()
         lng: model.GPoint().lng()
@@ -639,6 +640,7 @@ define [
       # Add a building link if applicable.
       # Cache result
       property = if model.get("property") then model.get("property") else false
+      location = if model.get("location") then Parse.App.locations.find((l) -> l.id is model.get("location").id) else false
 
       vars = _.merge model.toJSON(), 
         url: model.url()
@@ -653,9 +655,12 @@ define [
         name: model.name()
         profilePic: model.profilePic("thumb")
         propertyLinked: if property then true else false
-        propertyTitle: if property then property.get("title") else false
+        propertyTitle: if property then property.get("profile").name() else false
         propertyCover: if property then property.get("profile").cover("tiny") else false
         propertyUrl: if property then property.publicUrl() else false
+        locationTitle: if location then location.get("profile").name() else false
+        locationCover: if location then location.get("profile").cover("tiny") else false
+        locationUrl: if location then location.url() else false
         current: Parse.User.current()
         isSelf: Parse.User.current() and model.get("profile").id is Parse.User.current().get("profile").id
         i18nCommon: i18nCommon

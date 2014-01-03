@@ -1,5 +1,5 @@
 (function() {
-  define(['underscore', 'backbone', "collections/UnitList", "collections/LeaseList", "collections/InquiryList", "collections/TenantList", "collections/ApplicantList", "collections/ListingList", "collections/PhotoList", "collections/ActivityList", "collections/CommentList", "models/Unit", "models/Lease", "underscore.inflection"], function(_, Parse, UnitList, LeaseList, InquiryList, TenantList, ApplicantList, ListingList, PhotoList, ActivityList, CommentList, Unit, Lease, Listing, inflection) {
+  define(['underscore', 'backbone', "collections/UnitList", "collections/LeaseList", "collections/InquiryList", "collections/TenantList", "collections/ApplicantList", "collections/ListingList", "collections/PhotoList", "collections/ActivityList", "collections/CommentList", "models/Unit", "models/Lease", "i18n!nls/common"], function(_, Parse, UnitList, LeaseList, InquiryList, TenantList, ApplicantList, ListingList, PhotoList, ActivityList, CommentList, Unit, Lease, i18nCommon) {
     var Property;
 
     Property = Parse.Object.extend("Property", {
@@ -15,7 +15,6 @@
         location_type: "APPROXIMATE",
         thoroughfare: '',
         locality: '',
-        neighbourhood: '',
         administrative_area_level_1: '',
         administrative_area_level_2: '',
         country: '',
@@ -89,12 +88,16 @@
         return this.get("profile").name().replace(/\s+/g, '-').toLowerCase();
       },
       country: function() {
-        return Parse.App.countryCodes[this.get("country")];
+        return i18nCommon.countries[this.get("country")];
       },
       city: function() {
-        this.get("locality").replace(/\s+/g, '-') + "--";
-        +this.get("administrative_area_level_1").replace(/\s+/g, '-') + "--";
-        return +Parse.App.countryCodes[this.get("country")].replace(/\s+/g, '-');
+        if (this.get("location")) {
+          return this.get("location").url();
+        } else {
+          this.get("locality").replace(/\s+/g, '-') + "--";
+          +this.get("administrative_area_level_1").replace(/\s+/g, '-') + "--";
+          return +i18nCommon.countries[this.get("country")].replace(/\s+/g, '-');
+        }
       },
       scrub: function(attrs) {
         var attr, bools, _i, _len;
@@ -204,7 +207,7 @@
       return title.replace(/\s+/g, '-').toLowerCase();
     };
     Property.country = function(country) {
-      return Parse.App.countryCodes[country];
+      return i18nCommon.countries[country];
     };
     return Property;
   });

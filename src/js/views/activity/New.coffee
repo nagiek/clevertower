@@ -71,7 +71,7 @@ define [
 
           # We are private by default when posting to the property. Adjust model accordingly.
           @togglePostPrivate()
-          @$("#activity-profile-pic").prop "src", @model.get("property").cover("tiny") unless @model.get "profile"
+          @$("#activity-profile-pic").prop "src", @model.get("property").get("profile").cover("tiny") unless @model.get "profile"
           @marker.setVisible false
           @$('#property-options').removeClass 'hide'
           # @model.get("property").marker.setZIndex 100
@@ -86,13 +86,7 @@ define [
           @view.map.setOptions
             draggable: true
 
-      @listenTo @model, "change:profile", =>
-        if @model.get("property") and not @model.get("profile")
-          # Property profile pic
-          @$("#activity-profile-pic").prop "src", @model.get("property").cover("tiny")
-        else
-          # User profile pic
-          @$("#activity-profile-pic").prop "src", Parse.User.current().get("profile").cover("tiny")
+      @listenTo @model, "change:profile", => @$("#activity-profile-pic").prop "src", @model.get("profile").cover("tiny")
 
 
     # Mid level functions
@@ -103,8 +97,10 @@ define [
       @trigger "view:resize"
 
     togglePostAsProperty: ->
-      if @model.get "profile" then @model.unset "profile"
-      else @model.set "profile", Parse.User.current().get("profile")
+      if @model.get("property") and @model.get("profile")
+        if @model.get("property").get("profile").id isnt @model.get("profile").id
+          @model.set "profile", @model.get("property").get("profile")
+        else @model.set "profile", Parse.User.current().get("profile")
 
     togglePostPrivate: ->
       if @$("#post-private").is(":checked") then @model.set("public", false) else @model.set("public", true)
@@ -152,15 +148,17 @@ define [
           @model.set "property", Parse.User.current().get("network").properties.models[0]
         else if Parse.User.current().get "property"
           @model.set "property", Parse.User.current().get("property")
+
       else
         @$('#add-property').removeClass 'active'
         @model.unset "property"
         # Don't post as property.
         @$("#post-as-property").prop "checked", false 
-        @model.set "profile", Parse.User.current().get("profile")
         # Post publicly
         @$("#post-private").prop "checked", true
-        @model.set "public", true
+        @model.set 
+          profile: Parse.User.current().get("profile")
+          public: true
       @trigger "view:resize"
 
 
@@ -170,14 +168,16 @@ define [
     setProperty : =>
       p = @$('#property-options select :selected').val()
       property = Parse.User.current().get("network").properties.get(p) || Parse.User.current().get("property")
-      @model.set "property", property
+      @model.set 
+        property: property
+        profile: property.get("profile")
 
 
     populatePropertySelectFromNetwork : ->
       if Parse.User.current().get("network").properties.length > 0
         propertyOptions = ''
         Parse.User.current().get("network").properties.each (p) -> 
-          propertyOptions += "<option value='#{p.id}'>#{p.get("title")}</option>"
+          propertyOptions += "<option value='#{p.id}'>#{p.get("profile").name()}</option>"
         @$("#property-options select").html propertyOptions
       else
         @handleNoProperty()
@@ -268,7 +268,7 @@ define [
       @$('.datepicker').datepicker()
 
       if Parse.User.current().get("property")
-        @$("#property-options .controls").html "<strong>#{Parse.User.current().get("property").get("title")}</strong>"
+        @$("#property-options .controls").html "<strong>#{Parse.User.current().get("property").get("profile").name()}</strong>"
         # rand = Math.floor Math.random() * i18nUser.form.share.length
         # @$("#activity-type :nth-child(#{rand + 1}) input").prop('checked', true)
         # @changeActivityType()
@@ -410,6 +410,9 @@ define [
               when 'postal_code'
                 attrs.postal_code = c.long_name
 
+          pointers = Parse.App.locations.closestNeighbourhoodAndLocation @model.get("center")
+          attrs = _.merge attrs, pointers
+
           @model.save(attrs).then (model) => 
             # Add to appropriate collection
             if @model.get("property")
@@ -431,16 +434,15 @@ define [
               vars.end_time = attrs.endDate if attrs.endDate
 
               # Add city if we have set one up.
-              city = @model.city()
-              if _.contains _.keys(Parse.App.cities), city
-                vars.place = Parse.App.cities.fbID
+              if @model.get("location")
+                vars.place = @model.get("location").get("profile").get("fbID")
                   # id: Parse.App.cities.fbID
                   # name: Parse.App.cities.fbName
                   # location:
                   #   country: @model.country()
                   #   latitude: @model.get("center")._latitude
                   #   longitude: @model.get("center")._longitude
-                vars.city = window.location.origin + city
+                vars.city = window.location.origin + @model.get("location").url()
 
               window.FB.api 'me/og.posts',
                 'post', vars,

@@ -96,6 +96,10 @@
       changes_saved: "Changes Saved.",
       request_sent: "Request sent."
     },
+    countries: {
+      CA: "Canada",
+      US: "United States"
+    },
     dates: {
       moment_format: "MM/DD/YYYY",
       datepicker_format: "mm/dd/yyyy",
@@ -183,12 +187,6 @@
     activity: {
       building: "Post to your building",
       people_who_like_this: "People who like this",
-      people_following: function(name) {
-        return "People following <em>" + name + "</em>";
-      },
-      people_followed_by: function(name) {
-        return "People followed by <em>" + name + "</em>";
-      },
       be_the_first_to_like_this: "Be the first one to like this",
       following_no_one: function(name) {
         return "<em>" + name + "</em> isn't following anyone";
@@ -214,6 +212,7 @@
       on: "on",
       off: "off",
       at: "at",
+      "in": "in",
       eg: "E.g., "
     },
     affirmations: {
@@ -228,6 +227,7 @@
       beginning: "Beginning",
       loading: "Loading",
       following: "Following",
+      followed_by: "Followed by",
       explore: "Explore",
       manage: "Manage",
       view: "View"

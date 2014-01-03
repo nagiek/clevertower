@@ -112,7 +112,17 @@ define [
               image: arguments[0].get "url"
               title: i18nProperty.activity.added_photos(arguments.length)
               public: true
+              center: @model.get "center"
               property: @model
+              network: @model.get "network"
+              profile: @model.get "profile"
+              locality: @model.get "locality"
+              administrative_area_level_1: @model.get "administrative_area_level_1"
+              administrative_area_level_2: @model.get "administrative_area_level_2"
+              location: @model.get "location"
+              neighbourhood: @model.get "neighbourhood"
+              country: @model.get "country"
+              postal_code: @model.get "postal_code"
             activity.save().then => Parse.App.activity.add activity if Parse.App.activity,
             (error) => console.log error
 

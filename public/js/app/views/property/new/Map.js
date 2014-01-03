@@ -216,7 +216,7 @@
       };
 
       GMapView.prototype.parse = function(res) {
-        var components, route, street_number;
+        var components, pointers, route, street_number;
 
         components = {
           'formatted_address': res.formatted_address,
@@ -226,8 +226,6 @@
         street_number = '';
         route = '';
         _.each(res.address_components, function(c) {
-          var neighborhood;
-
           switch (c.types[0]) {
             case 'street_number':
               street_number = c.long_name;
@@ -237,9 +235,6 @@
               break;
             case 'locality':
               components.locality = c.long_name;
-              break;
-            case 'neighborhood':
-              neighborhood = c.long_name;
               break;
             case 'administrative_area_level_1':
               components.administrative_area_level_1 = c.short_name.substr(0, 2).toUpperCase();
@@ -256,6 +251,8 @@
           }
         });
         components.thoroughfare = street_number + " " + route;
+        pointers = Parse.App.locations.closestNeighbourhoodAndLocation(components.center);
+        components = _.merge(components, pointers);
         return components;
       };
 

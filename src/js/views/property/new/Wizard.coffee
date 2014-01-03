@@ -204,12 +204,19 @@ define [
               activityACL.setPublicReadAccess true
               activity.save
                 activity_type: "new_property"
+                title: data.activity.title
                 public: true
                 center: @model.get "center"
                 property: @model
                 network: @model.get "network"
-                title: data.activity.title
                 profile: @model.get "profile"
+                locality: @model.get "locality"
+                administrative_area_level_1: @model.get "administrative_area_level_1"
+                administrative_area_level_2: @model.get "administrative_area_level_2"
+                location: @model.get "location"
+                neighbourhood: @model.get "neighbourhood"
+                country: @model.get "country"
+                postal_code: @model.get "postal_code"
                 ACL: activityACL
               .then ->
                 Parse.User.current().activity = Parse.User.current().activity || new ActivityList [], {}

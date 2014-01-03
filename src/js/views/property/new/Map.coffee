@@ -198,11 +198,6 @@ define [
           when 'locality'
             components.locality = c.long_name
             break
-          when 'neighborhood'
-            # Replace the city if we don't have one.
-            # components.locality ||= c.long_name
-            neighborhood = c.long_name
-            break
           when 'administrative_area_level_1'
             components.administrative_area_level_1 = c.short_name.substr(0,2).toUpperCase()
             break
@@ -216,6 +211,11 @@ define [
             components.postal_code = c.long_name
             break
       components.thoroughfare = street_number + " " + route
+
+      pointers = Parse.App.locations.closestNeighbourhoodAndLocation components.center
+
+      components = _.merge components, pointers
+
       return components
 
     clear : =>

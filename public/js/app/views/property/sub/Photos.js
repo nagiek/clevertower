@@ -99,7 +99,17 @@
                 image: arguments[0].get("url"),
                 title: i18nProperty.activity.added_photos(arguments.length),
                 "public": true,
-                property: _this.model
+                center: _this.model.get("center"),
+                property: _this.model,
+                network: _this.model.get("network"),
+                profile: _this.model.get("profile"),
+                locality: _this.model.get("locality"),
+                administrative_area_level_1: _this.model.get("administrative_area_level_1"),
+                administrative_area_level_2: _this.model.get("administrative_area_level_2"),
+                location: _this.model.get("location"),
+                neighbourhood: _this.model.get("neighbourhood"),
+                country: _this.model.get("country"),
+                postal_code: _this.model.get("postal_code")
               });
               activity.save().then(function() {
                 if (Parse.App.activity) {

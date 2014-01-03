@@ -12,8 +12,8 @@ define [
   "collections/CommentList"
   "models/Unit"
   "models/Lease"
-  "underscore.inflection"
-], (_, Parse, UnitList, LeaseList, InquiryList, TenantList, ApplicantList, ListingList, PhotoList, ActivityList, CommentList, Unit, Lease, Listing, inflection) ->
+  "i18n!nls/common"
+], (_, Parse, UnitList, LeaseList, InquiryList, TenantList, ApplicantList, ListingList, PhotoList, ActivityList, CommentList, Unit, Lease, i18nCommon) ->
 
   Property = Parse.Object.extend "Property",
   # class Property extends Parse.Object
@@ -31,7 +31,6 @@ define [
       location_type                 : "APPROXIMATE"
       thoroughfare                  : ''
       locality                      : ''
-      neighbourhood                 : ''
       administrative_area_level_1   : ''
       administrative_area_level_2   : ''
       country                       : ''
@@ -112,12 +111,14 @@ define [
     # URL friendly title
     publicUrl: -> "/places/#{@country()}/#{@get("administrative_area_level_1")}/#{@get("locality")}/#{@id}/#{@slug()}"
     slug: -> @get("profile").name().replace(/\s+/g, '-').toLowerCase()
-    country: -> Parse.App.countryCodes[@get("country")]
+    country: -> i18nCommon.countries[@get("country")]
 
     city: -> 
-      @get("locality").replace(/\s+/g, '-') + "--"
-      + @get("administrative_area_level_1").replace(/\s+/g, '-') + "--"
-      + Parse.App.countryCodes[@get("country")].replace(/\s+/g, '-')
+      if @get("location") then @get("location").url()
+      else  
+        @get("locality").replace(/\s+/g, '-') + "--"
+        + @get("administrative_area_level_1").replace(/\s+/g, '-') + "--"
+        + i18nCommon.countries[@get("country")].replace(/\s+/g, '-')
 
     scrub: (attrs) ->
       bools = ['electricity'
@@ -192,7 +193,7 @@ define [
   Property.url = (id) -> "/properties/#{id}"
   Property.publicUrl = (country, area, locality, id, slug) -> "/places/#{country}/#{area}/#{locality}/#{id}/#{slug}"
   Property.slug = (title) -> title.replace(/\s+/g, '-').toLowerCase()
-  Property.country = (country) -> Parse.App.countryCodes[country]
+  Property.country = (country) -> i18nCommon.countries[country]
 
 
   Property

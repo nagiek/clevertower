@@ -242,12 +242,19 @@
                 activityACL.setPublicReadAccess(true);
                 activity.save({
                   activity_type: "new_property",
+                  title: data.activity.title,
                   "public": true,
                   center: _this.model.get("center"),
                   property: _this.model,
                   network: _this.model.get("network"),
-                  title: data.activity.title,
                   profile: _this.model.get("profile"),
+                  locality: _this.model.get("locality"),
+                  administrative_area_level_1: _this.model.get("administrative_area_level_1"),
+                  administrative_area_level_2: _this.model.get("administrative_area_level_2"),
+                  location: _this.model.get("location"),
+                  neighbourhood: _this.model.get("neighbourhood"),
+                  country: _this.model.get("country"),
+                  postal_code: _this.model.get("postal_code"),
                   ACL: activityACL
                 }).then(function() {
                   Parse.User.current().activity = Parse.User.current().activity || new ActivityList([], {});

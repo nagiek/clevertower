@@ -102,6 +102,13 @@ define [
             property: modelJSON.property
             network: modelJSON.network
             title: modelJSON.title
+            locality: modelJSON.locality
+            administrative_area_level_1: modelJSON.administrative_area_level_1
+            administrative_area_level_2: modelJSON.administrative_area_level_2
+            location: modelJSON.location
+            neighbourhood: modelJSON.neighbourhood
+            country: modelJSON.country
+            postal_code: modelJSON.postal_code
 
           activity.save(activityVars).then (returnedActivity) ->
             model.save activity: returnedActivity

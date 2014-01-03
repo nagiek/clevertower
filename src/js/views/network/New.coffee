@@ -53,6 +53,8 @@ define [
 
         Parse.User.current().set(network: @model)
         if Parse.User.current().get("property") then Parse.User.current().get("property").set(network: @model)
+        if Parse.User.current().get("unit") then Parse.User.current().get("unit").set(network: @model)
+        if Parse.User.current().get("lease") then Parse.User.current().get("lease").set(network: @model)
 
         Parse.User.current().networkSetup().then =>
           Parse.history.navigate "inside", true

@@ -301,7 +301,13 @@ define [
       data = activity.data()
       model = Parse.User.current().get("profile").followingActivity.at(data.index)
 
-      @markAsLiked(activity) if Parse.User.current().get("profile").likes.find (l) => l.id is model.id
+      @markAsLiked(activity) if model.likedByUser()
+
+    checkIfFollowing: (activity) =>
+      data = activity.data()
+      model = Parse.User.current().get("profile").followingActivity.at(data.index)
+
+      @markAsFollowing(activity) if model.followedByUser()
 
     resetListViews: ->
 

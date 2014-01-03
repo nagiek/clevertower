@@ -21,11 +21,11 @@ define [
 
       @view = attrs.view
 
-      if Parse.User.current() and @model.get("unit")
-        if Parse.User.current().get("network")
-          @listenTo Parse.User.current().get("network").units, "reset", @addUnit
-        else if Parse.User.current().get("property")
-          @listenTo Parse.User.current().get("property").units, "reset", @addUnit
+      # if Parse.User.current() and @model.get("unit")
+      #   if Parse.User.current().get("network")
+      #     @listenTo Parse.User.current().get("network").units, "reset", @addUnit
+      #   else if Parse.User.current().get("property")
+      #     @listenTo Parse.User.current().get("property").units, "reset", @addUnit
   
     # Re-render the contents of the property item.
     render: ->
@@ -40,25 +40,25 @@ define [
         unit: false
 
       # Find if we have a connection to the person.
-      if Parse.User.current()
-        if Parse.User.current().get("network")
-          if @model.get("property")
-            property = Parse.User.current().get("network").properties.find((p) => p.id is @model.get("property").id)
-            if property 
-              vars.property = property.get("title")
-              # If we have the property, check for the unit.
-              if @model.get("unit")
-                unit = Parse.User.current().get("network").units.find((u) => u.id is @model.get("unit").id)
-                if unit then vars.unit = unit.get("title")
-        if Parse.User.current().get("property")
-          if @model.get("property")
-            if Parse.User.current().get("property") and Parse.User.current().get("property").id is @model.get("property").id 
-              vars.property = Parse.User.current().get("property").get("title")
+      # if Parse.User.current()
+      #   if Parse.User.current().get("network")
+      #     if @model.get("property")
+      #       property = Parse.User.current().get("network").properties.find((p) => p.id is @model.get("property").id)
+      #       if property 
+      #         vars.property = property.get("title")
+      #         # If we have the property, check for the unit.
+      #         if @model.get("unit")
+      #           unit = Parse.User.current().get("network").units.find((u) => u.id is @model.get("unit").id)
+      #           if unit then vars.unit = unit.get("title")
+      #   if Parse.User.current().get("property")
+      #     if @model.get("property")
+      #       if Parse.User.current().get("property") and Parse.User.current().get("property").id is @model.get("property").id 
+      #         vars.property = Parse.User.current().get("property").get("title")
 
-              # If we have the property, check for the unit.
-              if @model.get("unit")
-                unit = Parse.User.current().get("property").units.find((u) => u.id is @model.get("unit").id)
-                if unit then vars.unit = unit.get("title")
+      #         # If we have the property, check for the unit.
+      #         if @model.get("unit")
+      #           unit = Parse.User.current().get("property").units.find((u) => u.id is @model.get("unit").id)
+      #           if unit then vars.unit = unit.get("title")
 
       @$el.html JST["src/js/templates/profile/summary.jst"](vars)
       @

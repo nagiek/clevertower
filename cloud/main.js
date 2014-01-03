@@ -123,6 +123,79 @@
     });
   });
 
+  Parse.Cloud.define("CreateLocations", function(req, res) {
+    var attrs, i, locationAttributes, locations, objectACL, profileAttributes, _i, _len;
+
+    Parse.Cloud.useMasterKey();
+    objectACL = new Parse.ACL;
+    objectACL.setPublicReadAccess(true);
+    locationAttributes = [
+      {
+        googleName: "Montreal--QC--Canada",
+        isCity: true,
+        center: new Parse.GeoPoint(45.5, -73.566667)
+      }, {
+        googleName: "Le-Plateau-Mont-Royal--Montreal--QC--Canada",
+        isCity: false,
+        center: new Parse.GeoPoint(45.521646, -73.57545)
+      }, {
+        googleName: "Toronto--ON--Canada",
+        isCity: true,
+        center: new Parse.GeoPoint(43.6537228, -79.373571)
+      }, {
+        googleName: "The-Beaches--Toronto--ON--Canada",
+        isCity: false,
+        center: new Parse.GeoPoint(43.667266, -79.297128)
+      }
+    ];
+    profileAttributes = [
+      {
+        fbID: 102184499823699,
+        name: "Montreal",
+        bio: 'Originally called Ville-Marie, or "City of Mary", it is named after Mount Royal, the triple-peaked hill located in the heart of the city.',
+        image_thumb: "/img/city/Montreal--QC--Canada.jpg",
+        image_profile: "/img/city/Montreal--QC--Canada.jpg",
+        image_full: "/img/city/Montreal--QC--Canada.jpg"
+      }, {
+        fbID: 106014166105010,
+        name: "The Plateau-Mont-Royal",
+        bio: 'The Plateau-Mont-Royal is the most densely populated borough in Canada, with 101,054 people living in an 8.1 square kilometre area.',
+        image_thumb: "/img/city/Montreal--QC--Canada.jpg",
+        image_profile: "/img/city/Montreal--QC--Canada.jpg",
+        image_full: "/img/city/Montreal--QC--Canada.jpg"
+      }, {
+        fbID: 110941395597405,
+        name: "Toronto",
+        bio: 'Canada’s most cosmopolitan city is situated on beautiful Lake Ontario, and is the cultural heart of south central Ontario and of English-speaking Canada.',
+        image_thumb: "/img/city/Toronto--ON--Canada.jpg",
+        image_profile: "/img/city/Toronto--ON--Canada.jpg",
+        image_full: "/img/city/Toronto--ON--Canada.jpg"
+      }, {
+        fbID: 111084918946366,
+        name: "The Beaches",
+        bio: 'The Beaches (also known as "The Beach") is a neighbourhood and popular tourist destination. It is located on the east side of the "Old" City of Toronto.',
+        image_thumb: "/img/city/Toronto--ON--Canada.jpg",
+        image_profile: "/img/city/Toronto--ON--Canada.jpg",
+        image_full: "/img/city/Toronto--ON--Canada.jpg"
+      }
+    ];
+    locations = [];
+    for (i = _i = 0, _len = locationAttributes.length; _i < _len; i = ++_i) {
+      attrs = locationAttributes[i];
+      attrs.profile = new Parse.Object("Profile", profileAttributes[i]);
+      attrs.ACL = objectACL;
+      locations.push(new Parse.Object("Location", attrs));
+    }
+    return Parse.Object.saveAll(locations, {
+      success: function() {
+        return res.success();
+      },
+      error: function(error) {
+        return res.error;
+      }
+    });
+  });
+
   Parse.Cloud.define("SetPicture", function(req, res) {
     return Parse.Cloud.httpRequest({
       method: "GET",
@@ -692,7 +765,7 @@
   });
 
   Parse.Cloud.afterSave("Network", function(req) {
-    var managerACL;
+    var managerACL, objsToSave;
 
     if (!req.object.existed()) {
       managerACL = req.object.getACL();
@@ -705,14 +778,18 @@
         accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb",
         ACL: managerACL
       });
-      req.user.save({
-        network: req.object
-      });
+      objsToSave = [];
+      objsToSave.push(req.user.set("network", req.object));
       if (req.user.get("property")) {
-        return req.user.get("property").save({
-          network: req.object
-        });
+        objsToSave.push(req.user.get("property").set("network", req.object));
       }
+      if (req.user.get("unit")) {
+        objsToSave.push(req.user.get("unit").set("network", req.object));
+      }
+      if (req.user.get("lease")) {
+        objsToSave.push(req.user.get("lease").set("network", req.object));
+      }
+      return Parse.Object.saveAll(objsToSave);
     }
   });
 
@@ -882,6 +959,20 @@
       success: function(profile) {
         return profile.save({
           property: req.object,
+          ACL: req.object.getACL()
+        });
+      }
+    });
+  });
+
+  Parse.Cloud.afterSave("Location", function(req) {
+    if (req.object.existed()) {
+      return;
+    }
+    return (new Parse.Query("Profile")).get(req.object.get("profile").id, {
+      success: function(profile) {
+        return profile.save({
+          location: req.object,
           ACL: req.object.getACL()
         });
       }
@@ -1845,6 +1936,8 @@
             property: property,
             center: property.get("center"),
             network: property.get("network"),
+            location: property.get("location"),
+            neighbourhood: property.get("neighbourhood"),
             ACL: activityACL
           });
           return res.success();
