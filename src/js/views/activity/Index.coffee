@@ -240,14 +240,14 @@ define [
         @activityQuery = Parse.Query.or(
           Parse.App.activity.query,
           Parse.User.current().activity.query
-        )
+        ).include("property.profile").include("profile").include("location.profile")
         @commentQuery = Parse.Query.or(
           Parse.App.comments.query
           Parse.User.current().comments.query
-        )
+        ).include("property.profile").include("profile").include("location.profile")
       else
-        @activityQuery = Parse.App.activity.query
-        @commentQuery = Parse.App.comments.query
+        @activityQuery = Parse.App.activity.query.include("property.profile").include("profile").include("location.profile")
+        @commentQuery = Parse.App.comments.query.include("property.profile").include("profile").include("location.profile")
 
     renderMap : =>
       if @radius
@@ -349,8 +349,8 @@ define [
       @$loading.html "<img src='/img/misc/spinner.gif' class='spinner' alt='#{i18nCommon.verbs.loading}' />"
       @moreToDisplay = true
 
-      @activityQuery.skip(@resultsPerPage * (@page - 1)).limit(@resultsPerPage).include("property").include("profile")
-      @commentQuery.skip(@commentsPerPage * (@page - 1)).limit(@commentsPerPage).include("property").include("profile")
+      @activityQuery.skip(@resultsPerPage * (@page - 1)).limit(@resultsPerPage)
+      @commentQuery.skip(@commentsPerPage * (@page - 1)).limit(@commentsPerPage)
 
       # handleMapActivity
       Parse.Promise.when(

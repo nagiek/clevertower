@@ -556,11 +556,11 @@ require [
       profile.followers.query = profile.relation("followers").query().include("property")
 
       profile.followingActivity = new ActivityList [], {}
-      # profile.followingActivity.query = Parse.Query.or(
-      #   new Parse.Query("Activity").matchesQuery("profile", profile.relation("following").query())
-      #   , new Parse.Query("Activity").matchesKeyInQuery("location", "location", profile.relation("following").query())
-      # ).include("property").include("profile").include("location")
-      profile.followingActivity.query = new Parse.Query("Activity").matchesKeyInQuery("location", "location", profile.relation("following").query())
+      profile.followingActivity.query = Parse.Query.or(
+        new Parse.Query("Activity").matchesKeyInQuery("location", "location", profile.relation("following").query())
+        , 
+        new Parse.Query("Activity").matchesQuery("profile", profile.relation("following").query())
+      ).include("property.profile").include("profile").include("location.profile")
 
       profile.followingComments = new CommentList [], {}
       profile.followingComments.query.matchesQuery "profile", profile.relation("following").query()

@@ -233,8 +233,8 @@ define [
       @$loading.html "<img src='/img/misc/spinner.gif' class='spinner' alt='#{i18nCommon.verbs.loading}' />"
       @moreToDisplay = true
 
-      Parse.User.current().get("profile").followingActivity.query.skip(@resultsPerPage * (@page - 1)).limit(@resultsPerPage).include("property").include("profile")
-      Parse.User.current().get("profile").followingComments.query.skip(@commentsPerPage * (@page - 1)).limit(@commentsPerPage).include("property").include("profile")
+      Parse.User.current().get("profile").followingActivity.query.skip(@resultsPerPage * (@page - 1)).limit(@resultsPerPage)
+      Parse.User.current().get("profile").followingComments.query.skip(@commentsPerPage * (@page - 1)).limit(@commentsPerPage)
 
       # handleMapActivity
       Parse.Promise.when(

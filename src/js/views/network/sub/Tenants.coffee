@@ -70,7 +70,7 @@ define [
       visible = switch @currentFilter
         when 'filter-all'     then @model.tenants.models
         when 'filter-recent'  then @model.tenants.filterRecent()
-      if visible.length is 0 then @$list.html "<li class='span'>#{i18nGroup.tenant.empty.index}</li>"
+      if visible.length is 0 then @$list.html "<li class='col-xs-12'>#{i18nGroup.tenant.empty.index}</li>"
       else _.each visible, @addOne
       
       @$list.addClass "in"
