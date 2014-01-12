@@ -194,6 +194,8 @@
       followed_by_no_one: function(name) {
         return "<em>" + name + "</em> isn't followed by anyone";
       },
+      you_arent_following_anyone: "You aren't following anyone, so there's nothing here!",
+      find_your_interests: "Find your favourite locations, buildings, and people to follow.",
       be_the_first_to_like_this: "Be the first one to like this",
       exhausted: "There are no more items to display."
     },
@@ -249,6 +251,7 @@
       outside: "Outside",
       following: "Following",
       followers: "Followers",
+      suggestions: "Suggestions",
       history: "History",
       tenants: "Tenants",
       roommates: "Roommates",

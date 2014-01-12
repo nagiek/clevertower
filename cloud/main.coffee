@@ -607,7 +607,8 @@ Parse.Cloud.beforeSave Parse.User, (req, res) ->
   email = req.object.get "email"
   
   # Map the user to the profile, if any.
-  (new Parse.Query "Profile").equalTo('email', email).first()
+  # Make sure we are not taking an existing profile.
+  (new Parse.Query "Profile").equalTo('email', email).doesNotExist("property").doesNotExist("location").doesNotExist("user").first()
   .then (profile) ->
     
     # Get all pre-exising profile things

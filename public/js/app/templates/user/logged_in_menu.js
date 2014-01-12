@@ -26,6 +26,8 @@ __p += '<li class="hidden-sm hidden-xs">\n  <a id="profile-link" class="clearfix
 ((__t = ( i18nUser.menu.privacy_settings )) == null ? '' : __t) +
 '</a></li>\n    <li><a href="/account/apps"><span class="glyphicon glyphicon-th"></span> ' +
 ((__t = ( i18nUser.menu.apps )) == null ? '' : __t) +
+'</a></li>\n    <li class="divider">\n    <li><a href="/find_friends"><span class="glyphicon glyphicon-info-sign"></span> ' +
+((__t = ( i18nUser.menu.find_friends )) == null ? '' : __t) +
 '</a></li>\n    <li class="divider">\n    <li><a id="logout" href="#">' +
 ((__t = ( i18nDevise.actions.logout )) == null ? '' : __t) +
 '</a></li>\n  </ul>\n</li>\n<li class="visible-xs visible-sm list-item-icon"><a href="#" data-target="#search-menu" data-toggle="collapse"><span class="glyphicon glyphicon-search"></span></a></li>';

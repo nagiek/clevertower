@@ -59,11 +59,12 @@ define [
             # Must run through login-start process in-sync, without trigger, as we may change the profile.
             Parse.User.current().setup().then =>
               # User signed up and logged in through Facebook
-              FB.api '/me', 
-              fields: 'first_name, last_name, email, birthday, bio, website, gender, picture.width(270).height(270)', # picture?width=400&height=400
+              FB.api '/me',
+              fields: 'friends, id, first_name, last_name, email, birthday, bio, website, gender, picture.width(270).height(270)', # picture?width=400&height=400
               (response) =>
 
                 userVars = 
+                  fbFriends: if response.friends then _.map response.friends.data, (f) -> f.id else []
                   email: response.email
                   birthday: new Date response.birthday
                   gender: response.gender
@@ -71,6 +72,7 @@ define [
                 userVars.location = response.location.name if response.location
                 Parse.User.current().save userVars
                 Parse.User.current().get("profile").save
+                  fbID: if response.id then Number response.id
                   email: response.email
                   first_name: response.first_name
                   last_name: response.last_name

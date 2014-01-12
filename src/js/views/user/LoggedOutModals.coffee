@@ -47,8 +47,8 @@ define [
       @$('#login-modal').remove()
 
       unless Parse.User.current().get("property") or Parse.User.current().get("network") 
-        Parse.history.navigate "/account/setup", trigger: true
-      @clear()
+        Parse.history.navigate "/find_friends", true
+      else @clear()
 
     render: =>
       @$el.append JST["src/js/templates/user/logged_out_modals.jst"](i18nCommon: i18nCommon, i18nDevise: i18nDevise)
@@ -119,12 +119,14 @@ define [
             Parse.User.current().setup().then =>
               # User signed up and logged in through Facebook
               FB.api '/me', 
-              fields: 'first_name, last_name, email, birthday, bio, website, gender, picture.width(270).height(270)', # picture?width=400&height=400
+              fields: 'friends, id, first_name, last_name, email, birthday, bio, website, gender, picture.width(270).height(270)', # picture?width=400&height=400
               (response) =>
-
-                console.log response
+                  
+                friends = []
+                if response.friends then _.each response.friends.data, (f) -> friends.push(Number f.id)
 
                 userVars = 
+                  fbFriends: friends
                   email: response.email
                   birthday: new Date response.birthday
                   gender: response.gender
@@ -132,6 +134,7 @@ define [
                 userVars.location = response.location.name if response.location
                 Parse.User.current().save userVars
                 Parse.User.current().get("profile").save
+                  fbID: if response.id then Number response.id
                   email: response.email
                   first_name: response.first_name
                   last_name: response.last_name

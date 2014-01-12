@@ -34,6 +34,8 @@ define [
       likesCount          : 0
       followersCount      : 0
       followingCount      : 0
+      # Recommended
+      recommended         : false
 
     # Backbone default, as Parse function does not exist.
     url: ->

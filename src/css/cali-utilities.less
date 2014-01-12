@@ -74,12 +74,18 @@ a > .badge {
  * Lists
  */
 ul.list-inline, ol.list-inline {
-  margin-bottom: 0;
+  margin-bottom: 9px;
   // li + li {
   //   margin-left:10px;
   // }
   &.inline-condensed {
     li + li { padding-left: 1px; padding-right: 1px; }
+  }
+}
+
+@media (min-width: @screen-sm-min) {
+  ul.list-inline, ol.list-inline {
+    margin-bottom: 0;
   }
 }
 

@@ -15,6 +15,16 @@
 
       <% if (current) { %>
         <a href="/account/edit" class="btn btn-default pull-right visible-xs"><%= i18nCommon.actions.edit %></a>
+      <% } else { %>
+        <div class="pull-right follow-controls">
+          <% if (!followedByUser) { %>
+            <button type="button" class="btn btn-primary follow"><%= i18nCommon.actions.follow %></button>
+          <% } else { %>
+            <span class="btn btn-primary following"><%= i18nCommon.verbs.following %></span>
+            <span></span> <!-- to break up .btn btn-default + .btn btn-default spacing -->
+            <button type="button" class="btn btn-default follow unfollow"><%= i18nCommon.actions.unfollow %></button>
+          <% } %>
+        </div>
       <% } %>
       <h1 class="soften left-xs"><%= name %></h1>
 

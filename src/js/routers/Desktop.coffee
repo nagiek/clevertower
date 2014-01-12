@@ -16,6 +16,7 @@ define [
       "outside*splat"               : "outside"
       "following/*splat"            : "following"
       "following*splat"             : "following"
+      "find_friends"                : "findFriends"
       # "inside"                      : "propertiesManage"
       # "inside/*splat"               : "propertiesManage"
       "network/new"                 : "networkNew"
@@ -55,25 +56,31 @@ define [
 
       $("#sidebar-toggle").click -> $("body").toggleClass("active")
           
-      @listenTo Parse.Dispatcher, "user:login", =>
-        if Parse.User.current().get("network") or Parse.User.current().get("property")
-          # Reload the current path. 
-          # Don't use navigate, as it will fail.
-          # The route functions themselves are responsible for altering content.
-          Parse.history.loadUrl location.pathname
-        else
-          # require ["views/helper/Alert", 'i18n!nls/property'], (Alert, i18nProperty) =>
-          #   new Alert
-          #     event:    'no_network'
-          #     type:     'warning'
-          #     fade:     true
-          #     heading:  i18nProperty.errors.network_not_set
-          Parse.history.navigate "account/setup", true
+      # @listenTo Parse.Dispatcher, "user:login", =>
 
-      @listenTo Parse.Dispatcher, "user:logout", =>
-        # Reload the current path. Don't use navigate, as it will fail.
-        # The route functions themselves are responsible for altering content.
-        Parse.history.loadUrl location.pathname
+      #   # Reload the current path. 
+      #   # Don't use navigate, as it will fail.
+      #   # The route functions themselves are responsible for altering content.
+      #   Parse.history.loadUrl location.pathname
+
+        # if Parse.User.current().get("network") or Parse.User.current().get("property")
+        #   # Reload the current path. 
+        #   # Don't use navigate, as it will fail.
+        #   # The route functions themselves are responsible for altering content.
+        #   Parse.history.loadUrl location.pathname
+        # else
+        #   # require ["views/helper/Alert", 'i18n!nls/property'], (Alert, i18nProperty) =>
+        #   #   new Alert
+        #   #     event:    'no_network'
+        #   #     type:     'warning'
+        #   #     fade:     true
+        #   #     heading:  i18nProperty.errors.network_not_set
+        #   Parse.history.navigate "account/setup", true
+
+      # @listenTo Parse.Dispatcher, "user:logout", =>
+      #   # Reload the current path. Don't use navigate, as it will fail.
+      #   # The route functions themselves are responsible for altering content.
+      #   Parse.history.loadUrl location.pathname
       
 
       # Reset global view state.
@@ -116,12 +123,25 @@ define [
           view.clear() if view
 
     following: (splat) ->
-      view = @view
-      require ["views/activity/following"], (FollowingActivityView) =>
-        if !view or view !instanceof FollowingActivityView
-          vars = @deparamAction splat
-          @view = new FollowingActivityView(location: vars.path, params: vars.params).render()
-          view.clear() if view
+      if Parse.User.current()
+        view = @view
+        require ["views/activity/following"], (FollowingActivityView) =>
+          if !view or view !instanceof FollowingActivityView
+            vars = @deparamAction splat
+            @view = new FollowingActivityView(location: vars.path, params: vars.params).render()
+            view.clear() if view
+      else
+        Parse.history.navigate "account/login", true
+
+    findFriends: ->
+      if Parse.User.current()
+        view = @view
+        require ["views/user/suggestions"], (SuggestionsUserView) =>
+          if !view or view !instanceof SuggestionsUserView
+            @view = new SuggestionsUserView().render()
+            view.clear() if view
+      else
+        Parse.history.navigate "account/login", true
     # 
     # 
 

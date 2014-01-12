@@ -33,10 +33,17 @@
       </div>
     </div>
     <div class="col-sm-8 content">
-      <div id="activities" class="thumbnails row"></div>
-      <div class="loading center col-xs-12">
-        <img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" />
+      <div id="activities" class="thumbnails row">
+        <% if (!isFollowing) { %>
+          <h2 class="col-xs-12 center"><%= i18nCommon.activity.you_arent_following_anyone %></h2>
+          <h3 class="col-xs-12 center"><a href="/find_friends"><%= i18nCommon.activity.find_your_interests %></a></h3>
+        <% } %>
       </div>
+      <% if (isFollowing) { %>
+        <div class="loading center col-xs-12">
+          <img src='/img/misc/spinner.gif' class='spinner' alt="<%= i18nCommon.verbs.loading %>" />
+        </div>
+      <% } %>
       <div class="pagination col-xs-12">
         <ul></ul>
       </div>

@@ -106,8 +106,8 @@ define [
           activity = lv.find("> div > .activity-#{l.id}")
           if activity.length > 0
             @markAsLiked activity[0].$el
-            # return false to avoid checking the other column.
-            false
+            # return {} to avoid checking the other column.
+            {}
 
     checkForFollowing: =>
       Parse.User.current().get("profile").following.each @markProfileActivitiesAsFollowing
@@ -117,16 +117,16 @@ define [
         activity = lv.find("> div > .profile-#{p.id}")
         if activity.length > 0
           _.each activity, (a) => @markAsNotFollowing a.$el
-          # return false to avoid checking the other column.
-        false
+          # return {} to avoid checking the other column.
+          {}
 
     markProfileActivitiesAsFollowing: (p) =>
       _.each @listViews, (lv) =>
         activity = lv.find("> div > .profile-#{p.id}")
         if activity.length > 0
           _.each activity, (a) => @markAsFollowing a.$el
-          # return false to avoid checking the other column.
-        false
+          # return {} to avoid checking the other column.
+          {}
 
     redoSearch : =>
 

@@ -35,6 +35,21 @@
   }
 }
 
+.suggestion {
+  margin-bottom: 9px;
+}
+
+@media (max-width: @screen-xs-max) {
+  .suggestion {
+    min-height: 80px;
+  }
+}
+@media (min-width: @screen-sm-min) and (max-width: @screen-sm-max) {
+  .suggestion {
+    min-height: 200px;
+  }
+}
+
 #profile-stats {
   h6 {
     text-transform: uppercase;
@@ -65,7 +80,7 @@
 /**
  * Apps form
  */
-.apps-form {
+.app {
   h3 { 
     margin-top:0;
   }
@@ -84,42 +99,3 @@
     z-index: 0;
   }
 }
-
-/**
- * Profile view
- */
-.page-user {
-  .profile-pic {
-    float:left;
-  }
-  h1 {
-    display:inline-block;
-    margin-right: 12px;
-    margin-bottom:9px;
-  }
-  .btn-group {
-    vertical-align:top;
-    margin-top:9px; // Same as h1.
-  }
-  .field-bio {
-    margin-bottom:9px;
-    font-size:14px;
-  }
-  .action-links {
-    float:none;
-  }
-  .field-label {
-    width:100px;
-    display:inline-block;
-  }
-}
-
-/* Split into two sections */
-.entity-profile2 {
-  .field-type-image,
-  .group-info {
-    vertical-align:top;
-    display:inline-block;
-  }
-}
-

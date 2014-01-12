@@ -28,6 +28,7 @@ define [
       'click #followers-link'               : 'showFollowers'
       'click #following-link'               : 'showFollowing'
       "submit #profile-picture-upload-form" : 'save'
+      'click .follow'                       : 'follow'
 
     initialize: (attrs) ->
 
@@ -130,6 +131,7 @@ define [
         i18nUser: i18nUser
         i18nCommon: i18nCommon
         current: @current
+        followedByUser: @model.followedByUser()
         joinDate: moment(@model.createdAt).format("LL")
       
       _.defaults vars, Profile::defaults
@@ -245,3 +247,68 @@ define [
           </div>
         """
 
+    # Copied from BaseIndexActivityView
+    follow : (e, buttonParent, undo) =>
+
+      if Parse.User.current()
+
+        buttonParent = buttonParent || @$(e.currentTarget).parent()
+
+        if @model.followedByUser()
+          buttonParent.html """<button type="button" class="btn btn-primary follow">#{i18nCommon.actions.follow}</button>"""
+
+          Parse.User.current().get("profile").increment followingCount: -1
+          Parse.User.current().get("profile").relation("following").remove @model
+          Parse.User.current().get("profile").following.remove @model
+
+          # Check through other subviews to 
+          @view.trigger "profile:unfollow", @model
+
+          unless undo
+            Parse.Cloud.run "Unfollow", {
+              followee: @model.id
+              follower: Parse.User.current().get("profile").id
+            },
+            # Optimistic saving.
+            # success: (res) => 
+            error: (res) => 
+              # Undo what we did.
+              @follow(e, buttonParent, true)
+              console.log res
+          else new Alert event: 'follow', fade: false, message: i18nCommon.errors.not_saved, type: 'danger'
+
+        else
+          # extra span to break up .btn + .btn spacing
+          # Don't put in the unfollow button right away.
+          buttonParent.html("""<span class="btn btn-primary following">#{i18nCommon.verbs.following}</span>""")
+          setTimeout ->
+            buttonParent.append """
+              <span></span> 
+              <button type="button" class="btn btn-default follow unfollow">#{i18nCommon.actions.unfollow}</button>
+            """
+          , 500
+
+          Parse.User.current().get("profile").increment followingCount: +1
+          Parse.User.current().get("profile").relation("following").add @model
+          # Adding to a relation will somehow add to collection..?
+          Parse.User.current().get("profile").following.add @model
+
+          @view.trigger "profile:follow", @model
+
+          unless undo
+            Parse.Cloud.run "Follow", {
+              followee: @model.id
+              follower: Parse.User.current().get("profile").id
+            },
+            # Optimistic saving.
+            # success: (res) => 
+            error: (res) => 
+              # Undo what we did.
+              @follow(e, buttonParent, true)
+              console.log res
+          else new Alert event: 'follow', fade: false, message: i18nCommon.errors.not_saved, type: 'danger'
+          
+        Parse.User.current().get("profile").save()
+
+      else
+        $("#login-modal").modal()

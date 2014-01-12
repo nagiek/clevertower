@@ -13,6 +13,7 @@ define
     account:                    "Account"
     privacy:                    "Privacy"
     apps:                       "Apps"
+    find_friends:               "Find friends"
     connect_to_continue:        "Connect to continue"
     account_settings:           "Account settings"
     privacy_settings:           "Privacy settings"
@@ -26,6 +27,8 @@ define
     photo:            (name) -> "#{_.escape(name)}'s photo"
   setup:
     welcome_message:            "Welcome to CleverTower"
+    see_whos_on:                "You can follow lots of stuff on CleverTower. Find your favourite neighbourhoods, properties, or friends to follow."
+    your_first_property:        "Setting up your first property"
     performing_setup_for:       "Performing setup for"
     existing_notifications:     "You have existing offers to join or manage properties. Please select from the list below."
   fields:                       

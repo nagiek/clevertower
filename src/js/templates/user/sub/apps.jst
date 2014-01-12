@@ -1,55 +1,7 @@
 <form id="apps-form" class="apps-form">
   <div class="row">
-    <div class="facebook-group form-group col-md-6">
-      <div class="photo photo-thumbnail pull-left">
-        <img width="64" height="64" alt="Facebook" src="/img/vendor/facebook/fb-icon-64.png">
-        <div class="mask mask-thumbnail"></div>
-      </div>
-      <div class="photo-float thumbnail-float clearfix">
-        <div class="controls pull-right">
-          <% if (!fbLinked) { %>
-            <button id="fb-link" class="btn btn-default"><%= i18nCommon.actions.link %></button>
-          <% } else { %>
-            <span class="btn btn-default active linked"><%= i18nCommon.adjectives.linked %></span>
-            <span></span> <!-- to break up .btn btn-default + .btn btn-default spacing -->
-            <button id="fb-unlink" class="btn btn-default revoke btn-danger"><%= i18nCommon.actions.revoke_access %></button>
-          <% } %>
-        </div>
-        <label class="control-label">Facebook</label>
-        <p><%= i18nUser.app_descriptions.facebook %></p>
-      </div>
-    </div>
+    <div class="facebook-group form-group col-md-6 app"></div>
   </div>
-<!--   
-  <div class="row">
-    <div class="twitter-group form-group col-md-6">
-      <div class="photo photo-thumbnail pull-left">
-        <img width="64" height="64" alt="Twitter" src="/img/vendor/twitter/twitter-icon-64.png">
-        <div class="mask mask-thumbnail"></div>
-      </div>
-      <div class="photo-float thumbnail-float">
-        <label for="user-email" class="control-label">
-          <h3>
-            Twitter
-            <div class="right-lg">
-              <% if (1 == 1) { %>
-                <button id="twitter-link" class="btn btn-default"><%= i18nCommon.actions.link %></button>
-              <% } else { %>
-                <span class="btn btn-default active linked"><%= i18nCommon.adjectives.linked %></span>
-                <span></span> <!-- to break up .btn btn-default + .btn btn-default spacing --><!-- 
-                <button id="twitter-unlink" class="btn btn-default revoke btn-danger"><%= i18nCommon.actions.revoke_access %></button>
-              <% } %>
-            </div>
-          </h3>
-
-        </label>
-        <div class="controls">
-          <%= i18nUser.app_descriptions.twitter %>
-        </div>
-      </div>
-    </div>
-  </div>
--->
   <div class="form-actions">
     <a href="<%= cancel_path %>" class="back btn btn-default"><%= i18nUser.actions.back_to_profile %></a>
   </div>

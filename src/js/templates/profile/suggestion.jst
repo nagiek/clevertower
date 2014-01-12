@@ -1,0 +1,21 @@
+<div class="photo photo-medium photo-elastic left-sm">
+  <a href="<%= url %>">
+    <img src="<%= cover %>" alt="Profile" class="profile-picture">
+  </a>
+</div>
+<div class="photo-float medium-float elastic-float">
+  <div class="form-group">
+    <h4><a href="<%= url %>"><%= name %></a></h4>
+    <div class="property"><small><% if (property) { %><%= property %><% } %></small></div>
+    <div class="unit"><small><% if (unit) { %><%= unit %><% } %></small></div>
+  </div>
+  <div class="follow-controls">
+    <% if (!followedByUser) { %>
+      <button type="button" class="btn btn-primary follow"><%= i18nCommon.actions.follow %></button>
+    <% } else { %>
+      <span class="btn btn-primary following"><%= i18nCommon.verbs.following %></span>
+      <span></span> <!-- to break up .btn btn-default + .btn btn-default spacing -->
+      <button type="button" class="btn btn-default follow unfollow"><%= i18nCommon.actions.unfollow %></button>
+    <% } %>
+  </div>
+</div>

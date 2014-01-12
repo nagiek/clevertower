@@ -33,6 +33,7 @@
         "outside*splat": "outside",
         "following/*splat": "following",
         "following*splat": "following",
+        "find_friends": "findFriends",
         "network/new": "networkNew",
         "listings/new": "listingsNew",
         "leases/new": "leasesNew",
@@ -68,16 +69,6 @@
         Parse.App.search = new SearchView().render();
         $("#sidebar-toggle").click(function() {
           return $("body").toggleClass("active");
-        });
-        this.listenTo(Parse.Dispatcher, "user:login", function() {
-          if (Parse.User.current().get("network") || Parse.User.current().get("property")) {
-            return Parse.history.loadUrl(location.pathname);
-          } else {
-            return Parse.history.navigate("account/setup", true);
-          }
-        });
-        this.listenTo(Parse.Dispatcher, "user:logout", function() {
-          return Parse.history.loadUrl(location.pathname);
         });
         this.listenTo(Parse.history, "route", function(router, route, params) {
           return Parse.App.search.$('input').val("").blur();
@@ -154,21 +145,44 @@
         var view,
           _this = this;
 
-        view = this.view;
-        return require(["views/activity/following"], function(FollowingActivityView) {
-          var vars;
+        if (Parse.User.current()) {
+          view = this.view;
+          return require(["views/activity/following"], function(FollowingActivityView) {
+            var vars;
 
-          if (!view || !(view instanceof FollowingActivityView)) {
-            vars = _this.deparamAction(splat);
-            _this.view = new FollowingActivityView({
-              location: vars.path,
-              params: vars.params
-            }).render();
-            if (view) {
-              return view.clear();
+            if (!view || !(view instanceof FollowingActivityView)) {
+              vars = _this.deparamAction(splat);
+              _this.view = new FollowingActivityView({
+                location: vars.path,
+                params: vars.params
+              }).render();
+              if (view) {
+                return view.clear();
+              }
             }
-          }
-        });
+          });
+        } else {
+          return Parse.history.navigate("account/login", true);
+        }
+      };
+
+      DesktopRouter.prototype.findFriends = function() {
+        var view,
+          _this = this;
+
+        if (Parse.User.current()) {
+          view = this.view;
+          return require(["views/user/suggestions"], function(SuggestionsUserView) {
+            if (!view || !(view instanceof SuggestionsUserView)) {
+              _this.view = new SuggestionsUserView().render();
+              if (view) {
+                return view.clear();
+              }
+            }
+          });
+        } else {
+          return Parse.history.navigate("account/login", true);
+        }
       };
 
       DesktopRouter.prototype.activityShow = function(id) {

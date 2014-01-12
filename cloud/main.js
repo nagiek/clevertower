@@ -603,7 +603,7 @@
       return res.success();
     }
     email = req.object.get("email");
-    return (new Parse.Query("Profile")).equalTo('email', email).first().then(function(profile) {
+    return (new Parse.Query("Profile")).equalTo('email', email).doesNotExist("property").doesNotExist("location").doesNotExist("user").first().then(function(profile) {
       if (profile) {
         req.object.set("profile", profile);
         return res.success();

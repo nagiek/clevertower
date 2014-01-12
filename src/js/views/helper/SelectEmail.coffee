@@ -14,7 +14,7 @@ define [
     className: 'modal fade'
 
     events:
-      "click .done" : 'close'
+      "click .done" : 'clear'
       "click .next" : 'next'
       "click .prev" : 'prev'
     
@@ -107,7 +107,7 @@ define [
       @$end.html @index + res.feed.entry.length
       @contacts.add models
 
-    close: (e) =>
+    clear: (e) =>
       # e.preventDefault()
       @trigger('close')
       @$el.modal('hide')

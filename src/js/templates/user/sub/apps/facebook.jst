@@ -1,0 +1,18 @@
+
+<div class="photo photo-thumbnail pull-left">
+  <img width="64" height="64" alt="Facebook" src="/img/vendor/facebook/fb-icon-64.png">
+  <div class="mask mask-thumbnail"></div>
+</div>
+<div class="photo-float thumbnail-float clearfix">
+  <div class="controls pull-right">
+    <% if (!fbLinked) { %>
+      <button id="fb-link" class="btn btn-default"><%= i18nCommon.actions.link %></button>
+    <% } else { %>
+      <span class="btn btn-default active linked"><%= i18nCommon.adjectives.linked %></span>
+      <span></span> <!-- to break up .btn btn-default + .btn btn-default spacing -->
+      <button id="fb-unlink" class="btn btn-default revoke btn-danger"><%= i18nCommon.actions.revoke_access %></button>
+    <% } %>
+  </div>
+  <label class="control-label">Facebook</label>
+  <p><%= i18nUser.app_descriptions.facebook %></p>
+</div>

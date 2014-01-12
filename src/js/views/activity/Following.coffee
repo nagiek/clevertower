@@ -62,11 +62,23 @@ define [
       @listenTo Parse.User.current().get("profile").followingComments, "reset", @addAllComments
 
     render : ->
+
+      isFollowing = Parse.User.current().get("profile").get("followingCount") > 0
+
       vars = 
         today: moment().format("L")
         i18nListing: i18nListing
         i18nCommon: i18nCommon
+        isFollowing: isFollowing 
       @$el.html JST["src/js/templates/activity/following.jst"](vars)
+
+      # Record our fixed block.
+      @$block = @$('#map-container')
+      @getPersonalizedMapCenter()
+      @renderMap()
+
+      # If we aren't following anyone, abort and suggest trying again.
+      unless isFollowing then return @
 
       @$list = @$(".content > .thumbnails")
       if @$list.width() < 767 then @$list.html '<div class="list-view col-md-12"></div>'
@@ -140,11 +152,18 @@ define [
       # @$pagination = @$(".content > .pagination ul")
       @$loading = @$(".content > .loading")
 
-      # Record our fixed block.
-      @$block = @$('#map-container')
+      # Do a new search unless we've been here before.
+      unless Parse.User.current().get("profile").followingActivity.length > 0
+        @search()
+      else
 
-      @getPersonalizedMapCenter()
-      @renderMap()
+        # Protect ourselves from old models.
+        Parse.User.current().get("profile").followingActivity.query.notContainedIn "objectId", Parse.User.current().get("profile").followingActivity.map((a) -> a.id)
+        Parse.User.current().get("profile").followingComments.query.notContainedIn "objectId", Parse.User.current().get("profile").followingComments.map((c) -> c.id)
+
+        # Show the activities
+        @addAllActivity()
+        @addAllComments Parse.User.current().get("profile").followingComments
 
       # Track scrolling & resizing for map
       $(window).resize @resize
@@ -210,19 +229,6 @@ define [
       @bindMapPosition()
       # @dragListener = google.maps.event.addListener @map, 'dragend', => @trigger "dragend"
       # @zoomListener = google.maps.event.addListener @map, 'zoom_changed', @checkIfShouldSearch
-
-      # Do a new search unless we've been here before.
-      unless Parse.User.current().get("profile").followingActivity.length > 0
-        @search()
-      else
-
-        # Protect ourselves from old models.
-        Parse.User.current().get("profile").followingActivity.query.notContainedIn "objectId", Parse.User.current().get("profile").followingActivity.map((a) -> a.id)
-        Parse.User.current().get("profile").followingComments.query.notContainedIn "objectId", Parse.User.current().get("profile").followingComments.map((c) -> c.id)
-
-        # Show the activities
-        @addAllActivity()
-        @addAllComments Parse.User.current().get("profile").followingComments
 
 
     # Search functions

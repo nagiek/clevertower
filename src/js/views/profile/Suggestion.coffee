@@ -6,13 +6,13 @@ define [
   'models/Profile'
   "views/helper/Alert"
   "i18n!nls/common"
-  'templates/profile/summary'
+  'templates/profile/suggestion'
 ], ($, _, Parse, Lease, Profile, Alert, i18nCommon) ->
 
-  class ProfileSummaryView extends Parse.View
+  class ProfileSuggestionView extends Parse.View
   
     tagName: "li"
-    className: "clearfix"
+    className: "col-xs-12 col-sm-6 col-lg-4 suggestion"
     
     events:
       'click .follow' : 'follow'
@@ -31,7 +31,7 @@ define [
     render: ->
       vars =
         url: @model.url()
-        cover: @model.cover("thumb")
+        cover: @model.cover("profile")
         followedByUser: @model.followedByUser()
         name: @model.name()
         i18nCommon: i18nCommon
@@ -60,7 +60,7 @@ define [
       #           unit = Parse.User.current().get("property").units.find((u) => u.id is @model.get("unit").id)
       #           if unit then vars.unit = unit.get("title")
 
-      @$el.html JST["src/js/templates/profile/summary.jst"](vars)
+      @$el.html JST["src/js/templates/profile/suggestion.jst"](vars)
       @
 
     # Units may not be queried yet. Stand by to add.
@@ -76,68 +76,63 @@ define [
     # Copied from BaseIndexActivityView
     follow : (e, buttonParent, undo) =>
 
-      if Parse.User.current()
+      buttonParent = buttonParent || @$(e.currentTarget).parent()
 
-        buttonParent = buttonParent || @$(e.currentTarget).parent()
+      if @model.followedByUser()
+        buttonParent.html """<button type="button" class="btn btn-primary follow">#{i18nCommon.actions.follow}</button>"""
 
-        if @model.followedByUser()
-          buttonParent.html """<button type="button" class="btn btn-primary follow">#{i18nCommon.actions.follow}</button>"""
+        Parse.User.current().get("profile").increment followingCount: -1
+        Parse.User.current().get("profile").relation("following").remove @model
+        Parse.User.current().get("profile").following.remove @model
 
-          Parse.User.current().get("profile").increment followingCount: -1
-          Parse.User.current().get("profile").relation("following").remove @model
-          Parse.User.current().get("profile").following.remove @model
+        # Check through other subviews to 
+        @view.trigger "profile:unfollow", @model
 
-          # Check through other subviews to 
-          @view.trigger "profile:unfollow", @model
-
-          unless undo
-            Parse.Cloud.run "Unfollow", {
-              followee: @model.id
-              follower: Parse.User.current().get("profile").id
-            },
-            # Optimistic saving.
-            # success: (res) => 
-            error: (res) => 
-              # Undo what we did.
-              @follow(e, buttonParent, true)
-              console.log res
-          else new Alert event: 'follow', fade: false, message: i18nCommon.errors.not_saved, type: 'danger'
-
-        else
-          # extra span to break up .btn + .btn spacing
-          # Don't put in the unfollow button right away.
-          buttonParent.html("""<span class="btn btn-primary following">#{i18nCommon.verbs.following}</span>""")
-          setTimeout ->
-            buttonParent.append """
-              <span></span> 
-              <button type="button" class="btn btn-default follow unfollow">#{i18nCommon.actions.unfollow}</button>
-            """
-          , 500
-
-          Parse.User.current().get("profile").increment followingCount: +1
-          Parse.User.current().get("profile").relation("following").add @model
-          # Adding to a relation will somehow add to collection..?
-          Parse.User.current().get("profile").following.add @model
-
-          @view.trigger "profile:follow", @model
-
-          unless undo
-            Parse.Cloud.run "Follow", {
-              followee: @model.id
-              follower: Parse.User.current().get("profile").id
-            },
-            # Optimistic saving.
-            # success: (res) => 
-            error: (res) => 
-              # Undo what we did.
-              @follow(e, buttonParent, true)
-              console.log res
-          else new Alert event: 'follow', fade: false, message: i18nCommon.errors.not_saved, type: 'danger'
-          
-        Parse.User.current().get("profile").save()
+        unless undo
+          Parse.Cloud.run "Unfollow", {
+            followee: @model.id
+            follower: Parse.User.current().get("profile").id
+          },
+          # Optimistic saving.
+          # success: (res) => 
+          error: (res) => 
+            # Undo what we did.
+            @follow(e, buttonParent, true)
+            console.log res
+        else new Alert event: 'follow', fade: false, message: i18nCommon.errors.not_saved, type: 'danger'
 
       else
-        $("#login-modal").modal()
+        # extra span to break up .btn + .btn spacing
+        # Don't put in the unfollow button right away.
+        buttonParent.html("""<span class="btn btn-primary following">#{i18nCommon.verbs.following}</span>""")
+        setTimeout ->
+          buttonParent.append """
+            <span></span> 
+            <button type="button" class="btn btn-default follow unfollow">#{i18nCommon.actions.unfollow}</button>
+          """
+        , 500
+
+        Parse.User.current().get("profile").increment followingCount: +1
+        Parse.User.current().get("profile").relation("following").add @model
+        # Adding to a relation will somehow add to collection..?
+        Parse.User.current().get("profile").following.add @model
+
+        @view.trigger "profile:follow", @model
+
+        unless undo
+          Parse.Cloud.run "Follow", {
+            followee: @model.id
+            follower: Parse.User.current().get("profile").id
+          },
+          # Optimistic saving.
+          # success: (res) => 
+          error: (res) => 
+            # Undo what we did.
+            @follow(e, buttonParent, true)
+            console.log res
+        else new Alert event: 'follow', fade: false, message: i18nCommon.errors.not_saved, type: 'danger'
+        
+      Parse.User.current().get("profile").save()
 
     clear: =>
       @remove()
