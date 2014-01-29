@@ -122,65 +122,71 @@
         withAction: "No new requests or invitations",
         all: "No notifications, requests or invitations"
       },
-      new_inquiry: function(person, property) {
-        return "<strong>" + (_.escape(person)) + "</strong> has applied to join <strong>" + (_.escape(property)) + "</strong>";
+      follow: function(subject, object) {
+        return "<strong>" + (_.escape(subject)) + "</strong> is now following " + (_.escape(object)) + ".";
       },
-      lease_join: function(person, property) {
-        return "<strong>" + (_.escape(person)) + "</strong> has joined <strong>" + (_.escape(property)) + "</strong>";
+      like: function(subject, object) {
+        return "<strong>" + (_.escape(subject)) + "</strong> likes " + (_.escape(object)) + " activity.";
+      },
+      new_inquiry: function(subject, object) {
+        return "<strong>" + (_.escape(subject)) + "</strong> has applied to join <strong>" + (_.escape(object)) + "</strong>";
+      },
+      lease_join: function(subject, object) {
+        return "<strong>" + (_.escape(subject)) + "</strong> has joined <strong>" + (_.escape(object)) + "</strong>";
       },
       inquiry_invitation: {
-        invited: function(person, property) {
-          return "<strong>" + (_.escape(person)) + "</strong> has indicated you are applying to join <strong>" + (_.escape(property)) + "</strong>";
+        invited: function(subject, property) {
+          return "<strong>" + (_.escape(subject)) + "</strong> has indicated you are applying to join <strong>" + (_.escape(property)) + "</strong>";
         },
-        accept: function(property) {
-          return "You have accepted the invitation to join <strong>" + (_.escape(property)) + "</strong>";
+        accept: function(subject) {
+          return "You have accepted the invitation to join <strong>" + (_.escape(subject)) + "</strong>";
         },
-        ignore: function(property) {
-          return "You have ignored the invitation to join <strong>" + (_.escape(property)) + "</strong>";
+        ignore: function(subject) {
+          return "You have ignored the invitation to join <strong>" + (_.escape(subject)) + "</strong>";
         }
       },
       lease_invitation: {
-        invited: function(person, property) {
-          return "You have been invited to a lease at <strong>" + (_.escape(property)) + "</strong>";
+        invited: function(subject, property) {
+          return "<strong>" + (_.escape(subject)) + "</strong> invited to join a lease at <strong>" + (_.escape(property)) + "</strong>";
         },
-        accept: function(property) {
-          return "You have accepted the invitation at <strong>" + (_.escape(property)) + "</strong>";
+        accept: function(subject) {
+          return "You have accepted the invitation at <strong>" + (_.escape(subject)) + "</strong>";
         },
-        ignore: function(property) {
-          return "You have ignored the invitation at <strong>" + (_.escape(property)) + "</strong>";
+        ignore: function(subject) {
+          return "You have ignored the invitation at <strong>" + (_.escape(subject)) + "</strong>";
         }
       },
       network_invitation: {
-        invited: function(person, network) {
-          return "<strong>" + (_.escape(person)) + "</strong> invited you to join their network <strong>" + (_.escape(network)) + "</strong>";
+        invited: function(subject, network) {
+          return "<strong>" + (_.escape(subject)) + "</strong> invited you to join their network <strong>" + (_.escape(network)) + "</strong>";
         },
-        accept: function(network) {
-          return "You have accepted the invitation to join <strong>" + (_.escape(network)) + "</strong>";
+        accept: function(subject) {
+          return "You have accepted the invitation to join <strong>" + (_.escape(subject)) + "</strong>";
         },
-        ignore: function(network) {
-          return "You have ignored the invitation to join <strong>" + (_.escape(network)) + "</strong>";
+        ignore: function(subject) {
+          return "You have ignored the invitation to join <strong>" + (_.escape(subject)) + "</strong>";
         }
       },
       manager_inquiry: {
-        invited: function(person, network) {
-          return "<strong>" + (_.escape(person)) + "</strong> wants to be a manager in your network.";
+        invited: function(subject) {
+          return "<strong>" + (_.escape(subject)) + "</strong> wants to be a manager in your network.";
         },
-        accept: function(person) {
-          return "You have accepted <strong>" + (_.escape(person)) + "</strong>'s request.";
+        accept: function(subject) {
+          return "You have accepted <strong>" + (_.escape(subject)) + "</strong>'s request.";
         },
-        ignore: function(person) {
-          return "You have ignored <strong>" + (_.escape(person)) + "</strong>'s request.";
+        ignore: function(subject) {
+          return "You have ignored <strong>" + (_.escape(subject)) + "</strong>'s request.";
         }
       },
       network_inquiry: {
-        invited: function(network, property) {
-          return "<strong>" + (_.escape(person)) + "</strong> wants to manage <strong>" + (_.escape(property)) + "</strong>.";
+        invited: function(subject, network) {
+          return "<strong>" + (_.escape(subject)) + "</strong> wants to help manage <strong>" + (_.escape(network)) + "</strong>.";
         },
-        accept: function(network) {
-          return "You have accepted <strong>" + (_.escape(network)) + "</strong>'s request.";
+        accept: function(subject) {
+          return "You have accepted <strong>" + (_.escape(subject)) + "</strong>'s request.";
         },
-        ignore: function(network) {
-          return "You have ignored <strong>" + (_.escape(network)) + "</strong>'s request.";
+        ignore: function(subject) {
+          return "You have ignored <strong>" + (_.escape(subject)) + "</strong>'s request.";
         }
       }
     },
@@ -239,6 +245,7 @@
       are_you_sure: "Are you sure?",
       get_started: "Get started",
       skip_this_step: "Skip this step",
+      mark_read: "Mark as read",
       see_all: "See all"
     },
     nouns: {
@@ -255,7 +262,8 @@
       history: "History",
       tenants: "Tenants",
       roommates: "Roommates",
-      you: "You",
+      You: "You",
+      you: "you",
       people: "People",
       places: "Places",
       sample_email: "keigan@example.com",
@@ -272,6 +280,18 @@
       accommodation: "Accommodation",
       optional_description: "Optional description",
       extra_details: "Extra details"
+    },
+    articles: {
+      your: "Your"
+    },
+    functions: {
+      possessive: function(noun) {
+        if (noun.toLowerCase() === "you") {
+          return "your";
+        } else {
+          return "" + noun + "'s";
+        }
+      }
     },
     order: {
       first: "First",

@@ -20,9 +20,16 @@ define [
     isMemo : -> if @get("withAction") then false else true
     withAction : -> if @get("withAction") then true else false
 
-    title : -> if @get("property") then @get("property").get("profile").name() else @get("network").get("title")
-    text : -> if @isMemo() then i18nCommon.notifications[@get("name")](@name(), @title()) else i18nCommon.notifications[@get("name")].invited(@name(), @title())
-    name : -> if @get("profile") then @get("profile").name() else false
+    text : ->
+      object = @object()
+      if object and @get("name") is "like" then object = i18nCommon.functions.possessive object
+      if @isMemo() then i18nCommon.notifications[@get("name")](@subject(), object) else i18nCommon.notifications[@get("name")].invited(@subject(), object)
+    subject : -> if @get("subject") then @get("subject").name() else false
+    object : ->
+      if @get("name").indexOf("inquiry") isnt -1 or @get("name").indexOf("invitation") isnt -1
+        if @get("name").indexOf("network") isnt -1 then @get("network").name() else @get("property").get("profile").name()
+      else if @get("object") 
+        if @get("object").id is Parse.User.current().get("profile").id then i18nCommon.nouns.you else @get("object").name() 
 
-    accepted : -> i18nCommon.notifications[@get("name")].accept(@title())
-    ignored : -> i18nCommon.notifications[@get("name")].ignore(@title())
+    accepted : -> i18nCommon.notifications[@get("name")].accept(@subject())
+    ignored : -> i18nCommon.notifications[@get("name")].ignore(@subject())

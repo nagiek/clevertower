@@ -8,6 +8,7 @@
         </div>
     <% } else { %>
       <div class="position-relative col-md-8">
+        <% if (subtitle) { %><p><%= subtitle %></p><% } %>
         <blockquote><%= title %></blockquote>
     <% } %>
       <% if (rent) { %><div class="rent">$<%= rent %></div><% } %>
@@ -21,10 +22,10 @@
     <div class="caption col-md-4">
       <header class="clearfix">
         <div class="photo photo-thumbnail pull-left">
-          <a class="profile-link" href="<%= profileUrl %>"><img src="<%= profilePic %>" alt="Profile" class="img-rounded profile-picture"></a>
+          <a class="profile-link" href="<%= subjectUrl %>"><img src="<%= cover %>" alt="Profile" class="img-rounded profile-picture"></a>
         </div>
         <div class="photo-float thumbnail-float">
-          <p><a class="profile-link" href="<%= profileUrl %>"><strong><%= name %></strong></a></p>
+          <p><a class="profile-link" href="<%= subjectUrl %>"><strong><%= name %></strong></a></p>
           <% if (!isSelf) { %>
             <div class="follow-controls">
               <% if (!followedByUser) { %>
@@ -38,55 +39,62 @@
           <% } %>
           <p><small><%= i18nCommon.fields.posted %> <%= postDate %></small></p>
         </div>
-        <ul class="activity-actions list-inline center">
-          <li>
-            <small>
-              <a href="#" class="like-button">
-                <% if (likedByUser) { %><%= i18nCommon.adjectives.liked %>
-                <% } else { %><%= i18nCommon.actions.like %><% } %>
+        <% if (wideAudience) { %>
+          <ul class="activity-actions list-inline center">
+            <li>
+              <small>
+                <a href="#" class="like-button">
+                  <% if (likedByUser) { %><%= i18nCommon.adjectives.liked %>
+                  <% } else { %><%= i18nCommon.actions.like %><% } %>
+                </a>
+              </small>
+            </li>
+            <li>
+              <a href="#" class="likers<% if (likedByUser) { %> active<% } %>" >
+                <i class="glyphicon glyphicon-thumbs-up"></i>
               </a>
-            </small>
-          </li>
-          <li>
-            <a href="#" class="likers<% if (likedByUser) { %> active<% } %>" >
-              <i class="glyphicon glyphicon-thumbs-up"></i>
-            </a>
-            <small class="likers-count"><%= likersCount %></small>
-          </li>
-          <!--
-          <li>
-            <a href="#" class="comment-button">
-              <span class="glyphicon glyphicon-comment"></span>
-            </a>
-            <small class="comment-count"><%= commentCount %></small>
-          </li>
-          -->
-        </ul>
+              <small class="likers-count"><%= likersCount %></small>
+            </li>
+            <!--
+            <li>
+              <a href="#" class="comment-button">
+                <span class="glyphicon glyphicon-comment"></span>
+              </a>
+              <small class="comment-count"><%= commentCount %></small>
+            </li>
+            -->
+          </ul>
+        <% } %>
       </header>
       <div>
-        <% if (postImage) { %><p><strong><%= title %></strong></p><% } %>
+        <% if (postImage) { %>
+          <p><strong><%= title %></strong></p>
+          <% if (subtitle) { %><p><%= subtitle %></p><% } %>
+        <% } %>
         <% if (isEvent) { %><p><strong><%= start %><% if (endDate) { %> - <%= end %><% } %></strong></p><% } %>
       </div>
-      <div class="comments">
-        <div class="additional-comments">
-          <button class="btn btn-link get-comments<% if (commentCount == 0) { %> hide<% } %>">
-            <%= i18nCommon.verbs.view %> <span class="remaining-comments"><%= commentCount %></span> <%= i18nCommon.nouns.more_comment(commentCount) %>
-          </button>
+      <% if (wideAudience) { %>
+        <div class="comments">
+          <div class="additional-comments">
+            <button class="btn btn-link get-comments<% if (commentCount == 0) { %> hide<% } %>">
+              <%= i18nCommon.verbs.view %> <span class="remaining-comments"><%= commentCount %></span> <%= i18nCommon.nouns.more_comment(commentCount) %>
+            </button>
+          </div>
+          <ul class="list-comments list-unstyled"></ul>
+          <% if (current) { %>
+            <form class="new-comment-form form-condensed">
+              <div class="form-group">
+                <div class="photo photo-micro pull-left">
+                  <img src="<%= selfCover %>" alt="<%= self %>" width="23" height="23">
+                </div>
+                <div class="photo-float micro-float">
+                  <input type="text" class="form-control input-sm" name="comment[title]" placeholder="<%= i18nCommon.actions.add_comment %>">
+                </div>
+              </div>
+            </form>
+          <% } %>
         </div>
-        <ul class="list-comments list-unstyled"></ul>
-        <% if (current) { %>
-          <form class="new-comment-form form-condensed">
-            <div class="form-group">
-              <div class="photo photo-micro pull-left">
-                <img src="<%= selfProfilePic %>" alt="<%= self %>" width="23" height="23">
-              </div>
-              <div class="photo-float micro-float">
-                <input type="text" class="form-control input-sm" name="comment[title]" placeholder="<%= i18nCommon.actions.add_comment %>">
-              </div>
-            </div>
-          </form>
-        <% } %>
-      </div>
+      <% } %>
       <% if (propertyTitle || locationTitle) { %>
         <footer class="position-bottom">
           <%= i18nCommon.fields.posted %>

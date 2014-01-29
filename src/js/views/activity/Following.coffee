@@ -44,6 +44,8 @@ define [
     
     initialize : (attrs) =>
 
+      @listenTo Parse.Dispatcher, "user:logout", -> Parse.history.navigate "outside"
+
       # Activity that we find on the map.
       Parse.User.current().get("profile").followingActivity || Parse.User.current().get("profile").followingActivity = new ActivityList [], {}
       Parse.User.current().get("profile").followingComments || Parse.User.current().get("profile").followingComments = new CommentList [], {}
@@ -56,7 +58,7 @@ define [
       
       # Listen to 
       @listenTo Parse.User.current().get("profile").followingActivity, "reset", @addAllActivity
-      @listenTo Parse.User.current().get("profile").followingActivity, "add", @addOneActivity
+      @listenTo Parse.User.current().get("profile").followingActivity, "add",   @addOneActivity
 
       # Better off to use addAllComments manually.
       @listenTo Parse.User.current().get("profile").followingComments, "reset", @addAllComments
@@ -94,7 +96,7 @@ define [
             item.$el.data "pageIndex", index
             data = item.$el.data()
             if data.image then item.$el.find(".content .photo img").prop 'src', data.image
-            if data.profile then item.$el.find("footer img.profile-pic").prop 'src', data.profile
+            if data.subject then item.$el.find("footer img.profile-pic").prop 'src', data.subject
             unless item.marker
               originY = if data.collection is "user" then 25 else 0
 
@@ -297,7 +299,7 @@ define [
       model = Parse.User.current().get("profile").followingActivity.at(data.index)
 
       model.prep("likers")
-      @listenToOnce model.likers, "reset", @showLikers
+      @listenToOnce model.likers, "reset", @showLikersModal
       model.likers.fetch()
 
     # App Activity

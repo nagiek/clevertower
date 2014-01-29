@@ -20,9 +20,11 @@ define [
       # LOL WTF.
       @query = new Parse.Query(Notification)
                 .containedIn("channels", channels)
+                # .containedIn("object", profiles)
                 .include('network') # For mgr invitations.
                 .include('property.profile')
-                .include('profile')
+                .include('subject')
+                # .include('object')
                 .include('tenant')
                 .include('unit')
                 .include('lease')
@@ -43,4 +45,5 @@ define [
     # Underscore doesn't want to chain our custom functions :(
     unreadMemos: => @filter (n) -> n.isMemo() and n.unread()
     unreadWithAction: => @filter (n) -> !n.isMemo() and n.unread()
+    unclickedMemos: => @filter (n) -> n.isMemo() and n.unclicked()
     visibleWithAction: => @filter (n) -> !n.isMemo() and !n.hidden()

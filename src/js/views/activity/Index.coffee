@@ -122,7 +122,7 @@ define [
             item.$el.data "pageIndex", index
             data = item.$el.data()
             if data.image then item.$el.find(".content .photo img").prop 'src', data.image
-            if data.profile then item.$el.find("footer img.profile-pic").prop 'src', data.profile
+            if data.subject then item.$el.find("footer img.profile-pic").prop 'src', data.subject
             unless item.marker
               originY = if data.collection is "user" then 25 else 0
 
@@ -236,17 +236,18 @@ define [
 
     createQueries : ->
       # Set up query to match conditions
+      Parse.App.activity.query.notEqualTo 'wideAudience', false
       if Parse.User.current()
         @activityQuery = Parse.Query.or(
           Parse.App.activity.query,
           Parse.User.current().activity.query
-        ).include("property.profile").include("profile").include("location.profile")
+        ).include("property.profile").include("subject").include("location.profile")
         @commentQuery = Parse.Query.or(
           Parse.App.comments.query
           Parse.User.current().comments.query
         ).include("property.profile").include("profile").include("location.profile")
       else
-        @activityQuery = Parse.App.activity.query.include("property.profile").include("profile").include("location.profile")
+        @activityQuery = Parse.App.activity.query.include("property.profile").include("subject").include("location.profile")
         @commentQuery = Parse.App.comments.query.include("property.profile").include("profile").include("location.profile")
 
     renderMap : =>
@@ -455,7 +456,7 @@ define [
       else Parse.App.activity.at(data.index)
 
       model.prep("likers")
-      @listenToOnce model.likers, "reset", @showLikers
+      @listenToOnce model.likers, "reset", @showLikersModal
       model.likers.fetch()
 
 
@@ -608,7 +609,7 @@ define [
         Parse.User.current().activity.at(data.index)
       else Parse.App.activity.at(data.index)
 
-      @markAsFollowing(activity) if model.followedByUser()
+      @markAsFollowing(activity) if model.subject().followedByUser()
 
     resetListViews: ->
 
@@ -739,7 +740,6 @@ define [
         @location = location
         new Parse.Query("Search").descending("createdAt").equalTo("googleName", location).first()
           .then (obj) => 
-            console.log obj
             if obj then @placesService.getDetails reference: obj.get("reference"), @googleSearch
           (error) => console.log error
 

@@ -43,32 +43,46 @@
           return false;
         }
       },
-      title: function() {
-        if (this.get("property")) {
-          return this.get("property").get("profile").name();
-        } else {
-          return this.get("network").get("title");
-        }
-      },
       text: function() {
+        var object;
+
+        object = this.object();
+        if (object && this.get("name") === "like") {
+          object = i18nCommon.functions.possessive(object);
+        }
         if (this.isMemo()) {
-          return i18nCommon.notifications[this.get("name")](this.name(), this.title());
+          return i18nCommon.notifications[this.get("name")](this.subject(), object);
         } else {
-          return i18nCommon.notifications[this.get("name")].invited(this.name(), this.title());
+          return i18nCommon.notifications[this.get("name")].invited(this.subject(), object);
         }
       },
-      name: function() {
-        if (this.get("profile")) {
-          return this.get("profile").name();
+      subject: function() {
+        if (this.get("subject")) {
+          return this.get("subject").name();
         } else {
           return false;
         }
       },
+      object: function() {
+        if (this.get("name").indexOf("inquiry") !== -1 || this.get("name").indexOf("invitation") !== -1) {
+          if (this.get("name").indexOf("network") !== -1) {
+            return this.get("network").name();
+          } else {
+            return this.get("property").get("profile").name();
+          }
+        } else if (this.get("object")) {
+          if (this.get("object").id === Parse.User.current().get("profile").id) {
+            return i18nCommon.nouns.you;
+          } else {
+            return this.get("object").name();
+          }
+        }
+      },
       accepted: function() {
-        return i18nCommon.notifications[this.get("name")].accept(this.title());
+        return i18nCommon.notifications[this.get("name")].accept(this.subject());
       },
       ignored: function() {
-        return i18nCommon.notifications[this.get("name")].ignore(this.title());
+        return i18nCommon.notifications[this.get("name")].ignore(this.subject());
       }
     });
   });

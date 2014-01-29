@@ -8,6 +8,7 @@ define [
   "collections/CommentList"
   "collections/ProfileList"
   "models/Profile"
+  "views/helper/Alert"
   "views/profile/Summary"
   "views/profile/sub/Activity"
   "views/activity/BaseIndex"
@@ -16,7 +17,7 @@ define [
   'templates/profile/show'
   'templates/activity/modal'
   'templates/comment/summary'
-], ($, _, Parse, infinity, moment, ActivityList, CommentList, ProfileList, Profile, SummaryProfileView, ActivityView, BaseIndexActivityView, i18nUser, i18nCommon) ->
+], ($, _, Parse, infinity, moment, ActivityList, CommentList, ProfileList, Profile, Alert, SummaryProfileView, ActivityView, BaseIndexActivityView, i18nUser, i18nCommon) ->
 
   class ShowProfileView extends Parse.View
   
@@ -43,10 +44,10 @@ define [
       # @listenTo Parse.Dispatcher, "user:logout", @switchToPublic
 
       unless @model.activity
-        @model.activity = new ActivityList [], profile: @model
+        @model.activity = new ActivityList [], subject: @model
 
       unless @model.likes
-        @model.likes = new ActivityList [], profile: @model
+        @model.likes = new ActivityList [], subject: @model
         @model.likes.query = @model.relation("likes").query().include("property")
 
       unless @model.following
@@ -262,7 +263,7 @@ define [
           Parse.User.current().get("profile").following.remove @model
 
           # Check through other subviews to 
-          @view.trigger "profile:unfollow", @model
+          # @view.trigger "profile:unfollow", @model
 
           unless undo
             Parse.Cloud.run "Unfollow", {
@@ -293,7 +294,7 @@ define [
           # Adding to a relation will somehow add to collection..?
           Parse.User.current().get("profile").following.add @model
 
-          @view.trigger "profile:follow", @model
+          # @view.trigger "profile:follow", @model
 
           unless undo
             Parse.Cloud.run "Follow", {

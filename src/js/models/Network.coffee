@@ -56,3 +56,4 @@ define [
 
     publicUrl: -> "/networks/#{@id}"
     # privateUrl: -> "#{location.protocol}//#{@get("name")}.#{location.host}"
+    name: -> @get("name")

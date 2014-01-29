@@ -48,6 +48,8 @@ define [
       @model.prep "photos"
       @model.prep "listings"
 
+      @model.activity.query.notEqualTo 'wideAudience', false
+
       # Do not add activity, as we may get extra items added.
       # @listenTo @model.activity, "add", @addOneActivity
       # @listenTo @model.activity, "reset", @addAllActivity
@@ -118,7 +120,7 @@ define [
             item.$el.data "pageIndex", index
             data = item.$el.data()
             if data.image then item.$el.find(".content .photo img").prop 'src', data.image
-            if data.profile then item.$el.find("footer img.profile-pic").prop 'src', data.profile
+            if data.subject then item.$el.find("footer img.profile-pic").prop 'src', data.subject
             item.loaded = true
 
 
@@ -295,7 +297,7 @@ define [
       model = @model.activity.at(data.index)
 
       model.prep("likers")
-      @listenToOnce model.likers, "reset", @showLikers
+      @listenToOnce model.likers, "reset", @showLikersModal
       model.likers.fetch()
 
     updatePaginiation : =>

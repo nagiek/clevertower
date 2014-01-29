@@ -100,6 +100,8 @@ define [
             listing: model
             unit: modelJSON.unit
             property: modelJSON.property
+            subject: modelJSON.profile
+            object: if model.get("location") then model.get("location").get("profile")
             network: modelJSON.network
             title: modelJSON.title
             locality: modelJSON.locality

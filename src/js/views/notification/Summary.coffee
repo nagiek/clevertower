@@ -66,7 +66,8 @@ define [
       channels = @model.get "channels"
       network = @model.get "network"
       property = @model.get "property"
-      profile = @model.get "profile"
+      subject = @model.get "subject"
+      object = @model.get "object"
 
       if @model.get "forMgr"
         url = ""
@@ -82,15 +83,14 @@ define [
           photo_src = property.get("profile").cover("thumb")
         when 'leases' or 'tenant'
           icon = 'plus'
-          photo_src = profile.cover("thumb")
+          photo_src = subject.cover("thumb")
         else 
           icon = 'calendar'
-          photo_src = profile.cover("thumb")
+          photo_src = subject.cover("thumb")
 
-      if clicked
-        text = @model.accepted()
-      else if hidden
-        text = @model.ignored() + "<small>(<a href='#' class='undo'>" + i18nCommon.actions.undo + "</a>)</small>"
+      if @model.withAction() and (clicked or hidden)
+        text = if clicked then @model.accepted()
+        else @model.ignored() + "<small>(<a href='#' class='undo'>" + i18nCommon.actions.undo + "</a>)</small>"
       else
         text = @model.text()
 
@@ -102,7 +102,7 @@ define [
         icon: icon
         photo_src: photo_src
         i18nCommon: i18nCommon
-        withAction: !@model.isMemo()
+        withAction: @model.withAction()
 
       @$el.html JST["src/js/templates/notification/summary.jst"](vars)
       @

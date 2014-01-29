@@ -458,15 +458,15 @@
         }
         profile = user.get("profile");
         profile.likes = new ActivityList([], {
-          profile: profile
+          subject: profile
         });
-        profile.likes.query = profile.relation("likes").query().include("property");
+        profile.likes.query = profile.relation("likes").query().include("subject");
         profile.following = new ProfileList([], {});
         profile.following.query = profile.relation("following").query().include("property");
         profile.followers = new ProfileList([], {});
         profile.followers.query = profile.relation("followers").query().include("property");
         profile.followingActivity = new ActivityList([], {});
-        profile.followingActivity.query = Parse.Query.or(new Parse.Query("Activity").matchesKeyInQuery("location", "location", profile.relation("following").query()), new Parse.Query("Activity").matchesQuery("profile", profile.relation("following").query())).include("property.profile").include("profile").include("location.profile");
+        profile.followingActivity.query = Parse.Query.or(new Parse.Query("Activity").matchesQuery("subject", profile.relation("following").query()), new Parse.Query("Activity").matchesKeyInQuery("location", "location", profile.relation("following").query())).include("property.profile").include("subject").include("location.profile").include("activity.subject").include("object");
         profile.followingComments = new CommentList([], {});
         profile.followingComments.query.matchesQuery("profile", profile.relation("following").query());
         _this.set("profile", profile);

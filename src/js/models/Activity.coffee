@@ -17,6 +17,7 @@ define [
       likersCount:    0
       commentCount:   0
       isEvent:        false
+      wideAudience:   true
 
     GPoint : -> 
       center = @get "center"
@@ -75,7 +76,8 @@ define [
     # Avoid double-loading of profile/property data
     # ------------------------
 
-    profile: -> if @collection and @collection.profile then @collection.profile else @get("profile") 
+    subject: -> if @collection and @collection.subject then @collection.subject else @get("subject")
+    object: -> if @collection and @collection.object then @collection.object else @get("object")
     property: -> if @collection and @collection.property then @collection.property else @get("property")
 
 
@@ -83,22 +85,10 @@ define [
     # -----------------
 
     likedByUser: -> Parse.User.current() and Parse.User.current().get("profile").likes.any (l) => l.id is @id
-    followedByUser: -> @profile().followedByUser()
 
 
     # Display functions
     # -----------------
-
-    name: -> @profile().name()
-    profilePic: (size) -> @profile().cover(size)
-    profileUrl: -> if @property() then @property().publicUrl() else @profile().url()
-
-    title: ->
-      switch @get "activity_type"
-        when "new_post", "new_listing", "new_property" then @get("title")
-        # when "new_property" then @property().get("title")
-        when "new_photo" then @property().get("title")
-        else false
 
     icon: ->
       switch @get "activity_type"
@@ -114,6 +104,8 @@ define [
         when "new_listing", "new_property","new_tenant", "new_manager" then @profile().cover(size)
         when "new_post", "new_photo" then @get("image") || false
         else false
+
+    title: -> if @get("title").indexOf("%NAME") isnt -1 then @get("title").replace("%NAME", @get("subject").name()) else @get("title")
 
 
   # CLASS METHODS

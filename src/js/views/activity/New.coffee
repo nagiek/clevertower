@@ -50,7 +50,7 @@ define [
 
       @model = new Activity
         activity_type: "new_post"
-        profile: Parse.User.current().get("profile")
+        subject: Parse.User.current().get("profile")
         public: true
         isEvent: false
 
@@ -157,7 +157,7 @@ define [
         # Post publicly
         @$("#post-private").prop "checked", true
         @model.set 
-          profile: Parse.User.current().get("profile")
+          subject: Parse.User.current().get("profile")
           public: true
       @trigger "view:resize"
 
@@ -170,7 +170,7 @@ define [
       property = Parse.User.current().get("network").properties.get(p) || Parse.User.current().get("property")
       @model.set 
         property: property
-        profile: property.get("profile")
+        subject: property.get("profile")
 
 
     populatePropertySelectFromNetwork : ->
@@ -243,7 +243,7 @@ define [
       @hasProperty = true
 
       vars = 
-        profilePic: Parse.User.current().get("profile").cover("tiny")
+        cover: Parse.User.current().get("profile").cover("tiny")
         fbLinked: Parse.User.current()._isLinked("facebook")
         i18nCommon: i18nCommon
         i18nProperty: i18nProperty
@@ -425,7 +425,7 @@ define [
             if data.share.fb is "on" or data.share.fb is "1"
               vars =
                 object: window.location.origin + @model.url()
-                message: @model.get("title")
+                message: @model.title()
                 "fb:explicitly_shared": true
 
               # Optional params.
@@ -451,7 +451,7 @@ define [
             # Reset
             @model = new Activity
               activity_type: "new_post"
-              profile: Parse.User.current().get("profile")
+              subject: Parse.User.current().get("profile")
               public: true
               isEvent: false
 

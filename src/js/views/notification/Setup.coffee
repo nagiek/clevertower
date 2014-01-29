@@ -60,16 +60,15 @@ define [
       @model.add clicked: [Parse.User.current().id]
       @model.save null, patch: true
 
-    # Re-render the contents of the property item.
+
     render: =>
       channels = @model.get "channels"
       network = @model.get "network"
-      property = @model.get "property"
-      profile = @model.get "profile"
+      subject = @model.get "subject"
+      object = @model.get "object"
 
       if @model.get "forMgr"
         url = ""
-        url += "//#{Parse.User.current().get("network").get("name")}.#{location.host}" if location.host.split(".").length is 2
         url += "/properties/#{property.id}" if property
         url += channels[0].replace("-", "/") unless channels[0].indexOf('properties') or channels[0].indexOf('profiles')
       else
@@ -81,10 +80,10 @@ define [
           photo_src = property.cover("thumb")
         when 'leases' or 'tenant'
           icon = 'plus'
-          photo_src = profile.cover("thumb")
+          photo_src = subject.cover("thumb")
         else 
           icon = 'calendar'
-          photo_src = profile.cover("thumb")
+          photo_src = subject.cover("thumb")
 
       vars = 
         timeAgo: moment(@model.createdAt).fromNow()

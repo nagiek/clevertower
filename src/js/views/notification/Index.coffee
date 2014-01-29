@@ -13,8 +13,10 @@ define [
     el: "#user-menu"
 
     events:
-      'click #mLabel' : 'markMemosAsRead'
-      'click #fLabel' : 'markWithActionsllAsRead'
+      # Despite the names, "read" means "seen", and "clicked" means "read"
+      'click #mark-read' : 'markMemosAsClicked'
+      'click #mLabel'    : 'markMemosAsRead'
+      'click #fLabel'    : 'markWithActionsllAsRead'
         
     initialize: (attrs) ->
 
@@ -22,19 +24,24 @@ define [
       @listenTo Parse.User.current().notifications, "add", @addOne
       @listenTo Parse.User.current().notifications, "reset", @addAll
       
+    markMemosAsClicked: (e) =>
+      e.preventDefault()
+      e.stopPropagation()
+      unclickedMemos = Parse.User.current().notifications.unclickedMemos()
+      _.each unclickedMemos, (n) -> n.add(clicked: [Parse.User.current().id])
+      Parse.Object.saveAll unclickedMemos
+
     markMemosAsRead: =>
       @$mCount.html(0).addClass("hide")
-      _.each Parse.User.current().notifications.unread(), (n) -> 
-        n.add(read: [Parse.User.current().id])
-        n.save null, patch: true
-        # n.save()
+      unreadMemos = Parse.User.current().notifications.unreadMemos()
+      _.each unreadMemos, (n) -> n.add(read: [Parse.User.current().id])
+      Parse.Object.saveAll unreadMemos
 
     markWithActionsllAsRead: =>
       @$fCount.html(0).addClass("hide")
-      _.each Parse.User.current().notifications.withAction(), (n) -> 
-        n.add(read: [Parse.User.current().id])
-        n.save null, patch: true
-        # n.save()
+      unreadActions = Parse.User.current().notifications.withAction()
+      _.each unreadActions, (n) -> n.add(read: [Parse.User.current().id])
+      Parse.Object.saveAll unreadActions
 
     # Re-rendering the App just means refreshing the statistics -- the rest
     # of the app doesn't change.

@@ -51,7 +51,7 @@ define [
             item.$el.data "pageIndex", index
             data = item.$el.data()
             if data.image then item.$el.find(".content .photo img").prop 'src', data.image
-            if data.profile then item.$el.find("footer img.profile-pic").prop 'src', data.profile
+            if data.subject then item.$el.find("footer img.profile-pic").prop 'src', data.subject
             item.loaded = true
 
       @$loading = @$(".loading")
@@ -59,7 +59,9 @@ define [
       # Start activity search.
       @addAllActivity @model.likes if @model.likes.length > 0
       @addAllComments @model.comments if @model.comments.length > 0
-      @search() unless @model.likes.length > @resultsPerPage * @page
+
+      # Assume we have been here before if @model.activity.length > 0
+      @search() unless @model.likes.length > 0
 
       @
 
@@ -138,8 +140,8 @@ define [
         if objs
 
           # Set the profile, as we may have not included it for profile-specific queries.
-          if objs[0] and not objs[0].get "profile"
-            _.each objs, (o) => o.set "profile", @model
+          if objs[0] and not objs[0].get "subject"
+            _.each objs, (o) => o.set "subject", @model
 
           addedObjs = @model.likes.add objs
 
@@ -194,7 +196,7 @@ define [
       model = @model.likes.at(data.index)
 
       model.prep("likers")
-      @listenToOnce model.likers, "reset", @showLikers
+      @listenToOnce model.likers, "reset", @showLikersModal
       model.likers.fetch()
 
     checkIfLiked: (activity) =>
@@ -209,7 +211,7 @@ define [
 
       model = @model.activity.at(data.index)
 
-      @markAsFollowing(activity) if Parse.User.current().get("profile").following.find (p) => p.id is model.get("profile").id
+      @markAsFollowing(activity) if Parse.User.current().get("profile").following.find (p) => p.id is model.get("subject").id
 
     updatePaginiation : =>
       countQuery = @model.likes.query
@@ -240,10 +242,10 @@ define [
     findModelActivity: (collection) =>
       if collection instanceof ActivityList
         collection.select (a) =>
-          a.get("profile") and a.get("profile").id is @model.id
+          a.get("subject") and a.get("subject").id is @model.id
       else 
         _.select collection, (a) =>
-          a.get("profile") and a.get("profile").id is @model.id
+          a.get("subject") and a.get("subject").id is @model.id
 
     findModelComments: (collection) =>
       if collection instanceof CommentList

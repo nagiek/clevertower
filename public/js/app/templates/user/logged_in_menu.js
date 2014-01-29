@@ -12,7 +12,9 @@ __p += '<li class="hidden-sm hidden-xs">\n  <a id="profile-link" class="clearfix
 ((__t = ( photo_alt )) == null ? '' : __t) +
 '" width="32" height="32">\n    <span class="photo-float tiny-float">' +
 ((__t = ( name )) == null ? '' : __t) +
-'</span>\n  </a>\n</li>\n<li id="memos" class="dropdown list-item-icon">\n  <a id="mLabel" data-target="#" data-toggle="dropdown" role="menu" class="dropdown-toggle">\n    <span class="glyphicon glyphicon-flag"></span>\n    <span id="memos-count" class="badge badge-danger hide">0</span>\n  </a>\n  <div aria-labelledby="mLabel" role="menu" class="dropdown-menu notifications-menu">\n    <ul></ul>\n    <a href="/notifications" class="dropdown-bottom">' +
+'</span>\n  </a>\n</li>\n<li id="memos" class="dropdown list-item-icon">\n  <a id="mLabel" data-target="#" data-toggle="dropdown" role="menu" class="dropdown-toggle">\n    <span class="glyphicon glyphicon-flag"></span>\n    <span id="memos-count" class="badge badge-danger hide">0</span>\n  </a>\n  <div aria-labelledby="mLabel" role="menu" class="dropdown-menu notifications-menu">\n    <div class="dropdown-top"><a href="#" id="mark-read">' +
+((__t = ( i18nCommon.expressions.mark_read )) == null ? '' : __t) +
+'</a></div>\n    <ul></ul>\n    <a href="/notifications" class="dropdown-bottom">' +
 ((__t = ( i18nCommon.expressions.see_all )) == null ? '' : __t) +
 '</a>\n  </div>\n</li>\n<li id="friend-requests" class="dropdown list-item-icon">\n  <a id="fLabel" data-target="#" data-toggle="dropdown" role="menu" class="dropdown-toggle">\n    <span class="glyphicon glyphicon-user"></span>\n    <span id="friend-requests-count" class="badge badge-danger hide">0</span>\n  </a>\n  <div aria-labelledby="fLabel" role="menu" class="dropdown-menu notifications-menu">\n    <ul></ul>\n    <a href="/notifications" class="dropdown-bottom">' +
 ((__t = ( i18nCommon.expressions.see_all )) == null ? '' : __t) +

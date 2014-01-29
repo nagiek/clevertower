@@ -19,8 +19,6 @@ define [
       'change .unit-select'         : 'showUnitIfNew'
     
     initialize : (attrs) ->
-      
-      _.bind 'accept'
 
       @model.prep "applicants"
       # Get the emails of applicants within our inquiry
@@ -43,7 +41,7 @@ define [
       @cancel_path = "/properties/#{@property.id}/listings/#{@model.get("listing").id}"
 
 
-    accept : (e) ->
+    accept : (e) =>
       e.preventDefault()
       if confirm(i18nCommon.actions.confirm + " " + i18nListing.warnings.accept_instructions)
         @model.get("listing").save public: false, {patch: true}

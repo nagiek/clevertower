@@ -115,7 +115,8 @@ define [
               center: @model.get "center"
               property: @model
               network: @model.get "network"
-              profile: @model.get "profile"
+              subject: @model.get "profile"
+              object: if @model.get("location") then @model.get("location").get("profile")
               locality: @model.get "locality"
               administrative_area_level_1: @model.get "administrative_area_level_1"
               administrative_area_level_2: @model.get "administrative_area_level_2"

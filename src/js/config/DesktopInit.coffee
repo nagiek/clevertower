@@ -546,8 +546,8 @@ require [
       # Profile.
       profile = user.get "profile"
       
-      profile.likes = new ActivityList [], profile: profile
-      profile.likes.query = profile.relation("likes").query().include("property")
+      profile.likes = new ActivityList [], subject: profile
+      profile.likes.query = profile.relation("likes").query().include("subject")
 
       profile.following = new ProfileList [], {}
       profile.following.query = profile.relation("following").query().include("property")
@@ -557,10 +557,13 @@ require [
 
       profile.followingActivity = new ActivityList [], {}
       profile.followingActivity.query = Parse.Query.or(
+        # These two queries do not play nicely together...
+        new Parse.Query("Activity").matchesQuery("subject", profile.relation("following").query())
+        ,
         new Parse.Query("Activity").matchesKeyInQuery("location", "location", profile.relation("following").query())
-        , 
-        new Parse.Query("Activity").matchesQuery("profile", profile.relation("following").query())
-      ).include("property.profile").include("profile").include("location.profile")
+      # Include activity.subject and object, as we may have "likes" and "follow" activity.
+      ).include("property.profile").include("subject").include("location.profile").include("activity.subject").include("object")
+
 
       profile.followingComments = new CommentList [], {}
       profile.followingComments.query.matchesQuery "profile", profile.relation("following").query()

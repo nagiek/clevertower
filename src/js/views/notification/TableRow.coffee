@@ -73,7 +73,8 @@ define [
       channels = @model.get "channels"
       network = @model.get "network"
       property = @model.get "property"
-      profile = @model.get "profile"
+      subject = @model.get "subject"
+      object = @model.get "object"
 
       if @model.get "forMgr"
         url = ""
@@ -86,13 +87,13 @@ define [
       switch channels[0].split("-")[0]
         when 'properties'
           icon = 'person'
-          photo_src = property.cover("thumb")
+          photo_src = property.get("profile").cover("thumb")
         when 'leases' or 'tenant'
           icon = 'plus'
-          photo_src = profile.cover("thumb")
+          photo_src = subject.cover("thumb")
         else 
           icon = 'calendar'
-          photo_src = profile.cover("thumb")
+          photo_src = subject.cover("thumb")
 
       if clicked
         text = @model.accepted()

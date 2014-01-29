@@ -10,7 +10,44 @@ Parse.Cloud.define "Follow", (req, res) ->
         profile = new Parse.Object("Profile")
         profile.id = req.params.follower
         model.relation("likers").add profile
-        model.save().then ->
+
+        activityACL = new Parse.ACL
+        activityACL.setReadAccess req.user.id, true
+        activityACL.setWriteAccess req.user.id, true
+        activityACL.setPublicReadAccess true
+
+        notificationACL = new Parse.ACL
+        notificationACL.setReadAccess model.get("user").id, true
+        notificationACL.setWriteAccess model.get("user").id, true
+
+        activity = new Parse.Object("Activity")
+
+        name = if model.get("first_name") then model.get("first_name") else model.get("name")
+        activity.set
+          activity_type: "follow"
+          title: "%NAME is now following #{name}"
+          public: true
+          wideAudience: false
+          subject: profile
+          object: model
+          ACL: activityACL
+
+        notification = new Parse.Object("Notification")
+        notification.set
+          text: "%NAME is now following you."
+          channels: [ "profiles-#{model.id}" ]
+          channel: "profiles-#{model.id}"
+          name: "follow"
+          forMgr: false
+          withAction: false
+          # TODO: invitingProfile causes notification to not save.
+          subject: profile
+          object: model
+          # No email, as they have to exist, and email is only if they don't.
+          # email: model.get("email")
+          ACL: notificationACL
+
+        Parse.Object.saveAll([model, activity, notification]).then ->
           res.success()
         , -> res.error "model_not_saved"
       else 
@@ -36,14 +73,60 @@ Parse.Cloud.define "Unfollow", (req, res) ->
 
 Parse.Cloud.define "Like", (req, res) ->
   Parse.Cloud.useMasterKey()
-  (new Parse.Query "Activity").equalTo('objectId', req.params.likee).first()
+  (new Parse.Query "Activity").equalTo('objectId', req.params.likee).include("subject").first()
     .then (model) ->
       if model
         model.increment likersCount: +1
         profile = new Parse.Object("Profile")
         profile.id = req.params.liker
         model.relation("likers").add profile
-        model.save().then ->
+        
+        activityACL = new Parse.ACL
+        activityACL.setReadAccess req.user.id, true
+        activityACL.setWriteAccess req.user.id, true
+        activityACL.setPublicReadAccess true
+
+        notificationACL = new Parse.ACL
+        notificationACL.setReadAccess model.get("subject").get("user").id, true
+        notificationACL.setWriteAccess model.get("subject").get("user").id, true
+
+        activity = new Parse.Object("Activity")
+        if model.get("subject").id isnt profile.id
+          name = if model.get("subject").get("first_name") then model.get("subject").get("first_name") else model.get("subject").get("name")
+          name += "'s"
+
+          # Notify the user if their activity has been liked
+          if model.get("likersCount") is 1
+            notification = new Parse.Object("Notification")
+            notification.set
+              text: "%NAME liked your activity."
+              channels: [ "profiles-#{model.get("subject").id}" ]
+              channel: "profiles-#{model.get("subject").id}"
+              name: "like"
+              forMgr: false
+              withAction: false
+              # TODO: invitingProfile causes notification to not save.
+              subject: profile
+              object: model.get("subject")
+              # No email, as they have to exist, and email is only if they don't.
+              # email: model.get("email")
+              ACL: notificationACL
+
+        else
+          name = "their own"
+
+        activity.set
+          activity_type: "like"
+          title: "%NAME liked #{name} activity"
+          activity: model
+          public: true
+          wideAudience: false
+          subject: profile
+          # Subject of activity is object of our "like".
+          object: model.get("subject")
+          ACL: activityACL
+
+        Parse.Object.saveAll([model, activity, notification]).then ->
           res.success()
         , -> res.error "model_not_saved"
       else 
@@ -322,11 +405,12 @@ Parse.Cloud.define "AddTenants", (req, res) ->
 
       for email in emailsWithoutProfile
         # Add the SignUp promise to the list of things to do.
-        newProfileSaves.push new Parse.Object("Profile").save
+        newProfile = new Parse.Object("Profile").set
           email: email
           ACL: profileACL
+        newProfileSaves.push newProfile
 
-      Parse.Promise.when(newProfileSaves)
+      Parse.Object.saveAll(newProfileSaves)
     , (error) -> 
       console.error "role_query_error"
       res.error 'role_query_error'
@@ -338,7 +422,7 @@ Parse.Cloud.define "AddTenants", (req, res) ->
         user = profile.get("user")
 
         # Save the joinClass
-        vars = 
+        newJoinClass = new Parse.Object(joinClassName).set
           property: property
           network: network
           unit: leaseOrInquiry.get("unit")
@@ -347,19 +431,19 @@ Parse.Cloud.define "AddTenants", (req, res) ->
           profile: profile
           accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb"
           ACL: joinClassACL
-        vars[className.toLowerCase()] = 
+        newJoinClass.set className.toLowerCase(),
           __type: "Pointer"
           className: className
           objectId: leaseOrInquiry.id
-        joinClassSaves.push new Parse.Object(joinClassName).save(vars)
+        joinClassSaves.push newJoinClass
 
-      Parse.Promise.when(joinClassSaves)
+      Parse.Object.saveAll(joinClassSaves)
     , -> 
       console.error "profiles_not_saved"
       res.error 'profiles_not_saved'
     ).then( ->
 
-      notifClassSaves = new Array()
+      objsToSave = new Array()
       _.each arguments, (joinClass) ->
 
         # Profile exists, but user does not necessarily exist.
@@ -372,8 +456,8 @@ Parse.Cloud.define "AddTenants", (req, res) ->
           notificationACL = new Parse.ACL()
 
           if user
-            notificationACL.setReadAccess user, true
-            notificationACL.setWriteAccess user, true
+            notificationACL.setReadAccess user.id, true
+            notificationACL.setWriteAccess user.id, true
 
           else
             # Notify the user
@@ -389,7 +473,7 @@ Parse.Cloud.define "AddTenants", (req, res) ->
             , success: (httpres) ->
               error: (httpres) ->
 
-          notifVars = 
+          notification = new Parse.Object("Notification").set
             text: "You have been invited to join #{title}"
             channels: [ "profiles-#{profile.id}" ]
             channel: "profiles-#{profile.id}"
@@ -397,26 +481,27 @@ Parse.Cloud.define "AddTenants", (req, res) ->
             forMgr: false
             withAction: true
             # TODO: invitingProfile causes notification to not save.
-            profile: req.user.get("profile")
+            subject: property.get("profile")
+            object: profile
             email: profile.get("email")
             property: property
             network: network
             ACL: notificationACL
-          notifVars[joinClassName.toLowerCase()] = joinClass
+          notification.set joinClassName.toLowerCase(), joinClass
 
-          notifClassSaves.push new Parse.Object("Notification").save(notifVars)
+          objsToSave.push notification
 
-      Parse.Promise.when(notifClassSaves)
+      Parse.Object.saveAll(objsToSave)
       
     , ->
       res.error 'joinClasses_not_saved'
     ).then( ->
       roleSaves = []
       if className is "Lease"
-        roleSaves.push propRole.save() if propRole
-        roleSaves.push tntRole.save() if tntRole
+        roleSaves.push propRole if propRole
+        roleSaves.push tntRole if tntRole
       
-      Parse.Promise.when(roleSaves)
+      Parse.Object.saveAll(roleSaves)
 
     , (error) ->
       console.error 'signup_error'
@@ -493,11 +578,12 @@ Parse.Cloud.define "AddManagers", (req, res) ->
         if foundProfile then newProfileSaves.push foundProfile
         else
           # Add the SignUp promise to the list of things to do.
-          newProfileSaves.push new Parse.Object("Profile").save
+          newProfile = new Parse.Object("Profile").set
             email: email
             ACL: profileACL
+          newProfileSaves.push newProfile
 
-      Parse.Promise.when(newProfileSaves)
+      Parse.Object.saveAll(newProfileSaves)
       .then( ->
         joinClassSaves = new Array()
         _.each arguments, (profile) ->
@@ -508,25 +594,25 @@ Parse.Cloud.define "AddManagers", (req, res) ->
           myJoinClassACL = joinClassACL
           if user    
             myJoinClassACL.setRoleAccess user, true
-            myJoinClassACL.setWriteAccess user, true
+            myJoinClassACL.setReadAccess user.id, true
 
           # Save the joinClass
-          vars = 
+          newJoinClass = new Parse.Object(joinClassName).set
             network: network
             status: if user and user.id is req.user.id then 'current' else status
             profile: profile
             accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb"
             ACL: myJoinClassACL
 
-          joinClassSaves.push new Parse.Object(joinClassName).save(vars)
+          joinClassSaves.push newJoinClass
 
-        Parse.Promise.when(joinClassSaves)
+        Parse.Object.saveAll(joinClassSaves)
       , -> res.error 'profiles_not_saved'
       ).then( ->
 
         joinClasses = arguments
 
-        notifClassSaves = new Array()
+        objsToSave = new Array()
 
         for joinClass in joinClasses
 
@@ -540,8 +626,8 @@ Parse.Cloud.define "AddManagers", (req, res) ->
             notificationACL = new Parse.ACL()
 
             if user
-              notificationACL.setReadAccess user, true
-              notificationACL.setWriteAccess user, true
+              notificationACL.setReadAccess user.id, true
+              notificationACL.setReadAccess user.id, true
 
               vstRoleUsers.add user
 
@@ -559,7 +645,7 @@ Parse.Cloud.define "AddManagers", (req, res) ->
               , success: (httpres) ->
                 error: (httpres) ->
 
-            notifVars = 
+            notification = new Parse.Object("Notification").set
               text: "You have been invited to join #{title}"
               channels: [ "profiles-#{profile.id}" ]
               channel: "profiles-#{profile.id}"
@@ -568,15 +654,16 @@ Parse.Cloud.define "AddManagers", (req, res) ->
               forMgr: false
               withAction: true
               # TODO: invitingProfile causes notification to not save.
-              profile: req.user.get("profile")
+              subject: network.get("profile")
+              object: profile
               email: email
               network: network
               manager: joinClass
               ACL: notificationACL
 
-            notifClassSaves.push new Parse.Object("Notification").save(notifVars)
+            objsToSave.push notification
 
-        Parse.Promise.when(notifClassSaves)
+        Parse.Object.saveAll(objsToSave)
         
       , -> res.error 'joinClasses_not_saved'
       ).then( ->
@@ -738,7 +825,7 @@ Parse.Cloud.beforeSave "Network", (req, res) ->
       role = new Parse.Role(current, networkACL)
       vstRole = new Parse.Role(visit, networkACL)
       role.getUsers().add(req.user)
-      Parse.Promise.when(role.save(), vstRole.save()).then -> 
+      Parse.Object.saveAll([role, vstRole]).then -> 
         req.object.set "role", role
         req.object.set "vstRole", vstRole
         res.success()
@@ -841,11 +928,11 @@ Parse.Cloud.beforeSave "Property", (req, res) ->
         role = new Parse.Role(current, roleACL)
         mgrRole = new Parse.Role(mgr, roleACL)
 
-        objsToSave = [role.save(), mgrRole.save()]
-        unless req.object.get("profile") then objsToSave.unshift new Parse.Object("Profile").save(name: req.object.get("thoroughfare"))
+        objsToSave = [role, mgrRole]
+        unless req.object.get("profile") then objsToSave.unshift new Parse.Object("Profile").set("name", req.object.get("thoroughfare"))
 
         # Create profile
-        Parse.Promise.when(objsToSave).then (profile) -> 
+        Parse.Object.saveAll(objsToSave).then (profile) -> 
 
           # Set the property to public.
           propertyACL = roleACL
@@ -892,12 +979,12 @@ Parse.Cloud.beforeSave "Property", (req, res) ->
       role.getUsers().add req.user
       mgrRole.getUsers().add req.user
 
-      objsToSave = [role.save(), mgrRole.save()]
+      objsToSave = [role, mgrRole]
 
-      unless req.object.get("profile") then objsToSave.unshift new Parse.Object("Profile").save(name: req.object.get("thoroughfare"), ACL: propertyACL)
+      unless req.object.get("profile") then objsToSave.unshift new Parse.Object("Profile").set(name: req.object.get("thoroughfare"), ACL: propertyACL)
 
       # Create profile
-      Parse.Promise.when(objsToSave).then (profile) -> 
+      Parse.Object.saveAll(objsToSave).then (profile) -> 
 
         # Set the property to public.
         propertyACL = roleACL
@@ -935,12 +1022,12 @@ Parse.Cloud.beforeSave "Property", (req, res) ->
             if l.get "public" isnt isPublic
               listingACL = l.getACL()
               listingACL.setPublicReadAccess isPublic
-              l.save
+              l.set
                 public: isPublic
                 ACL: listingACL 
               objsToSave.push l
 
-        Parse.Promise.when(objsToSave).then -> res.success()
+        Parse.Object.saveAll(objsToSave).then -> res.success()
       , -> res.error "bad_query"
     else res.success()
 
@@ -1057,7 +1144,7 @@ Parse.Cloud.beforeSave "Inquiry", (req, res) ->
     if mgrRole
       notificationACL.setRoleReadAccess mgrRole, true
       notificationACL.setRoleWriteAccess mgrRole, true
-    notificationACL.setWriteAccess req.user, true
+    notificationACL.setWriteAccess req.user.id, true
 
     notification.save
       name: "new_inquiry"
@@ -1067,14 +1154,15 @@ Parse.Cloud.beforeSave "Inquiry", (req, res) ->
       forMgr: true
       withAction: false
       property: property
-      profile: req.user.get("profile")
+      subject: req.user.get("profile")
+      object: property.get("profile")
       network: network
       ACL: notificationACL
       
     # Give tenants access to read the lease, and managers to read/write
     leaseACL = new Parse.ACL
-    leaseACL.setReadAccess req.user, true
-    leaseACL.setWriteAccess req.user, true
+    leaseACL.setReadAccess req.user.id, true
+    leaseACL.setWriteAccess req.user.id, true
     if network
       leaseACL.setRoleWriteAccess netRole, true
       leaseACL.setRoleReadAccess netRole, true
@@ -1193,7 +1281,7 @@ Parse.Cloud.beforeSave "Lease", (req, res) ->
       # created by the same person.
       # --------
 
-      savesToComplete = []
+      objsToSave = []
 
       unless property.get("user").id is req.user.id and req.object.get("forNetwork")
         channels = ["properties-#{property.id}"]
@@ -1203,27 +1291,29 @@ Parse.Cloud.beforeSave "Lease", (req, res) ->
         if network
           notificationACL.setRoleReadAccess netRole, true
           notificationACL.setRoleWriteAccess netRole, true
-          channels.push "networks-#{network.id}"
-        savesToComplete.push new Parse.Object("Notification").save
+          channels.push "networks-#{network.id}" 
+        notification = new Parse.Object("Notification").set
           name: "lease_join"
           text: "New tenants have joined #{property.get("profile").get("name")}"
           channels: channels
           channel: "property-#{property.id}"
           forMgr: true
           withAction: false
-          profile: req.user.get("profile")
+          subject: req.user.get("profile")
+          object: property.get("profile")
           property: property
           network: network
           ACL: notificationACL
+        objsToSave.push notification
 
       # Create new role (API not chainable)
       # Prepare a role for tenants
       role = new Parse.Role(current, leaseACL)
       # This is done via the AddTenants function.
       # role.getUsers().add req.user unless req.object.get "forNetwork"
-      savesToComplete.push role.save()
+      objsToSave.push role
 
-      Parse.Promise.when(savesToComplete)
+      Parse.Object.saveAll(objsToSave)
       .then -> 
         req.object.set "role", role
         res.success()
@@ -1330,8 +1420,8 @@ Parse.Cloud.beforeSave "Listing", (req, res) ->
         listingACL.setRoleReadAccess mgrRole, true
 
       # Let the user modify their own listing, if 
-      listingACL.setWriteAccess req.user, true
-      listingACL.setReadAccess req.user, true
+      listingACL.setWriteAccess req.user.id, true
+      listingACL.setReadAccess req.user.id, true
 
       req.object.set 
         # Update with the property in case it wasn't set.
@@ -1448,7 +1538,7 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
 
       Parse.Promise.when(mgrQuery, netQuery, profileQuery)
       .then( (mgrObj, netObj, profile) ->
-        savesToComplete = []
+        objsToSave = []
         user = profile.get "user"
 
         # Set ACL
@@ -1484,10 +1574,10 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
           if user
             if tntRole 
               tntRole.getUsers().add user
-              savesToComplete.push tntRole.save()
+              objsToSave.push tntRole
             if propRole
               propRole.getUsers().add user
-              savesToComplete.push propRole.save()
+              objsToSave.push propRole
 
           # Upgrade the status
           if req.object.existed() and status and status is 'pending' and newStatus and newStatus is 'current'
@@ -1495,10 +1585,11 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
             # Made it! No need to add tenant to role as they are already there.
 
             if user
-              savesToComplete.push user.save 
+              user.set
                 property: property 
                 unit: req.object.get "unit"
                 lease: req.object.get "lease"
+              objsToSave.push user
 
             # Create activity
             activity = new Parse.Object("Activity")
@@ -1507,7 +1598,7 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
             activityACL.setRoleReadAccess mgrRole, true if mgrRole
             activityACL.setRoleReadAccess propRole, true if propRole
 
-            savesToComplete.push activity.save
+            activity.set
               activity_type: "new_tenant"
               public: false
               center: property.get "center"
@@ -1516,9 +1607,11 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
               unit: req.object.get "unit"
               property: property
               network: network
-              profile: profile
+              subject: profile
+              object: property.get("profile")
               accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb"
               ACL: activityACL
+            objsToSave.push activity
 
           else
             newStatus = 'invited'
@@ -1526,18 +1619,21 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
             # Notify the user.
             title = property.get("profile").get "name"
             notificationACL = new Parse.ACL
-            notificationACL.setReadAccess user, true
-            notificationACL.setWriteAccess user, true
-            savesToComplete.push new Parse.Object("Notification").save
+            notificationACL.setReadAccess user.id, true
+            notificationACL.setReadAccess user.id, true
+            notification = new Parse.Object("Notification").set
               name: "lease_invitation"
               text: "You have been invited to join #{title}"
               channels: [ "profiles-#{profile.id}" ]
               channel: "profiles-#{profile.id}"
               forMgr: false
               withAction: true
+              subject: property.get("profile")
+              object: profile
               property: property
               network: network
               ACL: notificationACL
+            objsToSave.push notification
           
           req.object.set "status", newStatus
               
@@ -1551,15 +1647,17 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
             profileACL.setRoleReadAccess propRole, true if propRole
             profileACL.setRoleReadAccess mgrRole, true if mgrRole
             profileACL.setRoleReadAccess netRole, true if netRole
-            savesToComplete.push profile.save ACL: profileACL
+            profile.setACL profileACL
+            objsToSave.push profile
 
           if req.object.existed() and status and status is 'invited' and newStatus and newStatus is 'current'
 
             if user
-              savesToComplete.push user.save 
+              user.set
                 property: property 
                 unit: req.object.get "unit"
                 lease: req.object.get "lease"
+              objsToSave.push user
 
             # Create activity
             activity = new Parse.Object("Activity")
@@ -1568,7 +1666,7 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
             activityACL.setRoleReadAccess netRole, true if netRole
             activityACL.setRoleReadAccess propRole, true if propRole
 
-            savesToComplete.push activity.save
+            activity.set
               activity_type: "new_tenant"
               public: false
               center: property.get "center"
@@ -1577,9 +1675,11 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
               unit: lease.get "unit"
               property: property
               network: network
-              profile: profile
+              subject: property.get("profile")
+              object: profile
               accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb"
               ACL: activityACL
+            objsToSave.push activity
 
           else
 
@@ -1596,21 +1696,23 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
               notificationACL.setRoleReadAccess netRole, true 
               notificationACL.setRoleWriteAccess netRole, true
 
-            savesToComplete.push notification.save
+            notification.set
               name: "tenant_inquiry"
               text: "%NAME wants to join your property."
               channels: channels
               channel: "properties-#{propertyId}"
               forMgr: true
               withAction: true
-              profile: profile
+              subject: profile
+              object: property.get("profile")
               property: property
               network: network
               ACL: notificationACL
+            objsToSave.push notification
           
           req.object.set "status", newStatus
 
-        Parse.Promise.when(savesToComplete)
+        Parse.Object.saveAll(objsToSave)
       , -> res.error "bad_query"
       ).then(
         -> res.success() # res.success property
@@ -1669,7 +1771,7 @@ Parse.Cloud.beforeSave "Concerige", (req, res) ->
 
     Parse.Promise.when(mgrQuery, profileQuery, netQuery)
     .then( (mgrObj, profile, netObj) ->
-      savesToComplete = []
+      objsToSave = []
       user = profile.get "user"
 
       # Set ACL
@@ -1697,9 +1799,10 @@ Parse.Cloud.beforeSave "Concerige", (req, res) ->
           concerigeACL.setRoleReadAccess netRole, true
           concerigeACL.setRoleWriteAccess netRole, true
 
-          savesToComplete.push property.save 
+          property.set
             network: network
             ACL: concerigeACL
+          objsToSave.push property
 
         else
           newStatus = 'invited'
@@ -1709,16 +1812,18 @@ Parse.Cloud.beforeSave "Concerige", (req, res) ->
           notificationACL = new Parse.ACL
           notificationACL.setRoleReadAccess netRole, true
           notificationACL.setRoleWriteAccess netRole, true
-          savesToComplete.push new Parse.Object("Notification").save
+          notification = new Parse.Object("Notification").save
             name: "property_invitation"
             text: "You have been requested to manage #{title}"
             channels: [ "networks-#{network.id}" ]
             channel: "networks-#{network.id}"
             forMgr: true
             withAction: true
-            profile: req.user.get("profile")
+            subject: req.user.get("profile")
+            object: network.get("profile")
             network: network
             ACL: notificationACL
+          objsToSave.push notification
         
         req.object.set "status", newStatus
             
@@ -1729,7 +1834,8 @@ Parse.Cloud.beforeSave "Concerige", (req, res) ->
 
         profileACL = profile.getACL()
         profileACL.setRoleReadAccess mgrRole, true
-        savesToComplete.push profile.save ACL: profileACL
+        profile.setACL profileACL
+        objsToSave.push profile
 
         if req.object.existed() and status and status is 'invited' and newStatus and newStatus is 'current'
 
@@ -1738,9 +1844,10 @@ Parse.Cloud.beforeSave "Concerige", (req, res) ->
           concerigeACL.setRoleReadAccess netRole, true
           concerigeACL.setRoleWriteAccess netRole, true
 
-          savesToComplete.push property.save 
+          property.set 
             network: network
             ACL: concerigeACL
+          objsToSave.push property
 
         else
           newStatus = 'pending'
@@ -1750,20 +1857,22 @@ Parse.Cloud.beforeSave "Concerige", (req, res) ->
           notificationACL.setRoleReadAccess mgrRole, true 
           notificationACL.setRoleWriteAccess mgrRole, true
 
-          savesToComplete.push new Parse.Object("Notification").save
+          notification = new Parse.Object("Notification").save
             name: "network_inquiry"
             text: "#{title} wants to manage your property"
             channels: [ "properties-#{property.id}" ]
             channel: "properties-#{property.id}"
             forMgr: false
             withAction: true
-            profile: req.user.get("profile")
+            subject: req.user.get("profile")
+            object: network.get("profile")
             network: network
             ACL: notificationACL
+          objsToSave.push notification 
         
         req.object.set "status", newStatus
 
-      Parse.Promise.when(savesToComplete)
+      Parse.Object.saveAll(objsToSave)
     , -> res.error "bad_query"
     ).then(
       -> res.success() # res.success network
@@ -1824,7 +1933,7 @@ Parse.Cloud.beforeSave "Manager", (req, res) ->
 
     Parse.Promise.when(netQuery, profileQuery)
     .then( (netObj, profile) ->
-      savesToComplete = []
+      objsToSave = []
       user = profile.get "user"
 
       # Set ACL
@@ -1838,8 +1947,8 @@ Parse.Cloud.beforeSave "Manager", (req, res) ->
         managerACL.setRoleReadAccess netRole, true
         managerACL.setRoleWriteAccess netRole, true
         if user
-          managerACL.setReadAccess user, true
-          managerACL.setWriteAccess user, true
+          managerACL.setReadAccess user.id, true
+          managerACL.setReadAccess user.id, true
         req.object.setACL managerACL
 
       # Check if the REQUEST user is in the role.
@@ -1852,9 +1961,11 @@ Parse.Cloud.beforeSave "Manager", (req, res) ->
           # Add the user to the managerACL list
           if user
             # User must certainly exist at this point...
-            savesToComplete.push user.save "network", network
+            user.set "network", network
+            objsToSave.push user
+
             netRole.getUsers().add user
-            savesToComplete.push netRole.save()
+            objsToSave.push netRole
 
           # Set the manager as visible to other managers.
           managerACL = req.object.getACL()
@@ -1867,7 +1978,7 @@ Parse.Cloud.beforeSave "Manager", (req, res) ->
           # activityACL = new Parse.ACL
           # activityACL.setRoleReadAccess netRole, true if netRole
 
-          # savesToComplete.push activity.save
+          # activity.set
           #   activity_type: "new_manager"
           #   public: false
           #   center: network.get "center"
@@ -1875,6 +1986,7 @@ Parse.Cloud.beforeSave "Manager", (req, res) ->
           #   network: network
           #   profile: profile
           #   ACL: activityACL
+          # objsToSave.push activity
 
         else
           newStatus = 'invited'
@@ -1882,18 +1994,20 @@ Parse.Cloud.beforeSave "Manager", (req, res) ->
           # Notify the user.
           title = network.get "title"
           notificationACL = new Parse.ACL
-          notificationACL.setReadAccess user, true
-          notificationACL.setWriteAccess user, true
-          savesToComplete.push new Parse.Object("Notification").save
+          notificationACL.setReadAccess user.id, true
+          notificationACL.setReadAccess user.id, true
+          notification = new Parse.Object("Notification").save
             name: "network_invitation"
             text: "You have been invited to join #{title}"
             channels: [ "profiles-#{profile.id}" ]
             channel: "profiles-#{profile.id}"
             forMgr: false
             withAction: true
-            profile: req.user.get("profile")
+            subject: network.get("profile")
+            object: req.user.get("profile")
             network: network
             ACL: notificationACL
+          objsToSave.push notification
         
         req.object.set "status", newStatus
             
@@ -1904,15 +2018,17 @@ Parse.Cloud.beforeSave "Manager", (req, res) ->
 
         profileACL = profile.getACL()
         profileACL.setRoleReadAccess netRole, true
-        savesToComplete.push profile.save ACL: profileACL
+        profile.setACL profileACL
+        objsToSave.push profile
 
         if req.object.existed() and status and status is 'invited' and newStatus and newStatus is 'current'
 
           # Add the user to the managerACL list
           if user
-            savesToComplete.push user.save "network", network
+            user.set "network", network
+            objsToSave.push user
             netRole.getUsers().add user
-            savesToComplete.push netRole.save()
+            objsToSave.push netRole
 
           # Set the manager as visible to other managers.
           managerACL = req.object.getACL()
@@ -1925,7 +2041,7 @@ Parse.Cloud.beforeSave "Manager", (req, res) ->
           # activityACL = new Parse.ACL
           # activityACL.setRoleReadAccess netRole, true
 
-          # savesToComplete.push activity.save
+          # activity.set
           #   activity_type: "new_manager"
           #   public: false
           #   center: network.get "center"
@@ -1933,6 +2049,7 @@ Parse.Cloud.beforeSave "Manager", (req, res) ->
           #   network: network
           #   profile: profile
           #   ACL: activityACL
+          # objsToSave.push activity
 
         else
           newStatus = 'pending'
@@ -1942,20 +2059,22 @@ Parse.Cloud.beforeSave "Manager", (req, res) ->
           notificationACL.setRoleReadAccess netRole, true 
           notificationACL.setRoleWriteAccess netRole, true
 
-          savesToComplete.push notification.save
+          notification.set
             name: "manager_inquiry"
             text: "%NAME wants to join your network."
             channels: [ "networks-#{network.id}" ]
             channel: "networks-#{network.id}"
             forMgr: true
             withAction: true
-            profile: profile
+            subject: profile
+            object: network.get("profile")
             network: network
             ACL: notificationACL
+          objsToSave.push notification
         
         req.object.set "status", newStatus
 
-      Parse.Promise.when(savesToComplete)
+      Parse.Object.saveAll(objsToSave)
     , -> res.error "bad_query"
     ).then(
       -> res.success() # res.success network
@@ -2028,9 +2147,7 @@ Parse.Cloud.afterSave "Notification", (req) ->
       body_md5 : body_md5
       auth_signature : signature
     success: (httpres) ->
-    error: (error) ->
-      req.object.set "error", error.text
-      req.object.save()
+    error: (error) -> req.object.save error: error.text
       
   # This will only work if we can get the users.
   # 
@@ -2049,18 +2166,37 @@ Parse.Cloud.afterSave "Notification", (req) ->
   
   # Send a push notification
   push_text = if text.indexOf("%NAME") > 0
-    profile = req.object.get("profile")
-    name = if profile.get("first_name") then profile.get("first_name") else profile.get("email")
-    text.replace("%NAME", name)
+    profile = req.object.get("subject")
+    name = if profile.get("first_name") then profile.get("first_name") 
+    else if profile.get("name") then profile.get("name") 
+    else if profile.get("last_name") then profile.get("last_name")
+    else profile.get("email")
+    if not name and profile.id
+      new Parse.Query("Profile").get profile.id,
+      success: (obj) ->
+        name = if profile.get("first_name") then profile.get("first_name") 
+        else if profile.get("name") then profile.get("name") 
+        else if profile.get("last_name") then profile.get("last_name")
+        else profile.get("email")
+        text.replace("%NAME", name) 
+        Parse.Push.send 
+          channels: channels, data: alert: push_text
+        , 
+          # success: -> 
+          error: (error) -> req.object.save error: JSON.stringify(error)
+    else
+      text.replace("%NAME", name) 
+      Parse.Push.send 
+        channels: channels, data: alert: push_text
+      , 
+        # success: -> 
+        error: (error) -> req.object.save error: JSON.stringify(error)
   else 
-    text
-  Parse.Push.send 
-    channels: channels, data: alert: push_text
-  , 
-    # success: -> 
-    error: (error) -> 
-      req.object.set "error", JSON.stringify(error)
-      req.object.save()
+    Parse.Push.send 
+      channels: channels, data: alert: push_text
+    , 
+      # success: -> 
+      error: (error) -> req.object.save error: JSON.stringify(error)
 
 # # Search validation
 # Parse.Cloud.beforeSave "Search", (req, res) ->
@@ -2079,11 +2215,6 @@ Parse.Cloud.beforeSave "Activity", (req, res) ->
     req.object.unset "accessToken"
     return res.success()
 
-  # Create activity
-  activityACL = new Parse.ACL
-  activityACL.setReadAccess req.user, true
-  activityACL.setWriteAccess req.user, true
-
   # Set appropriate ACLs if this is a property post.
   if req.object.get "property"
 
@@ -2097,15 +2228,23 @@ Parse.Cloud.beforeSave "Activity", (req, res) ->
       mgrRole = property.get "mgrRole"
       network = property.get "network"
 
-      # Create activity
-      if req.object.get "public"
-        activityACL.setPublicReadAccess true 
-      else 
-        activityACL.setRoleReadAccess propRole, true if propRole
-        activityACL.setRoleReadAccess mgrRole, true if mgrRole
-        if network
-          netRole = network.get "role"
-          activityACL.setRoleReadAccess netRole, true if netRole
+      # Create activityACL, unless we have one
+      unless req.object.getACL()
+        activityACL = new Parse.ACL
+        activityACL.setReadAccess req.user.id, true
+        activityACL.setWriteAccess req.user.id, true
+
+        # Create activity
+        if req.object.get "public"
+          activityACL.setPublicReadAccess true 
+        else 
+          activityACL.setRoleReadAccess propRole, true if propRole
+          activityACL.setRoleReadAccess mgrRole, true if mgrRole
+          if network
+            netRole = network.get "role"
+            activityACL.setRoleReadAccess netRole, true if netRole
+
+        req.object.setACL activityACL
 
       req.object.set
         property: property
@@ -2118,18 +2257,22 @@ Parse.Cloud.beforeSave "Activity", (req, res) ->
         # Why would we have this?
         # lease: req.user.get "lease" 
         # unit: req.user.get "unit"
-        ACL: activityACL
 
       res.success()
     error: -> res.error "bad_query"
 
   else 
-    activityACL.setPublicReadAccess true
-    req.object.set
-      # Make sure the profile is set if we don't have a property.
-      profile: req.user.get "profile"
-      public: true
-      ACL: activityACL
+    req.object.set public: true
+    unless req.object.getACL()
+      activityACL = new Parse.ACL
+      activityACL.setReadAccess req.user.id, true
+      activityACL.setWriteAccess req.user.id, true
+      activityACL.setPublicReadAccess true
+      req.object.setACL activityACL
+
+    # Make sure the profile is set if we don't have a property.
+    req.object.set "subject", req.user.get("profile") unless req.object.get("subject")
+    
     res.success()
 
 
@@ -2138,12 +2281,12 @@ Parse.Cloud.beforeSave "Comment", (req, res) ->
 
   return res.success() if req.object.existed()
 
-  CommentACL = new Parse.ACL
-  CommentACL.setPublicReadAccess true
-  CommentACL.setReadAccess req.user, true
-  CommentACL.setWriteAccess req.user, true
+  commentACL = new Parse.ACL
+  commentACL.setPublicReadAccess true
+  commentACL.setReadAccess req.user.id, true
+  commentACL.setWriteAccess req.user.id, true
 
-  req.object.setACL CommentACL
+  req.object.setACL commentACL
 
   res.success()
 
@@ -2151,12 +2294,47 @@ Parse.Cloud.beforeSave "Comment", (req, res) ->
 Parse.Cloud.afterSave "Comment", (req) ->
   # Allow comments on every activity.
   Parse.Cloud.useMasterKey()
-
   query = new Parse.Query("Activity")
-  query.get req.object.get("activity").id,
-    success: (activity) ->
-      activity.increment("commentCount")
-      activity.save()
+  query.get req.object.get("activity").include("profile").id,
+    success: (obj) ->
+
+      activityACL = new Parse.ACL
+      activityACL.setPublicReadAccess true
+      activityACL.setReadAccess req.user.id, true
+      activityACL.setWriteAccess req.user.id, true
+
+      notificationACL = new Parse.ACL
+      notificationACL.setReadAccess obj.get("profile").get("user"), true
+      notificationACL.setWriteAccess obj.get("profile").get("user"), true
+
+      obj.increment "commentCount"
+
+      activity = new Parse.Object("Activity")
+      activity.set
+        activity_type: "commented"
+        title: "%NAME commented on #{model.get("name")}'s activity"
+        public: true
+        subject: req.user.get("profile")
+        object: req.object.get("profile")
+        ACL: activityACL
+
+      # Notify the user if their activity has been liked
+      if activity.get("commentCount") is 1 
+        notification = new Parse.Object("Notification")
+        notification.set
+          text: "%NAME commented your activity."
+          channels: [ "profiles-#{obj.get("profile").id}" ]
+          channel: "profiles-#{obj.get("profile").id}"
+          name: "commented"
+          forMgr: false
+          withAction: false
+          # TODO: invitingProfile causes notification to not save.
+          subject: req.user.get("profile")
+          object: obj.get("profile")
+          # email: req.object.get("profile").get("email")
+          ACL: notificationACL
+      
+      Parse.Object.saveAll [obj, activity. notification]
 
 
 # # Task validation

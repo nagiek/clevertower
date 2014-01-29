@@ -29,12 +29,13 @@ define [
 
     # Re-render the contents of the property item.
     render: ->
+      console.log Parse.User.current()
       vars = 
         title:  Parse.User.current().get("property").get 'title'
         unitTitle: Parse.User.current().get("unit").get 'title'
         startDate: moment(@model.get "start_date").format("LL")
         endDate: moment(@model.get "end_date").format("LL")
-        cover: Parse.User.current().get("property").cover 'profile'
+        cover: Parse.User.current().get("property").get("profile").cover 'profile'
         # Strings
         i18nProperty: i18nProperty
         i18nLease: i18nLease
@@ -50,7 +51,7 @@ define [
     renderHeader: ->
       @$(".page-header .property-title").html Parse.User.current().get("property").get 'title'
       @$(".page-header .unit-title").html Parse.User.current().get("unit").get 'title'
-      @$(".page-header .photo img").prop "src", Parse.User.current().get("property").cover 'profile'
+      @$(".page-header .photo img").prop "src", Parse.User.current().get("property").get("profile").cover 'profile'
       @$(".page-header .start-date").html moment(@model.get "start_date").format("LL")
       @$(".page-header .end-date").html moment(@model.get "end_date").format("LL")
 

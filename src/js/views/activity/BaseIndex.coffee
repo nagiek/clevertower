@@ -169,11 +169,11 @@ define [
         propertyIndex = false
 
       # Possible for the same activity to be on the page twice (in two different tabs)
-      $el = $ "<div class='thumbnail clearfix activity activity-#{model.id} profile-#{model.get('profile').id} fade in' />"
+      $el = $ "<div class='thumbnail clearfix activity activity-#{model.id} profile-#{model.get('subject').id} fade in' />"
 
         # data-id="#{model.id}"
         # data-liked="#{likedByUser}"
-        # data-following="#{followedByUser}"
+        # data-followedByUser="#{followedByUser}"
         # data-linked="#{linked}"
         # data-property-index="#{propertyIndex}" 
         # data-property-id="#{propertyId}"
@@ -181,13 +181,14 @@ define [
         # data-lat="#{model.GPoint().lat()}"
         # data-lng="#{model.GPoint().lng()}"
         # data-collection="#{collection}"
-        # data-profile="#{model.profilePic("tiny")}"
+        # data-subject="#{model.subject().cover("tiny")}"
+        # data-object="#{model.object().cover("tiny")}"
         # data-image="#{model.image("full")}"
 
       $el.data
         id: model.id
         liked: likedByUser
-        following: followedByUser
+        followedByUser: followedByUser
         linked: linked
         "property-index": propertyIndex
         "property-id": propertyId
@@ -196,7 +197,8 @@ define [
         lat: model.GPoint().lat()
         lng: model.GPoint().lng()
         collection: collection
-        profile: model.profilePic("tiny")
+        subject: model.subject().cover("tiny")
+        object: if model.object() then model.object().cover("tiny")
         image: model.image("full")
 
       vars = _.merge model.toJSON(), 
@@ -206,20 +208,30 @@ define [
         end: moment(model.get("endDate")).format("LLL")
         postDate: moment(model.createdAt).fromNow()
         postImage: model.image("full") # Keep this in for template logic.
-        profileUrl: model.profileUrl()
+        subjectUrl: model.subject().url()
+        objectUrl: if model.object() then model.object().url()
         icon: model.icon()
-        name: model.name()
+        name: model.subject().name()
         likedByUser: likedByUser
         followedByUser: followedByUser
         current: Parse.User.current()
-        isSelf: collection is "user" or (Parse.User.current() and model.get("profile").id is Parse.User.current().get("profile").id)
+        isSelf: collection is "user" or (Parse.User.current() and model.get("subject").id is Parse.User.current().get("profile").id)
         i18nCommon: i18nCommon
         pos: if @onMap then (if linked then propertyIndex else model.pos()) % 20 else false # This will be incremented in the template.
+        wideAudience: model.get("wideAudience")
 
+      if model.get("activity")
+        vars.activity = true
+        vars.activityImage = model.get("activity").image("full")
+        vars.title = model.get("activity").title()
+        vars.subtitle = model.title()
+      else
+        vars.title = model.title()
+        vars.subtitle = false
 
       if Parse.User.current()
         vars.self = Parse.User.current().get("profile").name()
-        vars.selfProfilePic = Parse.User.current().get("profile").cover("tiny")
+        vars.selfCover = Parse.User.current().get("profile").cover("tiny")
 
       # Default options. 
       _.defaults vars,
@@ -229,9 +241,6 @@ define [
         endDate: false
         likersCount: 0
         commentCount: 0
-
-      # Override default title.
-      vars.title = model.title()
 
       $el.html JST["src/js/templates/activity/summary.jst"](vars)
 
@@ -247,7 +256,7 @@ define [
       #   view: @
       #   liked: Parse.User.current() and Parse.User.current().get("profile").likes.find (l) -> l.id is a.id
       # @listViews[@shortestColumnIndex()].append view.render().$el
-      @listViews[@shortestColumnIndex()].append @renderTemplate(a, a.likedByUser(), a.followedByUser(), false)
+      @listViews[@shortestColumnIndex()].append @renderTemplate(a, a.likedByUser(), a.subject().followedByUser(), false)
       # @$list.append view.render().el
 
     # Pagination
@@ -370,21 +379,21 @@ define [
 
     follow : (model, activity, buttonParent, data, undo) =>
 
-      if data.following
+      if data.followedByUser
         buttonParent.html """<button type="button" class="btn btn-primary follow">#{i18nCommon.actions.follow}</button>"""
         @markAsNotFollowing(activity)
 
         Parse.User.current().get("profile").increment followingCount: -1
-        Parse.User.current().get("profile").relation("following").remove model.get("profile")
-        Parse.User.current().get("profile").following.remove model.get("profile")
+        Parse.User.current().get("profile").relation("following").remove model.get("subject")
+        Parse.User.current().get("profile").following.remove model.get("subject")
 
         # Unfollow all other items from this profile
-        @markProfileActivitiesAsNotFollowing(model.get("profile"))
+        @markProfileActivitiesAsNotFollowing(model.get("subject"))
 
         # activity.attr "data-liked", "false"
         unless undo
           Parse.Cloud.run "Unfollow", {
-            followee: model.get("profile").id
+            followee: model.get("subject").id
             follower: Parse.User.current().get("profile").id
           },
           # Optimistic saving.
@@ -409,13 +418,13 @@ define [
         @markAsFollowing(activity)
 
         Parse.User.current().get("profile").increment followingCount: +1
-        Parse.User.current().get("profile").relation("following").add model.get("profile")
+        Parse.User.current().get("profile").relation("following").add model.get("subject")
         # Adding to a relation will somehow add to collection..?
-        Parse.User.current().get("profile").following.add model.get("profile")
+        Parse.User.current().get("profile").following.add model.get("subject")
 
         unless undo
           Parse.Cloud.run "Follow", {
-            followee: model.get("profile").id
+            followee: model.get("subject").id
             follower: Parse.User.current().get("profile").id
           },
           # Optimistic saving.
@@ -427,17 +436,17 @@ define [
         else new Alert event: 'like', fade: false, message: i18nCommon.errors.not_saved, type: 'danger'
         
         # Follow all other items from this profile
-        @markProfileActivitiesAsFollowing(model.get("profile"))
+        @markProfileActivitiesAsFollowing(model.get("subject"))
 
       Parse.User.current().get("profile").save()
 
     markAsNotFollowing: (activity) =>
       # activity.find(".follow-button").text i18nCommon.verbs.following
-      activity.data "following", false
+      activity.data "followedByUser", false
 
     markAsFollowing: (activity) =>
       # activity.find(".follow-button").text i18nCommon.verbs.following
-      activity.data "following", true
+      activity.data "followedByUser", true
 
     # Comments
     # --------
@@ -477,8 +486,8 @@ define [
         listItem = lv.find("> div > .activity-#{model.id}")
         if listItem.length > 0 
           @addOneComment comment, listItem[0]
-          # return false to avoid checking the other column.
-          false
+          # return {} to avoid checking the other column.
+          {}
 
       activity.find("input.comment-title").val("")
 
@@ -644,16 +653,17 @@ define [
 
       vars = _.merge model.toJSON(), 
         url: model.url()
-        profileUrl: model.profileUrl()
+        subjectUrl: model.subject().url()
+        objectUrl: if model.object() then model.object().url()
         start: moment(model.get("startDate")).format("LLL")
         end: moment(model.get("endDate")).format("LLL")
         postDate: moment(model.createdAt).fromNow()
         likedByUser: model.likedByUser()
-        followedByUser: model.followedByUser()
+        followedByUser: model.subject().followedByUser()
         postImage: model.image("full")
         icon: model.icon()
-        name: model.name()
-        profilePic: model.profilePic("thumb")
+        name: model.subject().name()
+        cover: model.subject().cover("thumb")
         propertyLinked: if property then true else false
         propertyTitle: if property then property.get("profile").name() else false
         propertyCover: if property then property.get("profile").cover("tiny") else false
@@ -662,12 +672,22 @@ define [
         locationCover: if location then location.get("profile").cover("tiny") else false
         locationUrl: if location then location.url() else false
         current: Parse.User.current()
-        isSelf: Parse.User.current() and model.get("profile").id is Parse.User.current().get("profile").id
+        isSelf: Parse.User.current() and model.get("subject").id is Parse.User.current().get("profile").id
         i18nCommon: i18nCommon
+        wideAudience: model.get("wideAudience")
+
+      if model.get("activity")
+        vars.activity = true
+        vars.activityImage = model.get("activity").image("full")
+        vars.title = model.get("activity").title()
+        vars.subtitle = model.title()
+      else
+        vars.title = model.title()
+        vars.subtitle = false
 
       if Parse.User.current()
         vars.self = Parse.User.current().get("profile").name()
-        vars.selfProfilePic = Parse.User.current().get("profile").cover("tiny")
+        vars.selfCover = Parse.User.current().get("profile").cover("tiny")
 
       # Default options. 
       _.defaults vars,
@@ -675,17 +695,14 @@ define [
         image: false
         isEvent: false
         endDate: false
-        likesCount: 0
+        likersCount: 0
         commentCount: 0
-
-      # Override default title.
-      vars.title = model.title()
 
       $("#view-content-modal").html JST["src/js/templates/activity/modal.jst"](vars)
 
       $("#view-content-modal").find("> .modal-dialog > .activity").data
         liked: model.likedByUser()
-        following: model.followedByUser()
+        followedByUser: model.subject().followedByUser()
 
       # Comments
       @$modalComments = $("#view-content-modal .list-comments")
@@ -716,7 +733,7 @@ define [
         title: comment.get "title"
         postDate: moment(comment.createdAt).fromNow()
         name: comment.name()
-        profilePic: comment.profilePic("tiny")
+        cover: comment.cover("tiny")
         profileUrl: comment.profileUrl()
         i18nCommon: i18nCommon
 
