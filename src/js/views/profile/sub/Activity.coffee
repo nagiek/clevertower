@@ -17,8 +17,9 @@ define [
     el: "#activity"
 
     events:
-      'click .thumbnails a.content'           : 'getModelDataToShowInModal'
-      'click .thumbnails button.get-comments' : 'getActivityCommentsAndCollection' # 'showModal'
+      'click .thumbnails a.content'             : 'getModelDataToShowInModal'
+      'click .thumbnails button.get-comments'   : 'getActivityCommentsAndCollection'
+      'click .thumbnails a.apply'               : 'applyToListingFromActivity'
       # Activity events
       "click .like-button"                    : "likeOrLoginFromActivity"
       "click .likers"                         : "getLikersFromActivity"
@@ -74,7 +75,7 @@ define [
       e.preventDefault()
 
       @modal = true
-      data = $(e.currentTarget).parent().data()
+      data = $(e.currentTarget).parents(".activity").data()
 
       # Keep track of where we are, for subsequent navigation.
       # Convert the index to an array and find the "new" index.
@@ -96,7 +97,7 @@ define [
       return unless Parse.User.current()
 
       button = @$(e.currentTarget)
-      activity = button.closest(".activity")
+      activity = button.parents(".activity")
       data = activity.data()
       model = @model.activity.at(data.index)
 
@@ -108,7 +109,7 @@ define [
       return unless Parse.User.current()
 
       button = @$(e.currentTarget)
-      activity = button.closest(".activity")
+      activity = button.parents(".activity")
       data = activity.data()
       model = @model.activity.at(data.index)
       comments = @model.comments
@@ -178,7 +179,7 @@ define [
     likeOrLoginFromActivity: (e) =>
       e.preventDefault()
       button = @$(e.currentTarget)
-      activity = button.closest(".activity")
+      activity = button.parents(".activity")
       data = activity.data()
       model = @model.activity.at(data.index)
 
@@ -190,13 +191,24 @@ define [
     getLikersFromActivity: (e) =>
       e.preventDefault()
       button = @$(e.currentTarget)
-      activity = button.closest(".activity")
+      activity = button.parents(".activity")
       data = activity.data()
       model = @model.activity.at(data.index)
 
       model.prep("likers")
       @listenToOnce model.likers, "reset", @showLikersModal
       model.likers.fetch()
+
+    applyToListingFromActivity: (e) =>
+      e.preventDefault()
+      if Parse.User.current()
+        button = @$(e.currentTarget)
+        activity = button.parents(".activity")
+        data = activity.data()
+        model = @model.activity.at(data.index)
+        @applyToListing model
+      else
+        $('#login-modal').modal()
 
     checkIfLiked: (activity) =>
       data = activity.data()
@@ -210,7 +222,7 @@ define [
 
       model = @model.activity.at(data.index)
 
-      @markAsFollowing(activity) if Parse.User.current().get("profile").following.find (p) => p.id is model.get("profile").id
+      @markAsFollowing(activity) if model.subject().followedByUser()
 
     updatePaginiation : =>
       countQuery = @model.activity.query

@@ -8,7 +8,7 @@
         </div>
     <% } else { %>
       <div class="position-relative col-md-8">
-        <% if (subtitle) { %><p><%= subtitle %></p><% } %>
+        <% if (header) { %><p><%= header %></p><% } %>
         <blockquote><%= title %></blockquote>
     <% } %>
       <% if (rent) { %><div class="rent">$<%= rent %></div><% } %>
@@ -39,41 +39,52 @@
           <% } %>
           <p><small><%= i18nCommon.fields.posted %> <%= postDate %></small></p>
         </div>
-        <% if (wideAudience) { %>
+        <% if (hasAction || hasListing) { %>
           <ul class="activity-actions list-inline center">
-            <li>
-              <small>
-                <a href="#" class="like-button">
-                  <% if (likedByUser) { %><%= i18nCommon.adjectives.liked %>
-                  <% } else { %><%= i18nCommon.actions.like %><% } %>
+            <% if (hasListing) { %>
+              <li>
+                <small>
+                  <button type="button" class="btn btn-info apply">
+                    <%= i18nCommon.actions.apply %>
+                  </button>
+                </small>
+              </li>
+            <% } %>
+            <% if (hasAction) { %>
+              <li>
+                <small>
+                  <a href="#" class="like-button">
+                    <% if (likedByUser) { %><%= i18nCommon.adjectives.liked %>
+                    <% } else { %><%= i18nCommon.actions.like %><% } %>
+                  </a>
+                </small>
+              </li>
+              <li>
+                <a href="#" class="likers<% if (likedByUser) { %> active<% } %>" >
+                  <i class="glyphicon glyphicon-thumbs-up"></i>
                 </a>
-              </small>
-            </li>
-            <li>
-              <a href="#" class="likers<% if (likedByUser) { %> active<% } %>" >
-                <i class="glyphicon glyphicon-thumbs-up"></i>
-              </a>
-              <small class="likers-count"><%= likersCount %></small>
-            </li>
-            <!--
-            <li>
-              <a href="#" class="comment-button">
-                <span class="glyphicon glyphicon-comment"></span>
-              </a>
-              <small class="comment-count"><%= commentCount %></small>
-            </li>
-            -->
+                <small class="likers-count"><%= likersCount %></small>
+              </li>
+              <!--
+              <li>
+                <a href="#" class="comment-button">
+                  <span class="glyphicon glyphicon-comment"></span>
+                </a>
+                <small class="comment-count"><%= commentCount %></small>
+              </li>
+              -->
+            <% } %>
           </ul>
         <% } %>
       </header>
       <div>
         <% if (postImage) { %>
           <p><strong><%= title %></strong></p>
-          <% if (subtitle) { %><p><%= subtitle %></p><% } %>
+          <% if (header) { %><p><%= header %></p><% } %>
         <% } %>
         <% if (isEvent) { %><p><strong><%= start %><% if (endDate) { %> - <%= end %><% } %></strong></p><% } %>
       </div>
-      <% if (wideAudience) { %>
+      <% if (hasAction) { %>
         <div class="comments">
           <div class="additional-comments">
             <button class="btn btn-link get-comments<% if (commentCount == 0) { %> hide<% } %>">

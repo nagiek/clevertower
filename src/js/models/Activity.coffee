@@ -17,6 +17,7 @@ define [
       likersCount:    0
       commentCount:   0
       isEvent:        false
+      hasAction:      true
       wideAudience:   true
 
     GPoint : -> 
@@ -29,6 +30,13 @@ define [
 
     # Index of model in its collection.
     url : -> "/posts/#{@id}"
+
+    subjectUrl : ->
+      # Get the property for the profile to craft the url.
+      property = @property()
+      subject = @subject()
+      subject.set "property", property if property
+      subject.url()
 
     validate: (attrs = {}, options = {}) ->
       # Check all attribute existence, as validate is called on set
@@ -101,7 +109,11 @@ define [
 
     image: (size) ->
       switch @get("activity_type")
-        when "new_listing", "new_property","new_tenant", "new_manager" then @profile().cover(size)
+        when "new_listing", "new_property"
+          # Make sure the profile knows that it has a property. 
+          @subject().set("property", @get("property"))
+          @subject().cover(size)
+        when "new_tenant", "new_manager" then @subject().cover(size)
         when "new_post", "new_photo" then @get("image") || false
         else false
 

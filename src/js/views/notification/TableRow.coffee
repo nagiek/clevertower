@@ -23,17 +23,21 @@ define [
     initialize: ->
       @listenTo Parse.Dispatcher, "user:logout", @clear
       @listenTo @model, "destroy", @clear
+      @listenTo @model, "change:hidden change:clicked", @render
 
     handleClick : =>
       @$("> a").removeClass "unclicked"
-      @markAsClicked()
+      @model.add clicked: [Parse.User.current().id]
+      @model.trigger "change:clicked"
+      @model.save null, patch: true
 
     accept: (e) =>
       actionItem = if @model.get("tenant") then @model.get("tenant") else @model.get("manager")
       return unless actionItem
       @model.add hidden: [Parse.User.current().id]
-      @markAsClicked()
-      @render()
+      @model.add clicked: [Parse.User.current().id]
+      @model.trigger "change:clicked"
+      @model.save null, patch: true
 
       # Until req.object.original lands for Cloud Code, have to pass in new status.
       actionItem.save(newStatus: "current").then ->
@@ -47,8 +51,8 @@ define [
     ignore: (e) =>
       # Don't modify the action item, just hide the request.
       @model.add hidden: [Parse.User.current().id]
+      @model.trigger "change:hidden"
       @model.save null, patch: true
-      @render()
 
     reject: (e) =>
       actionItem = if @model.get("tenant") then @model.get("tenant") else @model.get("manager")
@@ -58,11 +62,7 @@ define [
     undo: (e) =>
       # Don't modify the action item, just hide the request.
       @model.remove hidden: [Parse.User.current().id]
-      @model.save null, patch: true
-      @render()
-
-    markAsClicked: (e) =>
-      @model.add clicked: [Parse.User.current().id]
+      @model.trigger "change:clicked"
       @model.save null, patch: true
 
     # Re-render the contents of the property item.
@@ -95,10 +95,9 @@ define [
           icon = 'calendar'
           photo_src = subject.cover("thumb")
 
-      if clicked
-        text = @model.accepted()
-      else if hidden
-        text = @model.ignored() + "<small>(<a href='#' class='undo'>" + i18nCommon.actions.undo + "</a>)</small>"
+      if @model.withAction() and (clicked or hidden)
+        text = if clicked then @model.accepted()
+        else @model.ignored() + "<small>(<a href='#' class='undo'>" + i18nCommon.actions.undo + "</a>)</small>"
       else
         text = @model.text()
 

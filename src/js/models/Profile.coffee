@@ -39,7 +39,9 @@ define [
 
     # Backbone default, as Parse function does not exist.
     url: ->
-      if @get "property" then @get("property").publicUrl()
+      if @get "property" 
+        property = @get "property"
+        "/places/#{property.country()}/#{property.get("administrative_area_level_1")}/#{property.get("locality")}/#{property.id}/#{@slug()}"
       else if @get "location" then @get("location").url()
       else "/users/#{@id}" 
       
@@ -66,7 +68,9 @@ define [
     name: ->
       name = @get("name")
       unless name
-        name = @get("first_name") & " " & @get("last_name")
+        name = @get("first_name") 
+      unless name 
+        name = @get("last_name")
       unless name
         email = @get("email") 
         if email
@@ -76,6 +80,8 @@ define [
         else 
           name = "unknown"
       name
+
+    slug: -> @name().replace(/\s+/g, '-').toLowerCase()
       
     validate: (attrs, options) ->
       if attrs.email and attrs.email isnt ""

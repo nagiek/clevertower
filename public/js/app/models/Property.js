@@ -85,7 +85,7 @@
         return "/places/" + (this.country()) + "/" + (this.get("administrative_area_level_1")) + "/" + (this.get("locality")) + "/" + this.id + "/" + (this.slug());
       },
       slug: function() {
-        return this.get("profile").name().replace(/\s+/g, '-').toLowerCase();
+        return this.get("profile").slug();
       },
       country: function() {
         return i18nCommon.countries[this.get("country")];

@@ -38,3 +38,6 @@ define [
 
 
       @[collectionName]
+
+    title: ->
+      if @get("listing").collection then @get("listing").collection.title else @get("property").get("profile").name()

@@ -27,8 +27,9 @@ define [
 
     events:
       'click .nav a'                            : 'showTab'
-      'click #activity .thumbnails a.content'   : 'getModelDataToShowInModal'
-      'click .thumbnails button.get-comments'   : 'getActivityCommentsAndCollection' # 'showModal'
+      'click .thumbnails a.content'             : 'getModelDataToShowInModal'
+      'click .thumbnails button.get-comments'   : 'getActivityCommentsAndCollection'
+      'click .thumbnails a.apply'               : 'applyToListingFromActivity'
       'click #new-lease'                        : 'showLeaseModal'
       # Activity events
       "click .like-button"                      : "likeOrLoginFromActivity"
@@ -48,6 +49,7 @@ define [
       @model.prep "photos"
       @model.prep "listings"
 
+      @model.activity.query.notContainedIn "activity_type", ["new_listing"]
       @model.activity.query.notEqualTo 'wideAudience', false
 
       # Do not add activity, as we may get extra items added.
@@ -92,7 +94,7 @@ define [
 
       model = @model.activity.at(data.index)
 
-      @markAsFollowing(activity) if Parse.User.current().get("profile").following.find (p) => p.id is model.get("profile").id
+      @markAsFollowing(activity) if model.subject().followedByUser()
 
     render: ->
 
@@ -160,7 +162,7 @@ define [
       # Start activity search.
       @addAllActivity @model.activity if @model.activity.length > 0
       @addAllComments @model.comments if @model.comments.length > 0
-      @search() unless @model.activity.length > @resultsPerPage * @page
+      @search() unless @model.activity.length > 0
 
       if @model.photos.length > 0 then @addAllPhotos() else @model.photos.fetch()
       if @model.listings.length > 0 then @addAllListings() else @model.listings.fetch()
@@ -179,7 +181,7 @@ define [
       e.preventDefault()
 
       @modal = true
-      data = $(e.currentTarget).parent().data()
+      data = $(e.currentTarget).parents(".activity").data()
 
       # Keep track of where we are, for subsequent navigation.
       # Convert the index to an array and find the "new" index.
@@ -201,7 +203,7 @@ define [
       return unless Parse.User.current()
 
       button = @$(e.currentTarget)
-      activity = button.closest(".activity")
+      activity = button.parents(".activity")
       data = activity.data()
       model = @model.activity.at(data.index)
 
@@ -213,7 +215,7 @@ define [
       return unless Parse.User.current()
 
       button = @$(e.currentTarget)
-      activity = button.closest(".activity")
+      activity = button.parents(".activity")
       data = activity.data()
       model = @model.activity.at(data.index)
       comments = @model.comments
@@ -272,15 +274,11 @@ define [
       # We can infer whether we need it the second time around.
       if @page is 2 then @updatePaginiation()
 
-    checkIfEnd : =>
-
-      # Check if we have hit the end.
-      if @model.activity.length >= @activityCount then @trigger "view:exhausted"
 
     likeOrLoginFromActivity: (e) =>
       e.preventDefault()
       button = @$(e.currentTarget)
-      activity = button.closest(".activity")
+      activity = button.parents(".activity")
       data = activity.data()
       model = @model.activity.at(data.index)
 
@@ -292,13 +290,29 @@ define [
     getLikersFromActivity: (e) =>
       e.preventDefault()
       button = @$(e.currentTarget)
-      activity = button.closest(".activity")
+      activity = button.parents(".activity")
       data = activity.data()
       model = @model.activity.at(data.index)
 
       model.prep("likers")
       @listenToOnce model.likers, "reset", @showLikersModal
       model.likers.fetch()
+
+    applyToListingFromActivity: (e) =>
+      e.preventDefault()
+      if Parse.User.current()
+        button = @$(e.currentTarget)
+        activity = button.parents(".activity")
+        data = activity.data()
+        model = @model.activity.at(data.index)
+        @applyToListing model
+      else
+        $('#login-modal').modal()
+
+    checkIfEnd : =>
+
+      # Check if we have hit the end.
+      if @model.activity.length >= @activityCount then @trigger "view:exhausted"
 
     updatePaginiation : =>
       countQuery = @model.activity.query

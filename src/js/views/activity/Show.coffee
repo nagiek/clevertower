@@ -53,8 +53,8 @@ define [
           Parse.User.current().get("profile").relation("likes").remove @model
           Parse.User.current().get("profile").likes.remove @model
           @liked = false
-          Parse.Object.saveAll [@model, Parse.User.current().get("profile")]
-          @clear() if @currentProfile
+          Parse.Object.saveAll [@model, Parse.User.current().get("profile")],
+          success: => @clear() if @currentProfile
         
       else
         $("#signup-modal").modal()

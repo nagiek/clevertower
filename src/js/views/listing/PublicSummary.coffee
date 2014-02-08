@@ -3,10 +3,12 @@ define [
   "underscore"
   "backbone"
   "moment"
+  'models/inquiry'
+  'views/inquiry/new'
   "i18n!nls/listing"
   "i18n!nls/common"
   'templates/listing/publicsummary'
-], ($, _, Parse, moment, i18nListing, i18nCommon) ->
+], ($, _, Parse, moment, Inquiry, InquiryView, i18nListing, i18nCommon) ->
 
   class ListingPublicSummaryView extends Parse.View
   
@@ -51,8 +53,7 @@ define [
     showModal: (e) =>
       e.preventDefault()
       if Parse.User.current()
-        require ['models/inquiry', 'views/inquiry/new'], (Inquiry, InquiryView) =>
-          @inquiry = new Inquiry listing: @model unless @inquiry
-          new InquiryView(model: @inquiry).render().$el.modal()
+        inquiry = new Inquiry listing: @model
+        new InquiryView(model: inquiry).render().$el.modal()
       else
         $('#login-modal').modal()

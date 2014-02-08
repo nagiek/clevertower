@@ -1,30 +1,33 @@
-<form id="profile-picture-upload-form" class="modal-dialog">
+<form id="apply-form" class="modal-dialog form-modal">
   <div class="modal-content">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-labelledby="edit-profile-picture-modal-label" aria-hidden="true">&times;</button>
-      <h3 id="edit-profile-picture-modal-label"><%= i18nListing.actions.apply_to %> <em><%= propertyTitle %></em></h3>
+      <h3 id="edit-profile-picture-modal-label" class="modal-title"><%= i18nListing.actions.apply_to %> <em>"<%= propertyTitle %>"</em></h3>
     </div>
     <div class="modal-body">
+
       <div class="date-group form-group">
         <label for="inquiry-dates" class="control-label"><%= i18nListing.form.dates %> <span class="required">*</span></label>
         <div class="row">
           <div class="col-xs-6">
-            <input type="text" class="form-control start-date datepicker" name="inquiry[start_date]" maxlength="12" date="<%= start_date %>" value="<%= start_date %>" data-date-format="<%= i18nCommon.dates.datepicker_format %>"  />
+            <input type="text" class="form-control start-date datepicker" name="inquiry[start_date]" maxlength="12" value="<%= dates.start %>" data-date="<%= dates.start %>" data-date-format="<%= i18nCommon.dates.datepicker_format %>"  />
           </div>
           <div class="col-xs-6">
-            <input type="text" class="form-control end-date datepicker"   name="inquiry[end_date]"   maxlength="12" date="<%= end_date %>" value="<%= end_date %>" data-date-format="<%= i18nCommon.dates.datepicker_format %>"  />
+            <input type="text" class="form-control end-date datepicker"   name="inquiry[end_date]"   maxlength="12" value="<%= dates.end %>" data-date="<%= dates.end %>"   data-date-format="<%= i18nCommon.dates.datepicker_format %>"  />
           </div>
         </div>
       </div>
-      
+
+        
       <%= JST["src/js/templates/helper/field/tenant.jst"]({emails: false, i18nCommon: i18nCommon, label: i18nListing.form.inquiry_tenants}) %>
       <div class="form-group comments-group">
         <label for="inquiry-comments" class="control-label"><%= i18nListing.form.comments %></label>
         <textarea name="inquiry[comments]" rows="2" class="form-control"></textarea>
       </div>
+
     </div>
     <div class="modal-footer">
-      <button id="apply" class="save btn btn-primary"><%= i18nCommon.actions.apply %></button>
+      <button id="apply" class="btn btn-primary"><%= i18nListing.actions.apply %></button>
       <button class="btn btn-default" data-dismiss="modal"><%= i18nCommon.actions.close %></button>
     </div>
   </div>

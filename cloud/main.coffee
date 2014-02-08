@@ -27,6 +27,10 @@ Parse.Cloud.define "Follow", (req, res) ->
           activity_type: "follow"
           title: "%NAME is now following #{name}"
           public: true
+          likersCount: 0
+          commentCount: 0
+          isEvent: false
+          hasAction: false
           wideAudience: false
           subject: profile
           object: model
@@ -47,9 +51,9 @@ Parse.Cloud.define "Follow", (req, res) ->
           # email: model.get("email")
           ACL: notificationACL
 
-        Parse.Object.saveAll([model, activity, notification]).then ->
-          res.success()
-        , -> res.error "model_not_saved"
+        Parse.Object.saveAll [model, activity, notification],
+        success: -> res.success()
+        error: -> res.error "model_not_saved"
       else 
         res.error "bad_query"
     , -> res.error "bad_query"
@@ -120,15 +124,19 @@ Parse.Cloud.define "Like", (req, res) ->
           title: "%NAME liked #{name} activity"
           activity: model
           public: true
+          likersCount: 0
+          commentCount: 0
+          isEvent: false
+          hasAction: true
           wideAudience: false
           subject: profile
           # Subject of activity is object of our "like".
           object: model.get("subject")
           ACL: activityACL
 
-        Parse.Object.saveAll([model, activity, notification]).then ->
-          res.success()
-        , -> res.error "model_not_saved"
+        Parse.Object.saveAll [model, activity, notification], 
+        success: -> res.success()
+        error: (error) -> res.error "model_not_saved"
       else 
         res.error "bad_query"
     , -> res.error "bad_query"
@@ -410,108 +418,106 @@ Parse.Cloud.define "AddTenants", (req, res) ->
           ACL: profileACL
         newProfileSaves.push newProfile
 
-      Parse.Object.saveAll(newProfileSaves)
+      Parse.Object.saveAll newProfileSaves, 
+      success: (newProfiles) ->
+
+        joinClassSaves = new Array()
+
+        for profile in newProfiles
+
+          # Profile exists, but user does not necessarily exist.
+          user = profile.get("user")
+
+          # Save the joinClass
+          newJoinClass = new Parse.Object(joinClassName).set
+            property: property
+            network: network
+            unit: leaseOrInquiry.get("unit")
+            listing: leaseOrInquiry.get("listing")
+            status: if user and user.id is req.user.id then 'current' else status
+            profile: profile
+            accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb"
+            ACL: joinClassACL
+          newJoinClass.set className.toLowerCase(),
+            __type: "Pointer"
+            className: className
+            objectId: leaseOrInquiry.id
+          joinClassSaves.push newJoinClass
+
+        Parse.Object.saveAll joinClassSaves,
+        success: (newJoinClasses) ->
+
+          objsToSave = new Array()
+          for joinClass in newJoinClasses
+
+            # Profile exists, but user does not necessarily exist.
+            profile = joinClass.get("profile")
+            user = profile.get("user")
+
+            # Send a notification, unless it is to us.
+            unless user and user.id is req.user.id 
+
+              notificationACL = new Parse.ACL()
+
+              if user
+                notificationACL.setReadAccess user.id, true
+                notificationACL.setWriteAccess user.id, true
+
+              else
+                # Notify the user
+                Mandrill.sendEmail
+                  message:
+                    subject: "You have been invited to try CleverTower"
+                    text: "Hello World!"
+                    from_email: "parse@cloudcode.com"
+                    from_name: "Cloud Code"
+                    to: [{email: profile.get("email"), name: profile.get("email")}]
+                  async: true
+                # Do nothing, but have to keep object around regardless.
+                , success: (httpres) ->
+                  error: (httpres) ->
+
+              notification = new Parse.Object("Notification").set
+                text: "You have been invited to join #{title}"
+                channels: [ "profiles-#{profile.id}" ]
+                channel: "profiles-#{profile.id}"
+                name: "#{className.toLowerCase()}_invitation"
+                forMgr: false
+                withAction: true
+                # TODO: invitingProfile causes notification to not save.
+                subject: property.get("profile")
+                object: profile
+                email: profile.get("email")
+                property: property
+                network: network
+                ACL: notificationACL
+              notification.set joinClassName.toLowerCase(), joinClass
+
+              objsToSaves.push notification
+
+          if className is "Lease"
+            objsToSaves.push propRole if propRole
+            objsToSaves.push tntRole if tntRole
+            
+          Parse.Object.saveAll objsToSave, 
+          success: -> res.success leaseOrInquiry
+          error: -> 
+            console.error "obj_save_error"
+            res.error 'obj_save_error'
+
+        error: (error) ->
+          console.error 'joinClasses_not_saved'
+          res.error 'joinClasses_not_saved'
+
+      error: (error) ->
+        console.error "profiles_not_saved"
+        res.error 'profiles_not_saved'
+
     , (error) -> 
       console.error "role_query_error"
       res.error 'role_query_error'
-    ).then( ->
-      joinClassSaves = new Array()
-      _.each arguments, (profile) ->
-
-        # Profile exists, but user does not necessarily exist.
-        user = profile.get("user")
-
-        # Save the joinClass
-        newJoinClass = new Parse.Object(joinClassName).set
-          property: property
-          network: network
-          unit: leaseOrInquiry.get("unit")
-          listing: leaseOrInquiry.get("listing")
-          status: if user and user.id is req.user.id then 'current' else status
-          profile: profile
-          accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb"
-          ACL: joinClassACL
-        newJoinClass.set className.toLowerCase(),
-          __type: "Pointer"
-          className: className
-          objectId: leaseOrInquiry.id
-        joinClassSaves.push newJoinClass
-
-      Parse.Object.saveAll(joinClassSaves)
-    , -> 
-      console.error "profiles_not_saved"
-      res.error 'profiles_not_saved'
-    ).then( ->
-
-      objsToSave = new Array()
-      _.each arguments, (joinClass) ->
-
-        # Profile exists, but user does not necessarily exist.
-        profile = joinClass.get("profile")
-        user = profile.get("user")
-
-        # Send a notification, unless it is to us.
-        unless user and user.id is req.user.id 
-
-          notificationACL = new Parse.ACL()
-
-          if user
-            notificationACL.setReadAccess user.id, true
-            notificationACL.setWriteAccess user.id, true
-
-          else
-            # Notify the user
-            Mandrill.sendEmail
-              message:
-                subject: "You have been invited to try CleverTower"
-                text: "Hello World!"
-                from_email: "parse@cloudcode.com"
-                from_name: "Cloud Code"
-                to: [{email: profile.get("email"), name: profile.get("email")}]
-              async: true
-            # Do nothing, but have to keep object around regardless.
-            , success: (httpres) ->
-              error: (httpres) ->
-
-          notification = new Parse.Object("Notification").set
-            text: "You have been invited to join #{title}"
-            channels: [ "profiles-#{profile.id}" ]
-            channel: "profiles-#{profile.id}"
-            name: "#{className.toLowerCase()}_invitation"
-            forMgr: false
-            withAction: true
-            # TODO: invitingProfile causes notification to not save.
-            subject: property.get("profile")
-            object: profile
-            email: profile.get("email")
-            property: property
-            network: network
-            ACL: notificationACL
-          notification.set joinClassName.toLowerCase(), joinClass
-
-          objsToSave.push notification
-
-      Parse.Object.saveAll(objsToSave)
-      
-    , ->
-      res.error 'joinClasses_not_saved'
-    ).then( ->
-      roleSaves = []
-      if className is "Lease"
-        roleSaves.push propRole if propRole
-        roleSaves.push tntRole if tntRole
-      
-      Parse.Object.saveAll(roleSaves)
-
-    , (error) ->
-      console.error 'signup_error'
-      res.error 'signup_error'
-    ).then( ->
-      res.success leaseOrInquiry
-    , (error) -> 
-      console.error "role_save_error"
-      res.error 'role_save_error'
     )
+
   , (error) -> 
     console.error "bad_query"
     res.error "bad_query"
@@ -543,8 +549,8 @@ Parse.Cloud.define "AddManagers", (req, res) ->
   # a joined tenant, instead of being a tenant trying to join.
   # In theory this could overwrite an inquiry, but oh well.
   status = 'invited'
-  (new Parse.Query "Network").include('vstRole').get req.params.networkId,
-  success: (network) ->
+  (new Parse.Query "Network").include('vstRole').equalTo("objectId", req.params.networkId).first()
+  .then( (network) ->
       
     vstRole = network.get "vstRole"
     title = network.get "title"
@@ -562,57 +568,56 @@ Parse.Cloud.define "AddManagers", (req, res) ->
     # Create the joinClass.
     # Query for the profile and include the user to add to roles
     (new Parse.Query "Profile").include("user").containedIn("email", emails).find()
-    .then (profiles) ->
 
-      # Set profile to be totally open. Will close once the user registers.
-      profileACL = new Parse.ACL
-      profileACL.setPublicReadAccess true
-      profileACL.setPublicWriteAccess true
+  , -> res.error "bad_query"
+  ).then((profiles) ->
 
-      newProfileSaves = new Array()
+    # Set profile to be totally open. Will close once the user registers.
+    profileACL = new Parse.ACL
+    profileACL.setPublicReadAccess true
+    profileACL.setPublicWriteAccess true
 
-      for email in emails
-        foundProfile = false
-        foundProfile = _.find profiles, (profile) -> return profile if email is profile.get "email"
+    newProfileSaves = new Array()
 
-        if foundProfile then newProfileSaves.push foundProfile
-        else
-          # Add the SignUp promise to the list of things to do.
-          newProfile = new Parse.Object("Profile").set
-            email: email
-            ACL: profileACL
-          newProfileSaves.push newProfile
+    for email in emails
+      foundProfile = false
+      foundProfile = _.find profiles, (profile) -> return profile if email is profile.get "email"
 
-      Parse.Object.saveAll(newProfileSaves)
-      .then( ->
-        joinClassSaves = new Array()
-        _.each arguments, (profile) ->
+      if foundProfile then newProfileSaves.push foundProfile
+      else
+        # Add the SignUp promise to the list of things to do.
+        newProfile = new Parse.Object("Profile").set
+          email: email
+          ACL: profileACL
+        newProfileSaves.push newProfile
 
-          # Profile exists, but user does not necessarily exist.
-          user = profile.get("user")
+    Parse.Object.saveAll newProfileSaves,
+    success: (newProfiles) ->
+      joinClassSaves = new Array()
+      for profile in newProfiles
 
-          myJoinClassACL = joinClassACL
-          if user    
-            myJoinClassACL.setRoleAccess user, true
-            myJoinClassACL.setReadAccess user.id, true
+        # Profile exists, but user does not necessarily exist.
+        user = profile.get("user")
 
-          # Save the joinClass
-          newJoinClass = new Parse.Object(joinClassName).set
-            network: network
-            status: if user and user.id is req.user.id then 'current' else status
-            profile: profile
-            accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb"
-            ACL: myJoinClassACL
+        myJoinClassACL = joinClassACL
+        if user    
+          myJoinClassACL.setRoleAccess user, true
+          myJoinClassACL.setReadAccess user.id, true
 
-          joinClassSaves.push newJoinClass
+        # Save the joinClass
+        newJoinClass = new Parse.Object(joinClassName).set
+          network: network
+          status: if user and user.id is req.user.id then 'current' else status
+          profile: profile
+          accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb"
+          ACL: myJoinClassACL
 
-        Parse.Object.saveAll(joinClassSaves)
-      , -> res.error 'profiles_not_saved'
-      ).then( ->
+        joinClassSaves.push newJoinClass
 
-        joinClasses = arguments
+      Parse.Object.saveAll joinClassSaves,
+      success: (joinClasses) ->
 
-        objsToSave = new Array()
+        objsToSave = new Array(vstRole)
 
         for joinClass in joinClasses
 
@@ -663,17 +668,16 @@ Parse.Cloud.define "AddManagers", (req, res) ->
 
             objsToSave.push notification
 
-        Parse.Object.saveAll(objsToSave)
-        
-      , -> res.error 'joinClasses_not_saved'
-      ).then( ->
-        vstRole.save()
-      , (error) -> res.error 'signup_error'
-      ).then ->        
-        res.success joinClasses
-      , (error) -> res.error 'signup_error'
-    error: -> res.error "bad_query"
-  error: -> res.error "bad_query"
+        Parse.Object.saveAll objsToSave,
+        success: -> res.success joinClasses
+        error: (error) -> res.error 'save_error'
+
+      error: (error) -> res.error 'profiles_not_saved'
+      
+    error: (error) -> res.error 'joinClasses_not_saved'
+
+  , (error) -> res.error "bad_query"
+  )
 
 # User validation
 Parse.Cloud.beforeSave "Profile", (req, res) ->
@@ -825,11 +829,12 @@ Parse.Cloud.beforeSave "Network", (req, res) ->
       role = new Parse.Role(current, networkACL)
       vstRole = new Parse.Role(visit, networkACL)
       role.getUsers().add(req.user)
-      Parse.Object.saveAll([role, vstRole]).then -> 
+      Parse.Object.saveAll [role, vstRole], 
+      success: ->
         req.object.set "role", role
         req.object.set "vstRole", vstRole
         res.success()
-      , -> res.error "role_error"
+      errror: -> res.error "role_error"
 
     else
       isPublic = req.object.get "public"
@@ -932,7 +937,11 @@ Parse.Cloud.beforeSave "Property", (req, res) ->
         unless req.object.get("profile") then objsToSave.unshift new Parse.Object("Profile").set("name", req.object.get("thoroughfare"))
 
         # Create profile
-        Parse.Object.saveAll(objsToSave).then (profile) -> 
+        Parse.Object.saveAll objsToSave,
+        success: (list) -> 
+
+          # First item on our list.
+          profile = list[0]
 
           # Set the property to public.
           propertyACL = roleACL
@@ -953,7 +962,7 @@ Parse.Cloud.beforeSave "Property", (req, res) ->
           unless req.object.get("profile") then req.object.set "profile", profile
 
           res.success()
-        , -> res.error "role_error"
+        error: -> res.error "role_error"
       error : -> res.error 'bad_query'
     else
 
@@ -984,7 +993,11 @@ Parse.Cloud.beforeSave "Property", (req, res) ->
       unless req.object.get("profile") then objsToSave.unshift new Parse.Object("Profile").set(name: req.object.get("thoroughfare"), ACL: propertyACL)
 
       # Create profile
-      Parse.Object.saveAll(objsToSave).then (profile) -> 
+      Parse.Object.saveAll objsToSave,
+      success: (list) -> 
+        
+        # First item on our list.
+        profile = list[0]
 
         # Set the property to public.
         propertyACL = roleACL
@@ -1000,7 +1013,7 @@ Parse.Cloud.beforeSave "Property", (req, res) ->
         unless req.object.get("profile") then req.object.set "profile", profile
 
         res.success()
-      , -> res.error "role_error"
+      error: -> res.error "role_error"
       
   else
     isPublic = req.object.get "public"
@@ -1027,7 +1040,9 @@ Parse.Cloud.beforeSave "Property", (req, res) ->
                 ACL: listingACL 
               objsToSave.push l
 
-        Parse.Object.saveAll(objsToSave).then -> res.success()
+        Parse.Object.saveAll objsToSave,
+        success: -> res.success()
+        error: -> res.error "bad_save"
       , -> res.error "bad_query"
     else res.success()
 
@@ -1313,12 +1328,11 @@ Parse.Cloud.beforeSave "Lease", (req, res) ->
       # role.getUsers().add req.user unless req.object.get "forNetwork"
       objsToSave.push role
 
-      Parse.Object.saveAll(objsToSave)
-      .then -> 
+      Parse.Object.saveAll objsToSave, 
+      success: -> 
         req.object.set "role", role
         res.success()
-      , ->
-        res.error "role_error"
+      error: (error) -> res.error "role_error"
 
     error: -> res.error "bad_query"
   , -> res.error "bad_query"
@@ -1712,11 +1726,10 @@ Parse.Cloud.beforeSave "Tenant", (req, res) ->
           
           req.object.set "status", newStatus
 
-        Parse.Object.saveAll(objsToSave)
+        Parse.Object.saveAll objsToSave, 
+        success: -> res.success() # res.success network
+        error: (error) -> res.error "bad_save"
       , -> res.error "bad_query"
-      ).then(
-        -> res.success() # res.success property
-      , -> res.error "bad_save"
       ) 
     else res.error "no matching role"
   error: -> res.error "bad_query"
@@ -1872,11 +1885,10 @@ Parse.Cloud.beforeSave "Concerige", (req, res) ->
         
         req.object.set "status", newStatus
 
-      Parse.Object.saveAll(objsToSave)
+      Parse.Object.saveAll objsToSave, 
+      success: -> res.success() # res.success network
+      error: (error) -> res.error "bad_save"
     , -> res.error "bad_query"
-    ).then(
-      -> res.success() # res.success network
-    , -> res.error "bad_save"
     ) 
   error: -> res.error "bad_query"
 
@@ -2074,12 +2086,11 @@ Parse.Cloud.beforeSave "Manager", (req, res) ->
         
         req.object.set "status", newStatus
 
-      Parse.Object.saveAll(objsToSave)
+      Parse.Object.saveAll objsToSave, 
+      success: -> res.success() # res.success network
+      error: (error) -> res.error "bad_save"
     , -> res.error "bad_query"
-    ).then(
-      -> res.success() # res.success network
-    , -> res.error "bad_save"
-    ) 
+    )
   error: -> res.error "bad_query"
 
 
@@ -2296,45 +2307,45 @@ Parse.Cloud.afterSave "Comment", (req) ->
   Parse.Cloud.useMasterKey()
   query = new Parse.Query("Activity")
   query.get req.object.get("activity").include("profile").id,
-    success: (obj) ->
+  success: (obj) ->
 
-      activityACL = new Parse.ACL
-      activityACL.setPublicReadAccess true
-      activityACL.setReadAccess req.user.id, true
-      activityACL.setWriteAccess req.user.id, true
+    activityACL = new Parse.ACL
+    activityACL.setPublicReadAccess true
+    activityACL.setReadAccess req.user.id, true
+    activityACL.setWriteAccess req.user.id, true
 
-      notificationACL = new Parse.ACL
-      notificationACL.setReadAccess obj.get("profile").get("user"), true
-      notificationACL.setWriteAccess obj.get("profile").get("user"), true
+    notificationACL = new Parse.ACL
+    notificationACL.setReadAccess obj.get("profile").get("user"), true
+    notificationACL.setWriteAccess obj.get("profile").get("user"), true
 
-      obj.increment "commentCount"
+    obj.increment "commentCount"
 
-      activity = new Parse.Object("Activity")
-      activity.set
-        activity_type: "commented"
-        title: "%NAME commented on #{model.get("name")}'s activity"
-        public: true
+    activity = new Parse.Object("Activity")
+    activity.set
+      activity_type: "commented"
+      title: "%NAME commented on #{model.get("name")}'s activity"
+      public: true
+      subject: req.user.get("profile")
+      object: req.object.get("profile")
+      ACL: activityACL
+
+    # Notify the user if their activity has been liked
+    if activity.get("commentCount") is 1 
+      notification = new Parse.Object("Notification")
+      notification.set
+        text: "%NAME commented your activity."
+        channels: [ "profiles-#{obj.get("profile").id}" ]
+        channel: "profiles-#{obj.get("profile").id}"
+        name: "commented"
+        forMgr: false
+        withAction: false
+        # TODO: invitingProfile causes notification to not save.
         subject: req.user.get("profile")
-        object: req.object.get("profile")
-        ACL: activityACL
-
-      # Notify the user if their activity has been liked
-      if activity.get("commentCount") is 1 
-        notification = new Parse.Object("Notification")
-        notification.set
-          text: "%NAME commented your activity."
-          channels: [ "profiles-#{obj.get("profile").id}" ]
-          channel: "profiles-#{obj.get("profile").id}"
-          name: "commented"
-          forMgr: false
-          withAction: false
-          # TODO: invitingProfile causes notification to not save.
-          subject: req.user.get("profile")
-          object: obj.get("profile")
-          # email: req.object.get("profile").get("email")
-          ACL: notificationACL
-      
-      Parse.Object.saveAll [obj, activity. notification]
+        object: obj.get("profile")
+        # email: req.object.get("profile").get("email")
+        ACL: notificationACL
+    
+    Parse.Object.saveAll [obj, activity. notification]
 
 
 # # Task validation

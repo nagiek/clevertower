@@ -22,6 +22,8 @@ define [
 
     initialize: ->
 
+      Parse.User.current().get("profile").prep "applicants"
+
       @listenTo @model, 'invalid', (error) =>
         console.log error
         @$('button.save').button "reset"
@@ -50,9 +52,10 @@ define [
 
     render: ->
       vars =
-        start_date: moment(@model.get("listing").get("start_date")).format("L")
-        end_date: moment(@model.get("listing").get("end_date")).format("L")
-        propertyTitle: @model.get("listing").collection.title
+        dates:
+          start: moment(@model.get("listing").get("start_date")).format("L")
+          end: moment(@model.get("listing").get("end_date")).format("L")
+        propertyTitle: @model.title()
         i18nCommon: i18nCommon
         i18nListing: i18nListing
 

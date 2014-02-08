@@ -21,20 +21,24 @@ define [
         
     initialize: ->
       @listenTo Parse.Dispatcher, "user:logout", @clear
+      @listenTo @model, "change:hidden change:clicked", @render
 
     handleClick : =>
       @$("> a").removeClass "unclicked"
-      @markAsClicked()
+      @model.add clicked: [Parse.User.current().id]
+      @model.trigger "change:clicked"
+      @model.save null, patch: true
 
     accept: (e) =>
       actionItem = if @model.get("tenant") then @model.get("tenant") else @model.get("manager")
       return unless actionItem
       @model.add hidden: [Parse.User.current().id]
-      @markAsClicked()
-      @render()
+      @model.add clicked: [Parse.User.current().id]
+      @model.trigger "change:clicked"
+      @model.save null, patch: true
 
       # Until req.object.original lands for Cloud Code, have to pass in new status.
-      actionItem.save(newStatus: "current").then ->
+      actionItem.save(newStatus: "current").then =>
         if @model.className is "Tenant" 
           Parse.User.current().set
             property: @model.get("property")
@@ -45,17 +49,13 @@ define [
     ignore: (e) =>
       # Don't modify the action item, just hide the request.
       @model.add hidden: [Parse.User.current().id]
+      @model.trigger "change:hidden"
       @model.save null, patch: true
-      @render()
 
     undo: (e) =>
       # Don't modify the action item, just hide the request.
       @model.remove hidden: [Parse.User.current().id]
-      @model.save null, patch: true
-      @render()
-  
-    markAsClicked: (e) =>
-      @model.add clicked: [Parse.User.current().id]
+      @model.trigger "change:hidden"
       @model.save null, patch: true
   
     # Re-render the contents of the property item.

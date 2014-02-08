@@ -30,7 +30,8 @@ define [
     events:
       # 'click .pagination > ul > li > a'       : 'changePage'
       'click .thumbnails a.content'             : 'getModelDataToShowInModal'
-      'click .thumbnails button.get-comments'   : 'getActivityCommentsAndCollection' # 'showModal'
+      'click .thumbnails button.get-comments'   : 'getActivityCommentsAndCollection'
+      'click .thumbnails a.apply'               : 'applyToListingFromActivity'
       "mouseover .thumbnails .activity"         : "highlightMarkerFromCard"
       "mouseout .thumbnails .activity"          : "unhighlightMarkerFromCard"
       # 'hide #view-content-modal'              : 'hideModal'
@@ -282,7 +283,7 @@ define [
     likeOrLoginFromActivity: (e) =>
       e.preventDefault()
       button = @$(e.currentTarget)
-      activity = button.closest(".activity")
+      activity = button.parents(".activity")
       data = activity.data()
       model = Parse.User.current().get("profile").followingActivity.at(data.index)
 
@@ -294,13 +295,24 @@ define [
     getLikersFromActivity: (e) =>
       e.preventDefault()
       button = @$(e.currentTarget)
-      activity = button.closest(".activity")
+      activity = button.parents(".activity")
       data = activity.data()
       model = Parse.User.current().get("profile").followingActivity.at(data.index)
 
       model.prep("likers")
       @listenToOnce model.likers, "reset", @showLikersModal
       model.likers.fetch()
+
+    applyToListingFromActivity: (e) =>
+      e.preventDefault()
+      if Parse.User.current()
+        button = @$(e.currentTarget)
+        activity = button.parents(".activity")
+        data = activity.data()
+        model = Parse.User.current().get("profile").followingActivity.at(data.index)
+        @applyToListing model
+      else
+        $('#login-modal').modal()
 
     # App Activity
     # ------------
@@ -315,7 +327,7 @@ define [
       data = activity.data()
       model = Parse.User.current().get("profile").followingActivity.at(data.index)
 
-      @markAsFollowing(activity) if model.followedByUser()
+      @markAsFollowing(activity) if model.subject().followedByUser()
 
     resetListViews: ->
 
@@ -337,7 +349,7 @@ define [
       e.preventDefault()
 
       @modal = true
-      data = $(e.currentTarget).parent().data()
+      data = $(e.currentTarget).parents(".activity").data()
       # Keep track of where we are, for subsequent navigation.
       @modalIndex = data.index
 
@@ -353,7 +365,7 @@ define [
       return unless Parse.User.current()
 
       button = @$(e.currentTarget)
-      activity = button.closest(".activity")
+      activity = button.parents(".activity")
       data = activity.data()
       model = Parse.User.current().get("profile").followingActivity.at(data.index)
 
@@ -366,7 +378,7 @@ define [
       return unless Parse.User.current()
 
       button = @$(e.currentTarget)
-      activity = button.closest(".activity")
+      activity = button.parents(".activity")
       data = activity.data()
 
       model = Parse.User.current().get("profile").followingActivity.at(data.index)
@@ -503,8 +515,8 @@ define [
       this.unhighlightMarker page.items[pageIndex].marker
 
 
-    highlightCard : ($ref) => $ref.addClass('active')
-    unhighlightCard : ($ref) => $ref.removeClass('active')
+    highlightCard : ($ref) => $ref.find('.thumbnail').addClass('active')
+    unhighlightCard : ($ref) => $ref.find('.thumbnail').removeClass('active')
     highlightMarker : (marker) -> 
       marker.icon.origin = new google.maps.Point(marker.icon.origin.x + 25, marker.icon.origin.y)
       marker.setIcon marker.icon

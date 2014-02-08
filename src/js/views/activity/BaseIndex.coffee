@@ -7,8 +7,10 @@ define [
   'collections/ActivityList'
   'collections/CommentList'
   "models/Comment"
+  'models/Inquiry'
   "views/helper/Alert"
   "views/profile/Summary"
+  'views/inquiry/New'
   "views/listing/Search"
   "views/activity/New"
   "i18n!nls/listing"
@@ -20,7 +22,7 @@ define [
   # 'masonry'
   # 'jqueryui'
   "gmaps"
-], ($, _, Parse, infinity, moment, ActivityList, CommentList, Comment, Alert, SummaryProfileView, ListingSearchView, NewActivityView, i18nListing, i18nCommon) ->
+], ($, _, Parse, infinity, moment, ActivityList, CommentList, Comment, Inquiry, Alert, SummaryProfileView, NewInquiryView, ListingSearchView, NewActivityView, i18nListing, i18nCommon) ->
 
   class BaseActivityIndexView extends Parse.View
   
@@ -28,7 +30,8 @@ define [
 
     events:
       'click .thumbnails a.content'             : 'getModelDataToShowInModal' # 'showModal'
-      'click .thumbnails a.get-comments'        : 'getActivityCommentsAndCollection' # 'showModal'
+      'click .thumbnails button.get-comments'   : 'getActivityCommentsAndCollection' # 'showModal'
+      'click .thumbnails a.apply'               : 'applyToListingFromActivity' # 'showModal'
       # Activity events
       "click .like-button"                      : "likeOrLoginFromActivity"
       "click .likers"                           : "getLikersFromActivity"
@@ -156,7 +159,7 @@ define [
     # Adding from Collections
     # -----------------------
 
-    renderTemplate: (model, likedByUser, followedByUser, linked) =>
+    renderTemplate: (model, linked) =>
 
       # Create new element with extra details for infinity.js
       if linked
@@ -168,8 +171,22 @@ define [
         propertyId = false
         propertyIndex = false
 
+      # Get variables position from original activity, in case they change.
+      index = model.pos()
+      pos = if @onMap then (if linked then propertyIndex else index) % 20 else false # This will be incremented in the template.
+
+      if model.get("activity")
+        header = model.title()
+
+        # Focus on the new model instead.
+        model = model.get("activity")
+
+      title = model.title()
+      likedByUser = model.likedByUser()
+      followedByUser = model.subject().followedByUser()
+
       # Possible for the same activity to be on the page twice (in two different tabs)
-      $el = $ "<div class='thumbnail clearfix activity activity-#{model.id} profile-#{model.get('subject').id} fade in' />"
+      $el = $ "<div class='activity activity-#{model.id} profile-#{model.get('subject').id}' />"
 
         # data-id="#{model.id}"
         # data-liked="#{likedByUser}"
@@ -193,7 +210,7 @@ define [
         "property-index": propertyIndex
         "property-id": propertyId
         "location-id": if model.get("location") then model.get("location").id else false
-        index: model.pos()
+        index: index
         lat: model.GPoint().lat()
         lng: model.GPoint().lng()
         collection: collection
@@ -208,26 +225,21 @@ define [
         end: moment(model.get("endDate")).format("LLL")
         postDate: moment(model.createdAt).fromNow()
         postImage: model.image("full") # Keep this in for template logic.
-        subjectUrl: model.subject().url()
+        subjectUrl: model.subjectUrl()
         objectUrl: if model.object() then model.object().url()
         icon: model.icon()
+        header: header
+        title: title
         name: model.subject().name()
         likedByUser: likedByUser
         followedByUser: followedByUser
         current: Parse.User.current()
         isSelf: collection is "user" or (Parse.User.current() and model.get("subject").id is Parse.User.current().get("profile").id)
         i18nCommon: i18nCommon
-        pos: if @onMap then (if linked then propertyIndex else model.pos()) % 20 else false # This will be incremented in the template.
+        pos: pos
         wideAudience: model.get("wideAudience")
-
-      if model.get("activity")
-        vars.activity = true
-        vars.activityImage = model.get("activity").image("full")
-        vars.title = model.get("activity").title()
-        vars.subtitle = model.title()
-      else
-        vars.title = model.title()
-        vars.subtitle = false
+        hasListing: !!model.get("listing")
+        hasAction: model.get("hasAction")
 
       if Parse.User.current()
         vars.self = Parse.User.current().get("profile").name()
@@ -256,7 +268,7 @@ define [
       #   view: @
       #   liked: Parse.User.current() and Parse.User.current().get("profile").likes.find (l) -> l.id is a.id
       # @listViews[@shortestColumnIndex()].append view.render().$el
-      @listViews[@shortestColumnIndex()].append @renderTemplate(a, a.likedByUser(), a.subject().followedByUser(), false)
+      @listViews[@shortestColumnIndex()].append @renderTemplate(a, false)
       # @$list.append view.render().el
 
     # Pagination
@@ -599,6 +611,7 @@ define [
       $('#view-content-modal').on 'click', 'a.profile-link', @closeModal
       $('#view-content-modal').on 'click', 'button.follow', @followOrLoginFromModal
       $('#view-content-modal').on 'click', 'button.get-comments', @getModalComments
+      $('#view-content-modal').on 'click', 'button.apply', @applyToListingFromModal
       $('#view-content-modal').on 'click', '.left', @prevModal
       $('#view-content-modal').on 'click', '.right', @nextModal
       $('#view-content-modal').on 'hide.bs.modal', @hideModal
@@ -646,6 +659,16 @@ define [
 
       model = if @modalCollection instanceof ActivityList then @modalCollection.at @modalIndex else @modalCollection[@modalIndex]
 
+      if model.get("activity")
+        header = model.title()
+
+        # Focus on the new model instead.
+        model = model.get("activity")
+
+      title = model.title()
+      likedByUser = model.likedByUser()
+      followedByUser = model.subject().followedByUser()
+
       # Add a building link if applicable.
       # Cache result
       property = if model.get("property") then model.get("property") else false
@@ -653,15 +676,17 @@ define [
 
       vars = _.merge model.toJSON(), 
         url: model.url()
-        subjectUrl: model.subject().url()
+        subjectUrl: model.subjectUrl()
         objectUrl: if model.object() then model.object().url()
         start: moment(model.get("startDate")).format("LLL")
         end: moment(model.get("endDate")).format("LLL")
         postDate: moment(model.createdAt).fromNow()
-        likedByUser: model.likedByUser()
-        followedByUser: model.subject().followedByUser()
+        likedByUser: likedByUser
+        followedByUser: followedByUser
         postImage: model.image("full")
         icon: model.icon()
+        header: header
+        title: title
         name: model.subject().name()
         cover: model.subject().cover("thumb")
         propertyLinked: if property then true else false
@@ -675,15 +700,8 @@ define [
         isSelf: Parse.User.current() and model.get("subject").id is Parse.User.current().get("profile").id
         i18nCommon: i18nCommon
         wideAudience: model.get("wideAudience")
-
-      if model.get("activity")
-        vars.activity = true
-        vars.activityImage = model.get("activity").image("full")
-        vars.title = model.get("activity").title()
-        vars.subtitle = model.title()
-      else
-        vars.title = model.title()
-        vars.subtitle = false
+        hasListing: !!model.get("listing")
+        hasAction: model.get("hasAction")
 
       if Parse.User.current()
         vars.self = Parse.User.current().get("profile").name()
@@ -701,8 +719,8 @@ define [
       $("#view-content-modal").html JST["src/js/templates/activity/modal.jst"](vars)
 
       $("#view-content-modal").find("> .modal-dialog > .activity").data
-        liked: model.likedByUser()
-        followedByUser: model.subject().followedByUser()
+        liked: likedByUser
+        followedByUser: followedByUser
 
       # Comments
       @$modalComments = $("#view-content-modal .list-comments")
@@ -814,7 +832,6 @@ define [
       # postComment will actually do this for us.
       # @renderOneModalComment comment
 
-
     followOrLoginFromModal : (e) =>
       e.preventDefault()
       if Parse.User.current()
@@ -826,3 +843,20 @@ define [
         @follow model, activity, buttonParent, data, false
       else
         $("#signup-modal").modal()
+
+
+    # Listing
+    # -------
+
+    applyToListingFromModal: (e) =>
+      e.preventDefault()
+      if Parse.User.current()
+        model = if @modalCollection instanceof ActivityList then @modalCollection.at @modalIndex else @modalCollection[@modalIndex]
+        @applyToListing model
+        @closeModal()
+      else
+        $('#login-modal').modal()
+
+    applyToListing: (activity) =>  
+      inquiry = new Inquiry listing: activity.get("listing"), property: activity.get("property"), profile: activity.get("profile")
+      new NewInquiryView(model: inquiry).render().$el.modal()

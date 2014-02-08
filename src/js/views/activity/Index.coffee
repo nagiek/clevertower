@@ -33,7 +33,9 @@ define [
       'click #search-map'                       : 'searchMap'
       # 'click .pagination > ul > li > a'       : 'changePage'
       'click .thumbnails a.content'             : 'getModelDataToShowInModal'
-      'click .thumbnails button.get-comments'   : 'getActivityCommentsAndCollection' # 'showModal'
+      'click .thumbnails button.get-comments'   : 'getActivityCommentsAndCollection'
+      'click .thumbnails a.apply'               : 'applyToListingFromActivity'
+
       "mouseover .thumbnails .activity"         : "highlightMarkerFromCard"
       "mouseout .thumbnails .activity"          : "unhighlightMarkerFromCard"
       # 'hide #view-content-modal'              : 'hideModal'
@@ -435,7 +437,7 @@ define [
     likeOrLoginFromActivity: (e) =>
       e.preventDefault()
       button = @$(e.currentTarget)
-      activity = button.closest(".activity")
+      activity = button.parents(".activity")
       data = activity.data()
       model = if data.collection is "user"
         Parse.User.current().activity.at(data.index)
@@ -449,7 +451,7 @@ define [
     getLikersFromActivity: (e) =>
       e.preventDefault()
       button = @$(e.currentTarget)
-      activity = button.closest(".activity")
+      activity = button.parents(".activity")
       data = activity.data()
       model = if data.collection is "user"
         Parse.User.current().activity.at(data.index)
@@ -458,6 +460,19 @@ define [
       model.prep("likers")
       @listenToOnce model.likers, "reset", @showLikersModal
       model.likers.fetch()
+
+    applyToListingFromActivity: (e) =>
+      e.preventDefault()
+      if Parse.User.current()
+        button = @$(e.currentTarget)
+        activity = button.parents(".activity")
+        data = activity.data()
+        model = if data.collection is "user"
+          Parse.User.current().activity.at(data.index)
+        else Parse.App.activity.at(data.index)
+        @applyToListing model
+      else
+        $('#login-modal').modal()
 
 
     # User activity
@@ -558,7 +573,7 @@ define [
       # item = new infinity.ListItem view.render().$el
       if ((!@filter or @filter is a.get("activity_type")) and (!@specificSearchControls or @specificSearchControls.filter(a)))
 
-        item = new infinity.ListItem @renderTemplate(a, a.likedByUser(), true, true)
+        item = new infinity.ListItem @renderTemplate(a, true)
         item.marker = a.get("property").marker
 
         a.get("property").marker.items.push item
@@ -640,7 +655,7 @@ define [
         #   linkedToProperty: true
         #   liked: false
         # item = new infinity.ListItem view.render().$el
-        item = new infinity.ListItem @renderTemplate(a, false, true, true)
+        item = new infinity.ListItem @renderTemplate(a, true)
         item.marker = a.get("property").marker
         a.get("property").marker.items.push item
         @listViews[@shortestColumnIndex()].prepend item
@@ -650,13 +665,13 @@ define [
         #   view: @
         #   liked: false
         # # @listViews[@shortestColumnIndex()].prepend new infinity.ListItem view.render().$el
-        @listViews[@shortestColumnIndex()].prepend @renderTemplate(a, false, true, false)
+        @listViews[@shortestColumnIndex()].prepend @renderTemplate(a, false)
 
     getModelDataToShowInModal: (e) ->
       e.preventDefault()
 
       @modal = true
-      data = $(e.currentTarget).parent().data()
+      data = $(e.currentTarget).parents(".activity").data()
       # Keep track of where we are, for subsequent navigation.
       @modalIndex = data.index
 
@@ -676,7 +691,7 @@ define [
       return unless Parse.User.current()
 
       button = @$(e.currentTarget)
-      activity = button.closest(".activity")
+      activity = button.parents(".activity")
       data = activity.data()
       model = if data.collection is "user"
         Parse.User.current().activity.at(data.index)
@@ -691,7 +706,7 @@ define [
       return unless Parse.User.current()
 
       button = @$(e.currentTarget)
-      activity = button.closest(".activity")
+      activity = button.parents(".activity")
       data = activity.data()
       if data.collection is "user"
         model = Parse.User.current().activity.at(data.index)
@@ -942,8 +957,8 @@ define [
       this.unhighlightMarker page.items[pageIndex].marker
 
 
-    highlightCard : ($ref) => $ref.addClass('active')
-    unhighlightCard : ($ref) => $ref.removeClass('active')
+    highlightCard : ($ref) => $ref.find('.thumbnail').addClass('active')
+    unhighlightCard : ($ref) => $ref.find('.thumbnail').removeClass('active')
     highlightMarker : (marker) -> 
       marker.icon.origin = new google.maps.Point(marker.icon.origin.x + 25, marker.icon.origin.y)
       marker.setIcon marker.icon

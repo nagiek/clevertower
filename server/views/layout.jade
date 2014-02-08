@@ -99,6 +99,24 @@ html(lang="en")
               .modal-footer
                 button.btn.btn-default(data-dismiss="modal") Close
 
+        // Apply modal, for applying to listings.
+        #apply-modal.modal.fade
+          form#apply-form.modal-dialog.form-modal
+            .modal-content
+              .modal-header
+                button.close(type='button', data-dismiss='modal', aria-labelledby='edit-profile-picture-modal-label', aria-hidden='true') ×
+                h3#edit-profile-picture-modal-label.modal-title
+              .modal-body
+                .row
+                  .date-group.form-group
+                    label.control-label(for='inquiry-dates')
+                    .controls
+                      input.col-md-2.start-date.datepicker(type='text', name='inquiry[start_date]', maxlength='12', value='value')
+              .modal-footer
+                button#apply.btn.btn-primary
+                button.btn.btn-default(data-dismiss='modal')
+
+
         // Full-page modal, for wizards
         // #full-modal.hide.main
             

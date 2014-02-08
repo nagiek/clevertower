@@ -24,6 +24,10 @@
           activity_type: "follow",
           title: "%NAME is now following " + name,
           "public": true,
+          likersCount: 0,
+          commentCount: 0,
+          isEvent: false,
+          hasAction: false,
           wideAudience: false,
           subject: profile,
           object: model,
@@ -41,10 +45,13 @@
           object: model,
           ACL: notificationACL
         });
-        return Parse.Object.saveAll([model, activity, notification]).then(function() {
-          return res.success();
-        }, function() {
-          return res.error("model_not_saved");
+        return Parse.Object.saveAll([model, activity, notification], {
+          success: function() {
+            return res.success();
+          },
+          error: function() {
+            return res.error("model_not_saved");
+          }
         });
       } else {
         return res.error("bad_query");
@@ -124,15 +131,22 @@
           title: "%NAME liked " + name + " activity",
           activity: model,
           "public": true,
+          likersCount: 0,
+          commentCount: 0,
+          isEvent: false,
+          hasAction: true,
           wideAudience: false,
           subject: profile,
           object: model.get("subject"),
           ACL: activityACL
         });
-        return Parse.Object.saveAll([model, activity, notification]).then(function() {
-          return res.success();
-        }, function() {
-          return res.error("model_not_saved");
+        return Parse.Object.saveAll([model, activity, notification], {
+          success: function() {
+            return res.success();
+          },
+          error: function(error) {
+            return res.error("model_not_saved");
+          }
         });
       } else {
         return res.error("bad_query");
@@ -388,118 +402,118 @@
           });
           newProfileSaves.push(newProfile);
         }
-        return Parse.Object.saveAll(newProfileSaves);
+        return Parse.Object.saveAll(newProfileSaves, {
+          success: function(newProfiles) {
+            var joinClassSaves, newJoinClass, _k, _len2;
+
+            joinClassSaves = new Array();
+            for (_k = 0, _len2 = newProfiles.length; _k < _len2; _k++) {
+              profile = newProfiles[_k];
+              user = profile.get("user");
+              newJoinClass = new Parse.Object(joinClassName).set({
+                property: property,
+                network: network,
+                unit: leaseOrInquiry.get("unit"),
+                listing: leaseOrInquiry.get("listing"),
+                status: user && user.id === req.user.id ? 'current' : status,
+                profile: profile,
+                accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb",
+                ACL: joinClassACL
+              });
+              newJoinClass.set(className.toLowerCase(), {
+                __type: "Pointer",
+                className: className,
+                objectId: leaseOrInquiry.id
+              });
+              joinClassSaves.push(newJoinClass);
+            }
+            return Parse.Object.saveAll(joinClassSaves, {
+              success: function(newJoinClasses) {
+                var joinClass, notification, notificationACL, objsToSave, _l, _len3;
+
+                objsToSave = new Array();
+                for (_l = 0, _len3 = newJoinClasses.length; _l < _len3; _l++) {
+                  joinClass = newJoinClasses[_l];
+                  profile = joinClass.get("profile");
+                  user = profile.get("user");
+                  if (!(user && user.id === req.user.id)) {
+                    notificationACL = new Parse.ACL();
+                    if (user) {
+                      notificationACL.setReadAccess(user.id, true);
+                      notificationACL.setWriteAccess(user.id, true);
+                    } else {
+                      Mandrill.sendEmail({
+                        message: {
+                          subject: "You have been invited to try CleverTower",
+                          text: "Hello World!",
+                          from_email: "parse@cloudcode.com",
+                          from_name: "Cloud Code",
+                          to: [
+                            {
+                              email: profile.get("email"),
+                              name: profile.get("email")
+                            }
+                          ]
+                        },
+                        async: true
+                      }, {
+                        success: function(httpres) {
+                          return {
+                            error: function(httpres) {}
+                          };
+                        }
+                      });
+                    }
+                    notification = new Parse.Object("Notification").set({
+                      text: "You have been invited to join " + title,
+                      channels: ["profiles-" + profile.id],
+                      channel: "profiles-" + profile.id,
+                      name: "" + (className.toLowerCase()) + "_invitation",
+                      forMgr: false,
+                      withAction: true,
+                      subject: property.get("profile"),
+                      object: profile,
+                      email: profile.get("email"),
+                      property: property,
+                      network: network,
+                      ACL: notificationACL
+                    });
+                    notification.set(joinClassName.toLowerCase(), joinClass);
+                    objsToSaves.push(notification);
+                  }
+                }
+                if (className === "Lease") {
+                  if (propRole) {
+                    objsToSaves.push(propRole);
+                  }
+                  if (tntRole) {
+                    objsToSaves.push(tntRole);
+                  }
+                }
+                return Parse.Object.saveAll(objsToSave, {
+                  success: function() {
+                    return res.success(leaseOrInquiry);
+                  },
+                  error: function() {
+                    console.error("obj_save_error");
+                    return res.error('obj_save_error');
+                  }
+                });
+              },
+              error: function(error) {
+                console.error('joinClasses_not_saved');
+                return res.error('joinClasses_not_saved');
+              }
+            });
+          },
+          error: function(error) {
+            console.error("profiles_not_saved");
+            return res.error('profiles_not_saved');
+          }
+        });
       }, function(error) {
         console.error("role_query_error");
         return res.error('role_query_error');
-      }).then(function() {
-        var joinClassSaves;
-
-        joinClassSaves = new Array();
-        _.each(arguments, function(profile) {
-          var newJoinClass, user;
-
-          user = profile.get("user");
-          newJoinClass = new Parse.Object(joinClassName).set({
-            property: property,
-            network: network,
-            unit: leaseOrInquiry.get("unit"),
-            listing: leaseOrInquiry.get("listing"),
-            status: user && user.id === req.user.id ? 'current' : status,
-            profile: profile,
-            accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb",
-            ACL: joinClassACL
-          });
-          newJoinClass.set(className.toLowerCase(), {
-            __type: "Pointer",
-            className: className,
-            objectId: leaseOrInquiry.id
-          });
-          return joinClassSaves.push(newJoinClass);
-        });
-        return Parse.Object.saveAll(joinClassSaves);
-      }, function() {
-        console.error("profiles_not_saved");
-        return res.error('profiles_not_saved');
-      }).then(function() {
-        var objsToSave;
-
-        objsToSave = new Array();
-        _.each(arguments, function(joinClass) {
-          var notification, notificationACL, profile, user;
-
-          profile = joinClass.get("profile");
-          user = profile.get("user");
-          if (!(user && user.id === req.user.id)) {
-            notificationACL = new Parse.ACL();
-            if (user) {
-              notificationACL.setReadAccess(user.id, true);
-              notificationACL.setWriteAccess(user.id, true);
-            } else {
-              Mandrill.sendEmail({
-                message: {
-                  subject: "You have been invited to try CleverTower",
-                  text: "Hello World!",
-                  from_email: "parse@cloudcode.com",
-                  from_name: "Cloud Code",
-                  to: [
-                    {
-                      email: profile.get("email"),
-                      name: profile.get("email")
-                    }
-                  ]
-                },
-                async: true
-              }, {
-                success: function(httpres) {
-                  return {
-                    error: function(httpres) {}
-                  };
-                }
-              });
-            }
-            notification = new Parse.Object("Notification").set({
-              text: "You have been invited to join " + title,
-              channels: ["profiles-" + profile.id],
-              channel: "profiles-" + profile.id,
-              name: "" + (className.toLowerCase()) + "_invitation",
-              forMgr: false,
-              withAction: true,
-              subject: property.get("profile"),
-              object: profile,
-              email: profile.get("email"),
-              property: property,
-              network: network,
-              ACL: notificationACL
-            });
-            notification.set(joinClassName.toLowerCase(), joinClass);
-            return objsToSave.push(notification);
-          }
-        });
-        return Parse.Object.saveAll(objsToSave);
-      }, function() {
-        return res.error('joinClasses_not_saved');
-      }).then(function() {
-        var roleSaves;
-
-        roleSaves = [];
-        if (className === "Lease") {
-          if (propRole) {
-            roleSaves.push(propRole);
-          }
-          if (tntRole) {
-            roleSaves.push(tntRole);
-          }
-        }
-        return Parse.Object.saveAll(roleSaves);
-      }, function(error) {
-        console.error('signup_error');
-        return res.error('signup_error');
-      }).then(function() {
-        return res.success(leaseOrInquiry);
-      }, function(error) {
-        console.error("role_save_error");
-        return res.error('role_save_error');
       });
     }, function(error) {
       console.error("bad_query");
@@ -519,145 +533,142 @@
     Mandrill.initialize('rE7-kYdcFOw7SxRfCfkVzQ');
     Parse.Cloud.useMasterKey();
     status = 'invited';
-    return (new Parse.Query("Network")).include('vstRole').get(req.params.networkId, {
-      success: function(network) {
-        var joinClassACL, joinClassName, joinClasses, title, vstRole, vstRoleUsers;
+    return (new Parse.Query("Network")).include('vstRole').equalTo("objectId", req.params.networkId).first().then(function(network) {
+      var joinClassACL, joinClassName, joinClasses, title, vstRole, vstRoleUsers;
 
-        vstRole = network.get("vstRole");
-        title = network.get("title");
-        joinClassName = "Manager";
-        joinClassACL = new Parse.ACL;
-        joinClassACL.setRoleRoleAccess(netRole, true);
-        joinClassACL.setRoleWriteAccess(netRole, true);
-        joinClasses = void 0;
-        vstRoleUsers = vstRole.getUsers();
-        (new Parse.Query("Profile")).include("user").containedIn("email", emails).find().then(function(profiles) {
-          var email, foundProfile, newProfile, newProfileSaves, profileACL, _i, _len;
+      vstRole = network.get("vstRole");
+      title = network.get("title");
+      joinClassName = "Manager";
+      joinClassACL = new Parse.ACL;
+      joinClassACL.setRoleRoleAccess(netRole, true);
+      joinClassACL.setRoleWriteAccess(netRole, true);
+      joinClasses = void 0;
+      vstRoleUsers = vstRole.getUsers();
+      return (new Parse.Query("Profile")).include("user").containedIn("email", emails).find();
+    }, function() {
+      return res.error("bad_query");
+    }).then(function(profiles) {
+      var email, foundProfile, newProfile, newProfileSaves, profileACL, _i, _len;
 
-          profileACL = new Parse.ACL;
-          profileACL.setPublicReadAccess(true);
-          profileACL.setPublicWriteAccess(true);
-          newProfileSaves = new Array();
-          for (_i = 0, _len = emails.length; _i < _len; _i++) {
-            email = emails[_i];
-            foundProfile = false;
-            foundProfile = _.find(profiles, function(profile) {
-              if (email === profile.get("email")) {
-                return profile;
-              }
-            });
-            if (foundProfile) {
-              newProfileSaves.push(foundProfile);
-            } else {
-              newProfile = new Parse.Object("Profile").set({
-                email: email,
-                ACL: profileACL
-              });
-              newProfileSaves.push(newProfile);
-            }
+      profileACL = new Parse.ACL;
+      profileACL.setPublicReadAccess(true);
+      profileACL.setPublicWriteAccess(true);
+      newProfileSaves = new Array();
+      for (_i = 0, _len = emails.length; _i < _len; _i++) {
+        email = emails[_i];
+        foundProfile = false;
+        foundProfile = _.find(profiles, function(profile) {
+          if (email === profile.get("email")) {
+            return profile;
           }
-          return Parse.Object.saveAll(newProfileSaves).then(function() {
-            var joinClassSaves;
-
-            joinClassSaves = new Array();
-            _.each(arguments, function(profile) {
-              var myJoinClassACL, newJoinClass, user;
-
-              user = profile.get("user");
-              myJoinClassACL = joinClassACL;
-              if (user) {
-                myJoinClassACL.setRoleAccess(user, true);
-                myJoinClassACL.setReadAccess(user.id, true);
-              }
-              newJoinClass = new Parse.Object(joinClassName).set({
-                network: network,
-                status: user && user.id === req.user.id ? 'current' : status,
-                profile: profile,
-                accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb",
-                ACL: myJoinClassACL
-              });
-              return joinClassSaves.push(newJoinClass);
-            });
-            return Parse.Object.saveAll(joinClassSaves);
-          }, function() {
-            return res.error('profiles_not_saved');
-          }).then(function() {
-            var joinClass, notification, notificationACL, objsToSave, profile, user, _j, _len1;
-
-            joinClasses = arguments;
-            objsToSave = new Array();
-            for (_j = 0, _len1 = joinClasses.length; _j < _len1; _j++) {
-              joinClass = joinClasses[_j];
-              profile = joinClass.get("profile");
-              user = profile.get("user");
-              if (!(user && user.id === req.user.id)) {
-                notificationACL = new Parse.ACL();
-                if (user) {
-                  notificationACL.setReadAccess(user.id, true);
-                  notificationACL.setReadAccess(user.id, true);
-                  vstRoleUsers.add(user);
-                } else {
-                  Mandrill.sendEmail({
-                    message: {
-                      subject: "You have been invited to try CleverTower",
-                      text: "Hello World!",
-                      from_email: "parse@cloudcode.com",
-                      from_name: "Cloud Code",
-                      to: [
-                        {
-                          email: profile.get("email"),
-                          name: profile.get("email")
-                        }
-                      ]
-                    },
-                    async: true
-                  }, {
-                    success: function(httpres) {
-                      return {
-                        error: function(httpres) {}
-                      };
-                    }
-                  });
-                }
-                notification = new Parse.Object("Notification").set({
-                  text: "You have been invited to join " + title,
-                  channels: ["profiles-" + profile.id],
-                  channel: "profiles-" + profile.id,
-                  name: "network_invitation",
-                  forMgr: false,
-                  withAction: true,
-                  subject: network.get("profile"),
-                  object: profile,
-                  email: email,
-                  network: network,
-                  manager: joinClass,
-                  ACL: notificationACL
-                });
-                objsToSave.push(notification);
-              }
-            }
-            return Parse.Object.saveAll(objsToSave);
-          }, function() {
-            return res.error('joinClasses_not_saved');
-          }).then(function() {
-            return vstRole.save();
-          }, function(error) {
-            return res.error('signup_error');
-          }).then(function() {
-            return res.success(joinClasses);
-          }, function(error) {
-            return res.error('signup_error');
-          });
         });
-        return {
-          error: function() {
-            return res.error("bad_query");
-          }
-        };
-      },
-      error: function() {
-        return res.error("bad_query");
+        if (foundProfile) {
+          newProfileSaves.push(foundProfile);
+        } else {
+          newProfile = new Parse.Object("Profile").set({
+            email: email,
+            ACL: profileACL
+          });
+          newProfileSaves.push(newProfile);
+        }
       }
+      return Parse.Object.saveAll(newProfileSaves, {
+        success: function(newProfiles) {
+          var joinClassSaves, myJoinClassACL, newJoinClass, profile, user, _j, _len1;
+
+          joinClassSaves = new Array();
+          for (_j = 0, _len1 = newProfiles.length; _j < _len1; _j++) {
+            profile = newProfiles[_j];
+            user = profile.get("user");
+            myJoinClassACL = joinClassACL;
+            if (user) {
+              myJoinClassACL.setRoleAccess(user, true);
+              myJoinClassACL.setReadAccess(user.id, true);
+            }
+            newJoinClass = new Parse.Object(joinClassName).set({
+              network: network,
+              status: user && user.id === req.user.id ? 'current' : status,
+              profile: profile,
+              accessToken: "AZeRP2WAmbuyFY8tSWx8azlPEb",
+              ACL: myJoinClassACL
+            });
+            joinClassSaves.push(newJoinClass);
+          }
+          return Parse.Object.saveAll(joinClassSaves, {
+            success: function(joinClasses) {
+              var joinClass, notification, notificationACL, objsToSave, _k, _len2;
+
+              objsToSave = new Array(vstRole);
+              for (_k = 0, _len2 = joinClasses.length; _k < _len2; _k++) {
+                joinClass = joinClasses[_k];
+                profile = joinClass.get("profile");
+                user = profile.get("user");
+                if (!(user && user.id === req.user.id)) {
+                  notificationACL = new Parse.ACL();
+                  if (user) {
+                    notificationACL.setReadAccess(user.id, true);
+                    notificationACL.setReadAccess(user.id, true);
+                    vstRoleUsers.add(user);
+                  } else {
+                    Mandrill.sendEmail({
+                      message: {
+                        subject: "You have been invited to try CleverTower",
+                        text: "Hello World!",
+                        from_email: "parse@cloudcode.com",
+                        from_name: "Cloud Code",
+                        to: [
+                          {
+                            email: profile.get("email"),
+                            name: profile.get("email")
+                          }
+                        ]
+                      },
+                      async: true
+                    }, {
+                      success: function(httpres) {
+                        return {
+                          error: function(httpres) {}
+                        };
+                      }
+                    });
+                  }
+                  notification = new Parse.Object("Notification").set({
+                    text: "You have been invited to join " + title,
+                    channels: ["profiles-" + profile.id],
+                    channel: "profiles-" + profile.id,
+                    name: "network_invitation",
+                    forMgr: false,
+                    withAction: true,
+                    subject: network.get("profile"),
+                    object: profile,
+                    email: email,
+                    network: network,
+                    manager: joinClass,
+                    ACL: notificationACL
+                  });
+                  objsToSave.push(notification);
+                }
+              }
+              return Parse.Object.saveAll(objsToSave, {
+                success: function() {
+                  return res.success(joinClasses);
+                },
+                error: function(error) {
+                  return res.error('save_error');
+                }
+              });
+            },
+            error: function(error) {
+              return res.error('profiles_not_saved');
+            }
+          });
+        },
+        error: function(error) {
+          return res.error('joinClasses_not_saved');
+        }
+      });
+    }, function(error) {
+      return res.error("bad_query");
     });
   });
 
@@ -815,12 +826,15 @@
         role = new Parse.Role(current, networkACL);
         vstRole = new Parse.Role(visit, networkACL);
         role.getUsers().add(req.user);
-        return Parse.Object.saveAll([role, vstRole]).then(function() {
-          req.object.set("role", role);
-          req.object.set("vstRole", vstRole);
-          return res.success();
-        }, function() {
-          return res.error("role_error");
+        return Parse.Object.saveAll([role, vstRole], {
+          success: function() {
+            req.object.set("role", role);
+            req.object.set("vstRole", vstRole);
+            return res.success();
+          },
+          errror: function() {
+            return res.error("role_error");
+          }
         });
       } else {
         isPublic = req.object.get("public");
@@ -913,25 +927,29 @@
             if (!req.object.get("profile")) {
               objsToSave.unshift(new Parse.Object("Profile").set("name", req.object.get("thoroughfare")));
             }
-            return Parse.Object.saveAll(objsToSave).then(function(profile) {
-              var propertyACL;
+            return Parse.Object.saveAll(objsToSave, {
+              success: function(list) {
+                var profile, propertyACL;
 
-              propertyACL = roleACL;
-              propertyACL.setPublicReadAccess(true);
-              req.object.set({
-                "public": true,
-                user: req.user,
-                role: role,
-                mgrRole: mgrRole,
-                network: network,
-                ACL: propertyACL
-              });
-              if (!req.object.get("profile")) {
-                req.object.set("profile", profile);
+                profile = list[0];
+                propertyACL = roleACL;
+                propertyACL.setPublicReadAccess(true);
+                req.object.set({
+                  "public": true,
+                  user: req.user,
+                  role: role,
+                  mgrRole: mgrRole,
+                  network: network,
+                  ACL: propertyACL
+                });
+                if (!req.object.get("profile")) {
+                  req.object.set("profile", profile);
+                }
+                return res.success();
+              },
+              error: function() {
+                return res.error("role_error");
               }
-              return res.success();
-            }, function() {
-              return res.error("role_error");
             });
           },
           error: function() {
@@ -961,24 +979,28 @@
             ACL: propertyACL
           }));
         }
-        return Parse.Object.saveAll(objsToSave).then(function(profile) {
-          var propertyACL;
+        return Parse.Object.saveAll(objsToSave, {
+          success: function(list) {
+            var profile, propertyACL;
 
-          propertyACL = roleACL;
-          propertyACL.setPublicReadAccess(true);
-          req.object.set({
-            "public": true,
-            user: req.user,
-            role: role,
-            mgrRole: mgrRole,
-            ACL: propertyACL
-          });
-          if (!req.object.get("profile")) {
-            req.object.set("profile", profile);
+            profile = list[0];
+            propertyACL = roleACL;
+            propertyACL.setPublicReadAccess(true);
+            req.object.set({
+              "public": true,
+              user: req.user,
+              role: role,
+              mgrRole: mgrRole,
+              ACL: propertyACL
+            });
+            if (!req.object.get("profile")) {
+              req.object.set("profile", profile);
+            }
+            return res.success();
+          },
+          error: function() {
+            return res.error("role_error");
           }
-          return res.success();
-        }, function() {
-          return res.error("role_error");
         });
       }
     } else {
@@ -1009,8 +1031,13 @@
               }
             }
           }
-          return Parse.Object.saveAll(objsToSave).then(function() {
-            return res.success();
+          return Parse.Object.saveAll(objsToSave, {
+            success: function() {
+              return res.success();
+            },
+            error: function() {
+              return res.error("bad_save");
+            }
           });
         }, function() {
           return res.error("bad_query");
@@ -1296,11 +1323,14 @@
           }
           role = new Parse.Role(current, leaseACL);
           objsToSave.push(role);
-          return Parse.Object.saveAll(objsToSave).then(function() {
-            req.object.set("role", role);
-            return res.success();
-          }, function() {
-            return res.error("role_error");
+          return Parse.Object.saveAll(objsToSave, {
+            success: function() {
+              req.object.set("role", role);
+              return res.success();
+            },
+            error: function(error) {
+              return res.error("role_error");
+            }
           });
         },
         error: function() {
@@ -1667,13 +1697,16 @@
               }
               req.object.set("status", newStatus);
             }
-            return Parse.Object.saveAll(objsToSave);
+            return Parse.Object.saveAll(objsToSave, {
+              success: function() {
+                return res.success();
+              },
+              error: function(error) {
+                return res.error("bad_save");
+              }
+            });
           }, function() {
             return res.error("bad_query");
-          }).then(function() {
-            return res.success();
-          }, function() {
-            return res.error("bad_save");
           });
         } else {
           return res.error("no matching role");
@@ -1784,13 +1817,16 @@
             }
             req.object.set("status", newStatus);
           }
-          return Parse.Object.saveAll(objsToSave);
+          return Parse.Object.saveAll(objsToSave, {
+            success: function() {
+              return res.success();
+            },
+            error: function(error) {
+              return res.error("bad_save");
+            }
+          });
         }, function() {
           return res.error("bad_query");
-        }).then(function() {
-          return res.success();
-        }, function() {
-          return res.error("bad_save");
         });
       },
       error: function() {
@@ -1905,13 +1941,16 @@
             }
             req.object.set("status", newStatus);
           }
-          return Parse.Object.saveAll(objsToSave);
+          return Parse.Object.saveAll(objsToSave, {
+            success: function() {
+              return res.success();
+            },
+            error: function(error) {
+              return res.error("bad_save");
+            }
+          });
         }, function() {
           return res.error("bad_query");
-        }).then(function() {
-          return res.success();
-        }, function() {
-          return res.error("bad_save");
         });
       },
       error: function() {

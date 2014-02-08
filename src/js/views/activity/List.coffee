@@ -82,8 +82,8 @@ define [
           @$(".likers").removeClass("active")
           @$(".like-button").text i18nCommon.actions.like
           @liked = false
-          Parse.Object.saveAll [@model, Parse.User.current().get("profile")]
-          @clear() if @currentProfile
+          Parse.Object.saveAll [@model, Parse.User.current().get("profile")],
+          success: => @clear() if @currentProfile
         else
           likes = @model.get "likeCount"
           @markAsLiked()

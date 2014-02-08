@@ -110,7 +110,7 @@ define [
     
     # URL friendly title
     publicUrl: -> "/places/#{@country()}/#{@get("administrative_area_level_1")}/#{@get("locality")}/#{@id}/#{@slug()}"
-    slug: -> @get("profile").name().replace(/\s+/g, '-').toLowerCase()
+    slug: -> @get("profile").slug()
     country: -> i18nCommon.countries[@get("country")]
 
     city: -> 
