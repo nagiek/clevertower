@@ -23,10 +23,10 @@ define [
 
       @listenTo Parse.Dispatcher, "user:loginEnd", ->
 
-      # Reload the current path. 
-      # Don't use navigate, as it will fail.
-      # The route functions themselves are responsible for altering content.
-      Parse.history.loadUrl location.pathname
+        # Reload the current path. 
+        # Don't use navigate, as it will fail.
+        # The route functions themselves are responsible for altering content.
+        Parse.history.loadUrl location.pathname
 
     # typeahead widget takes care of navigation.
     doNothing : (e) -> e.preventDefault()
