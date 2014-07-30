@@ -493,11 +493,11 @@ Parse.Cloud.define "AddTenants", (req, res) ->
                 ACL: notificationACL
               notification.set joinClassName.toLowerCase(), joinClass
 
-              objsToSaves.push notification
+              objsToSave.push notification
 
           if className is "Lease"
-            objsToSaves.push propRole if propRole
-            objsToSaves.push tntRole if tntRole
+            objsToSave.push propRole if propRole
+            objsToSave.push tntRole if tntRole
             
           Parse.Object.saveAll objsToSave, 
           success: -> res.success leaseOrInquiry

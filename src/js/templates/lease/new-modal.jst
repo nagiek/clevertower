@@ -2,7 +2,7 @@
   <div class="modal-content">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-labelledby="edit-profile-picture-modal-label" aria-hidden="true">&times;</button>
-      <h3 id="edit-profile-picture-modal-label" class="modal-title"><%= i18nCommon.actions.live_at %> <em><%= title %></em></h3>
+      <h3 id="edit-profile-picture-modal-label" class="modal-title"><%= i18nCommon.actions.add_your_lease_at %> <em><%= title %></em></h3>
     </div>
     <div class="modal-body">
       <%= JST["src/js/templates/lease/form.jst"]({emails: emails, isNew: true, lease: lease, dates: dates, unit: unit, moment: moment, i18nCommon: i18nCommon, i18nUnit: i18nUnit, i18nLease: i18nLease}) %>

@@ -479,15 +479,15 @@
                       ACL: notificationACL
                     });
                     notification.set(joinClassName.toLowerCase(), joinClass);
-                    objsToSaves.push(notification);
+                    objsToSave.push(notification);
                   }
                 }
                 if (className === "Lease") {
                   if (propRole) {
-                    objsToSaves.push(propRole);
+                    objsToSave.push(propRole);
                   }
                   if (tntRole) {
-                    objsToSaves.push(tntRole);
+                    objsToSave.push(tntRole);
                   }
                 }
                 return Parse.Object.saveAll(objsToSave, {

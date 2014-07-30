@@ -29,8 +29,6 @@ define [
         contentType: false
         success: (data) ->
           
-          console.log data
-          
           # save result from Parse local storage, so we can use it later
           localStorage.setItem "parse_file_name", data.name
           localStorage.setItem "parse_url", data.url

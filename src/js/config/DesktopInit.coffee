@@ -486,9 +486,10 @@ require [
   _.str = _String
   
   # Always include these headers, unless otherwise noted.
-  $.ajaxSetup beforeSend: (jqXHR, settings) ->
-    jqXHR.setRequestHeader "X-Parse-Application-Id", window.APPID
-    jqXHR.setRequestHeader "X-Parse-REST-API-Key", window.RESTAPIKEY
+  if window isnt undefined and window.$ then
+    $.ajaxSetup beforeSend: (jqXHR, settings) ->
+      jqXHR.setRequestHeader "X-Parse-Application-Id", window.APPID
+      jqXHR.setRequestHeader "X-Parse-REST-API-Key", window.RESTAPIKEY
 
   # init the FB JS SDK
   Parse.FacebookUtils.init

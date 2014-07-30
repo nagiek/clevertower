@@ -344,7 +344,6 @@ define [
 
         Parse.User.current().get("profile").increment likesCount: -1
         Parse.User.current().get("profile").relation("likes").add model
-        # Adding to a relation will somehow add to collection..?
         Parse.User.current().get("profile").likes.add model
         
         unless undo 

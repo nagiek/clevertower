@@ -70,7 +70,7 @@ define
     leave:                              "Leave"
     apply:                              "Apply"
     select:                             "Select"
-    live_at:                            "Live at"
+    add_your_lease_at:                  "Add your lease at"
     revoke_access:                      "Revoke access"
     confirm:                            "Confirm"
     accept:                             "Accept"

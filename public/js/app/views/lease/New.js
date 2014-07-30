@@ -75,7 +75,6 @@
               return i18nCommon.errors.unknown;
             }
           }).call(_this);
-          console.log(msg);
           new Alert({
             event: 'model-save',
             fade: false,
